@@ -1,0 +1,116 @@
+def load():
+    import es
+    import cfglib
+    config = cfglib.AddonCFG('%s/cfg/gungame51/gg_map_vote.cfg' %es.ServerVar('eventscripts_gamedir'))
+
+    config.text('*'*70)
+    config.text('*               gg_map_vote.cfg -- Map Voting Options                *')
+    config.text('*                                                                    *')
+    config.text('*         This file contains the settings for "gg_map_vote".         *')
+    config.text('*                                                                    *')
+    config.text('*  Note: Any alteration of this file requires a server restart or a  *')
+    config.text('*        reload of GunGame.                                          *')
+    config.text('*'*70)
+    config.text('')
+    config.text('')
+    
+    config.write()
+    es.dbgmsg(0, '\tgg_map_vote.cfg')
+    
+'''
+//----------------------------------------------------------------------------
+// gg_map_vote.cfg -- Holds map voting options.
+//
+// This file contains the settings for "gg_map_vote".
+//
+// Note: Any alteration of this file requires a server restart or a reload of
+//       GunGame.
+//----------------------------------------------------------------------------
+
+//=========================================================
+// MAP VOTE SIZE
+//=========================================================
+// This variable controls the number of maps that will be displayed as options
+// in the vote menu.
+//
+// Options: 0 = Entire map list.
+//          <options> = Show <options>.
+
+gg_map_vote_size 4
+
+//=========================================================
+// TRIGGER LEVEL
+//=========================================================
+// This variable controls what level the GunGame Vote is fired on. The value
+// will be subtracted from the total number of levels.
+//
+// Therefore, if there are 23 levels, and "gg_vote_trigger" is set to "3",
+// voting will start on level 20.
+
+gg_vote_trigger 3
+
+//=========================================================
+// MAP LIST SOURCE
+//=========================================================
+// This variable controls which map list that will be used to build the vote
+// menu.
+//
+// Options: 1 = mapcycle.txt
+//          2 = maplist.txt
+//          3 = "gg_map_list_file" variable
+//          4 = "maps" folder
+
+gg_map_list_source 1
+
+//=========================================================
+// MAP LIST FILE
+//=========================================================
+// This variable does not need to changed, unless the above variable is set to
+// 3.
+//
+// This variable will hold a custom maplist that you would like to use with
+// gg_map_vote.
+
+gg_map_list_file "cfg/gungame5/gg_maplist.txt"
+
+//=========================================================
+// VOTE TIME
+//=========================================================
+// This variable controls how long the vote will last for.
+//
+// Note: If no votes are taken within the set time, the next map will be the
+//       next one in the map list file.
+
+gg_vote_time 30
+
+//=========================================================
+// EXCLUDE RECENTLY PLAYED MAPS
+//=========================================================
+// This variable will exclude the selected number of recently played maps
+// from the vote menu.
+
+gg_dont_show_last_maps 1
+
+//=========================================================
+// SHOW PLAYER VOTES
+//=========================================================
+// This variable controls if votes will be publically announced.
+//
+// Example: Saul voted for cs_office
+//          RideGuy voted for de_dust2
+//
+// Options: 0 = Off
+//          1 = On
+
+gg_show_player_vote 1
+
+//=========================================================
+// BOTS VOTE
+//=========================================================
+// This variable controls whether or not bots will randomly vote for a map.
+//
+// Options: 0 = Off
+//          1 = On
+
+gg_vote_bots_vote 0
+'''

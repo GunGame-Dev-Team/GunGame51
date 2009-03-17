@@ -1,0 +1,20 @@
+/gungame
+    ./core
+        __init__.py
+        ./cfg
+            ./files (from core.cfg.files import *)
+                __init__.py
+                gg_en_config.py
+                gg_map_vote.py
+                gg_default_addons.py
+        ./addons (from core.addons import addons)
+            addons.py
+        ./events (from core.events import events)
+            events.py
+            ./data
+                es_gungame_events.res
+    ./scripts (from scripts.included import scriptname)
+        ./included
+            *.py
+        ./custom
+            *.py

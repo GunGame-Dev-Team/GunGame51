@@ -1,0 +1,484 @@
+def load():
+    import es
+    import cfglib
+    config = cfglib.AddonCFG('%s/cfg/gungame51/gg_default_addons.cfg' %es.ServerVar('eventscripts_gamedir'))
+
+    config.text('*'*70)
+    config.text('*        gg_default_addons.cfg -- Default Addon Configuration        *')
+    config.text('*                                                                    *')
+    config.text('*              This file defines GunGame Addon settings.             *')
+    config.text('*                                                                    *')
+    config.text('*  Note: Any alteration of this file requires a server restart or a  *')
+    config.text('*        reload of GunGame.                                          *')
+    config.text('*'*70)
+    config.text('')
+    config.text('')
+    
+    config.write()
+    es.dbgmsg(0, '\tgg_default_addons.cfg')
+    
+'''
+//----------------------------------------------------------------------------
+// gg_default_addons.cfg -- Default addon configuration.
+//
+// This file defines GunGame Addon settings. Any alteration of this file
+// requires a server restart or a reload of GunGame.
+//----------------------------------------------------------------------------
+
+//=========================================================
+// ERROR LOGGING
+//=========================================================
+// When enabled, this addon logs all GunGame-related errors to a log file
+// located in:
+//
+//  * addons/eventscripts/gungame/logs/
+//
+// Note: If something in GunGame is not working and you are going to post a
+//       bug, make sure you enable this addon then post the error log when
+//       you are filing your bug report.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_error_logging 1
+
+//=========================================================
+// KNIFE PRO
+//=========================================================
+// When enabled, if you kill a player with a knife, you will level up,
+// and the victim will level down.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_knife_pro 0
+
+//=========================================================
+// KNIFE PRO LEVEL LIMIT
+//=========================================================
+// Set this to limit level stealing to players close to your own level
+//
+// Example: If this is set to 3, you will not gain a level if you knife
+//          someone more than 3 levels below you.
+//
+// Options: 0 = Disabled
+//          <level> = Enabled
+
+gg_knife_pro_limit 10
+
+//=========================================================
+// KNIFE ROOKIE
+//=========================================================
+// Similar to gg_knife_pro but not as strict:
+//
+// The attacker will level up even when the victim is on level 1.
+// The attacker will level up even though the victim cannot leveldown.
+// The victim will level down even though the attacker cannot levelup.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_knife_rookie 0
+
+//=========================================================
+// MULTI LEVEL
+//=========================================================
+// Set the below variable to the number of times a player has to level
+// up prior to recieving the multi-level bonus.
+//
+// Note: Formally knows as Triple Level Bonus.
+//
+// Options: 0 = Disabled
+//          # = The number of kills in a row the player must get in order
+//              to recieve the multi-level bonus.
+
+gg_multi_level 0
+
+//=========================================================
+// TURBO
+//=========================================================
+// This gives you your next weapon immediately when you levelup
+//
+// Note: Knife Elite automatically disables Turbo Mode.
+// Note: Recommended for Deathmatch
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_turbo 0
+
+//=========================================================
+// NOBLOCK
+//=========================================================
+// Makes it possible to move through players.
+//
+// Note: Recommended for Surf servers
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_noblock 0
+
+//=========================================================
+// DEAD STRIP
+//=========================================================
+// Strip dead players weapons so that their weapons can't be picked up.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_dead_strip 0
+
+//=========================================================
+// KNIFE ELITE
+//=========================================================
+// After a player levels up, they only get a knife until the next round.
+//
+// Note: This will override Turbo mode!
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_knife_elite 0
+
+//=========================================================
+// EARN GRENADES
+//=========================================================
+// When a player reaches grenade level, they can earn extra grenades by
+// killing enemies with another weapon.
+//
+// Note: Players can only carry one hegrenade at a time.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_earn_nade 0
+
+//=========================================================
+// UNLIMITED GRENADES
+//=========================================================
+// When a player reaches grenade level, they are given another grenade when
+// their thrown grenade detonates.
+//
+// Note: This will automatically disable the "Earn grenades" addon.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_unl_grenade 0
+
+//=========================================================
+// GRENADE BONUS
+//=========================================================
+// If this is set, players on grenade level will receive this weapon along
+// with the hegrenade.
+//
+// Note: Set this to zero to disable this function.
+// Note: You can have multiple weapons by seperating them with commas.
+// 
+// Example: gg_nade_bonus flashbang,glock,smokegrenade
+// Example: gg_nade_bonus glock
+//
+// Options: 0 = Disabled
+//         <weapon name> = Enabled
+
+gg_nade_bonus 0
+
+//=========================================================
+// RELOAD
+//=========================================================
+// When a player makes a kill the ammo in their clip is replenished.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_reload 0
+
+//=========================================================
+// FRIENDLY FIRE
+//=========================================================
+// Automatically turn on friendly fire when a player reaches "x" levels
+// below the last level (+1)
+//
+// Example: gg_friendlyfire 1
+//          => The above will turn on friendly fire when a player reaches the
+//             last level.
+//
+// Example: gg_friendlyfire 2
+//          => The above will turn on friendly fire when a player reaches one
+//             level before the last.
+//
+// Options: 0 = Disabled
+//          <level> = Enabled
+
+gg_friendlyfire 0
+
+//=========================================================
+// STATS DATABASE AND COMMANDS
+//=========================================================
+// This variable controls whether you want to keep track of winners on your
+// server.  This also enables the stat commands (!leader, !top, !rank, etc).
+//
+// Note: This will save a file to the server and requires appropiate read /
+//       write permissions.
+//
+// Note: This feature does not work on game-servers.com and clan-servers.com
+//       game servers.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_stats 0
+
+//=========================================================
+// STATS DATABASE PRUNE
+//=========================================================
+// This variable controls how many days of inactivity for a winner is
+// tolerated until they are removed from the database.
+//
+// Options: 0 = Disabled (not recommended for large servers)
+//          <days> = Enabled
+
+gg_prune_database 30
+
+//=========================================================
+// STATS LOGGING
+//=========================================================
+// When enabled, this addon will log game events for stats tracking for
+// HLstatsX and Psychostats, etc.
+//
+// Note: Other options available in "stats logging.txt".
+// Note: This should be used with third-party stats programs.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_stats_logging 0
+
+//=========================================================
+// SPAWNPOINT MANAGER
+//=========================================================
+// When enabled it will load random spawnpoints if a spawnpoint file for the
+// current map has been created.  This addon also adds commands and a menu
+// to allow admins to manage spawnpoints on the current map.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_spawnpoints 0
+
+//=========================================================
+// DEATHMATCH
+//=========================================================
+// When enabled, this addon emulates a team-deathmatch mode, and players will
+// respawn when they die.
+//
+// Note: This addon enables: Turbo Mode.
+// Note: This addon disables: Knife Elite, Elimination.
+// Note: This addon disables: map objectives, freezetime and roundtime.
+// Note: This addon requires usage of the "gg_respawn_cmd" found in the
+//       gg_en_config.cfg
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_deathmatch 0
+
+//=========================================================
+// DEATHMATCH RESPAWN DELAY
+//=========================================================
+// This is a delay after a player dies before they will respawn.
+//
+// Default value: 2
+
+gg_dm_respawn_delay 2
+
+//=========================================================
+// SPAWN PROTECTION
+//=========================================================
+// Set this to the number of seconds to allow spawn protection, in which they
+// will be immune to other players fire but cannot levelup if they kill a
+// player.
+//
+// Options: 0 = Disabled
+//          <seconds> = Enabled
+
+gg_spawn_protect 0
+
+//=========================================================
+// SPAWN PROTECTION COLORS
+//=========================================================
+// Set player color while under spawn protection.
+//
+// Default values:
+//  Red: 255
+//  Green: 255
+//  Blue: 255
+//  Alpha: 150
+
+gg_spawn_protect_red 255
+gg_spawn_protect_green 255
+gg_spawn_protect_blue 255
+gg_spawn_protect_alpha 150
+
+//=========================================================
+// SPAWN PROTECTION "CANCEL-ON-FIRE"
+//=========================================================
+// If set to 1, when a player shoots when they are protected, the
+// unprotection timer will stop and they will instantly become
+// unprotected and able to level up.
+//
+// Note: Uses eventscripts_noisy, this may cause lag.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_spawn_protect_cancelonfire 0
+
+//=========================================================
+// ALLOW LEVELLING WHILST PROTECTED
+//=========================================================
+// When enabled, players can level up whilst spawn protected.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_spawn_protect_can_level_up 0
+
+//=========================================================
+// DISSOLVER
+//=========================================================
+// Removes ragdolls by dissolving them with various effects.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_dissolver 0
+
+//=========================================================
+// DISSOLVER EFFECT
+//=========================================================
+// This what type of effect that will happen upon the ragdoll.
+//
+// Options: 0 = No effect
+//          1 = Energy
+//          2 = Heavy electrical
+//          3 = Light electrical
+//          4 = Core Effect
+//          5 = Random Effect
+//
+// Default value: 5
+
+gg_dissolver_effect 5
+
+//=========================================================
+// ELIMINATION
+//=========================================================
+// Elimination is an alternative to an all out deathmatch. You respawn
+// when your killer is killed.
+//
+// Note: This addon enables: Turbo Mode.
+// Note: This addon disables: Knife Elite and Deathmatch.
+// Note: This addon disables: map objectives.
+// Note: This addon requires usage of the "gg_respawn_cmd" found in the gg_en_config.cfg
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_elimination 0
+
+//=========================================================
+// HANDICAP
+//=========================================================
+// Handicap helps newly connected players by adjusting their level.
+//
+// Options: 0 = Disabled
+//          1 = Set player to the lowest level player other than themself.
+//                  (Catch them up if they are behind.)
+//          2 = Set player to median level.
+//          3 = Set player to average level.
+
+gg_handicap 0
+
+//=========================================================
+// HANDICAP UPDATE
+//=========================================================
+// Set this to the number of seconds between handicap checking for players
+// who are below the handicap and increasing their level.
+//
+// Note: If disabled, players are only updated when they join the server.
+// Note: It is recommended you do not update any faster than every 120 seconds.
+//
+// Options: 0 = Check on connect
+//          120 = Check every 2 minutes
+
+gg_handicap_update 0
+
+//=========================================================
+// MAP VOTING
+//=========================================================
+// A map vote will be triggered once a player reaches a preset level below
+// the highest level.
+//
+// Once all human players have voted, the vote is stopped and the winning
+// map is displayed to the players.
+//
+// Note: This vote does not require any other plugin except EventScripts.
+// Note: More map vote options in gg_map_vote.cfg
+//
+// Example: If "gg_vote_trigger" is set to 3, once a player is 3 levels
+//          below the highest level, the vote will trigger.
+//
+// Options: 0 = Disabled
+//          1 = Enabled (GunGame Map Voting)
+//          2 = Third-party voting system (Uses gg_map_vote_command)
+
+gg_map_vote 0
+
+//=========================================================
+// MAP VOTE COMMAND
+//=========================================================
+// If gg_map_vote is set to 2, this is the command that will be issued
+// when the vote is triggered.
+//
+// Examples: Mani: gg_map_vote_command "ma_voterandom end 4"
+//           BeetlesMod: gg_map_vote_command "admin_votemaps"
+//           SourceMod: gg_map_vote_command "sm_map_vote"
+
+gg_map_vote_command "ma_voterandom end 4"
+
+//=========================================================
+// WELCOME MESSAGE
+//=========================================================
+// Show a welcome message to everyone that connects.
+//
+// Note: More options available in the "welcome_msg" folder.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_welcome_msg 0
+
+//=========================================================
+// WELCOME MESSAGE TIMEOUT
+//=========================================================
+// How long until the welcome message dismisses itself.
+//
+// Default value: 5
+//
+// Options: 0 = Never dismiss
+//          <seconds> = Stay up for <seconds>
+
+gg_welcome_msg_timeout 5
+
+//=========================================================
+// CONVERTER
+//=========================================================
+// Allows you to upgrade your current winner database / spawnpoints from
+// previous versions of GunGame (3/4) to GunGame 5 format.
+//
+// Options: 0 = Disabled
+//          1 = Enabled
+
+gg_convert 0
+'''
