@@ -1,55 +1,46 @@
+# ../cstrike/addons/eventscripts/gungame/gungame.py
+
+# ============================================================================
+# >> IMPORTS
+# ============================================================================
+# EventScripts Imports
 import es
 
-def load():
-    testConfigs()
-    testDependencies()
-    testAddonClass()
-    testDependencyDenial()
+# GunGame Imports
+from core.addons.shortcuts import Addon
+from core.addons.shortcuts import getAddon
+from core.addons.shortcuts import getAddons
 
-def testConfigs():
-    # Load, create, and excute all GunGame configs
-    import core.cfg.files
-    reload(core.cfg.files)
-    
-def testDependencies():
-    from core.addons.addons import DependencyManager
-    
-    myAddon = DependencyManager('gg_deathmatch')
-    myAddon.gg_deathmatch = 5
-    if myAddon.gg_deathmatch == 5:
-        es.dbgmsg(0, 'PASSED: Set gg_deathmatch to %s using attributes.' %myAddon.gg_deathmatch)
-    else:
-        es.dbgmsg(0, 'FAILED: Unable to set gg_deathmatch to using attributes.')
-    es.dbgmsg(0, myAddon.gg_deathmatch)
-    
-def testAddonClass():
-    from core.addons.addons import AddonManager
-    
-    myAddon = AddonManager('gg_deathmatch', displayName='Deathmatch', dependencyDict={'gg_turbo':1, 'gg_elimination':0})
-    es.dbgmsg(0, 'Display Name: %s' %myAddon.displayName)
-    
-    from core.addons.addons import DependencyManager
-    
-    myAddon = DependencyManager('gg_deathmatch')
-    
-    es.dbgmsg(0, 'gg_turbo dependency = %s' %myAddon.gg_turbo)
-    es.dbgmsg(0, 'gg_elimination dependency = %s' %myAddon.gg_elimination)
+# ============================================================================
+# >> TEST CODE
+# ============================================================================
+info1 = Addon('example_addon1')
+info1.name = 'example_addon1'
+info1.title = 'Example addon 1' 
+info1.author = 'SuperDave' 
+info1.version = '1.0' 
+info1.requires = ['gg_addon1', 'gg_addon2'] 
+info1.conflicts= ['gg_addon3', 'gg_addon4']
 
-    # Testing Error Code
-    #es.dbgmsg(0, 'gg_knife_pro dependency = %s' %myAddon.gg_knife_pro)
+info2 = Addon('example_addon2')
+info2.name = 'example_addon2'
+info2.title = 'Example addon 2' 
+info2.author = 'XE_ManUp'
+info2.version = '2.0' 
+info2.requires = ['gg_addon1', 'gg_addon2'] 
+info2.conflicts = ['gg_addon3', 'gg_addon4']
+
+es.dbgmsg(0, '')
+for addon in getAddons():
+    es.dbgmsg(0, '%s:' %addon)
+    es.dbgmsg(0, '-'*40)
+    for attribute in getAddons()[addon]:
+        es.dbgmsg(0, '%s = %s' %(attribute, getAddons()[addon][attribute]))
+    es.dbgmsg(0, '-'*40)
+    es.dbgmsg(0, '')
     
-def testDependencyDenial():
-    from core.addons.addons import DependencyManager
-    myAddon = DependencyManager('gg_elimination')
-    
-    from core.addons.addons import dependencies
-    
-    if len(dependencies) == 1:
-        es.dbgmsg(0, 'PASSED: gg_elimination dependencies denied due to prior dependency registration.')
-    else:
-        es.dbgmsg(0, 'FAILED: gg_elimination WAS NOT denied dependency registration.')
-'''
-def server_cvar(event_var):
-    if 'gg_' in event_var['cvarname']:
-        es.dbgmsg(0, '%s = %s' %(event_var['cvarname'], event_var['cvarvalue']))
-'''
+es.dbgmsg(0, getAddon('example_addon2').title)
+es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
+del info2
+es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
+es.dbgmsg(0, getAddon('example_addon2').title)
