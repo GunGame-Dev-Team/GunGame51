@@ -9,8 +9,38 @@ class AddonInfo(dict):
     def __init__(self):
         '''
         Initialize the dictionary and populate it with mandatory
-        information
+        information.
+        
+        NOTE:
+            This class is intended for internal use only.
+        
+        USAGE:
+            from gungame.core.addons import AddonInfo
+        
+            info = AddonInfo()
+        
+            # The addon's name, as if you were unsing es_load
+            info.name = 'example_addon'
+        
+            # The title of the addon, as it would be displayed in a menu
+            # Each word will automatically be capitalized
+            info.title = 'Example addon'
+        
+            # The author's name
+            info.author = 'yournamehere'
+        
+            # The version number
+            info.version = '1.0'
+        
+            # GunGame scripts that are required for your addon to run properly
+            # This MUST be a list
+            info.requires = ['gg_addon1', 'gg_addon2']
+        
+            # GunGame scripts that will conflict with your addon if loaded
+            # This MUST be a list
+            info.conflicts= ['gg_addon3', 'gg_addon4']
         '''
+        
         self.name = ''
         self.title = ''
         self.author = ''
@@ -52,12 +82,30 @@ class AddonInfo(dict):
         
     @staticmethod
     def _getKeyList():
+        '''
+        Return a list of valid attributes.
+        '''
         return ['name', 'title', 'author', 'version', 'requires', 'conflicts']
         
     
 class AddonStorage(dict):
     '''
-    This will contain all instances of AddonInfo() for each addon
+    This will contain all instances of AddonInfo() for each addon.
+    
+    NOTE:
+        This class is intended for internal use only.
+        
+    USAGE:
+        from gungame.core.addons import AddonStorage
+        
+        storage = AddonStorage()
+        storage['example_addon'] = AddonInfo()
+        storage['example_addon']['name'] = 'example_addon'
+        storage['example_addon']['title'] = 'Example Addon'
+        storage['example_addon']['author'] = 'yournamehere'
+        storage['example_addon']['version'] = '1.0'
+        storage['example_addon']['requires'] = ['gg_addon1', 'gg_addon2']
+        storage['example_addon']['conflicts'] = ['gg_addon3', 'gg_addon4']
     '''
     
     def __setattr__(self, addon, instance):
@@ -72,4 +120,5 @@ class AddonStorage(dict):
         '''
         return self[addon]
         
+# Create a dictionary to contain the instance of AddonStorage()
 addonStorage = AddonStorage()
