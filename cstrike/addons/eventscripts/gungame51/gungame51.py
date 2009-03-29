@@ -10,6 +10,10 @@ import es
 from core.addons.shortcuts import Addon
 from core.addons.shortcuts import getAddon
 from core.addons.shortcuts import getAddons
+from core.addons.shortcuts import getAddonType
+from core.addons.shortcuts import addonExists
+from core.addons.shortcuts import loadAddon
+from core.addons.shortcuts import unloadAddon
 
 # ============================================================================
 # >> TEST CODE
@@ -56,4 +60,22 @@ del info2
 es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
 
 # Raise an error by looking up example_addon2's title
-es.dbgmsg(0, getAddon('example_addon2').title)
+#es.dbgmsg(0, getAddon('example_addon2').title)
+
+es.dbgmsg(0, 'gg_deathmatch is of type: %s' %getAddonType('gg_deathmatch'))
+es.dbgmsg(0, 'gg_assist is of type: %s' %getAddonType('gg_assist'))
+
+# Raise an error by looking up an addon that doesn't exist
+#es.dbgmsg(0, 'gg_fake is of type: %s' %getAddonType('gg_fake'))
+
+loadAddon('gg_deathmatch')
+#unloadAddon('gg_deathmatch')
+
+#loadAddon('gg_assist')
+#unloadAddon('gg_assist')
+
+# Print out how many addons we have stored (should be 3)
+es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
+
+#loadAddon('gg_elimination')
+#unloadAddon('gg_elimination')
