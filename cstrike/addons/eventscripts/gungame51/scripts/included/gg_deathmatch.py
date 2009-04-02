@@ -2,14 +2,14 @@
 import es
 
 # GunGame Imports
-from gungame51.core.addons.shortcuts import Addon
+from gungame51.core.addons import AddonInfo
 
 # ============================================================================
 # >> TEST CODE
 # ============================================================================
 
 # Create "example_addon1" and set attributes
-info = Addon('gg_deathmatch')
+info = AddonInfo()
 info.name = 'gg_deathmatch'
 info.title = 'GG Deathmatch' 
 info.author = 'GG Dev Team' 

@@ -7,75 +7,29 @@
 import es
 
 # GunGame Imports
-from core.addons.shortcuts import Addon
-from core.addons.shortcuts import getAddon
-from core.addons.shortcuts import getAddons
-from core.addons.shortcuts import getAddonType
-from core.addons.shortcuts import addonExists
+from core.addons import AddonInfo
+from core.addons import AddonManager
 from core.addons.shortcuts import loadAddon
 from core.addons.shortcuts import unloadAddon
+
 
 # ============================================================================
 # >> TEST CODE
 # ============================================================================
-
-# Create "example_addon1" and set attributes
-info1 = Addon('example_addon1')
-info1.name = 'example_addon1'
-info1.title = 'Example addon 1' 
-info1.author = 'SuperDave' 
-info1.version = '1.0' 
-info1.requires = ['gg_addon1', 'gg_addon2'] 
-info1.conflicts= ['gg_addon3', 'gg_addon4']
-
-# Create "example_addon2" and set attributes
-info2 = Addon('example_addon2')
-info2.name = 'example_addon2'
-info2.title = 'Example addon 2' 
-info2.author = 'XE_ManUp'
-info2.version = '2.0' 
-info2.requires = ['gg_addon1', 'gg_addon2'] 
-info2.conflicts = ['gg_addon3', 'gg_addon4']
-
-# Loop through the addons that we created above and list their attributes
-es.dbgmsg(0, '')
-for addon in getAddons():
-    es.dbgmsg(0, '%s:' %addon)
-    es.dbgmsg(0, '-'*40)
-    for attribute in getAddons()[addon]:
-        es.dbgmsg(0, '%s = %s' %(attribute, getAddons()[addon][attribute]))
-    es.dbgmsg(0, '-'*40)
-    es.dbgmsg(0, '')
-    
-# Test the getAddon() function by looking up example_addon2's title
-es.dbgmsg(0, getAddon('example_addon2').title)
-
-# Print out how many addons we have stored (should be 2)
-es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
-
-# Delete "example_addon2"
-del info2
-
-# Print out how many addons we have stored (should be 1)
-es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
-
-# Raise an error by looking up example_addon2's title
-#es.dbgmsg(0, getAddon('example_addon2').title)
-
-es.dbgmsg(0, 'gg_deathmatch is of type: %s' %getAddonType('gg_deathmatch'))
-es.dbgmsg(0, 'gg_assist is of type: %s' %getAddonType('gg_assist'))
-
-# Raise an error by looking up an addon that doesn't exist
-#es.dbgmsg(0, 'gg_fake is of type: %s' %getAddonType('gg_fake'))
-
 loadAddon('gg_deathmatch')
 #unloadAddon('gg_deathmatch')
 
-#loadAddon('gg_assist')
-#unloadAddon('gg_assist')
+from core.addons.shortcuts import getAddonInfo
+
+loadAddon('gg_assist')
+    
+es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
+unloadAddon('gg_assist')
+es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
+#es.dbgmsg(0, str(AddonManager.getAddonInfo('gg_assist')))
 
 # Print out how many addons we have stored (should be 3)
-es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
+#es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
 
 #loadAddon('gg_elimination')
 #unloadAddon('gg_elimination')

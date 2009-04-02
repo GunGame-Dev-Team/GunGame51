@@ -2,14 +2,14 @@
 import es
 
 # GunGame Imports
-from gungame51.core.addons.shortcuts import Addon
+from gungame51.core.addons import AddonInfo
 
 # ============================================================================
 # >> TEST CODE
 # ============================================================================
 
 # Create "example_addon1" and set attributes
-info = Addon('gg_assist')
+info = AddonInfo()
 info.name = 'gg_assist'
 info.title = 'GG Assist' 
 info.author = 'GG Dev Team' 
@@ -22,3 +22,6 @@ def load():
     
 def unload():
     es.dbgmsg(0, 'GG Assist Unloaded.')
+    
+def player_death(event_var):
+    es.msg('(gg_assist) %s died!' %event_var['es_username'])

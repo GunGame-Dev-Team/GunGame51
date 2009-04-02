@@ -7,7 +7,6 @@
 import es
 
 # GunGame Imports
-from shortcuts import getAddon
 from shortcuts import getAddonType
 
 # ============================================================================
@@ -192,7 +191,9 @@ class AddonManager(object):
         self.__order__ = []
 
     def load(self, name):
-        """ Loads a GunGame sub-addon by name """
+        '''
+        Loads a GunGame sub-addon by name
+        '''
         # If the addon is loaded we cannot load it again
         if name in self.__loaded__:
             raise NameError, 'GunGame sub-addon "%s" is already loaded' % name
@@ -218,7 +219,9 @@ class AddonManager(object):
         self.callBlock(addon, 'load')
 
     def unload(self, name):
-        ''' Unloads a GunGame sub-addon by name '''
+        '''
+        Unloads a GunGame sub-addon by name
+        '''
         # If the addon is not loaded we cannot unload it
         if name not in self.__loaded__:
             raise NameError, "GunGame sub-addon '%s' is not loaded" % name
@@ -243,30 +246,46 @@ class AddonManager(object):
         self.callBlock(addon, 'unload')
 
     def registerEvents(self, addon, name):
-        """ Register all functions in the module as events to ES """
+        '''
+        Register all functions in the module as events to ES
+        '''
+        # Retrieve the module's dictionary
         addon_globals = addon.__dict__
+        
+        # Loop through all items in the module's dictionary
         for item in addon_globals:
-            if not callable(addon_globals[item]) or type(addon_globals[item]).__name__ != 'function':
+            # Ensure that the item is callable as well as a function
+            if not callable(addon_globals[item]) or \
+                type(addon_globals[item]).__name__ != 'function':
                 continue
                 
-            if item not in self.__events__:
+            # See if this is an event that we have not previously registered  
+            if item not in self.__events__.keys():
+                # Add the event to our __events__ dictionary
                 self.__events__[item] = {}
-                    
+                
+                # We only register the specific event once, and use
+                #   self.callEvent() to handle ALL events
+                es.addons.registerForEvent(self, item, self.callEvent)
+                
             # Add the addon to the list of addons to call when the event triggers
             self.__events__[item][name] = addon_globals[item]
-                
-            es.dbgmsg(0, 'self.__events__[%s][%s] = %s' %(item, name, addon_globals[item]))
-                
-            # Re-register the event to this instance passing the event name and the event variables passed by ES
-            es.addons.registerForEvent(self, item, lambda event_var: self.callEvent(item, event_var))
-            #es.addons.registerForEvent(addon, item, addon.__dict__[item])
-                
+            
     def unregisterEvents(self, addon, name):
-        """ Unregister all functions in the module from being called by ES as events """
+        '''
+        Unregister all functions in the module from being called by ES as
+        events
+        '''
+        # Retrieve the module's dictionary
         addon_globals = addon.__dict__
+        
+        # Loop through all items in the addon dictionary
         for item in addon_globals:
+            # Ensure that the item is callable, as well as contained within
+            #   the __events__ dictionary
             if callable(addon_globals[item]) and item in self.__events__:
-                # Delete the addon from the list of addons to call when the event triggers
+                # Delete the addon from the list of addons to call when the
+                #   event triggers
                 current_event = self.__events__[item]
                 if name in current_event:
                     del current_event[name]
@@ -274,19 +293,20 @@ class AddonManager(object):
                 if not self.__events__[item]:
                     es.addons.unregisterForEvent(self, item)
                     
-    def callEvent(self, event_name, event_var):
-        """ Calls the events in sub-addons in the order dictated by __order__ """
-        current_event = self.__events__[event_name]
-        es.dbgmsg(0, self.__events__)
+    
+    def callEvent(self, event_var):
+        '''
+        Calls the events in sub-addons in the order dictated by __order__
+        '''
+        # Grab the current event's dictionary from our __events__ dictionary
+        current_event = self.__events__[str(event_var['es_event'])]
+        
+        # Loop through each addon in the __order__ list
         for name in self.__order__:
-            es.msg(':::::::::::%s' %name)
+            # If the addon name is in the current event, call the function
             if name in current_event:
-                es.msg(event_var)
-                es.msg(event_name)
-                es.msg(current_event)
-                es.msg(current_event[name])
                 current_event[name](event_var)
-
+        
     def addDependenciesConflicts(self, addon, name):
         '''
         Raises an error if there is a dependency or conflict problem or adds
@@ -299,22 +319,32 @@ class AddonManager(object):
         conflicting = set(addon_depend).intersection(addon_conflict)
         
         if conflicting:
+            pass
+            return
             raise DependencyError, "Sub-addon '%s' depends on and also conflicts with sub-addon(s) '%s'" % (name,
             "', '".join(conflicting))
 
         # Ensure this addon does not conflict with a loaded addon
         if name in conflicts:
+            pass
+            return
             raise DependencyError, "Loaded sub-addon(s) '%s' conflict with sub-addon '%s'" % ("', '".join(conflicts[name]), name)
             
         # Ensure loaded addons do not conflict with this addon
         conflicting = set(self.__loaded__).intersection(addon_conflict)
         if conflicting:
+            pass
+            return
             raise DependencyError, "Sub-addon '%s' conflicts with loaded sub-addon(s) '%s'" % (name,
             "', '".join(conflicting))
             
         # Ensure addons depended on by this sub-addon are loaded
         conflicting = set(self.__loaded__).difference(addon_depend)
-        if conflicting:
+        
+        # WEIRD ERROR HERE!!!!!!!!!!!!!!!!!!!!!!!
+        if not conflicting:
+            pass
+            return
             raise DependencyError, "Sub-addon '%s' requires sub-addon(s) '%s' to be loaded" % (name,
             "', '".join(conflicting))
 
@@ -333,22 +363,23 @@ class AddonManager(object):
         
         mod = self.getAddonByName(addon)
         
-        es.dbgmsg(0, mod.__name__.split('.')[-1])
         
         # Grab the addon info
-        info = getAddon(addon)
+        info = self.getAddonInfo(mod.__name__.split('.')[-1])
         # Gather a list of dependencies
         addon_depend = info.requires if 'requires' in info else []
         # Gather a list of conflicts
         addon_conflict = info.conflicts if 'conflicts' in info else []
         
-        es.dbgmsg(0, 'Requires: %s' %addon_depend)
-        es.dbgmsg(0, 'Conflicts: %s' %addon_conflict)
+        #es.dbgmsg(0, 'Requires: %s' %addon_depend)
+        #es.dbgmsg(0, 'Conflicts: %s' %addon_conflict)
 
         return addon_depend, addon_conflict
 
     def getAddonByName(self, name):
-        ''' Returns the module of a sub-addon by name '''
+        '''
+        Returns the module of an addon by name
+        '''
         # If the addon is loaded we have stored the module
         if name in self.__loaded__:
             return self.__loaded__[name]
@@ -360,20 +391,30 @@ class AddonManager(object):
         return mod
         
     @staticmethod
-    def getAddonInfo(addon):
+    def getAddonInfo(addon=None):
         """ Returns the AddonInfo instance in the module if present """
+        if not addon:
+            # Return a dictionary of all addons
+            dict_addon = {}
+            for name in __addons__.__loaded__:
+                addon = AddonManager().getAddonByName(name)
+                addon_globals = addon.__dict__
+                for item in addon_globals:
+                    if isinstance(addon_globals[item], AddonInfo):
+                        dict_addon[name] =  addon_globals[item]
+                        break
+            return dict_addon
+                
+        if type(addon).__name__ == 'str':
+            addon = AddonManager().getAddonByName(addon)
+            
         # If the addon info exists we return it
         addon_globals = addon.__dict__
         for name in addon_globals:
             if isinstance(addon_globals[name], AddonInfo):
                 return addon_globals[name]
-        '''
-        # If the addon info does not exist we create a temporary substitution
-        info = AddonInfo()
-        info.name = addon.__name__
-        info.version = 'Unknown'
-        '''
-        return info
+                
+        return None
 
     @staticmethod
     def callBlock(addon, blockname, *a, **kw):
