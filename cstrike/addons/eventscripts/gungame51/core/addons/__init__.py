@@ -7,7 +7,7 @@
 import es
 
 # GunGame Imports
-from shortcuts import getAddonType
+from gungame51.core import getGameDir
 
 # ============================================================================
 # >> CLASSES
@@ -35,8 +35,7 @@ class AddonInfo(dict):
             info.name = 'example_addon'
         
             # The title of the addon, as it would be displayed in a menu
-            # Each word will automatically be capitalized
-            info.title = 'Example addon'
+            info.title = 'Example Addon'
         
             # The author's name
             info.author = 'yournamehere'
@@ -78,10 +77,6 @@ class AddonInfo(dict):
                             Use only "%s".' 
                                 %(name, '", "'.join(self._getKeyList())))
                                 
-        # Capitalize the first letter of each word
-        if name == 'title':
-            value = str(value).title()
-            
         dict.__setitem__(self, name, value)
         
     def __getitem__(self, name):
@@ -98,43 +93,6 @@ class AddonInfo(dict):
         Return a list of valid attributes.
         '''
         return ['name', 'title', 'author', 'version', 'requires', 'conflicts']
-        
-    
-class AddonStorage(dict):
-    '''
-    This will contain all instances of AddonInfo() for each addon.
-    
-    NOTE:
-        This class is intended for internal use only.
-        
-    USAGE:
-        from gungame.core.addons import AddonStorage
-        
-        storage = AddonStorage()
-        storage['example_addon'] = AddonInfo()
-        storage['example_addon']['name'] = 'example_addon'
-        storage['example_addon']['title'] = 'Example Addon'
-        storage['example_addon']['author'] = 'yournamehere'
-        storage['example_addon']['version'] = '1.0'
-        storage['example_addon']['requires'] = ['gg_addon1', 'gg_addon2']
-        storage['example_addon']['conflicts'] = ['gg_addon3', 'gg_addon4']
-    '''
-    
-    def __setattr__(self, addon, instance):
-        '''
-        Store the addon as an instance of AddonInfo()
-        '''
-        self[addon] = instance
-        
-    def __getattr__(self, addon):
-        '''
-        Return the named addon's instance of AddonInfo()
-        '''
-        return self[addon]
-        
-        
-# Create a dictionary to contain the instance of AddonStorage()
-addonStorage = AddonStorage()
 
 
 class DependencyError(Exception):
@@ -145,6 +103,7 @@ class DependencyError(Exception):
    gungame.DependencyError
    """
    pass
+
 
 class AddonCompatibility(dict):
    """
@@ -385,14 +344,19 @@ class AddonManager(object):
             return self.__loaded__[name]
       
         # If the addon is not loaded we need to import it
-        addonType = getAddonType(name)
+        addonType = AddonManager().getAddonType(name)
         modulePath = 'gungame51.scripts.%s.%s' %(addonType, name)
         mod = __import__(modulePath, globals(), locals(), [''])
         return mod
         
+    # ========================================================================
+    # AddonManager() Static Class Methods
+    # ========================================================================
     @staticmethod
     def getAddonInfo(addon=None):
-        """ Returns the AddonInfo instance in the module if present """
+        '''
+        Returns the AddonInfo instance in the module if present
+        '''
         if not addon:
             # Return a dictionary of all addons
             dict_addon = {}
@@ -415,6 +379,56 @@ class AddonManager(object):
                 return addon_globals[name]
                 
         return None
+        
+    @staticmethod
+    def getAddonType(name):
+        '''
+        Returns a string value of the addon type:
+            "custom"
+            "included"
+        '''
+        # Check addon exists
+        if not AddonManager().addonExists(name):
+            raise ValueError('Cannot get addon type (%s): doesn\'t exist.'
+                % name)
+        
+        from os.path import isfile
+        
+        # Get addon type
+        if isfile(getGameDir('addons/eventscripts/gungame51/scripts/included/%s.py'
+            %name)):
+            return 'included'
+        elif isfile(getGameDir('addons/eventscripts/gungame51/scripts/custom/%s.py'
+            %name)):
+            return 'custom'
+            
+    @staticmethod
+    def addonExists(name):
+        '''
+        Returns an int (bool) value depending on a GunGame addon's existance.
+            0 = False (addon does not exist)
+            1 = True (addon does exist)
+            
+        NOTE:
+            This function only searches for addons that are to be included
+            with GunGame 5.1+. It searches for the "addon_name.py" in the
+            directories:
+                "../<MOD>/addons/eventscripts/gungame/scripts/included"
+                "../<MOD>/addons/eventscripts/gungame/scripts/custom"
+                
+            If the "addon_name.py" of the script does not exist, 0 will be
+            returned.
+            
+        USAGE:
+            from core.addons.shortcuts import addonExists
+        '''
+        from os.path import isfile
+        
+        return int(isfile(getGameDir('addons/eventscripts/gungame51/scripts' +
+                                      '/included/%s.py' %name))) or \
+                                      int(isfile(getGameDir('addons' +
+                                      '/eventscripts/gungame51/scripts/custom' +
+                                      '/%s.py' %name)))
 
     @staticmethod
     def callBlock(addon, blockname, *a, **kw):

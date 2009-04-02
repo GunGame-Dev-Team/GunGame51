@@ -7,29 +7,37 @@
 import es
 
 # GunGame Imports
-from core.addons import AddonInfo
-from core.addons import AddonManager
 from core.addons.shortcuts import loadAddon
 from core.addons.shortcuts import unloadAddon
-
+from core.addons.shortcuts import getAddonInfo
+from core.addons.shortcuts import addonExists
 
 # ============================================================================
 # >> TEST CODE
 # ============================================================================
-loadAddon('gg_deathmatch')
-#unloadAddon('gg_deathmatch')
-
-from core.addons.shortcuts import getAddonInfo
-
-loadAddon('gg_assist')
+def load():
+    # Load our 2 test addons
+    es.dbgmsg(0, '')
+    es.dbgmsg(0, 'LOADING ADDONS:')
+    es.dbgmsg(0, '-'*30)
+    loadAddon('gg_deathmatch')
+    loadAddon('gg_assist')
+    es.dbgmsg(0, '-'*30)
+    es.dbgmsg(0, '')
     
-es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
-unloadAddon('gg_assist')
-es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
-#es.dbgmsg(0, str(AddonManager.getAddonInfo('gg_assist')))
-
-# Print out how many addons we have stored (should be 3)
-#es.dbgmsg(0, 'Addons stored: %i' %(len(getAddons())))
-
-#loadAddon('gg_elimination')
-#unloadAddon('gg_elimination')
+def unload():
+    from core.addons import __addons__
+    es.dbgmsg(0, '')
+    es.dbgmsg(0, 'UNLOADING ADDONS:')
+    es.dbgmsg(0, '-'*30)
+    es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
+    es.dbgmsg(0, '__loaded__ Addons: %s' %__addons__.__loaded__.keys())
+    es.dbgmsg(0, '__order__ Addons: %s' %__addons__.__order__)
+    for name in __addons__.__loaded__.copy():
+        unloadAddon(name)
+        # Test the count of addons via getAddonInfo()
+        es.dbgmsg(0, '# of addons remaining: %i' %len(getAddonInfo()))
+        es.dbgmsg(0, '__loaded__ Remaining: %s' %__addons__.__loaded__.keys())
+        es.dbgmsg(0, '__order__ Remaining: %s' %__addons__.__order__)
+    es.dbgmsg(0, '-'*30)
+    es.dbgmsg(0, '')
