@@ -1,14 +1,18 @@
-# EventScripts Imports
+# ============================================================================
+# >> IMPORTS
+# ============================================================================
+# Python Imports
+
+
+# Eventscripts Imports
 import es
 
 # GunGame Imports
-from gungame51.core.addons import AddonInfo
+from gungame51.core.addons.shortcuts import AddonInfo
 
 # ============================================================================
-# >> TEST CODE
+# >> ADDON REGISTRATION/INFORMATION
 # ============================================================================
-
-# Create "example_addon1" and set attributes
 info = AddonInfo()
 info.name = 'gg_deathmatch'
 info.title = 'GG Deathmatch' 
@@ -17,11 +21,30 @@ info.version = '0.1'
 info.requires = ['gg_turbo', 'gg_dead_strip', 'gg_dissolver'] 
 info.conflicts= ['gg_map_obj', 'gg_knife_elite', 'gg_elimination']
 
+# ============================================================================
+# >> GLOBAL VARIABLES
+# ============================================================================
+
+
+# ============================================================================
+# >> CLASSES
+# ============================================================================
+
+
+# ============================================================================
+# >> LOAD & UNLOAD
+# ============================================================================
 def load():
-    es.dbgmsg(0, 'GG Deathmatch Loaded.')
+    es.dbgmsg(0, 'Loaded: %s' % info.name)
     
 def unload():
-    es.dbgmsg(0, 'GG Deathmatch Unloaded.')
+    es.dbgmsg(0, 'Loaded: %s' % info.name)
     
-def player_death(event_var):
-    es.msg('(gg_deathmatch) %s died!' %event_var['es_username'])
+# ============================================================================
+# >> GAME EVENTS
+# ============================================================================
+
+
+# ============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# ============================================================================

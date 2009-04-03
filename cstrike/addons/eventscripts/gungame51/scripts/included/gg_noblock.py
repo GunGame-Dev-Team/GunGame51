@@ -14,12 +14,10 @@ from gungame51.core.addons.shortcuts import AddonInfo
 # >> ADDON REGISTRATION/INFORMATION
 # ============================================================================
 info = AddonInfo()
-info.name = 'gg_elimination'
-info.title = 'GG Elimination' 
+info.name = 'gg_noblock'
+info.title = 'GG No Block' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
-info.requires = ['gg_turbo', 'gg_dead_strip', 'gg_dissolver']
-info.conflicts = ['gg_knife_elite']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
