@@ -11,17 +11,22 @@ from core.addons.shortcuts import loadAddon
 from core.addons.shortcuts import unloadAddon
 from core.addons.shortcuts import getAddonInfo
 from core.addons.shortcuts import addonExists
+from core.cfg.files import *
 
 # ============================================================================
 # >> TEST CODE
 # ============================================================================
 def load():
-    # Load our 2 test addons
+    # Load our test addons
     es.dbgmsg(0, '')
     es.dbgmsg(0, 'LOADING ADDONS:')
     es.dbgmsg(0, '-'*30)
     loadAddon('gg_deathmatch')
     loadAddon('gg_assist')
+    loadAddon('gg_multi_level')
+    
+    # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...
+    unloadAddon('gg_turbo')
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
     
@@ -31,13 +36,12 @@ def unload():
     es.dbgmsg(0, 'UNLOADING ADDONS:')
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
-    es.dbgmsg(0, '__loaded__ Addons: %s' %__addons__.__loaded__.keys())
-    es.dbgmsg(0, '__order__ Addons: %s' %__addons__.__order__)
-    for name in __addons__.__loaded__.copy():
+    # Create a copy of the list of addons
+    list_addons = __addons__.__order__[:]
+    # We need to unload in reverse due to DependencyErrors
+    list_addons.reverse()
+    for name in list_addons:
         unloadAddon(name)
-        # Test the count of addons via getAddonInfo()
         es.dbgmsg(0, '# of addons remaining: %i' %len(getAddonInfo()))
-        es.dbgmsg(0, '__loaded__ Remaining: %s' %__addons__.__loaded__.keys())
-        es.dbgmsg(0, '__order__ Remaining: %s' %__addons__.__order__)
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')

@@ -3,11 +3,19 @@
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+# Python Imports
+import os.path
+
 # Eventscripts Imports
 import es
 
 # GunGame Imports
 from gungame51.core import getGameDir
+
+# ============================================================================
+# >> GLOBAL VARIABLES
+# ============================================================================
+
 
 # ============================================================================
 # >> CLASSES
@@ -106,31 +114,33 @@ class DependencyError(Exception):
 
 
 class AddonCompatibility(dict):
-   """
+   '''
    This class holds sub-addons that are depended on or will conflict with
    a sub-addon being loaded. The loaded sub-addon will be stored under each
    dependency or conflict so we know what addons rely or conflict with other
    addons.
-   """
+   '''
 
    def notAcceptable(self, name, namelist):
-      """
+      '''
       Returns a set object of sub-addons in "namelist" that intersect with
       this instance's stored dependencies or conflicts
-      """
+      '''
       return set(namelist).intersection(self)
 
    def add(self, addon_name, namelist):
-      """
+      '''
       Adds a list of dependencies or conflicts, storing the
       addon name under each entry so we know which addons depend on
       or conflict with other addons.
-      """
+      '''
       for name in namelist:
          self[name] = self.get(name, []) + [addon_name]
 
    def remove(self, addon_name):
-      """ Removes every dependency or conflict for a sub-addon """
+      '''
+      Removes every dependency or conflict for a sub-addon
+      '''
       for sub_addon in list(self):
          if addon_name in self[sub_addon]:
             self[sub_addon].remove(addon_name)
@@ -278,60 +288,63 @@ class AddonManager(object):
         conflicting = set(addon_depend).intersection(addon_conflict)
         
         if conflicting:
-            pass
-            return
-            raise DependencyError, "Sub-addon '%s' depends on and also conflicts with sub-addon(s) '%s'" % (name,
-            "', '".join(conflicting))
+            raise DependencyError('Sub-addon "%s" depends on and also '
+                %name + 'conflicts with sub-addon(s) "%s"'
+                    %('", "'.join(conflicting)))
 
         # Ensure this addon does not conflict with a loaded addon
         if name in conflicts:
-            pass
-            return
-            raise DependencyError, "Loaded sub-addon(s) '%s' conflict with sub-addon '%s'" % ("', '".join(conflicts[name]), name)
+            raise DependencyError('Loaded sub-addon(s) "%s" conflict with ' 
+                    %('", "'.join(conflicts[name])) +
+                    'sub-addon "%s"' %(name))
             
         # Ensure loaded addons do not conflict with this addon
         conflicting = set(self.__loaded__).intersection(addon_conflict)
+        
         if conflicting:
-            pass
-            return
-            raise DependencyError, "Sub-addon '%s' conflicts with loaded sub-addon(s) '%s'" % (name,
-            "', '".join(conflicting))
+            raise DependencyError('Sub-addon "%s" conflicts with loaded'
+                %name + ' sub-addon(s) "%s"' % ('", "'.join(conflicting)))
             
         # Ensure addons depended on by this sub-addon are loaded
-        conflicting = set(self.__loaded__).difference(addon_depend)
+        conflicting = set(addon_depend).difference(self.__loaded__)
         
-        # WEIRD ERROR HERE!!!!!!!!!!!!!!!!!!!!!!!
-        if not conflicting:
-            pass
-            return
-            raise DependencyError, "Sub-addon '%s' requires sub-addon(s) '%s' to be loaded" % (name,
-            "', '".join(conflicting))
+        if conflicting:
+            # Loop through all addons that are not loaded and load them
+            for subaddon in conflicting:
+                load(subaddon)
 
         # Add this sub-addon's dependencies and conflicts
         dependencies.add(name, addon_depend)
         conflicts.add(name, addon_conflict)
 
     def removeDependenciesConflicts(self, name):
-        """ Removes the dependencies or conflicts associated with a sub-addon """
+        '''
+        Removes the dependencies or conflicts associated with a sub-addon
+        '''
+        # Ensure this addon is not depended on by other sub-addons
+        if name in dependencies:
+            raise DependencyError('Loaded sub-addon(s) "%s" depend on '
+                %('", "'.join(dependencies[name])) + 'sub-addon "%s"' %name)
+        
         # Remove the sub-addon's dependencies and conflicts
         dependencies.remove(name)
         conflicts.remove(name)
 
     def getDependenciesConflicts(self, addon):
-        """ Returns the dependencies and conflicts of an addon """
-        
+        '''
+        Returns the dependencies and conflicts of an addon
+        '''
+        # Retrieve the addon's module
         mod = self.getAddonByName(addon)
-        
         
         # Grab the addon info
         info = self.getAddonInfo(mod.__name__.split('.')[-1])
+        
         # Gather a list of dependencies
         addon_depend = info.requires if 'requires' in info else []
+        
         # Gather a list of conflicts
         addon_conflict = info.conflicts if 'conflicts' in info else []
-        
-        #es.dbgmsg(0, 'Requires: %s' %addon_depend)
-        #es.dbgmsg(0, 'Conflicts: %s' %addon_conflict)
 
         return addon_depend, addon_conflict
 
@@ -392,43 +405,24 @@ class AddonManager(object):
             raise ValueError('Cannot get addon type (%s): doesn\'t exist.'
                 % name)
         
-        from os.path import isfile
-        
         # Get addon type
-        if isfile(getGameDir('addons/eventscripts/gungame51/scripts/included/%s.py'
-            %name)):
+        if os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts/included' +
+            '/%s.py' %name)):
             return 'included'
-        elif isfile(getGameDir('addons/eventscripts/gungame51/scripts/custom/%s.py'
-            %name)):
+        elif os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts/custom' +
+            '/%s.py' %name)):
             return 'custom'
             
     @staticmethod
     def addonExists(name):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
-            0 = False (addon does not exist)
-            1 = True (addon does exist)
-            
-        NOTE:
-            This function only searches for addons that are to be included
-            with GunGame 5.1+. It searches for the "addon_name.py" in the
-            directories:
-                "../<MOD>/addons/eventscripts/gungame/scripts/included"
-                "../<MOD>/addons/eventscripts/gungame/scripts/custom"
-                
-            If the "addon_name.py" of the script does not exist, 0 will be
-            returned.
-            
-        USAGE:
-            from core.addons.shortcuts import addonExists
         '''
-        from os.path import isfile
-        
-        return int(isfile(getGameDir('addons/eventscripts/gungame51/scripts' +
-                                      '/included/%s.py' %name))) or \
-                                      int(isfile(getGameDir('addons' +
-                                      '/eventscripts/gungame51/scripts/custom' +
-                                      '/%s.py' %name)))
+        return int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts' +
+                                     '/included/%s.py' %name))) or \
+                                     int(os.path.isfile(getGameDir('addons' +
+                                     '/eventscripts/gungame51/scripts' +
+                                     '/custom/%s.py' %name)))
 
     @staticmethod
     def callBlock(addon, blockname, *a, **kw):
@@ -454,3 +448,23 @@ load.__doc__ = AddonManager.load.__doc__
 def unload(*a, **kw):
    __addons__.unload(*a, **kw)
 unload.__doc__ = AddonManager.unload.__doc__
+
+def getValidAddons():
+    included = getGameDir('addons/eventscripts/gungame51/scripts/included')
+    custom = getGameDir('addons/eventscripts/gungame51/scripts/custom')
+    
+    list_addons = []
+    
+    for path in [included, custom]:
+        for filename in os.listdir(path):
+            # Ignore subfolders
+            if os.path.isdir(os.path.join(path, filename)):
+                continue
+            if '.pyc' in filename:
+                continue
+            if '__init__' in filename:
+                continue
+            filename = filename.split('.')
+            if len(filename) > 1 and filename[1] == 'py':
+                list_addons.append(filename[0])
+    return list_addons

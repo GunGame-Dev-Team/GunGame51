@@ -36,7 +36,7 @@ def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
 def unload():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
+    es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
 # ============================================================================
 # >> GAME EVENTS

@@ -7,6 +7,7 @@
 import es
 
 # GunGame Imports
+from gungame51.core.addons import AddonInfo
 from gungame51.core.addons import AddonManager
 from gungame51.core.addons import load
 from gungame51.core.addons import unload

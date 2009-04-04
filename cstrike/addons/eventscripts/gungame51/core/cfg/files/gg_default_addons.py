@@ -17,6 +17,7 @@ def load():
     config.write()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
     
+    config.cvar('gg_knife_pro', 0, 'Loads or unloads gg_knife_pro').makepublic()
 '''
 //----------------------------------------------------------------------------
 // gg_default_addons.cfg -- Default addon configuration.
