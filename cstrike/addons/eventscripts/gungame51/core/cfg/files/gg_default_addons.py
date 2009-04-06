@@ -1,273 +1,507 @@
-def load():
-    import es
-    import cfglib
-    config = cfglib.AddonCFG('%s/cfg/gungame51/gg_default_addons.cfg' %es.ServerVar('eventscripts_gamedir'))
+# ../cstrike/addons/eventscripts/gungame/core/cfg/files/gg_default_addons.py
 
-    config.text('*'*70)
-    config.text('*        gg_default_addons.cfg -- Default Addon Configuration        *')
-    config.text('*                                                                    *')
-    config.text('*              This file defines GunGame Addon settings.             *')
-    config.text('*                                                                    *')
-    config.text('*  Note: Any alteration of this file requires a server restart or a  *')
-    config.text('*        reload of GunGame.                                          *')
-    config.text('*'*70)
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
+
+# ============================================================================
+# >> IMPORTS
+# ============================================================================
+# EventScripts Imports
+import es
+import cfglib
+
+# ============================================================================
+# >> GLOBAL VARIABLES
+# ============================================================================
+config = cfglib.AddonCFG('%s/cfg/gungame51/gg_default_addons.cfg'
+    %es.ServerVar('eventscripts_gamedir'))
+        
+# ============================================================================
+# >> LOAD & UNLOAD
+# ============================================================================
+def load():
+    config.text('*'*76)
+    config.text('*' + ' '*11 + 'gg_default_addons.cfg -- Default Addon ' +
+                'Configuration' + ' '*11 + '*')
+    config.text('*' + ' '*74 + '*')
+    config.text('*' + ' '*17 + 'This file defines GunGame Addon settings.' +
+                ' '*16 + '*')
+    config.text('*' + ' '*74 + '*')
+    config.text('*  Note: Any alteration of this file requires a server ' +
+                'restart or a' + ' '*8 + '*')
+    config.text('*' + ' '*11 + 'reload of GunGame.' + ' '*45 + '*')
+    config.text('*'*76)
     config.text('')
     config.text('')
+    
+    # Error Logging
+    config.text('='*76)
+    config.text('>> ERROR LOGGING')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Logs all GunGame-related errors to a log file located in:')
+    config.text('      "../<MOD>/addons/eventscripts/gungame/logs/"')
+    config.text('Notes:')
+    config.text('   * If something in GunGame is not working and you are ' +
+                'going to post a bug,')
+    config.text('     make sure you enable this addon then post the ' +
+                'error log when you are')
+    config.text('     filling your bug report.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not log errors.')
+    config.text('   1 = (Enabled) Log errors.')
+    config.text('Default Value: 1')
+    config.cvar('gg_error_logging', 1, 'Logs all GunGame-related ' +
+                'errors.').addFlag('notify')
+    
+    # Multi-Level
+    config.text('')
+    config.text('='*76)
+    config.text('>> MULTI-LEVEL')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The number of times a player has to level up without ' +
+                'dying prior to')
+    config.text('   recieving the multi-level bonus:')
+    config.text('      * The attacker will be given a speed boost.')
+    config.text('      * The attacker will have sparks fly from their feet.')
+    config.text('      * The attacker will have music emitted from their ' +
+                'location.')
+    config.text('Note:')
+    config.text('   * Formally knows as Triple Level Bonus.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_multi_level.')
+    config.text('   # = (Enabled) The number of levels a player must get ' +
+                'before achieving the')
+    config.text('                 multi-level bonus.')
+    config.text('Default Value: 0')
+    config.cvar('gg_multi_level', 0, 'The # of levels it takes to get the ' +
+                'multi-level bonus.').addFlag('notify')
+    
+    # Turbo Mode
+    config.text('')
+    config.text('='*76)
+    config.text('>> TURBO MODE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Gives the player their next weapon immediately when they' +
+                ' level up.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_turbo.')
+    config.text('   1 = (Enabled) Load gg_turbo.')
+    config.text('Default Value: 0')
+    config.cvar('gg_turbo', 0, 'Enables/Disables gg_turbo.').addFlag('notify')
+    
+    # No Block
+    config.text('')
+    config.text('='*76)
+    config.text('>> NO BLOCK')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Makes it possible to pass through all players.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_noblock.')
+    config.text('   1 = (Enabled) Load gg_noblock.')
+    config.text('Default Value: 0')
+    config.cvar('gg_noblock', 0, 'Enables/Disables ' +
+                'gg_noblock.').addFlag('notify')
+    
+    # Dead Strip
+    config.text('')
+    config.text('='*76)
+    config.text('>> DEAD STRIP')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Removes a player\'s weapons when they die.')
+    config.text('Note:')
+    config.text('   * Prevents players from picking up the wrong weapon.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_dead_strip.')
+    config.text('   1 = (Enabled) Load gg_dead_strip.')
+    config.text('Default Value: 0')
+    config.cvar('gg_dead_strip', 0, 'Enables/Disables ' +
+                'gg_dead_strip.').addFlag('notify')
+    
+    # =========================================================================
+    # KNIFE-RELATED CVARS
+    # =========================================================================
+    # Knife Pro
+    config.text('')
+    config.text('='*76)
+    config.text('>> KNIFE PRO')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   When you kill a player with a knife, you will level up, ' +
+                'and the victim')
+    config.text('   will level down.')
+    config.text('Notes:')
+    config.text('   * Will not load with "gg_knife_rookie" enabled.')
+    config.text('   * See the variable "gg_knife_pro_limit" for further ' +
+                'enhancement of')
+    config.text('     gg_knife_pro.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_knife_pro.')
+    config.text('   1 = (Enabled) Load gg_knife_pro.')
+    config.text('Default Value: 0')
+    config.cvar('gg_knife_pro', 1, 'Enables/Disables gg_knife_pro').addFlag('notify')
+    
+    # Knife Pro Limit
+    config.text('')
+    config.text('='*76)
+    config.text('>> KNIFE PRO LIMIT')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Limits level stealing to players close to your own ' +
+                'level.')
+    config.text('Example:')
+    config.text('   * If this is set to 3, you will not gain a level if you ' +
+                'knife someone')
+    config.text('     more than 3 levels below you.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not enable the knife pro limit.')
+    config.text('   # = (Enabled) Limit level stealing to this # of levels ' +
+                'below the')
+    config.text('                 attacker.')
+    config.text('Default Value: 0')
+    config.cvar('gg_knife_pro_limit', 0, 'Limit level stealing to this # of ' +
+                'levels below the attacker.').addFlag('notify')
+    
+    # Knife Rookie
+    config.text('')
+    config.text('='*76)
+    config.text('>> KNIFE ROOKIE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Similar to gg_knife_pro, but not as strict:')
+    config.text('      * The attacker will level up even when the victim is ' +
+                'on level 1.')
+    config.text('      * The attacker will level up even though the victim ' +
+                'cannot leveldown.')
+    config.text('      * The victim will level down even though the attacker' +
+                ' cannot levelup.')
+    config.text('Note:')
+    config.text('   * Will not load with "gg_knife_pro" enabled.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_knife_rookie.')
+    config.text('   1 = (Enabled) Load gg_knife_rookie.')
+    config.text('Default Value: 0')
+    config.cvar('gg_knife_rookie', 0, 'Enables/Disables ' +
+                'gg_knife_rookie.').addFlag('notify')
+                
+    # Knife Elite
+    config.text('')
+    config.text('='*76)
+    config.text('>> KNIFE ELITE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Once a player levels up, they only get a knife until ' +
+                'the next round.')
+    config.text('Notes:')
+    config.text('   * Will not load with "gg_turbo" enabled.')
+    config.text('   * "gg_dead_strip" will automatically be enabled.')
+    config.text('   * Will not load if "gg_dead_strip" can not be enabled.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_knife_elite.')
+    config.text('   1 = (Enabled) Load gg_knife_elite.')
+    config.text('Default Value: 0')
+    config.cvar('gg_knife_elite', 0, 'Enables/Disables ' +
+                'gg_knife_elite.').addFlag('notify')
+    
+    # =========================================================================
+    # GRENADE-RELATED CVARS
+    # =========================================================================
+    # Earn Grenade
+    config.text('')
+    config.text('='*76)
+    config.text('>> EARN GRENADES')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   When a player reaches grenade level, they can earn extra' +
+                ' grenades by')
+    config.text('   killing enemies with another weapon.')
+    config.text('Note:')
+    config.text('   * Players can only carry one hegrenade at a time.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_earn_nade.')
+    config.text('   1 = (Enabled) Load gg_earn_nade.')
+    config.text('Default Value: 0')
+    config.cvar('gg_earn_nade', 0, 'Enables/Disables ' +
+                'gg_earn_nade.').addFlag('notify')
+    
+    # Unlimited Grenades
+    config.text('')
+    config.text('='*76)
+    config.text('>> UNLIMITED GRENADES')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   When a player reaches grenade level, they are given ' +
+                'another grenade when')
+    config.text('   their thrown grenade detonates.')
+    config.text('Note:')
+    config.text('   * Will not load with "gg_earn_nades" enabled.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_unl_grenade.')
+    config.text('   1 = (Enabled) Load gg_unl_grenade.')
+    config.text('Default Value: 0')
+    config.cvar('gg_unl_grenade', 0, 'Enables/Disables ' +
+                'gg_unl_grenade.').addFlag('notify')
+    
+    # Grenade Bonus
+    config.text('')
+    config.text('='*76)
+    config.text('>> GRENADE BONUS')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Players on grenade level will receive this weapon along ' +
+                'with the')
+    config.text('   hegrenade.')
+    config.text('Notes:')
+    config.text('   * You can have multiple weapons by seperating them ' +
+                'with commas.')
+    config.text('   * If you choose to have multiple weapons, you can only ' +
+                'have one primary')
+    config.text('     weapon, one secondary weapon, and one grenade (not an ' +
+                'hegrenade).')
+    config.text('Examples:')
+    config.text('   * gg_nade_bonus aug')
+    config.text('   * gg_nade_bonus glock,aug')
+    config.text('Options:')
+    config.text('\tawp   \tscout\taug   \tmac10\ttmp   \tmp5navy\tump45\tp90')
+    config.text('\tgalil\tfamas\tak47\tsg552\tsg550\tg3sg1\tm249\tm3')
+    config.text('\txm1014\tm4a1\tglock\tusp   \tp228\tdeagle\telite\t' +
+                'fiveseven')
+    config.text('\tflashbang   \tsmokegrenade')
+    config.text('\t0 = (Disabled) Do not load gg_nade_bonus.')
+    config.text('Default Value: 0')
+    config.cvar('gg_nade_bonus', 0, 'The weapon(s) to be given as a grenade ' +
+                'level bonus weapon.').addFlag('notify')
+    
+    # Reload
+    config.text('')
+    config.text('='*76)
+    config.text('>> RELOAD')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   When a player gains a level, the ammo in their clip is ' +
+                'replenished.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_reload.')
+    config.text('   1 = (Enabled) Load gg_reload.')
+    config.text('Default Value: 0')
+    config.cvar('gg_reload', 0, 'Enables/Disables ' +
+                'gg_reload.').addFlag('notify')
+    
+    # Friendly Fire
+    config.text('')
+    config.text('='*76)
+    config.text('>> FRIENDLY FIRE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Automatically turn on friendly fire when a player reaches' +
+                ' "x" levels')
+    config.text('   below the last level (+1).')
+    config.text('Examples:')
+    config.text('   * gg_friendlyfire 1')
+    config.text('       - The above will turn on friendly fire when a player' +
+                ' reaches the last')
+    config.text('         level.')
+    config.text('   * gg_friendlyfire 2')
+    config.text('        - The above will turn on friendly fire when a player' +
+                ' reaches one')
+    config.text('          level before the last.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_friendlyfire.')
+    config.text('   # = (Enabled) Turn on friendly fire when a player ' +
+                'reaches "#" (+1) levels')
+    config.text('                 below the last level.')
+    config.text('Default Value: 0')
+    config.cvar('gg_friendlyfire', 0, 'The number (+1) of levels below the ' +
+                'last level to enable friendly fire.').addFlag('notify')
+    
+    # =========================================================================
+    # STATS-RELATED CVARS
+    # =========================================================================
+    # Stats Database and Commands
+    config.text('')
+    config.text('='*76)
+    config.text('>> STATS DATABASE AND COMMANDS')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Whether you want to keep track of winners on your ' +
+                'server. This also')
+    config.text('   enables the stat commands (!leader, !top, !rank, etc).')
+    config.text('Note:')
+    config.text('   * This will save a file to the server and requires ' +
+                'appropiate read/write')
+    config.text('     permissions.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_stats.')
+    config.text('   1 = (Enabled) Load gg_stats).')
+    config.text('Default Value: 0')
+    config.cvar('gg_stats', 0, 'Enables/Disables ' +
+                'gg_stats.').addFlag('notify')
+    
+    # Stats Database Prune
+    config.text('')
+    config.text('='*76)
+    config.text('>> STATS DATABASE PRUNE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The number of days of inactivity for a winner that is ' +
+                'tolerated until')
+    config.text('   they are removed from the database.')
+    config.text('Notes:')
+    config.text('   * Pruning the database of old entries is STRONGLY ' +
+                'RECOMMENDED for ')
+    config.text('     high-volume servers.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_prune_database.')
+    config.text('   1 = (Enabled) Load gg_prune_database.')
+    config.text('Default Value: 0')
+    config.cvar('gg_prune_database', 0, 'The number inactive days before ' +
+                'a winner is removed from the database.').addFlag('notify')
+                
+    # Stats Logging
+    config.text('')
+    config.text('='*76)
+    config.text('>> STATS LOGGING')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   When enabled, this addon will log game events for stats ' +
+                'tracking for')
+    config.text('   HLstatsX, Psychostats, and etc.')
+    config.text('Notes:')
+    # Not quite sure what this is, but I don't think I like it...
+    config.text('   * Other options available in "stats_logging.txt".')
+    config.text('   * This should be used with third-party stats programs.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_stats_logging.')
+    config.text('   1 = (Enabled) Load gg_stats_logging.')
+    config.text('Default Value: 0')
+    config.cvar('gg_stats_logging', 0, 'Enables/Disables ' +
+                'stats logging for third-party programs.').addFlag('notify')
+    
+    # =========================================================================
+    # SPAWN-RELATED CVARS
+    # =========================================================================
+    # Spawnpoint Manager
+    config.text('')
+    config.text('='*76)
+    config.text('>> SPAWNPOINT MANAGER')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
+                'current map has been')
+    config.text('   created.  This addon also adds commands and a menu to ' +
+                'allow admins to')
+    config.text('   manage spawnpoints on the current map.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_spawnpoints.')
+    config.text('   1 = (Enabled) Load gg_spawnpoints.')
+    config.text('Default Value: 0')
+    config.cvar('gg_spawnpoints', 0, 'Enables/Disables random spawn points ' +
+                'and spawn point management.').addFlag('notify')
+    
+    # Spawn Protection
+    config.text('')
+    config.text('='*76)
+    config.text('>> SPAWN PROTECTION')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The number of seconds to allow spawn protection, in ' +
+                'which they will be')
+    config.text('   immune to other players fire but cannot levelup if they ' +
+                'kill a player.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_spawn_protect.')
+    config.text('   1 = (Enabled) Load gg_spawn_protect.')
+    config.text('Default Value: 0')
+    config.cvar('gg_spawn_protect', 0, 'Enables/Disables spawn ' +
+                'protection.').addFlag('notify')
+                
+    # Spawn Protection Colors
+    config.text('')
+    config.text('='*76)
+    config.text('>> SPAWN PROTECTION COLORS')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The player\'s color while under spawn protection.')
+    config.text('Notes:')
+    config.text('   * Colors are set via the RGB (red/green/blue) model. ' +
+                'For more information ')
+    config.text('     on how to get the color you want, visit:')
+    config.text('        http://www.tayloredmktg.com/rgb/')
+    config.text('   * Alpha is the transparency of the player. The lower ' +
+                'the number, the more')
+    config.text('     transparent the player becomes.')
+    config.text('Options:')
+    config.text('   0-255')
+    config.text('Default Values:')
+    config.text('   * Red: 255')
+    config.text('   * Green: 255')
+    config.text('   * Blue: 255')
+    config.text('   * Alpha: 150')
+    config.cvar('gg_spawn_protect_red', 255, 'The red shade of the spawn ' +
+                'protected player.').addFlag('notify')
+    config.cvar('gg_spawn_protect_green', 255, 'The green shade of the spawn' +
+                ' protected player.').addFlag('notify')
+    config.cvar('gg_spawn_protect_blue', 255, 'The blue shade of the spawn ' +
+                'protected player.').addFlag('notify')
+    config.cvar('gg_spawn_protect_alpha', 150, 'The alpha of the spawn ' +
+                'protected player.').addFlag('notify')
+                
+    # Spawn Protection "Cancel On Fire"
+    config.text('')
+    config.text('='*76)
+    config.text('>> SPAWN PROTECTION "CANCEL-ON-FIRE"')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Cancels the spawn protection timer when the player ' +
+                'fires their weapon and')
+    config.text('   allows the player to level up.')
+    config.text('Note:')
+    config.text('   * Uses "eventscripts_noisy", which "may" cause lag.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_spawn_protect_cancelonfire.')
+    config.text('   1 = (Enabled) Load gg_spawn_protect_cancelonfire.')
+    config.text('Default Value: 0')
+    config.cvar('gg_spawn_protect_cancelonfire', 0, 'Cancels spawn ' +
+                'protection when the weapon is fired.').addFlag('notify')
+                
+    # Allow Leveling Whilst Protected
+    config.text('')
+    config.text('='*76)
+    config.text('>> ALLOW LEVELING WHILST PROTECTED')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Players can level up while spawn protected.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_spawn_protect_can_level_up.')
+    config.text('   1 = (Enabled) Load gg_spawn_protect_can_level_up.')
+    config.text('Default Value: 0')
+    config.cvar('gg_spawn_protect_can_level_up', 0, 'Cancels spawn ' +
+                'protection when the weapon is fired.').addFlag('notify')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     config.write()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
-    
-    config.cvar('gg_knife_pro', 0, 'Loads or unloads gg_knife_pro').makepublic()
 '''
-//----------------------------------------------------------------------------
-// gg_default_addons.cfg -- Default addon configuration.
-//
-// This file defines GunGame Addon settings. Any alteration of this file
-// requires a server restart or a reload of GunGame.
-//----------------------------------------------------------------------------
-
-//=========================================================
-// ERROR LOGGING
-//=========================================================
-// When enabled, this addon logs all GunGame-related errors to a log file
-// located in:
-//
-//  * addons/eventscripts/gungame/logs/
-//
-// Note: If something in GunGame is not working and you are going to post a
-//       bug, make sure you enable this addon then post the error log when
-//       you are filing your bug report.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_error_logging 1
-
-//=========================================================
-// KNIFE PRO
-//=========================================================
-// When enabled, if you kill a player with a knife, you will level up,
-// and the victim will level down.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_knife_pro 0
-
-//=========================================================
-// KNIFE PRO LEVEL LIMIT
-//=========================================================
-// Set this to limit level stealing to players close to your own level
-//
-// Example: If this is set to 3, you will not gain a level if you knife
-//          someone more than 3 levels below you.
-//
-// Options: 0 = Disabled
-//          <level> = Enabled
-
-gg_knife_pro_limit 10
-
-//=========================================================
-// KNIFE ROOKIE
-//=========================================================
-// Similar to gg_knife_pro but not as strict:
-//
-// The attacker will level up even when the victim is on level 1.
-// The attacker will level up even though the victim cannot leveldown.
-// The victim will level down even though the attacker cannot levelup.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_knife_rookie 0
-
-//=========================================================
-// MULTI LEVEL
-//=========================================================
-// Set the below variable to the number of times a player has to level
-// up prior to recieving the multi-level bonus.
-//
-// Note: Formally knows as Triple Level Bonus.
-//
-// Options: 0 = Disabled
-//          # = The number of kills in a row the player must get in order
-//              to recieve the multi-level bonus.
-
-gg_multi_level 0
-
-//=========================================================
-// TURBO
-//=========================================================
-// This gives you your next weapon immediately when you levelup
-//
-// Note: Knife Elite automatically disables Turbo Mode.
-// Note: Recommended for Deathmatch
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_turbo 0
-
-//=========================================================
-// NOBLOCK
-//=========================================================
-// Makes it possible to move through players.
-//
-// Note: Recommended for Surf servers
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_noblock 0
-
-//=========================================================
-// DEAD STRIP
-//=========================================================
-// Strip dead players weapons so that their weapons can't be picked up.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_dead_strip 0
-
-//=========================================================
-// KNIFE ELITE
-//=========================================================
-// After a player levels up, they only get a knife until the next round.
-//
-// Note: This will override Turbo mode!
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_knife_elite 0
-
-//=========================================================
-// EARN GRENADES
-//=========================================================
-// When a player reaches grenade level, they can earn extra grenades by
-// killing enemies with another weapon.
-//
-// Note: Players can only carry one hegrenade at a time.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_earn_nade 0
-
-//=========================================================
-// UNLIMITED GRENADES
-//=========================================================
-// When a player reaches grenade level, they are given another grenade when
-// their thrown grenade detonates.
-//
-// Note: This will automatically disable the "Earn grenades" addon.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_unl_grenade 0
-
-//=========================================================
-// GRENADE BONUS
-//=========================================================
-// If this is set, players on grenade level will receive this weapon along
-// with the hegrenade.
-//
-// Note: Set this to zero to disable this function.
-// Note: You can have multiple weapons by seperating them with commas.
-// 
-// Example: gg_nade_bonus flashbang,glock,smokegrenade
-// Example: gg_nade_bonus glock
-//
-// Options: 0 = Disabled
-//         <weapon name> = Enabled
-
-gg_nade_bonus 0
-
-//=========================================================
-// RELOAD
-//=========================================================
-// When a player makes a kill the ammo in their clip is replenished.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_reload 0
-
-//=========================================================
-// FRIENDLY FIRE
-//=========================================================
-// Automatically turn on friendly fire when a player reaches "x" levels
-// below the last level (+1)
-//
-// Example: gg_friendlyfire 1
-//          => The above will turn on friendly fire when a player reaches the
-//             last level.
-//
-// Example: gg_friendlyfire 2
-//          => The above will turn on friendly fire when a player reaches one
-//             level before the last.
-//
-// Options: 0 = Disabled
-//          <level> = Enabled
-
-gg_friendlyfire 0
-
-//=========================================================
-// STATS DATABASE AND COMMANDS
-//=========================================================
-// This variable controls whether you want to keep track of winners on your
-// server.  This also enables the stat commands (!leader, !top, !rank, etc).
-//
-// Note: This will save a file to the server and requires appropiate read /
-//       write permissions.
-//
-// Note: This feature does not work on game-servers.com and clan-servers.com
-//       game servers.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_stats 0
-
-//=========================================================
-// STATS DATABASE PRUNE
-//=========================================================
-// This variable controls how many days of inactivity for a winner is
-// tolerated until they are removed from the database.
-//
-// Options: 0 = Disabled (not recommended for large servers)
-//          <days> = Enabled
-
-gg_prune_database 30
-
-//=========================================================
-// STATS LOGGING
-//=========================================================
-// When enabled, this addon will log game events for stats tracking for
-// HLstatsX and Psychostats, etc.
-//
-// Note: Other options available in "stats logging.txt".
-// Note: This should be used with third-party stats programs.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_stats_logging 0
-
-//=========================================================
-// SPAWNPOINT MANAGER
-//=========================================================
-// When enabled it will load random spawnpoints if a spawnpoint file for the
-// current map has been created.  This addon also adds commands and a menu
-// to allow admins to manage spawnpoints on the current map.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_spawnpoints 0
-
 //=========================================================
 // DEATHMATCH
 //=========================================================
@@ -293,58 +527,6 @@ gg_deathmatch 0
 // Default value: 2
 
 gg_dm_respawn_delay 2
-
-//=========================================================
-// SPAWN PROTECTION
-//=========================================================
-// Set this to the number of seconds to allow spawn protection, in which they
-// will be immune to other players fire but cannot levelup if they kill a
-// player.
-//
-// Options: 0 = Disabled
-//          <seconds> = Enabled
-
-gg_spawn_protect 0
-
-//=========================================================
-// SPAWN PROTECTION COLORS
-//=========================================================
-// Set player color while under spawn protection.
-//
-// Default values:
-//  Red: 255
-//  Green: 255
-//  Blue: 255
-//  Alpha: 150
-
-gg_spawn_protect_red 255
-gg_spawn_protect_green 255
-gg_spawn_protect_blue 255
-gg_spawn_protect_alpha 150
-
-//=========================================================
-// SPAWN PROTECTION "CANCEL-ON-FIRE"
-//=========================================================
-// If set to 1, when a player shoots when they are protected, the
-// unprotection timer will stop and they will instantly become
-// unprotected and able to level up.
-//
-// Note: Uses eventscripts_noisy, this may cause lag.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_spawn_protect_cancelonfire 0
-
-//=========================================================
-// ALLOW LEVELLING WHILST PROTECTED
-//=========================================================
-// When enabled, players can level up whilst spawn protected.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_spawn_protect_can_level_up 0
 
 //=========================================================
 // DISSOLVER
@@ -483,3 +665,12 @@ gg_welcome_msg_timeout 5
 
 gg_convert 0
 '''
+
+def unload():
+    # Remove the "notify" flags as set by addFlag('notify')
+    for cvar in config.getCvars().keys():
+        es.flags('remove', 'notify', cvar)
+    
+    # Delete the cfglib.AddonCFG instance
+    global config
+    del config

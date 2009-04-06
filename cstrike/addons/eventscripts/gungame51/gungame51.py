@@ -1,5 +1,11 @@
 # ../cstrike/addons/eventscripts/gungame/gungame.py
 
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
+
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
@@ -12,6 +18,7 @@ from core.addons.shortcuts import unloadAddon
 from core.addons.shortcuts import getAddonInfo
 from core.addons.shortcuts import addonExists
 from core.cfg.files import *
+from core.cfg import __configs__
 
 # ============================================================================
 # >> TEST CODE
@@ -21,12 +28,12 @@ def load():
     es.dbgmsg(0, '')
     es.dbgmsg(0, 'LOADING ADDONS:')
     es.dbgmsg(0, '-'*30)
-    loadAddon('gg_deathmatch')
-    loadAddon('gg_assist')
-    loadAddon('gg_multi_level')
+    es.server.cmd('gg_deathmatch 1')
+    es.server.cmd('gg_assist 1')
+    es.server.cmd('gg_multi_level 1')
     
     # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...
-    unloadAddon('gg_turbo')
+    es.server.cmd('gg_turbo 0')
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
     
@@ -45,3 +52,6 @@ def unload():
         es.dbgmsg(0, '# of addons remaining: %i' %len(getAddonInfo()))
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
+    
+    # Testing the unloading of configs and removal of flags
+    __configs__.unload('gg_en_config')

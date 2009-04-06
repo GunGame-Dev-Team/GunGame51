@@ -26,6 +26,7 @@ info.name = 'gg_knife_pro'
 info.title = 'GG Knife Pro' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.conflicts = ['gg_knife_rookie']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
