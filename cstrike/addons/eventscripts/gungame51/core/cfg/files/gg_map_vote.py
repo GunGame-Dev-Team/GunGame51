@@ -28,6 +28,39 @@ def load():
 //----------------------------------------------------------------------------
 
 //=========================================================
+// MAP VOTING
+//=========================================================
+// A map vote will be triggered once a player reaches a preset level below
+// the highest level.
+//
+// Once all human players have voted, the vote is stopped and the winning
+// map is displayed to the players.
+//
+// Note: This vote does not require any other plugin except EventScripts.
+// Note: More map vote options in gg_map_vote.cfg
+//
+// Example: If "gg_vote_trigger" is set to 3, once a player is 3 levels
+//          below the highest level, the vote will trigger.
+//
+// Options: 0 = Disabled
+//          1 = Enabled (GunGame Map Voting)
+//          2 = Third-party voting system (Uses gg_map_vote_command)
+
+gg_map_vote 0
+
+//=========================================================
+// MAP VOTE COMMAND
+//=========================================================
+// If gg_map_vote is set to 2, this is the command that will be issued
+// when the vote is triggered.
+//
+// Examples: Mani: gg_map_vote_command "ma_voterandom end 4"
+//           BeetlesMod: gg_map_vote_command "admin_votemaps"
+//           SourceMod: gg_map_vote_command "sm_map_vote"
+
+gg_map_vote_command "ma_voterandom end 4"
+
+//=========================================================
 // MAP VOTE SIZE
 //=========================================================
 // This variable controls the number of maps that will be displayed as options

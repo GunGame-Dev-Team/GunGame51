@@ -146,7 +146,7 @@ def load():
     config.text('   0 = (Disabled) Do not load gg_knife_pro.')
     config.text('   1 = (Enabled) Load gg_knife_pro.')
     config.text('Default Value: 0')
-    config.cvar('gg_knife_pro', 1, 'Enables/Disables gg_knife_pro').addFlag('notify')
+    config.cvar('gg_knife_pro', 0, 'Enables/Disables gg_knife_pro').addFlag('notify')
     
     # Knife Pro Limit
     config.text('')
@@ -485,151 +485,149 @@ def load():
     config.cvar('gg_spawn_protect_can_level_up', 0, 'Cancels spawn ' +
                 'protection when the weapon is fired.').addFlag('notify')
     
+    # Deathmatch
+    config.text('')
+    config.text('='*76)
+    config.text('>> DEATHMATCH')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Emulates a team-deathmatch mode, and players will ' +
+                'respawn when they die.')
+    config.text('Notes:')
+    config.text('   * "gg_dead_strip" will automatically be enabled.')
+    config.text('   * Will not load if "gg_dead_strip" can not be enabled.')
+    config.text('   * "gg_turbo" will automatically be enabled.')
+    config.text('   * Will not load if "gg_turbo" can not be enabled.')
+    config.text('   * "gg_dissolver" will automatically be enabled.')
+    config.text('   * Will not load if "gg_dissolver" can not be enabled.')
+    config.text('   * Will not load with "gg_map_obj" enabled.')
+    config.text('   * Will not load with "gg_knife_elite" enabled.')
+    config.text('   * Will not load with "gg_elimination" enabled.')
+    config.text('   * This addon requires usage of the "gg_respawn_cmd" ' +
+                'found in the')
+    config.text('     gg_en_config.cfg')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_deathmatch.')
+    config.text('   1 = (Enabled) Load gg_deathmatch.')
+    config.text('Default Value: 0')
+    config.cvar('gg_deathmatch', 0, 'Enables/Disables ' +
+                'gg_deathmatch.').addFlag('notify')
     
+    # Deathmatch Respawn Delay
+    config.text('')
+    config.text('='*76)
+    config.text('>> DEATHMATCH RESPAWN DELAY')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The amount of time (in seconds) to wait before ' +
+                'respawning a player after')
+    config.text('   they die.')
+    config.text('Notes:')
+    config.text('   * The respawn delay must be greater than 0.')
+    config.text('   * You can use 0.1 for a nearly immediate respawn time.')
+    config.text('   * If set to 0 or less, the delay will be set to 0.1.')
+    config.text('Options:')
+    config.text('   # = Time (in seconds) to wait before respawning a player.')
+    config.text('Default Value: 2')
+    config.cvar('gg_dm_respawn_delay', 2, 'Seconds to wait before respawning' +
+                ' a player after death.').addFlag('notify')
     
+    # Elimination
+    config.text('')
+    config.text('='*76)
+    config.text('>> ELIMINATION')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Respawn when your killer is killed.')
+    config.text('Notes:')
+    config.text('   * "gg_dead_strip" will automatically be enabled.')
+    config.text('   * Will not load if "gg_dead_strip" can not be enabled.')
+    config.text('   * "gg_turbo" will automatically be enabled.')
+    config.text('   * Will not load if "gg_turbo" can not be enabled.')
+    config.text('   * "gg_dissolver" will automatically be enabled.')
+    config.text('   * Will not load if "gg_dissolver" can not be enabled.')
+    config.text('   * Will not load with "gg_deathmatch" enabled.')
+    config.text('   * Will not load with "gg_knife_elite" enabled.')
+    config.text('   * Will not load with "gg_map_obj" enabled.')
+    config.text('   * This addon requires usage of the "gg_respawn_cmd" ' +
+                'found in the')
+    config.text('     gg_en_config.cfg')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_elimination.')
+    config.text('   1 = (Enabled) Load gg_elimination.')
+    config.text('Default Value: 0')
+    config.cvar('gg_elimination', 0, 'Enables/Disables ' +
+                'gg_elimination.').addFlag('notify')
     
+    # Dissolver
+    config.text('')
+    config.text('='*76)
+    config.text('>> DISSOLVER')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Removes ragdolls by dissolving them with various effects.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_dissolver.')
+    config.text('   1 = (Enabled) Load gg_dissolver.')
+    config.text('Default Value: 0')
+    config.cvar('gg_dissolver', 0, 'Enables/Disables ' +
+                'gg_dissolver.').addFlag('notify')
     
+    # Dissolver Effect
+    config.text('')
+    config.text('='*76)
+    config.text('>> DISSOLVER EFFECT')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The type of effect that will happen upon the ragdoll.')
+    config.text('Options:')
+    config.text('   0 = No Effect')
+    config.text('   1 = Energy')
+    config.text('   2 = Heavy Electrical')
+    config.text('   3 = Light Electrical')
+    config.text('   4 = Core Effect')
+    config.text('   5 = Random Effect')
+    config.text('Default Value: 5')
+    config.cvar('gg_dissolver_effect', 5, 'The type of effect that will ' +
+                'happen upon the ragdoll.').addFlag('notify')
     
+    # Handicap
+    config.text('')
+    config.text('='*76)
+    config.text('>> HANDICAP')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Helps newly connected players by adjusting their level.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_handicap.')
+    config.text('   1 = Set player to the lowest level player other than ' +
+                'themself.')
+    config.text('       (Catch them up if they are behind)')
+    config.text('   2 = Set player to median level.')
+    config.text('   3 = Set player to average level.')
+    config.text('Default Value: 0')
+    config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
+                'adjusting their level.').addFlag('notify')
     
-    
-    
-    
-    
-    
-    
-    
+    # Handicap Update
+    config.text('')
+    config.text('='*76)
+    config.text('>> HANDICAP UPDATE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   A timer (in seconds) that updates players\' levels who ' +
+                'are below the handicap.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_handicap_update.')
+    config.text('   1 = (Enabled) Load gg_handicap_update.')
+    config.text('Default Value: 0')
+    config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
+                'players\' levels using handicap.').addFlag('notify')
     
     config.write()
+    config.execute()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
 '''
-//=========================================================
-// DEATHMATCH
-//=========================================================
-// When enabled, this addon emulates a team-deathmatch mode, and players will
-// respawn when they die.
-//
-// Note: This addon enables: Turbo Mode.
-// Note: This addon disables: Knife Elite, Elimination.
-// Note: This addon disables: map objectives, freezetime and roundtime.
-// Note: This addon requires usage of the "gg_respawn_cmd" found in the
-//       gg_en_config.cfg
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_deathmatch 0
-
-//=========================================================
-// DEATHMATCH RESPAWN DELAY
-//=========================================================
-// This is a delay after a player dies before they will respawn.
-//
-// Default value: 2
-
-gg_dm_respawn_delay 2
-
-//=========================================================
-// DISSOLVER
-//=========================================================
-// Removes ragdolls by dissolving them with various effects.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_dissolver 0
-
-//=========================================================
-// DISSOLVER EFFECT
-//=========================================================
-// This what type of effect that will happen upon the ragdoll.
-//
-// Options: 0 = No effect
-//          1 = Energy
-//          2 = Heavy electrical
-//          3 = Light electrical
-//          4 = Core Effect
-//          5 = Random Effect
-//
-// Default value: 5
-
-gg_dissolver_effect 5
-
-//=========================================================
-// ELIMINATION
-//=========================================================
-// Elimination is an alternative to an all out deathmatch. You respawn
-// when your killer is killed.
-//
-// Note: This addon enables: Turbo Mode.
-// Note: This addon disables: Knife Elite and Deathmatch.
-// Note: This addon disables: map objectives.
-// Note: This addon requires usage of the "gg_respawn_cmd" found in the gg_en_config.cfg
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_elimination 0
-
-//=========================================================
-// HANDICAP
-//=========================================================
-// Handicap helps newly connected players by adjusting their level.
-//
-// Options: 0 = Disabled
-//          1 = Set player to the lowest level player other than themself.
-//                  (Catch them up if they are behind.)
-//          2 = Set player to median level.
-//          3 = Set player to average level.
-
-gg_handicap 0
-
-//=========================================================
-// HANDICAP UPDATE
-//=========================================================
-// Set this to the number of seconds between handicap checking for players
-// who are below the handicap and increasing their level.
-//
-// Note: If disabled, players are only updated when they join the server.
-// Note: It is recommended you do not update any faster than every 120 seconds.
-//
-// Options: 0 = Check on connect
-//          120 = Check every 2 minutes
-
-gg_handicap_update 0
-
-//=========================================================
-// MAP VOTING
-//=========================================================
-// A map vote will be triggered once a player reaches a preset level below
-// the highest level.
-//
-// Once all human players have voted, the vote is stopped and the winning
-// map is displayed to the players.
-//
-// Note: This vote does not require any other plugin except EventScripts.
-// Note: More map vote options in gg_map_vote.cfg
-//
-// Example: If "gg_vote_trigger" is set to 3, once a player is 3 levels
-//          below the highest level, the vote will trigger.
-//
-// Options: 0 = Disabled
-//          1 = Enabled (GunGame Map Voting)
-//          2 = Third-party voting system (Uses gg_map_vote_command)
-
-gg_map_vote 0
-
-//=========================================================
-// MAP VOTE COMMAND
-//=========================================================
-// If gg_map_vote is set to 2, this is the command that will be issued
-// when the vote is triggered.
-//
-// Examples: Mani: gg_map_vote_command "ma_voterandom end 4"
-//           BeetlesMod: gg_map_vote_command "admin_votemaps"
-//           SourceMod: gg_map_vote_command "sm_map_vote"
-
-gg_map_vote_command "ma_voterandom end 4"
-
 //=========================================================
 // WELCOME MESSAGE
 //=========================================================

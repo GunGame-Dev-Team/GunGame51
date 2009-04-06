@@ -27,7 +27,7 @@ info.title = 'GG Elimination'
 info.author = 'GG Dev Team' 
 info.version = '0.1'
 info.requires = ['gg_turbo', 'gg_dead_strip', 'gg_dissolver']
-info.conflicts = ['gg_knife_elite']
+info.conflicts = ['gg_deathmatch', 'gg_knife_elite']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
