@@ -1,9 +1,9 @@
 # gungame/scripts/included/gg_noblock.py
 
 '''
-$Rev$
+$Rev: 13 $
 $LastChangedBy: micbarr $
-$LastChangedDate: 2009-04-04 22:40:08 -0400 (Sat, 04 Apr 2009) $
+$LastChangedDate$
 '''
 
 # ============================================================================

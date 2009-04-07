@@ -1,7 +1,7 @@
 # ../cstrike/addons/eventscripts/gungame/core/cfg/files/gg_default_addons.py
 
 '''
-$Rev$
+$Rev: 15 $
 $LastChangedBy$
 $LastChangedDate$
 '''

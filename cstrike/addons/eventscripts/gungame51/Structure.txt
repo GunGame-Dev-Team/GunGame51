@@ -20,6 +20,6 @@
         ./custom
             *.py
             
-----> $Rev$ <----
+----> $Rev: 13 $ <----
 
 Should say 11 above.
