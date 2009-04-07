@@ -1,7 +1,7 @@
 # gungame/scripts/included/gg_knife_rookie.py
 
 '''
-$Rev: 15 $
+$Rev: 13 $
 $LastChangedBy: micbarr $
 $LastChangedDate$
 '''

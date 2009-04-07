@@ -103,6 +103,47 @@ class AddonInfo(dict):
         return ['name', 'title', 'author', 'version', 'requires', 'conflicts']
 
 
+class AddonLoadedByDependency(dict):
+    '''
+    This class is designed to store subaddons that were loaded as a result of
+    being a dependency to another subaddon.
+    '''
+    
+    def add(self, dependency, addon_name):
+        '''
+        We will only add dependencies (subaddons) that were not loaded via
+        configs or that were previously determined as being loaded due to
+        being a dependency.
+        '''
+        if int(es.ServerVar(dependency)) == 0 or dependency in self:
+            if dependency not in self:
+                self[dependency] = []
+            
+            self[dependency].append(addon_name)
+            
+    def remove(self, addon_name):
+        '''
+        We will remove the addons from the list of dependencies that were
+        loaded. If the dependency no longer has any addons that rely on it,
+        we will unload the dependency.
+        '''
+        for dependency in list(self):
+            # Ensure that the subaddon is listed in the dictionary
+            if not addon_name in self[dependency]:
+                return
+            
+            # Remove the subaddon from the list
+            self[dependency].remove(addon_name)
+            
+            # If no more addons are listed under the dependency, unload it
+            if not self[dependency]:
+                unload(dependency)
+                del self[dependency]
+
+
+loadedByDependency = AddonLoadedByDependency()
+
+
 class DependencyError(Exception):
    """
    We want a nice, descriptive error for dependency problems
@@ -200,6 +241,9 @@ class AddonManager(object):
 
         # Remove dependencies or conflicts of the sub-addon being unloaded
         self.removeDependenciesConflicts(name)
+        
+        # Unload any subaddons that were loaded as dependencies
+        self.removeLoadedByDependency(name)
 
         # Unregister the events in the addon
         self.unregisterEvents(addon, name)
@@ -311,6 +355,8 @@ class AddonManager(object):
         if conflicting:
             # Loop through all addons that are not loaded and load them
             for subaddon in conflicting:
+                # Add the subaddon to the "loadedByDependency" dictionary
+                self.addLoadedByDependency(subaddon, name)
                 load(subaddon)
 
         # Add this sub-addon's dependencies and conflicts
@@ -347,6 +393,20 @@ class AddonManager(object):
         addon_conflict = info.conflicts if 'conflicts' in info else []
 
         return addon_depend, addon_conflict
+        
+    def addLoadedByDependency(self, dependency, addon_name):
+        '''
+        Adds dependencies to be unloaded later that were loaded as a result of
+        as sub-addon.
+        '''
+        loadedByDependency.add(dependency, addon_name)
+        
+    def removeLoadedByDependency(self, name):
+        '''
+        Removes and unloads dependencies that were loaded as a result of a
+        sub-addon.
+        '''
+        loadedByDependency.remove(name)
 
     def getAddonByName(self, name):
         '''

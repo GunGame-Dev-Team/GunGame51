@@ -1,7 +1,7 @@
 # gungame/scripts/included/gg_elimination.py
 
 '''
-$Rev: 15 $
+$Rev: 13 $
 $LastChangedBy: micbarr $
 $LastChangedDate$
 '''

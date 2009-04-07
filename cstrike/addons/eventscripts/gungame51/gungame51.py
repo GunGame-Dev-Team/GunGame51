@@ -29,11 +29,16 @@ def load():
     es.dbgmsg(0, 'LOADING ADDONS:')
     es.dbgmsg(0, '-'*30)
     es.server.cmd('gg_deathmatch 1')
-    es.server.cmd('gg_assist 1')
-    es.server.cmd('gg_multi_level 1')
+    #es.server.cmd('gg_assist 1')
+    #es.server.cmd('gg_multi_level 1')
     
     # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...
-    es.server.cmd('gg_turbo 0')
+    #es.server.cmd('gg_turbo 0')
+    es.server.cmd('gg_deathmatch 0')
+    from core.addons import __addons__
+    list_addons = __addons__.__order__[:]
+    es.dbgmsg(0, list_addons)
+    es.dbgmsg(0, '# of addons remaining: %i' %len(getAddonInfo()))
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
     
