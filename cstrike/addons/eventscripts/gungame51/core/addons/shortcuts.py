@@ -75,7 +75,8 @@ def addonExists(name):
         from core.addons.shortcuts import addonExists
     '''
     return AddonManager.addonExists(name)
-                                  
+
+# These are only here temporarily. Do not use them in scripts.
 def loadAddon(name):
    '''
    Loads GunGame Addons

@@ -115,10 +115,13 @@ class AddonLoadedByDependency(dict):
         configs or that were previously determined as being loaded due to
         being a dependency.
         '''
+        # Make sure the dependency's server var is 0, or already registered
         if int(es.ServerVar(dependency)) == 0 or dependency in self:
+            # Create a new dependency list
             if dependency not in self:
                 self[dependency] = []
             
+            # Add the addon to the dependency list
             self[dependency].append(addon_name)
             
     def remove(self, addon_name):
@@ -137,6 +140,7 @@ class AddonLoadedByDependency(dict):
             
             # If no more addons are listed under the dependency, unload it
             if not self[dependency]:
+                es.set(dependency, 0)
                 unload(dependency)
                 del self[dependency]
 
@@ -357,6 +361,7 @@ class AddonManager(object):
             for subaddon in conflicting:
                 # Add the subaddon to the "loadedByDependency" dictionary
                 self.addLoadedByDependency(subaddon, name)
+                es.set(subaddon, 1)
                 load(subaddon)
 
         # Add this sub-addon's dependencies and conflicts
@@ -479,10 +484,8 @@ class AddonManager(object):
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
         return int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts' +
-                                     '/included/%s.py' %name))) or \
-                                     int(os.path.isfile(getGameDir('addons' +
-                                     '/eventscripts/gungame51/scripts' +
-                                     '/custom/%s.py' %name)))
+            '/included/%s.py' %name))) or int(os.path.isfile(getGameDir('addons' +
+            '/eventscripts/gungame51/scripts/custom/%s.py' %name)))
 
     @staticmethod
     def callBlock(addon, blockname, *a, **kw):
