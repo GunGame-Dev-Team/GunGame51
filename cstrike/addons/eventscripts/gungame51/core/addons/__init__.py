@@ -1,5 +1,11 @@
 # ../cstrike/addons/eventscripts/gungame51/core/addons/__init__.py
 
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
+
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
@@ -11,6 +17,7 @@ import es
 
 # GunGame Imports
 from gungame51.core import getGameDir
+from gungame51.core.players import Player
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -257,6 +264,9 @@ class AddonManager(object):
         
         # Remove the module from the order of called events
         self.__order__.remove(name)
+        
+        # Remove custom attribute callbacks associated with this addon
+        Player.removeCallBacksForAddon(name)
         
         # Call the unload block as is normally done by ES
         # Again, we do this last so it doesn't matter if the block errors

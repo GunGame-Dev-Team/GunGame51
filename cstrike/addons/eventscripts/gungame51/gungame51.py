@@ -36,11 +36,12 @@ def load():
     es.dbgmsg(0, '')
     es.dbgmsg(0, 'LOADING ADDONS:')
     es.dbgmsg(0, '-'*30)
-    es.server.cmd('gg_deathmatch 1')
+    #es.server.cmd('gg_deathmatch 1')
     
     # Wow! I have to use a delay to list the addons because they load so quickly!
-    gamethread.delayed(0, listAddons, ())
+    #gamethread.delayed(0, listAddons, ())
     #es.server.cmd('gg_assist 1')
+    loadAddon('gg_assist')
     #es.server.cmd('gg_multi_level 1')
     
     # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...

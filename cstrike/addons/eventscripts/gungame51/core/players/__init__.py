@@ -1,48 +1,67 @@
+# ../cstrike/addons/eventscripts/gungame51/core/players/__init__.py
+
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
+
+# ============================================================================
+# >> IMPORTS
+# ============================================================================
+# EventScripts Imports
 import es
 from playerlib import uniqueid
 
+# ============================================================================
+# >> CLASSES
+# ============================================================================
 class CustomAttributeCallbacks(dict):
     '''
-    This class is designed to store subaddons that were loaded as a result of
-    being a dependency to another subaddon.
+    This class is designed to store callback functions for custom attributes
+    added to GunGame via a subaddon.
     '''
-    
-    def add(self, attribute, function):
+    def add(self, attribute, function, addon):
         '''
-        We will only add dependencies (subaddons) that were not loaded via
-        configs or that were previously determined as being loaded due to
-        being a dependency.
+        Adds a callback to execute when a previously created attribute is set
+        via the BasePlayer class' __setitem__ or __setattr__ methods.
+        
+        Note:
+            You can not add callbacks for primary GunGame attributes:
+                * userid
+                * steamid
+                * level
+                * preventlevel
+                * multikill
         '''
-        # Create a hook list
-        if attribute not in self:
-            self[attribute] = []
+        # Do not let them add callbacks to GunGame's attributes
+        if attribute in ['userid', 'level', 'preventlevel',
+                         'steamid', 'multikill']:
+            raise AttributeError('No callbacks are allowed to be set for "%s".'
+                %attribute)
+        
+        # Make sure that the function is callable
+        if not callable(function):
+            raise AttributeError('Callback "%s" is not callable.' %function)
             
-        if function in self[attribute]:
+        # Create the attribute callback
+        self[attribute] = (function, addon)
+            
+    def remove(self, attribute):
+        '''
+        Removes a callback to execute when a previously created attribute is
+        set via the BasePlayer class' __getitem__ or __getattr__ methods.
+        '''
+        # Make sure the attribute callback exists
+        if not attribute in self:
             return
             
-        # Add the addon to the dependency list
-        self[attribute].append(function)
-            
-    def remove(self, attribute, function):
-        '''
-        We will remove the addons from the list of dependencies that were
-        loaded. If the dependency no longer has any addons that rely on it,
-        we will unload the dependency.
-        '''
-        # Ensure that the subaddon is listed in the dictionary
-        if not function in self[attribute]:
-            return
-            
-        # Remove the subaddon from the list
-        self[attribute].remove(function)
-            
-        # If no more addons are listed under the dependency, unload it
-        if not self[attribute]:
-            del self[attribute]
+        # Delete the attribtue callback
+        del self[attribute]
 
 
 setHooks = CustomAttributeCallbacks()
-getHooks = CustomAttributeCallbacks()
+
 
 class BasePlayer(object): 
     def __init__(self, userid): 
@@ -56,22 +75,40 @@ class BasePlayer(object):
         '''
         #Setting an attribute is equivalent to setting an item
         '''
+        # First, we execute the custom attribute callbacks
         if name in setHooks:
-            for function in setHooks[name]:
-                function(name, value)
+            setHooks[name][0](name, value)
+            
+        # Set the attribute value
         object.__setattr__(self, name, value)
         
     def __getattr__(self, name):
         '''
         #Getting an attribute is equivalent to getting an item
         '''
+        if name in getHooks:
+            getHooks[name](name, value)
         return object.__getattribute__(self, name)
+        
+    def __delattr__(self, name):
+        if name in ['userid', 'level', 'preventlevel', 'steamid', 'multikill']:
+            raise AttributeError('Unable to delete attribute "%s". '
+                % attribute + 'This is a required attribute for GunGame.')
+        
+        # Remove this attribute from the custom attribute callbacks
+        if name in setHooks:
+            del setHooks[name]
+            
+        object.__delattr__(self, name)
         
     def __setitem__(self, name, value):
         self.__setattr__(name, value)
         
     def __getitem__(self, name):
         return object.__getattribute__(self, name)
+        
+    def __delitem__(self, name):
+        self.__delattr__(name)
 
     def msg(self): 
         es.msg('We just sent %s a message!' %es.getplayername(self.userid)) 
@@ -101,7 +138,9 @@ class PlayerDict(dict):
         es.msg('Dictionary cleared!') 
         super(PlayerDict, self).clear() 
 
+
 players = PlayerDict() 
+
 
 class Player(object):
     def __init__(self, userid):
@@ -124,8 +163,18 @@ class Player(object):
             object.__setattr__(self, name, value)
         else:
             players[self.userid][name] = value
-           
-    def addAttributeCallBack(self, attribute, function):
+            
+    def __delitem__(self, name):
+        del players[self.userid][name]
+        
+    def __delattr__(self, name):
+        del players[self.userid][name]
+            
+    # ========================================================================
+    # Player() Static Class Methods
+    # ========================================================================
+    @staticmethod
+    def addAttributeCallBack(attribute, function, addon):
         '''
         Description:
             Adds a callback function when an attribute is set. The callback
@@ -148,40 +197,17 @@ class Player(object):
                 else:
                     raise ValueError('Value must be between 1 and 10!')
         '''
-        if not hasattr(players[self.userid], attribute):
-            raise AttributeError('%s has no attribute: %s' %(players[self.userid], attribute))
-            
-        setHooks.add(attribute, function)
-
-def player_spawn(event_var): 
-    if int(event_var['es_userteam']) > 1:
-        myPlayer = Player(event_var['userid'])
-        es.dbgmsg(0, '')
-        es.dbgmsg(0, 'Player Spawn: (%s)' %myPlayer.steamid)
-        es.dbgmsg(0, '-'* 30)
-        es.msg('%s\'s level: %s' %(event_var['es_username'], myPlayer.level))
-        es.dbgmsg(0, '-'* 30)
-
-def player_death(event_var):
-    myPlayer = Player(event_var['attacker'])
-    myPlayer.level += 1
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, 'Player Death: (%s killed %s)' %(event_var['es_attackername'], event_var['es_username']))
-    es.dbgmsg(0, '-'* 30)
-    es.msg('%s\'s level: %s' %(event_var['es_attackername'], myPlayer.level))
-    es.dbgmsg(0, '-'* 30)
-    
-    myPlayer.customattribute = 5
-    es.dbgmsg(0, BasePlayer.__dict__)
-    myPlayer.addAttributeCallBack('customattribute', mySetHook)
-    myPlayer.customattribute = 1
-    es.dbgmsg(0, '%s has a custom attribute of: %s' %(event_var['es_attackername'], myPlayer['customattribute']))
-
-def player_disconnect(event_var): 
-    del players[event_var['userid']]
-    
-def mySetHook(name, value):
-    if name == 'customattribute':
-        if value not in range(1, 10):
-            raise ValueError('%s must be between 1 and 10...it was set to %s, noob.' %(name, value))
-    es.dbgmsg(0, 'Set Hook was called for "%s" with a value of %s' %(name, value))
+        setHooks.add(attribute, function, addon)
+        
+    @staticmethod
+    def removeAttributeCallBack(attribute):
+        setHooks.remove(attribute)
+        
+    @staticmethod
+    def removeCallBacksForAddon(addon):
+        for attribute in list(setHooks):
+            if not addon in setHooks[attribute]:
+                continue
+                
+            es.dbgmsg(0, 'Removing attribute "%s" from callbacks.' %attribute)
+            setHooks.remove(attribute)
