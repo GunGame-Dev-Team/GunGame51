@@ -16,55 +16,64 @@ import es
 # >> CLASSES
 # ============================================================================
 class EventManager(object):
-    def gg_levelup(self, userid, levelsAwarded, victim, reason):
+    def gg_levelup(self, playerInstance, levelsAwarded, victim, reason):
         '''
         Adds a declared number of levels to the attacker.
         
         Arguments:
+            * playerInstance: (required)
+                The stored BasePlayer instance contained within the PlayerDict.
+                    - AKA "player[userid]"
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.
-            * victim: (default of 0)
+            * victim: (required)
                 The userid of the victim.
-            * reason: (not required)
+            * reason: (required)
                 The string reason for leveling up the attacker.
         '''
-        from gungame51.core.players import players
-        
         # Set old level and the new level
-        oldLevel = players[userid].level
-        newLevel = players[userid].level + int(levelsAwarded)
-        players[userid].level = newLevel
+        oldLevel = playerInstance.level
+        newLevel = playerInstance.level + int(levelsAwarded)
+        playerInstance.level = newLevel
         
         # Fire the event
         es.event('initialize', 'gg_levelup')
-        es.event('setint', 'gg_levelup', 'attacker', userid)
-        es.event('setint', 'gg_levelup', 'leveler', userid)
+        es.event('setint', 'gg_levelup', 'attacker', playerInstance.userid)
+        es.event('setint', 'gg_levelup', 'leveler', playerInstance.userid)
         es.event('setint', 'gg_levelup', 'old_level', oldLevel)
         es.event('setint', 'gg_levelup', 'new_level', newLevel)
         es.event('setint', 'gg_levelup', 'userid', victim)
         es.event('setstring', 'gg_levelup', 'reason', reason)
         es.event('fire', 'gg_levelup')
-        
         return True
         
-    def gg_leveldown(self, userid, levelsTaken, attacker, reason):
+    def gg_leveldown(self, playerInstance, levelsTaken, attacker, reason):
         '''
-        This player should be the victim (the player that is levelling down)
+        Removes a declared number of levels from the victim.
+        
+        Arguments:
+            * playerInstance: (required)
+                The stored BasePlayer instance contained within the PlayerDict.
+                    - AKA "player[userid]"
+            * levelsAwarded: (required)
+                The number of levels to award to the attacker.
+            * victim: (required)
+                The userid of the victim.
+            * reason: (required)
+                The string reason for leveling up the attacker.
         '''
-        from gungame51.core.players import players
         # Set old level and the new level
-        oldLevel = players[userid].level
-        players[userid].level = oldLevel - int(levelsTaken)
+        oldLevel = playerInstance.level
+        playerInstance.level = oldLevel - int(levelsTaken)
         
         # Fire the event
         es.event('initialize', 'gg_leveldown')
-        es.event('setint', 'gg_leveldown', 'userid', userid)
-        es.event('setint', 'gg_leveldown', 'leveler', userid)
+        es.event('setint', 'gg_leveldown', 'userid', playerInstance.userid)
+        es.event('setint', 'gg_leveldown', 'leveler', playerInstance.userid)
         es.event('setint', 'gg_leveldown', 'old_level', oldLevel)
-        es.event('setint', 'gg_leveldown', 'new_level', players[userid].level)
+        es.event('setint', 'gg_leveldown', 'new_level', playerInstance.level)
         es.event('setint', 'gg_leveldown', 'attacker', attacker)
         es.event('setstring', 'gg_leveldown', 'reason', reason)
         es.event('fire', 'gg_leveldown')
-        
         
 events = EventManager()

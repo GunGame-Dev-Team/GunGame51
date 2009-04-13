@@ -54,6 +54,10 @@ class CustomAttributeCallbacks(dict):
         '''
         Removes a callback to execute when a previously created attribute is
         set via the BasePlayer class' __getitem__ or __getattr__ methods.
+        
+        Note:
+            No exceptions are raised if you attempt to delete a non-existant
+            callback.
         '''
         # Make sure the attribute callback exists
         if not attribute in self:
@@ -86,31 +90,32 @@ class BasePlayer(object):
         object.__setattr__(self, name, value)
         
     def __getattr__(self, name):
-        '''
-        #Getting an attribute is equivalent to getting an item
-        '''
-        if name in getHooks:
-            getHooks[name](name, value)
+        # Return the attribute value
         return object.__getattribute__(self, name)
         
     def __delattr__(self, name):
+        # Make sure we don't try to delete required GunGame attributes
         if name in ['userid', 'level', 'preventlevel', 'steamid', 'multikill']:
             raise AttributeError('Unable to delete attribute "%s". '
                 % attribute + 'This is a required attribute for GunGame.')
         
-        # Remove this attribute from the custom attribute callbacks
+        # Remove this attribute from the custom attribute callbacks, if any
         if name in setHooks:
             del setHooks[name]
             
+        # Delete the attribute
         object.__delattr__(self, name)
         
     def __setitem__(self, name, value):
+        # Forward to __setattr__
         self.__setattr__(name, value)
         
     def __getitem__(self, name):
+        # Return using __getattr__
         return object.__getattribute__(self, name)
         
     def __delitem__(self, name):
+        # Forward to __delattr__
         self.__delattr__(name)
         
     def levelup(self, levelsAwarded, victim=0, reason=''):
@@ -130,29 +135,48 @@ class BasePlayer(object):
             return False
             
         # Use the EventManager to call the gg_levelup event
-        events.gg_levelup(self.userid, levelsAwarded, victim, reason)
+        events.gg_levelup(self, levelsAwarded, victim, reason)
         
     def leveldown(self, levelsTaken, attacker=0, reason=''):
         '''
-        This player should be the victim (the player that is levelling down)
+        Removes a declared number of levels from the victim.
+        
+        Arguments:
+            * levelsAwarded: (required)
+                The number of levels to award to the attacker.
+            * victim: (default of 0)
+                The userid of the victim.
+            * reason: (not required)
+                The string reason for leveling up the attacker.
         '''
         # Return false if we can't level down
         if len(self.preventlevel):
             return False
             
         # Use the EventManager to call the gg_leveldown event
-        events.gg_leveldown(self.userid, levelsTaken, attacker, reason)
+        events.gg_leveldown(self, levelsTaken, attacker, reason)
         
     def msg(self):
+        # This is where we will handle/send translated GunGame messages
         es.msg('We just sent %s a message!' %es.getplayername(self.userid))
+        
+    def hudhint(self):
+        # This is where we will handle/send translated GunGame hudhints
+        es.msg('We just sent %s a hudhint!' %es.getplayername(self.userid))
 
 
-class PlayerDict(dict): 
+class PlayerDict(dict):
+    '''
+    A class-based dictionary to contain instances of BasePlayer.
+    
+    Note:
+        This class is meant for private use.
+    '''
     def __getitem__(self, userid): 
-        """ 
-        When we get an item in the dictionary BasePlayer is instantiated 
-        if it hasn't been already 
-        """ 
+        '''
+        When we get an item in the dictionary BasePlayer is instantiated if it
+        hasn't been already.
+        '''
         userid = int(userid) 
         if userid not in self: 
             self[userid] = BasePlayer(userid) 
@@ -161,46 +185,77 @@ class PlayerDict(dict):
         return super(PlayerDict, self).__getitem__(userid)
 
     def __delitem__(self, userid): 
-        """ Putting the existence check here makes it easier to delete players """ 
-        userid = int(userid) 
-        if userid in self: 
-            del super(PlayerDict, self)[userid] 
+        '''
+        Putting the existence check here makes it easier to delete players.
+        '''
+        userid = int(userid)
+        if userid in self:
+            del super(PlayerDict, self)[userid]
 
     def clear(self): 
-        """ Invariably you will put something here """ 
-        es.msg('Dictionary cleared!') 
-        super(PlayerDict, self).clear() 
+        """ Invariably you will put something here """
+        es.msg('Dictionary cleared!')
+        super(PlayerDict, self).clear()
 
 
 players = PlayerDict()
 
 
 class Player(object):
+    '''
+    This class is intended to be used as the class container for interaction
+    with all GunGame-based player attributes. This class forwards to the stored
+    PlayerDict instance of the player's userid, which in return forwards to the
+    BasePlayer class.
+    
+    Usage:
+        # Setting attributes
+        Player(userid).customattribute = value
+        Player(userid)['customattribute'] = value
+        
+        # Getting attributes
+        level = Player(userid).level
+        level = Player(userid)['level']
+        
+        # Deleting custom attributes
+        del Player(userid).customattribute
+        
+    Note:
+        For class methods, see the gungame.core.players.BasePlayer class.
+    '''
     def __init__(self, userid):
         self.userid = int(userid)
         
     def __getitem__(self, item):
+        # We only directly allow the attribute "userid" to be set
         return players[self.userid][item]
         
     def __setitem__(self, item, value):
+        # We only directly allow the attribute "userid" to be set
         players[self.userid][item] = value
     
     def __getattr__(self, name):
         if name == 'userid':
+            # We only directly allow the attribute "userid" to be retrieved
             object.__getattr__(self, name)
         else:
+            # Redirect to the PlayerDict instance
             return players[self.userid][name]
       
     def __setattr__(self, name, value):
         if name == 'userid':
+            # We only directly allow the attribute "userid" to be set
             object.__setattr__(self, name, value)
         else:
+            # Redirect to the PlayerDict instance
             players[self.userid][name] = value
             
     def __delitem__(self, name):
+        # Redirect to the PlayerDict instance
         del players[self.userid][name]
         
     def __delattr__(self, name):
+        # Redirect to the PlayerDict instance
         del players[self.userid][name]
             
     # ========================================================================
@@ -209,36 +264,69 @@ class Player(object):
     @staticmethod
     def addAttributeCallBack(attribute, function, addon):
         '''
-        Description:
-            Adds a callback function when an attribute is set. The callback
-            function must have 2 arguments declared. The first argument will
-            be the actual name of the attribute. The second argument will be
-            the value that it was set to.
-        
-        Notes:
-            You must set (instantiate) a custom attribute before adding an
-            attribute callback to it.
+        Adds a callback function when an attribute is set using the class-
+        based dictionary CustomAttributeCallbacks. The callback function
+        must have 2 arguments declared. The first argument will be the
+        actual name of the attribute. The second argument will be the value
+        that it was set to.
             
-            If an error is raised in your callback, the value will not be set.
+        Notes:
+            * If an error is raised in your callback, the value will not be
+              set.
+            * You can set callbacks before you set the custom attribute on the
+              player instances.
+            * The intention of this method is to be able to check the value of
+              custom attributes, and raise errors if they are not within
+              certain ranges/specifications.
         
         Usage:
-            addAttributeCallBack(attributeName, callbackFunction)
+            Player.addAttributeCallBack('attributeName', callbackFunction,
+                                        'gg_addon_name')
             
             def callbackFunction(name_of_the_attribute, value_to_be_checked):
-                if value > 0 and value < 10:
-                    pass
-                else:
-                    raise ValueError('Value must be between 1 and 10!')
+                if name_of_the_attribute == 'attributeName':
+                    if value_to_be_checked > 0 and value_to_be_checked < 10:
+                        pass
+                    else:
+                        raise ValueError('Value must be between 1 and 10!')
         '''
+        # Add the attribute callback to the CustomAttributeCallbacks instance
         setHooks.add(attribute, function, addon)
         
     @staticmethod
     def removeAttributeCallBack(attribute):
+        '''
+        Removes a callback function that is called when a named attribute is
+        set using the class-based dictionary CustomAttributeCallbacks.
+        
+        Note:
+            Attempting to remove a non-existant attribute callback will not
+            raise an exception.
+            
+        Usage:
+            Player.removeAttributeCallBack('attributeName')
+        '''
+        # Remove the callback from the CustomAttributeCallbacks instance
         setHooks.remove(attribute)
         
     @staticmethod
     def removeCallBacksForAddon(addon):
+        '''
+        Removes all attribute callbacks from the class-based dictionary
+        CustomAttributeCallBacks that have been associated with the named
+        addon.
+        
+        Usage:
+            Player.removeCallBacksForAddon('gg_addon_name')
+            
+        Note:
+            Attempting to remove attributes from an addon that does not exist
+            or if no attributes exist that are associated with the addon will
+            not raise an exception.
+        '''
+        # Loop through each attribute in the CustomAttributeCallBacks instance
         for attribute in list(setHooks):
+            # Continue to the next attribute if the addon name is not found
             if not addon in setHooks[attribute]:
                 continue
                 

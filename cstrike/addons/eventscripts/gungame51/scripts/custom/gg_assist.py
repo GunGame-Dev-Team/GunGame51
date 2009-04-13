@@ -48,8 +48,6 @@ def load():
         Player(userid).assistpoints = 0
     Player.addAttributeCallBack('assistpoints', callback, 'gg_assist')
     
-    help(Player(userid).levelup)
-    
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
