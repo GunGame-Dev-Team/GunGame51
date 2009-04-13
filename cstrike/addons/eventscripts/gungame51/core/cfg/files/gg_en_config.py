@@ -16,6 +16,7 @@ import cfglib
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
+global config
 config = cfglib.AddonCFG('%s/cfg/gungame51/gg_en_config.cfg'
         %es.ServerVar('eventscripts_gamedir'))
         

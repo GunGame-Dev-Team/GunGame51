@@ -172,14 +172,6 @@ class AddonCompatibility(dict):
    dependency or conflict so we know what addons rely or conflict with other
    addons.
    '''
-
-   def notAcceptable(self, name, namelist):
-      '''
-      Returns a set object of sub-addons in "namelist" that intersect with
-      this instance's stored dependencies or conflicts
-      '''
-      return set(namelist).intersection(self)
-
    def add(self, addon_name, namelist):
       '''
       Adds a list of dependencies or conflicts, storing the
@@ -435,6 +427,8 @@ class AddonManager(object):
         addonType = AddonManager().getAddonType(name)
         modulePath = 'gungame51.scripts.%s.%s' %(addonType, name)
         mod = __import__(modulePath, globals(), locals(), [''])
+        reload(mod)
+        
         return mod
         
     # ========================================================================
