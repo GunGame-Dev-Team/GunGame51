@@ -310,8 +310,11 @@ class AddonManager(object):
                     del current_event[name]
                 # Unregister the event if no more sub-addons are using it
                 if not self.__events__[item]:
+                    # Unregister the event with EventScripts
                     es.addons.unregisterForEvent(self, item)
                     
+                    # Remove the event from our __events__ dictionary
+                    del self.__events__[item]
     
     def callEvent(self, event_var):
         '''

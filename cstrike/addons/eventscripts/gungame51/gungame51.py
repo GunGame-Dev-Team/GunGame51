@@ -20,6 +20,7 @@ from core.addons.shortcuts import getAddonInfo
 from core.addons.shortcuts import addonExists
 from core.cfg.files import *
 from core.cfg import __configs__
+from core.cfg import getConfigList
 
 '''
 import core.addons.unittest as addons
@@ -54,6 +55,8 @@ def load():
     
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
+    
+    es.dbgmsg(0, getConfigList('meh'))
     
 def es_map_start(event_var):
     # Load custom GunGame events

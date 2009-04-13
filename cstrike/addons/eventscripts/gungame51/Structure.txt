@@ -11,14 +11,18 @@
             __init__.py
             shortcuts.py
         ./events (from core.events import events)
-            events.py
+            __init__.py
             ./data
                 es_gungame_events.res
     ./scripts (from scripts.included import scriptname)
         ./included
-            *.py
+            ./scriptname
+	        __init__.py
+                scriptname.py
         ./custom
-            *.py
+            ./scriptname
+	        __init__.py
+                scriptname.py
             
 ----> $Rev: 13 $ <----
 
