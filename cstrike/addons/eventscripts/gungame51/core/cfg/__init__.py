@@ -40,6 +40,9 @@ class ConfigManager(object):
         # Unload the config
         config.unload()
         
+        # Remove the stored config module
+        del self.__loaded__[name]
+        
     def getConfigByName(self, name):
         '''
         Returns the module of an addon by name
@@ -50,6 +53,8 @@ class ConfigManager(object):
         else:
             self.__loaded__[name] = __import__('gungame51.core.cfg.files.%s'
                 %name, globals(), locals(), [''])
+                
+            reload(self.__loaded__[name])
         
         return self.__loaded__[name]
         

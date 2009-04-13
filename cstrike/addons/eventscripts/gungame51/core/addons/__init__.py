@@ -427,6 +427,8 @@ class AddonManager(object):
         addonType = AddonManager().getAddonType(name)
         modulePath = 'gungame51.scripts.%s.%s' %(addonType, name)
         mod = __import__(modulePath, globals(), locals(), [''])
+        
+        # We have to reload the module to re-instantiate the globals
         reload(mod)
         
         return mod

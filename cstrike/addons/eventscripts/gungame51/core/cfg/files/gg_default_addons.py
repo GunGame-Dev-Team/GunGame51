@@ -665,10 +665,11 @@ gg_convert 0
 '''
 
 def unload():
+    global config
+    
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
     
     # Delete the cfglib.AddonCFG instance
-    global config
     del config
