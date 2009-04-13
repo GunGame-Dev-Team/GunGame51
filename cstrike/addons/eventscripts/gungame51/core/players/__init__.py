@@ -13,6 +13,9 @@ $LastChangedDate$
 import es
 from playerlib import uniqueid
 
+# GunGame Imports
+from gungame51.core.events import events
+
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -109,9 +112,39 @@ class BasePlayer(object):
         
     def __delitem__(self, name):
         self.__delattr__(name)
-
-    def msg(self): 
-        es.msg('We just sent %s a message!' %es.getplayername(self.userid)) 
+        
+    def levelup(self, levelsAwarded, victim=0, reason=''):
+        '''
+        Adds a declared number of levels to the attacker.
+        
+        Arguments:
+            * levelsAwarded: (required)
+                The number of levels to award to the attacker.
+            * victim: (default of 0)
+                The userid of the victim.
+            * reason: (not required)
+                The string reason for leveling up the attacker.
+        '''
+        # Return false if we can't level up
+        if len(self.preventlevel):
+            return False
+            
+        # Use the EventManager to call the gg_levelup event
+        events.gg_levelup(self.userid, levelsAwarded, victim, reason)
+        
+    def leveldown(self, levelsTaken, attacker=0, reason=''):
+        '''
+        This player should be the victim (the player that is levelling down)
+        '''
+        # Return false if we can't level down
+        if len(self.preventlevel):
+            return False
+            
+        # Use the EventManager to call the gg_leveldown event
+        events.gg_leveldown(self.userid, levelsTaken, attacker, reason)
+        
+    def msg(self):
+        es.msg('We just sent %s a message!' %es.getplayername(self.userid))
 
 
 class PlayerDict(dict): 
@@ -139,7 +172,7 @@ class PlayerDict(dict):
         super(PlayerDict, self).clear() 
 
 
-players = PlayerDict() 
+players = PlayerDict()
 
 
 class Player(object):
@@ -209,5 +242,5 @@ class Player(object):
             if not addon in setHooks[attribute]:
                 continue
                 
-            es.dbgmsg(0, 'Removing attribute "%s" from callbacks.' %attribute)
+            # Remove the custom attribute callback
             setHooks.remove(attribute)

@@ -1,3 +1,5 @@
+# ../cstrike/addons/eventscripts/gungame51/scripts/custom/gg_assist.py
+
 '''
 $Rev$
 $LastChangedBy$
@@ -46,16 +48,32 @@ def load():
         Player(userid).assistpoints = 0
     Player.addAttributeCallBack('assistpoints', callback, 'gg_assist')
     
+    help(Player(userid).levelup)
+    
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+    
+    for userid in es.getUseridList():
+        del Player(userid).assistpoints
+        
+    Player.removeAttributeCallBack('assistpoints')
     
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-'''
-def player_spawn(event_var):
-    del Player(event_var['userid'])['assistpoints']
-'''
+
+def player_death(event_var):
+    attacker = int(event_var['attacker'])
+    victim = int(event_var['userid'])
+    Player(attacker).levelup(1, victim, 'levelup')
+    Player(attacker).leveldown(1, victim, 'leveldown')
+    Player(attacker).msg()
+    
+def gg_levelup(event_var):
+    es.dbgmsg(0, '%s just leveled up: %s' %(event_var['es_attackername'], event_var['new_level']))
+    
+def gg_leveldown(event_var):
+    es.dbgmsg(0, '%s just leveled down: %s' %(event_var['es_username'], event_var['new_level']))
 
 '''
 def player_death(event_var):

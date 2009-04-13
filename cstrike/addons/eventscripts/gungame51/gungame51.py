@@ -32,6 +32,9 @@ addons.testGetAddonType()
 # >> TEST CODE
 # ============================================================================
 def load():
+    # Load custom events
+    es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    
     # Load our test addons
     es.dbgmsg(0, '')
     es.dbgmsg(0, 'LOADING ADDONS:')
@@ -50,6 +53,10 @@ def load():
     
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
+    
+def es_map_start(event_var):
+    # Load custom GunGame events
+    es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
 def listAddons():
     from core.addons import __addons__
