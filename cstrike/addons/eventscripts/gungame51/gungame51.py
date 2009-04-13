@@ -20,6 +20,7 @@ from core.addons.shortcuts import getAddonInfo
 from core.addons.shortcuts import addonExists
 from core.cfg.files import *
 from core.cfg import __configs__
+
 '''
 import core.addons.unittest as addons
 
@@ -39,7 +40,7 @@ def load():
     es.dbgmsg(0, '')
     es.dbgmsg(0, 'LOADING ADDONS:')
     es.dbgmsg(0, '-'*30)
-    #es.server.cmd('gg_deathmatch 1')
+    es.server.cmd('gg_deathmatch 1')
     
     # Wow! I have to use a delay to list the addons because they load so quickly!
     #gamethread.delayed(0, listAddons, ())

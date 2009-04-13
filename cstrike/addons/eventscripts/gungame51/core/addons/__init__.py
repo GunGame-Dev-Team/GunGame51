@@ -425,7 +425,7 @@ class AddonManager(object):
       
         # If the addon is not loaded we need to import it
         addonType = AddonManager().getAddonType(name)
-        modulePath = 'gungame51.scripts.%s.%s' %(addonType, name)
+        modulePath = 'gungame51.scripts.%s.%s.%s' %(addonType, name, name)
         mod = __import__(modulePath, globals(), locals(), [''])
         
         # We have to reload the module to re-instantiate the globals
@@ -477,11 +477,11 @@ class AddonManager(object):
                 % name)
         
         # Get addon type
-        if os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts/included' +
-            '/%s.py' %name)):
+        if os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts/' +
+            'included/%s/%s.py' %(name, name))):
             return 'included'
-        elif os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts/custom' +
-            '/%s.py' %name)):
+        elif os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+            'scripts/custom/%s/%s.py' %(name, name))):
             return 'custom'
             
     @staticmethod
@@ -489,9 +489,10 @@ class AddonManager(object):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
-        return int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts' +
-            '/included/%s.py' %name))) or int(os.path.isfile(getGameDir('addons' +
-            '/eventscripts/gungame51/scripts/custom/%s.py' %name)))
+        return int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+            'scripts/included/%s/%s.py' %(name, name)))) or \
+            int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+            'scripts/custom/%s/%s.py' %(name, name))))
 
     @staticmethod
     def callBlock(addon, blockname, *a, **kw):
@@ -525,15 +526,10 @@ def getValidAddons():
     list_addons = []
     
     for path in [included, custom]:
-        for filename in os.listdir(path):
+        for item in os.listdir(path):
             # Ignore subfolders
-            if os.path.isdir(os.path.join(path, filename)):
+            if not os.path.isdir(os.path.join(path, item)):
                 continue
-            if '.pyc' in filename:
-                continue
-            if '__init__' in filename:
-                continue
-            filename = filename.split('.')
-            if len(filename) > 1 and filename[1] == 'py':
-                list_addons.append(filename[0])
+                
+            list_addons.append(item)
     return list_addons
