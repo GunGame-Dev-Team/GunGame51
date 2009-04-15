@@ -21,6 +21,7 @@ from core.addons.shortcuts import addonExists
 from core.cfg.files import *
 from core.cfg import __configs__
 from core.cfg import getConfigList
+from core.weapons import weaponorders
 
 '''
 import core.addons.unittest as addons
@@ -36,7 +37,7 @@ addons.testGetAddonType()
 def load():
     # Load custom events
     es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
-    
+    '''
     # Load our test addons
     es.dbgmsg(0, '')
     es.dbgmsg(0, 'LOADING ADDONS:')
@@ -55,8 +56,10 @@ def load():
     
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
-    
-    es.dbgmsg(0, getConfigList('meh'))
+    '''
+    weaponorders.load('default_weapon_order')
+    weaponorders.setOrder('default_weapon_order')
+    weaponorders.echo()
     
 def es_map_start(event_var):
     # Load custom GunGame events

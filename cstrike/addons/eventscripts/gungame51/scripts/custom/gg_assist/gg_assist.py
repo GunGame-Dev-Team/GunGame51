@@ -3,7 +3,7 @@
 '''
 $Rev$
 $LastChangedBy$
-$LastChangedDate: 2009-04-12 20:26:01 -0400 (Sun, 12 Apr 2009) $
+$LastChangedDate: 2009-04-13 01:35:15 -0400 (Mon, 13 Apr 2009) $
 '''
 
 # ============================================================================
@@ -59,9 +59,7 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-def player_activate(event_var):
-    Player(event_var['userid']).assistpoints = 0
-    
+
 def player_death(event_var):
     attacker = int(event_var['attacker'])
     victim = int(event_var['userid'])
