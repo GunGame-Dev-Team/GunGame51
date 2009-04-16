@@ -31,6 +31,14 @@ addons.testAddonExists()
 addons.testGetAddonType()
 '''
 
+# ==================================
+#      THIS WILL BE IMPORTANT LATER
+# LOAD WEAPON ORDERS
+# LOAD CONFIGS
+# LOAD ADDONS
+# LOAD PLAYER CLASS
+# ==================================
+
 # ============================================================================
 # >> TEST CODE
 # ============================================================================
@@ -71,8 +79,6 @@ def load():
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
     '''
-    
-    
     
 def es_map_start(event_var):
     # Load custom GunGame events

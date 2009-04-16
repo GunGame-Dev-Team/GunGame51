@@ -9,6 +9,9 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+# Python imports
+import os.path
+
 # EventScripts Imports
 import es
 from weaponlib import getWeaponList
@@ -170,7 +173,7 @@ class WeaponManager(object):
     def __init__(self):
         self.__weaponorders__ = {}
         self.currentorder = None
-        self.gungameorder = None
+        self.gungameorder = 'default_weapon_order'
         
     def load(self, name):
         '''
@@ -212,6 +215,11 @@ class WeaponManager(object):
         gg_multikill_override
         Setting a new weapon order
         Changing the weapon order type
+        
+        We can create a gamethread.delayedname any time one of these changes,
+        and delay the delayedname for 1 second. If another item changes (which
+        should happen within milliseconds), we can cancel the delayedname, and
+        create a new one.
         '''
     def __getitem__(self, item):
         if name in ['currentorder', '__weaponorders__']:
@@ -256,3 +264,18 @@ class WeaponManager(object):
     
 
 weaponorders = WeaponManager()
+
+# ============================================================================
+# >> FUNCTIONS
+# ============================================================================
+def loadWeaponOrders():
+    weaponOrderPath = getGameDir('cfg/gungame51/weapon_orders')
+    
+    for item in os.listdir(weaponOrderPath):
+        # Ignore subfolders
+        if os.path.isdir(os.path.join(weaponOrderPath, item)):
+            continue
+                
+        weaponorders.load(item)
+        
+loadWeaponOrders()

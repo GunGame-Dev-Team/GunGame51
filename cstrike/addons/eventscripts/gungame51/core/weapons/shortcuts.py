@@ -1,5 +1,20 @@
+# ../cstrike/addons/eventscripts/gungame51/core/weapons/shortcuts.py
+
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
+
+# ============================================================================
+# >> IMPORTS
+# ============================================================================
+# GunGame Imports
 from gungame51.core.weapons import weaponorders
 
+# ============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# ============================================================================
 def getWeaponOrder(name=None):
     '''
     Returns the named weapon order instance if a name is provided as an
@@ -51,7 +66,13 @@ def setWeaponOrder(name, type='#default'):
     return getWeaponOrder()
     
 def getWeapon(level):
+    '''
+    Returns the name of the level's weapon set in GunGame's weapon order.
+    '''
     return getWeaponOrder().getWeapon(level)
     
 def getMultiKill(level):
-    return getWeaponOrder().getWMultiKill(level)
+    '''
+    Returns the multikill value of the level set in GunGame's weapon order.
+    '''
+    return getWeaponOrder().getMultiKill(level)
