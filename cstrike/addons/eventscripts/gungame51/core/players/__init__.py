@@ -17,6 +17,10 @@ from playerlib import uniqueid
 from gungame51.core.events import events
 from gungame51.core.weapons.shortcuts import getWeapon
 from gungame51.core.weapons.shortcuts import getMultiKill
+from gungame51.core import isDead
+from gungame51.core import isSpectator
+from gungame51.core import getOS
+from gungame51.core import GunGameError
 
 # ============================================================================
 # >> CLASSES
@@ -171,6 +175,49 @@ class BasePlayer(object):
         
     def getWeapon(self):
         return getWeapon(self.level)
+        
+    def giveWeapon(self):
+        '''Gives a player their current weapon.'''
+        # Make sure player is on a team
+        if isSpectator(self.userid):
+            raise GunGameError('Unable to give player weapon (%s):'
+                %self.userid + ' is not on a team.')
+        
+        # Make sure player is alive
+        if isDead(self.userid):
+            raise GunGameError('Unable to give player weapon (%s):'
+                %self.userid + ' is not alive.')
+        
+        # Get active weapon
+        if self.weapon != 'knife':
+            es.delayed(0, 'es_xgive %s weapon_%s; es_xsexec %s "use weapon_%s"'
+                %(self.userid, self.weapon, self.userid, self.weapon))
+                
+    def stripPlayer(self):
+        '''Strips the player of his primary and secondary weapon.'''
+        if getOS() == 'posix':
+            stripFormat  = 'es_xgive %s weapon_knife;' % self.userid
+            stripFormat += 'es_xgive %s player_weaponstrip;' % self.userid
+            stripFormat += 'es_xfire %s player_weaponstrip Strip;' % self.userid
+            stripFormat += 'es_xfire %s player_weaponstrip Kill' % self.userid
+            es.server.cmd(stripFormat)
+            return
+        
+        # Get player handle
+        playerHandle = es.getplayerhandle(self.userid)
+        
+        # Strip primary weapon
+        for weaponType in ('primary', 'secondary'):
+            weaponIndex = self.getWeaponIndex(playerHandle, weaponType)
+            if weaponIndex:
+                es.server.cmd('es_xremove %i' % weaponIndex)
+    
+    def getWeaponIndex(self, playerHandle, flag):
+        for weapon in getWeaponList(flag):
+            for weaponIndex in es.createentitylist('weapon_%s' % weapon):
+                # Check the owner against the handle
+                if es.getindexprop(weaponIndex, 'CBaseEntity.m_hOwnerEntity') == playerHandle:
+                    return weaponIndex
 
 
 class PlayerDict(dict):
