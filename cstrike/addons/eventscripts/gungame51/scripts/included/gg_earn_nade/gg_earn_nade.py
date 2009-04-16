@@ -53,7 +53,6 @@ def player_death(event_var):
         return
         
     # Is this player on nade level?
-    es.msg(Player(attackerid).weapon)
     if Player(attackerid).weapon == 'hegrenade':
     
         # Make sure the player didn't kill with an hegrenade
