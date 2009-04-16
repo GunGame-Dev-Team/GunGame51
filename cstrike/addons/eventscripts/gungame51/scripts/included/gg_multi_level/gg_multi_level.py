@@ -33,21 +33,19 @@ info.version = '0.1'
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-playerList = []
 multiLevelSound = "null.wav"
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    global playerList
 
     # Load up each player and set their multikill attribute
     for userid in es.getUseridList():
-        Player(userid).multikills = 0
+        Player(userid).multiKills = 0
         
         # Also add the userid to our playerList
-        Player(userid).multikillEntities = []
+        Player(userid).multiKillEntities = []
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
@@ -58,25 +56,37 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def player_activate(event_var):
-    global playerList
-    
+
     # Add the player's multikill attribute
     userid = int(event_var['userid'])
-    Player(userid).multikills = 0
-    Player(userid).multikillEntities = []
+    Player(userid).multiKills = 0
+    Player(userid).multiKillEntities = []
     
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
     
     # Remove this player and any of their entities
-    if userid in playerList:
+    if Player(userid).multiKillEntities:
         # Get rid of their multilevel
-        doRemoveMultiLevel(userid)
+        removeMultiLevel(userid)
 
-def player_death(event_var):
+def gg_levelup(event_var):
     userid = int(event_var['userid'])
-    attackerid = int(event_var['attacker'])
+    attackerid = int(event_var['attacker'])   
     
+    # Remove the multi-level for the victim
+    victim = Player(userid)
+    if victim.multiKillEntities:
+        
+        # Remove the multiLevel
+        removeMultiLevel(userid)
+        
+        # Cancel the gamethread
+        gamethread.cancelDelayed("%i_multilevel" % userid)
+        
+        # Reset their kills
+        victim.multiKills = 0
+        
     # Was it a suicide?
     if userid == attackerid:
         return
@@ -87,18 +97,18 @@ def player_death(event_var):
     # Teamkill?
     if int(es.getplayerteam(userid)) == int(es.getplayerteam(attackerid)):
         return
-        
+    
     # Increment multi-kills for attacker
     attacker = Player(attackerid)
-    attacker.multikills += 1
+    attacker.multiKills += 1
     
     # Is it greater than or equal to our threshold?
-    if attacker.multikills >= int(es.ServerVar("gg_multi_level")):
+    if attacker.multiKills >= int(es.ServerVar("gg_multi_level")):
         # Multi-Level them
         doMultiLevel(attackerid)
         
         # Reset their kills
-        attacker.multikills = 0
+        attacker.multiKills = 0
         
         # Remove multilevel in 10
         gamethread.delayedname(10, "%i_multilevel" % attackerid, removeMultiLevel, attackerid)
@@ -107,7 +117,6 @@ def player_death(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def doMultiLevel(userid):
-    global playerList
     global multiLevelSound
     
     es.msg(userid)
@@ -122,13 +131,13 @@ def doMultiLevel(userid):
         # ...
         
         # Create env_spark
-        cmdFormat = 'es_xgive %s env_spark; ' %userid
-        cmdFormat += 'es_xfire %s env_spark SetParent !activator;' %userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "spawnflags 896";' %userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' %userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "magnitude 8"; ' %userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "traillength 3";' %userid
-        cmdFormat += 'es_xfire %s env_spark StartSpark' %userid
+        cmdFormat = 'es_xgive %s env_spark; ' % userid
+        cmdFormat += 'es_xfire %s env_spark SetParent !activator;' % userid
+        cmdFormat += 'es_xfire %s env_spark AddOutput "spawnflags 896";' % userid
+        cmdFormat += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' % userid
+        cmdFormat += 'es_xfire %s env_spark AddOutput "magnitude 8"; ' % userid
+        cmdFormat += 'es_xfire %s env_spark AddOutput "traillength 3";' % userid
+        cmdFormat += 'es_xfire %s env_spark StartSpark' % userid
         es.server.cmd(cmdFormat)
         
         # Grab it's index
@@ -144,9 +153,16 @@ def doMultiLevel(userid):
         
         # Append it to this player's list
         if spark_index:
-            Player(userid).multikillEntities.append(spark_index)
+            Player(userid).multiKillEntities.append(spark_index)
         if speedmod_index:
-            Player(userid).multikillEntities.append(speedmod_index)
+            Player(userid).multiKillEntities.append(speedmod_index)
+            
+        # Fire gg_multi_level
+        es.dbgmsg(0, "Firing gg_multi_level event!")
+        es.event('initialize', 'gg_multi_level')
+        es.event('setint', 'gg_multi_level', 'userid', userid)
+        es.event('setint', 'gg_multi_level', 'leveler', userid)
+        es.event('fire', 'gg_multi_level')
         
 def removeMultiLevel(userid):
     # Check validity
@@ -157,13 +173,11 @@ def removeMultiLevel(userid):
         es.server.queuecmd('es_xfire %s !self "gravity 400"' % userid)
         
         # Remove the ent indexes
-        es.dbgmsg(0, Player(userid).multikillEntities)
-        while Player(userid).multikillEntities:
-            ind = Player(userid).multikillEntities.pop()
-            #es.msg(ind)
+        while Player(userid).multiKillEntities:
+            ind = Player(userid).multiKillEntities.pop()
+
             validIndexes = es.createentitylist('player_speedmod')
             validIndexes.update(es.createentitylist('env_spark'))
-            es.dbgmsg(0, validIndexes.keys())
             
             if ind not in validIndexes.keys():
                 es.dbgmsg(0, '')
@@ -172,8 +186,8 @@ def removeMultiLevel(userid):
                 es.dbgmsg(0, '-'*30)
                 es.dbgmsg(0, '')
                 
-            
-            es.server.queuecmd('es_xremove %i' % ind)
+            else:
+                es.server.queuecmd('es_xremove %i' % ind)
             
         # Clear the list
-        del Player(userid).multikillEntities[:]
+        del Player(userid).multiKillEntities[:]
