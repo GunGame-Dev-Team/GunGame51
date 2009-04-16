@@ -365,6 +365,7 @@ class AddonManager(object):
 
         # Ensure this addon does not conflict with a loaded addon
         if name in conflicts:
+            es.set(name, 0)
             raise DependencyError('Loaded sub-addon(s) "%s" conflict with ' 
                     %('", "'.join(conflicts[name])) +
                     'sub-addon "%s"' %(name))
@@ -373,6 +374,7 @@ class AddonManager(object):
         conflicting = set(self.__loaded__).intersection(addon_conflict)
         
         if conflicting:
+            es.set(name, 0)
             raise DependencyError('Sub-addon "%s" conflicts with loaded'
                 %name + ' sub-addon(s) "%s"' % ('", "'.join(conflicting)))
             
@@ -397,6 +399,7 @@ class AddonManager(object):
         '''
         # Ensure this addon is not depended on by other sub-addons
         if name in dependencies:
+            es.set(name, 1)
             raise DependencyError('Loaded sub-addon(s) "%s" depend on '
                 %('", "'.join(dependencies[name])) + 'sub-addon "%s"' %name)
         

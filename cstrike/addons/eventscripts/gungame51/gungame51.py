@@ -9,6 +9,9 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+# Python imports
+import sys
+
 # EventScripts Imports
 import es
 import gamethread
@@ -19,6 +22,9 @@ from core.weapons.shortcuts import getWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
 
 from core.cfg.files import *
+from scripts.cfg.included import *
+from scripts.cfg.custom import *
+
 from core.cfg import __configs__
 from core.cfg import getConfigList
 
@@ -50,41 +56,20 @@ addons.testGetAddonType()
 # ============================================================================
 def load():
     # Load custom events
-    es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    #es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
-    currentOrder = setWeaponOrder('default_weapon_order', '#reversed')
-    currentOrder.echo()
-    es.dbgmsg(0, '(current) The weapon for level 7 is: %s' %currentOrder.getWeapon(7))
-    es.dbgmsg(0, '(current) The multikill for level 7 is: %s' %currentOrder.getMultiKill(7))
+    # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
+    # this is needed so that the correct values are stored.
+    es.server.cmd('exec server.cfg')
     
-    myOrder = getWeaponOrder('weapon_short.txt.zomg.whatrudoing.u.bastard')
-    myOrder.echo()
-    es.dbgmsg(0, '(short) The weapon for level 3 is: %s' %myOrder.getWeapon(3))
-    es.dbgmsg(0, '(short) The multikill for level 3 is: %s' %myOrder.getMultiKill(3))
-    es.dbgmsg(0, '(current) The weapon for level 3 is: %s' %currentOrder.getWeapon(3))
-    es.dbgmsg(0, '(current) The multikill for level 3 is: %s' %currentOrder.getMultiKill(3))
-    '''
-    # Load our test addons
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, 'LOADING ADDONS:')
-    es.dbgmsg(0, '-'*30)
-    es.server.cmd('gg_deathmatch 1')
-    
-    # Wow! I have to use a delay to list the addons because they load so quickly!
-    #gamethread.delayed(0, listAddons, ())
-    #es.server.cmd('gg_assist 1')
-    '''
-    #loadAddon('gg_assist')
-    '''
-    #es.server.cmd('gg_multi_level 1')
-    
-    # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...
-    #es.server.cmd('gg_turbo 0')
-    #es.server.cmd('gg_deathmatch 0')
-    
-    es.dbgmsg(0, '-'*30)
-    es.dbgmsg(0, '')
-    '''
+    try:
+        initialize()
+    except:
+        #gungamelib.echo('gungame', 0, 0, 'Load_Exception')
+        es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+        es.excepter(*sys.exc_info())
+        es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+        es.unload('gungame')
     
 def es_map_start(event_var):
     # Load custom GunGame events
@@ -349,3 +334,147 @@ def player_death(event_var):
         
 def gg_levelup(event_var):
     es.msg('%s leveled up by killing %s!' %(event_var['es_attackername'], event_var['es_username']))
+    
+def initialize():
+    global countBombDeathAsSuicide
+    global list_stripExceptions
+    
+    '''
+    # Register addon
+    gungame = gungamelib.registerAddon('gungame')
+    gungame.setDisplayName('GunGame')
+    '''
+    # Print load started
+    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+    #gungamelib.echo('gungame', 0, 0, 'Load_Start', {'version': __version__})
+    
+    # Load custom events
+    es.loadevents('declare', 'addons/eventscripts/gungame/events/es_gungame_events.res')
+    
+    '''
+    # Loop through included addons
+    # NOTE TO DEVS: Move this over to gungamelib?
+    for includedAddon in os.listdir(gungamelib.getGameDir('addons/eventscripts/gungame/included_addons/')):
+        if includedAddon[:3] == 'gg_':
+            list_includedAddonsDir.append(includedAddon)
+    
+    # Loop through custom addons
+    # NOTE TO DEVS: Move this over to gungamelib?
+    for customAddon in os.listdir(gungamelib.getGameDir('addons/eventscripts/gungame/custom_addons/')):
+        if customAddon[:3] == 'gg_':
+            list_customAddonsDir.append(customAddon)
+    '''
+    '''
+    # Load and execute configs
+    import core.cfg.files
+    import scripts.config.included
+    import scripts.config.custom
+    '''
+    '''
+    gungamelib.echo('gungame', 0, 0, 'Load_Configs')
+    gungamelib.getConfig('gg_en_config.cfg')
+    gungamelib.getConfig('gg_default_addons.cfg')
+    gungamelib.getConfig('gg_map_vote.cfg')
+    
+    # Execute addon configs
+    #gungamelib.echo('gungame', 0, 0, 'Load_CustomConfigs')
+    
+    for addon in list_customAddonsDir:
+        gungamelib.echo('gungame', 0, 0, 'ExecuteCustomConfig', {'addon': addon})
+        gungamelib.getConfig('custom_addon_configs/%s.cfg' % addon)
+    '''
+    
+    # Fire the gg_server.cfg
+    es.server.cmd('exec gungame5/gg_server.cfg')
+    
+    # Get strip exceptions
+    if int(es.ServerVar('gg_map_strip_exceptions')) != 0:
+        list_stripExceptions = str(es.ServerVar('gg_map_strip_exceptions')).split(',')
+    '''
+    gungamelib.echo('gungame', 0, 0, 'Load_WeaponOrders')
+    '''
+    
+    # Get weapon order files
+    # ------> This should already be done
+    '''
+    baseDir = gungamelib.getGameDir('cfg/gungame5/weapon_orders/')
+    files = filter(lambda x: os.path.splitext(x)[1] == '.txt', os.listdir(baseDir))
+    
+    # Loop through the weapon order files
+    for x in files:
+        # Get file and extension
+        file, ext = os.path.splitext(x)
+        
+        # Parse the file
+        weaponOrder = gungamelib.getWeaponOrder(file)
+    '''
+    # Set this as the weapon order and set the weapon order type
+    currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
+    
+    # Set multikill override
+    if int(es.ServerVar('gg_multikill_override')) > 1:
+        currentOrder.setMultiKillOverride(int(es.ServerVar('gg_multikill_override')))
+        
+    # Echo the weapon order to console
+    currentOrder.echo()
+    '''
+    gungamelib.echo('gungame', 0, 0, 'Load_Commands')
+    
+    # Register commands
+    gungame.registerPublicCommand('weapons', gungamelib.sendWeaponOrderMenu)
+    '''
+    # Clear out the GunGame system
+    # gungamelib.resetGunGame() # TODO
+    
+    # Set Up a custom variable for voting in dict_variables
+    #dict_variables['gungame_voting_started'] = False
+    
+    # Set up a custom variable for tracking multi-rounds
+    #dict_variables['roundsRemaining'] = gungamelib.getVariableValue('gg_multi_round')
+    
+    #gungamelib.echo('gungame', 0, 0, 'Load_Warmup')
+    
+    '''
+    # Start warmup timer
+    if gungamelib.inMap():
+        # Check to see if the warmup round needs to be activated
+        if gungamelib.getVariableValue('gg_warmup_timer') > 0:
+            es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
+        else:
+            # Fire gg_start event
+            es.event('initialize','gg_start')
+            es.event('fire','gg_start')
+    '''
+    # Restart map
+    '''
+    This should all be done by the weapon order file being set/changed
+    gungamelib.msg('gungame', '#all', 'Loaded')
+    es.server.queuecmd('mp_restartgame 2')
+    '''
+    
+    '''
+    Moving all of this to an included addon
+    # Create a variable to prevent bomb explosion deaths from counting a suicides
+    countBombDeathAsSuicide = False
+    '''
+    
+    '''
+    # Load sound pack
+    gungamelib.echo('gungame', 0, 0, 'Load_SoundSystem')
+    gungamelib.getSoundPack(gungamelib.getVariableValue('gg_soundpack'))
+    
+    # Load gg_info_menus -- creates and sends ingame menus (!top, !leader, !score, !ranks, etc)
+    es.server.queuecmd('es_xload gungame/included_addons/gg_info_menus')
+    
+    # Load gg_thanks -- credits
+    es.server.queuecmd('es_xload gungame/included_addons/gg_thanks')
+    '''
+    # Fire gg_load event
+    es.event('initialize', 'gg_load')
+    es.event('fire', 'gg_load')
+    
+    # Print load completed
+    '''
+    gungamelib.echo('gungame', 0, 0, 'Load_Completed')
+    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+    '''

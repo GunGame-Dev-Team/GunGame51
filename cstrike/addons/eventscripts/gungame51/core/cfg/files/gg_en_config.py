@@ -478,9 +478,6 @@ def load():
 
     # This line creates/updates the .cfg file
     config.write()
-    
-    # Execute the config
-    config.execute()
 
     # Print to console to show successfule loading of the config
     es.dbgmsg(0, '\tgg_en_config.cfg')

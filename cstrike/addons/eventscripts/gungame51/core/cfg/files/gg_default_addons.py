@@ -625,7 +625,6 @@ def load():
                 'players\' levels using handicap.').addFlag('notify')
     
     config.write()
-    config.execute()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
 '''
 //=========================================================
