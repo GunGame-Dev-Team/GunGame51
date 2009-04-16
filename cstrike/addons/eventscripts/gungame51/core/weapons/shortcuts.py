@@ -71,7 +71,7 @@ def getWeapon(level):
     '''
     return getWeaponOrder().getWeapon(level)
     
-def getMultiKill(level):
+def getLevelMultiKill(level):
     '''
     Returns the multikill value of the level set in GunGame's weapon order.
     '''

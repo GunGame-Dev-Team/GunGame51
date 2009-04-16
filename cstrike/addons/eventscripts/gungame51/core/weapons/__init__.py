@@ -16,6 +16,8 @@ import random
 # EventScripts Imports
 import es
 from weaponlib import getWeaponList
+from gamethread import delayedname
+from gamethread import cancelDelayed
 
 # GunGame Imports
 from gungame51.core import getGameDir
@@ -214,7 +216,11 @@ class BaseWeaponOrders(object):
             if knifeData != None:
                 self.order[len(self.order)+1] = knifeData
         
-        ### WE NEED TO ADD THE DELAY HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # When the weapon order changes, we create/cancel a delayed name so
+        # that we do not restart the round multiple times due to one weapon
+        # order change
+        cancelDelayed('gg_mp_restartgame')
+        delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
         
         # Set the new order type
         return type
@@ -231,7 +237,15 @@ class BaseWeaponOrders(object):
             if self.order[level][0] != 'knife' and self.order[level][0] != 'hegrenade':
                 self.order[level][1] = value
         
-        ### WE NEED TO ADD THE DELAY HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # When the weapon order changes, we create/cancel a delayed name so
+        # that we do not restart the round multiple times due to one weapon
+        # order change
+        cancelDelayed('gg_mp_restartgame')
+        delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
+        
+    def restartRound(self):
+        es.server.cmd('mp_restartgame 5')
+        es.msg('Weapon Order Changed! Restarting in 5 seconds!')
         
     def echo(self):
         '''
@@ -398,7 +412,11 @@ class WeaponManager(object):
         else:
             self.gungameorder = name
         
-        ### WE NEED TO SET THE DELAT HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # When the weapon order changes, we create/cancel a delayed name so
+        # that we do not restart the round multiple times due to one weapon
+        # order change
+        cancelDelayed('gg_mp_restartgame')
+        delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
         
         # Things that will restart the round:
         '''

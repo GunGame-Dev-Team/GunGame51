@@ -16,7 +16,7 @@ from playerlib import uniqueid
 # GunGame Imports
 from gungame51.core.events import events
 from gungame51.core.weapons.shortcuts import getWeapon
-from gungame51.core.weapons.shortcuts import getMultiKill
+from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import isDead
 from gungame51.core import isSpectator
 from gungame51.core import getOS

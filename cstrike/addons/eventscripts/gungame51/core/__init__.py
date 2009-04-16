@@ -54,7 +54,7 @@ def isSpectator(userid):
     
     @retval True The player is a spectator, currently connecting or not on the server.
     @retval False The player is on an active team.'''
-    return getPlayer(userid).team <= 1
+    return es.getplayerteam(userid) <= 1
     
 def getOS():
     return platform
