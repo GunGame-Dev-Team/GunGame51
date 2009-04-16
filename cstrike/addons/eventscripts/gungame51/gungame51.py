@@ -20,6 +20,7 @@ import gamethread
 from core.weapons.shortcuts import setWeaponOrder
 from core.weapons.shortcuts import getWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
+from core.weapons.shortcuts import getWeapon
 
 from core.cfg.files import *
 from scripts.cfg.included import *

@@ -264,13 +264,13 @@ class BaseWeaponOrders(object):
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
 
     def getWeapon(self, level):
-        if not level in range(1, len(self.order)):
+        if not level in range(1, len(self.order) + 1):
             raise ValueError('Can not get weapon for level: "%s".'
                 %level + ' Level is out of range (1-%s).' %len(self.order))
         return self.order[level][0]
 
     def getMultiKill(self, level):
-        if not level in range(1, len(self.order)):
+        if not level in range(1, len(self.order) + 1):
             raise ValueError('Can not get multikill value for level: "%s".'
                 %level + ' Level is out of range (1-%s).' %len(self.order))
         return self.order[level][1]
