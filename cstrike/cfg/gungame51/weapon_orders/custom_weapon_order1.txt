@@ -1,0 +1,78 @@
+//----------------------------------------------------------------------------
+// Weapon order file -- Defines what weapon goes with each level.
+//
+// The order of the weapons below will define what order the weapons will go
+// in on a #default weapon order rotation.
+//
+// #reverse makes the weapon order go bottom to top, with the knife and
+// hegrenade being last.
+//----------------------------------------------------------------------------
+// Weapon order file -- Defines what weapon goes with each level.
+//
+// The order of the weapons below will define what order the weapons will go
+// in on a #default weapon order rotation.
+//
+// #reverse makes the weapon order go bottom to top, with the knife and
+// hegrenade being last.
+//
+// #random makes the weapon order a random order, being re-randomized on
+// every map change.
+//
+// The first line of each weapon order must be:
+// => Weapon order name here
+//
+// Format: <weapon name> <multikill>
+//
+// Options:
+// 
+// PISTOLS:
+// glock            usp
+// p228             deagle
+// fiveseven        elite
+// 
+// SHOTGUNS:
+// m3               xm1014
+// 
+// SUB MACHINE GUNS:
+// tmp              mac10
+// mp5navy          ump45
+// p90 
+// 
+// RIFLES:
+// galil            famas
+// ak47             scout
+// m4a1             sg550
+// g3sg1            awp
+// sg552            aug
+// 
+// MACHINE GUN:
+// m249
+// 
+// OTHER:
+// hegrenade        knife
+//----------------------------------------------------------------------------
+
+=> Custom weapon order
+glock
+usp 2
+p228 3
+deagle 4 
+fiveseven 5
+elite 1
+m3 2
+xm1014 3
+tmp 4
+mac10 5
+mp5navy
+ump45 2
+p90 3
+galil 4
+famas 5
+ak47 1
+scout 2
+m4a1 3
+sg552 4
+aug 5
+m249 1
+hegrenade 1
+knife 1

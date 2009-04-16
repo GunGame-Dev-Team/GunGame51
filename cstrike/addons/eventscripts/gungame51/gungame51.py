@@ -21,8 +21,8 @@ from core.addons.shortcuts import addonExists
 from core.cfg.files import *
 from core.cfg import __configs__
 from core.cfg import getConfigList
-from core.weapons import weaponorders
-
+from core.weapons.shortcuts import setWeaponOrder
+from core.weapons.shortcuts import getWeaponOrder
 '''
 import core.addons.unittest as addons
 
@@ -57,9 +57,18 @@ def load():
     es.dbgmsg(0, '-'*30)
     es.dbgmsg(0, '')
     '''
-    weaponorders.load('default_weapon_order')
-    weaponorders.setOrder('default_weapon_order')
-    weaponorders.echo()
+    
+    currentOrder = setWeaponOrder('default_weapon_order')
+    currentOrder.echo()
+    es.dbgmsg(0, '(current) The weapon for level 7 is: %s' %currentOrder.getWeapon(7))
+    es.dbgmsg(0, '(current) The multikill for level 7 is: %s' %currentOrder.getMultiKill(7))
+    
+    myOrder = getWeaponOrder('weapon_short.txt.zomg.whatrudoing.u.bastard')
+    myOrder.echo()
+    es.dbgmsg(0, '(short) The weapon for level 3 is: %s' %myOrder.getWeapon(3))
+    es.dbgmsg(0, '(short) The multikill for level 3 is: %s' %myOrder.getMultiKill(3))
+    es.dbgmsg(0, '(current) The weapon for level 3 is: %s' %currentOrder.getWeapon(3))
+    es.dbgmsg(0, '(current) The multikill for level 3 is: %s' %currentOrder.getMultiKill(3))
     
 def es_map_start(event_var):
     # Load custom GunGame events

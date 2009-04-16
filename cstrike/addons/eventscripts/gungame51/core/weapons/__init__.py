@@ -21,16 +21,15 @@ from gungame51.core import getGameDir
 # ============================================================================           
 class BaseWeaponOrders(object):
     def __init__(self, name):
-        es.dbgmsg(0, 'INSIDE BASEWEAPONORDERS: %s' %name)
         self.file = name
         self.filepath = getGameDir('cfg/gungame51/weapon_orders/%s.txt' %self.file)
         self.title = 'Untitled Weapon Order'
-        self.type = None
+        self.type = '#default'
         self.order = {}
-        
+
         # Parse the weapon order file
         self.parse()
-        
+
     def parse(self):
         '''Parses the weapon file.'''
         # Try to open the file
@@ -38,56 +37,68 @@ class BaseWeaponOrders(object):
             weaponOrderFile = open(self.filepath, 'r')
         except IOError, e:
             raise IOError('Cannot parse weapon order file (%s): IOError: %s' % (self.filepath, e))
-            
+
         # Clean and format the lines
         lines = [x.strip() for x in weaponOrderFile.readlines()]
         lines = filter(lambda x: x and (not x.startswith('//')), lines)
         lines = [x.split('//')[0] for x in lines]
         lines = [' '.join(x.split()) for x in lines]
-        
+
         # Close the file, we have the lines
         weaponOrderFile.close()
-        
+
         # Set a variable to keep track of the levels for each weapon as we
         # parse the file
         levelCounter = 0
-        
+
         # Parse each line searching for title, weapon, and multikill values0
         for line in lines:
             # Check to see if the line is set for the title of the weapon order
             if line.startswith('@'):
                 self.title = line[1:].strip()
                 continue
-                
+
             # Backwards compatible title (SOON TO BE DEPRECATED)
             if line.startswith('=>'):
                 self.title = line[2:].strip()
                 continue
-                
+
             # Convert the line to lower-case
             line = line.lower()
-            
+
             if len(line.split()) > 1:
                 weapon, multikill = line.split()
             else:
                 weapon, multikill = [line, 1]
-                multikill = int(multikill)
-            
+            multikill = int(multikill)
+
             # Check the weapon here with
             if 'weapon_%s' %weapon not in getWeaponList('#primary') \
                 + getWeaponList('#secondary') + ['weapon_hegrenade',
                 'weapon_knife']:
                     raise ValueError('"%s" is not a valid weapon!' %weapon)
-                    
+
             # Increment the level count
             levelCounter += 1
-            
+
             # Set level values as a list
             self.order[levelCounter] = [weapon, multikill]
-            
+
     def __getitem__(self, item):
         return object.__getattribute__(self, item)
         
+    def __setitem__(self, item, value):
+        return self.__setattr__(item, value)
+    
+    def __setattr__(self, name, value):
+        if name == 'type':
+            if value not in ['#default', '#reversed', '#random']:
+                raise AttributeError('Invalid attribute value for type: "%s".'
+                    %value + ' Use only "%s".' %'", "'.join(['#default',
+                        '#reversed', '#random']))
+                                
+        object.__setattr__(self, name, value)
+    
     def echo(self):
         '''
         Echos (prints) the current weapon order to console.
@@ -102,10 +113,22 @@ class BaseWeaponOrders(object):
             weapon = self.order[level][0]
             multikill = self.order[level][1]
             #es.dbgmsg(0, '[GunGame] |  %2s   |     %s     | %13s |' % (level, weapon, multikill))
-            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level, int(multikill), weapon))
+            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level, multikill, weapon))
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
-        
-        
+
+    def getWeapon(self, level):
+        if not level in range(1, len(self.order)):
+            raise ValueError('Can not get weapon for level: "%s".'
+                %level + ' Level is out of range (1-%s).' %len(self.order))
+        return self.order[level][0]
+
+    def getMultiKill(self, level):
+        if not level in range(1, len(self.order)):
+            raise ValueError('Can not get multikill value for level: "%s".'
+                %level + ' Level is out of range (1-%s).' %len(self.order))
+        return self.order[level][1]
+
+
 class WeaponOrdersDict(dict):
     '''
     A class-based dictionary to contain instances of BaseWeapons.
@@ -142,10 +165,12 @@ class WeaponOrdersDict(dict):
 
 orders = WeaponOrdersDict()
 
+
 class WeaponManager(object):
     def __init__(self):
         self.__weaponorders__ = {}
         self.currentorder = None
+        self.gungameorder = None
         
     def load(self, name):
         '''
@@ -158,7 +183,8 @@ class WeaponManager(object):
         Usage:
         '''
         self.__weaponorders__[name] = orders[name]
-        es.dbgmsg(0, 'self.__weaponorders__[%s] = %s' %(name, self.__weaponorders__[name]))
+        self.currentorder = name
+        return self.__weaponorders__[name]
         
     def unload(self, order):
         '''
@@ -175,8 +201,11 @@ class WeaponManager(object):
             self.currentorder = None
         
     def setOrder(self, name):
-        if name in self.__weaponorders__:
-            self.currentorder = name
+        if name not in self.__weaponorders__:
+            self.load(name)
+            self.gungameorder = name
+        else:
+            self.gungameorder = name
         
         # Things that will restart the round:
         '''
@@ -195,7 +224,7 @@ class WeaponManager(object):
             return orders[self.currentorder][item]
         
     def __setitem__(self, item, value):
-        if name in ['currentorder', '__weaponorders__']:
+        if item in ['currentorder', '__weaponorders__', 'gungameorder']:
             object.__setattr__(self, item, value)
         else:
             if not self.currentorder:
@@ -205,7 +234,7 @@ class WeaponManager(object):
             orders[self.currentorder][item] = value
     
     def __getattr__(self, name):
-        if name in ['currentorder', '__weaponorders__']:
+        if name in ['currentorder', '__weaponorders__', 'gungameorder']:
             # We only directly allow the attribute "userid" to be retrieved
             object.__getattr__(self, name)
         else:
@@ -215,12 +244,13 @@ class WeaponManager(object):
             return orders[self.currentorder][name]
       
     def __setattr__(self, name, value):
-        if name in ['currentorder', '__weaponorders__']:
-            # We only directly allow the attribute "userid" to be set
+        if name in ['currentorder', '__weaponorders__', 'gungameorder']:
+            # Set these attributes as they belong to this class
             object.__setattr__(self, name, value)
         else:
             if not self.currentorder:
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
+
             # Redirect to the PlayerDict instance
             orders[self.currentorder][name] = value
     
