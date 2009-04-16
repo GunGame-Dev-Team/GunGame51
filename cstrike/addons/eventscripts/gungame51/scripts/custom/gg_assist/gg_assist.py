@@ -64,15 +64,18 @@ def player_death(event_var):
     attacker = int(event_var['attacker'])
     victim = int(event_var['userid'])
     Player(attacker).levelup(1, victim, 'levelup')
-    Player(attacker).leveldown(1, victim, 'leveldown')
+    es.dbgmsg(0, 'Attacker\'s level : %s' %Player(attacker).level)
+    #Player(attacker).leveldown(1, victim, 'leveldown')
     Player(attacker).msg()
     
 def gg_levelup(event_var):
     es.dbgmsg(0, '%s just leveled up: %s' %(event_var['es_attackername'], event_var['new_level']))
+    es.dbgmsg(0, '%s is on level: %s' %(event_var['es_attackername'], Player(event_var['leveler']).level))
+    es.dbgmsg(0, '%s now has the weapon: %s' %(event_var['es_attackername'], Player(event_var['leveler']).weapon))
     
 def gg_leveldown(event_var):
     es.dbgmsg(0, '%s just leveled down: %s' %(event_var['es_username'], event_var['new_level']))
-
+    es.dbgmsg(0, '%s now has the weapon: %s' %(event_var['es_username'], Player(event_var['leveler']).weapon))
 '''
 def player_death(event_var):
     es.msg('(gg_assist) %s died!' %event_var['es_username'])

@@ -49,3 +49,9 @@ def setWeaponOrder(name, type='#default'):
     weaponorders.setOrder(name)
     weaponorders.type = type
     return getWeaponOrder()
+    
+def getWeapon(level):
+    return getWeaponOrder().getWeapon(level)
+    
+def getMultiKill(level):
+    return getWeaponOrder().getWMultiKill(level)

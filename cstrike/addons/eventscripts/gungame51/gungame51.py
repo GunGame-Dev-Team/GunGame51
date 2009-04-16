@@ -37,26 +37,6 @@ addons.testGetAddonType()
 def load():
     # Load custom events
     es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
-    '''
-    # Load our test addons
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, 'LOADING ADDONS:')
-    es.dbgmsg(0, '-'*30)
-    es.server.cmd('gg_deathmatch 1')
-    
-    # Wow! I have to use a delay to list the addons because they load so quickly!
-    #gamethread.delayed(0, listAddons, ())
-    #es.server.cmd('gg_assist 1')
-    loadAddon('gg_assist')
-    #es.server.cmd('gg_multi_level 1')
-    
-    # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...
-    #es.server.cmd('gg_turbo 0')
-    #es.server.cmd('gg_deathmatch 0')
-    
-    es.dbgmsg(0, '-'*30)
-    es.dbgmsg(0, '')
-    '''
     
     currentOrder = setWeaponOrder('default_weapon_order')
     currentOrder.echo()
@@ -69,6 +49,30 @@ def load():
     es.dbgmsg(0, '(short) The multikill for level 3 is: %s' %myOrder.getMultiKill(3))
     es.dbgmsg(0, '(current) The weapon for level 3 is: %s' %currentOrder.getWeapon(3))
     es.dbgmsg(0, '(current) The multikill for level 3 is: %s' %currentOrder.getMultiKill(3))
+    '''
+    # Load our test addons
+    es.dbgmsg(0, '')
+    es.dbgmsg(0, 'LOADING ADDONS:')
+    es.dbgmsg(0, '-'*30)
+    es.server.cmd('gg_deathmatch 1')
+    
+    # Wow! I have to use a delay to list the addons because they load so quickly!
+    #gamethread.delayed(0, listAddons, ())
+    #es.server.cmd('gg_assist 1')
+    '''
+    loadAddon('gg_assist')
+    '''
+    #es.server.cmd('gg_multi_level 1')
+    
+    # Oops! We can't unload turbo...it is a requirement of gg_deathmatch...
+    #es.server.cmd('gg_turbo 0')
+    #es.server.cmd('gg_deathmatch 0')
+    
+    es.dbgmsg(0, '-'*30)
+    es.dbgmsg(0, '')
+    '''
+    
+    
     
 def es_map_start(event_var):
     # Load custom GunGame events

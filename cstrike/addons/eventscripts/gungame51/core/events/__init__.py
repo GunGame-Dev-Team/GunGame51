@@ -64,7 +64,10 @@ class EventManager(object):
         '''
         # Set old level and the new level
         oldLevel = playerInstance.level
-        playerInstance.level = oldLevel - int(levelsTaken)
+        if (oldLevel - int(levelsTaken)) > 0:
+            playerInstance.level = oldLevel - int(levelsTaken)
+        else:
+            playerInstance.level = 1
         
         # Fire the event
         es.event('initialize', 'gg_leveldown')

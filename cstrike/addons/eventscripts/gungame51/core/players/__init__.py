@@ -15,6 +15,8 @@ from playerlib import uniqueid
 
 # GunGame Imports
 from gungame51.core.events import events
+from gungame51.core.weapons.shortcuts import getWeapon
+from gungame51.core.weapons.shortcuts import getMultiKill
 
 # ============================================================================
 # >> CLASSES
@@ -77,6 +79,7 @@ class BasePlayer(object):
         self.preventlevel = []
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
+        self.weapon = None
       
     def __setattr__(self, name, value):
         '''
@@ -90,6 +93,8 @@ class BasePlayer(object):
         object.__setattr__(self, name, value)
         
     def __getattr__(self, name):
+        if name == 'weapon':
+            self.weapon = getWeapon(self.level)
         # Return the attribute value
         return object.__getattribute__(self, name)
         
@@ -112,7 +117,7 @@ class BasePlayer(object):
         
     def __getitem__(self, name):
         # Return using __getattr__
-        return object.__getattribute__(self, name)
+        return self.__getattr__(name)
         
     def __delitem__(self, name):
         # Forward to __delattr__
@@ -163,6 +168,9 @@ class BasePlayer(object):
     def hudhint(self):
         # This is where we will handle/send translated GunGame hudhints
         es.msg('We just sent %s a hudhint!' %es.getplayername(self.userid))
+        
+    def getWeapon(self):
+        return getWeapon(self.level)
 
 
 class PlayerDict(dict):
