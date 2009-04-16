@@ -16,6 +16,9 @@ import es
 # >> CLASSES
 # ============================================================================
 class EventManager(object):
+    # =========================================================================
+    # >> EventManager() CUSTOM CLASS METHODS
+    # =========================================================================
     def gg_levelup(self, playerInstance, levelsAwarded, victim, reason):
         '''
         Adds a declared number of levels to the attacker.

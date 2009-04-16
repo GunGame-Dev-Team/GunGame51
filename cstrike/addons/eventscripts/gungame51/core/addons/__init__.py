@@ -32,7 +32,9 @@ class AddonInfo(dict):
     This will hold the sub-addon info similar to es.AddonInfo().
     It will be initialized in sub-addons that wish to use it.
     '''
-    
+    # =========================================================================
+    # >> AddonInfo() CLASS INITIALIZATION
+    # =========================================================================
     def __init__(self):
         '''
         Initialize the dictionary and populate it with mandatory
@@ -66,14 +68,16 @@ class AddonInfo(dict):
             # This MUST be a list
             info.conflicts= ['gg_addon3', 'gg_addon4']
         '''
-        
         self.name = ''
         self.title = ''
         self.author = ''
         self.version = '0.0'
         self.requires = []
         self.conflicts = []
-        
+
+    # =========================================================================
+    # >> AddonInfo() CLASS ATTRIBUTE METHODS
+    # =========================================================================
     def __setattr__(self, name, value):
         '''
         Setting an attribute is equivalent to setting an item
@@ -101,7 +105,10 @@ class AddonInfo(dict):
                                 %(name, '", "'.join(self._getKeyList())))
             
         return dict.__getitem__(self, name)
-        
+
+    # =========================================================================
+    # AddonInfo() STATIC CLASS METHODS
+    # =========================================================================
     @staticmethod
     def _getKeyList():
         '''
@@ -115,7 +122,9 @@ class AddonLoadedByDependency(dict):
     This class is designed to store subaddons that were loaded as a result of
     being a dependency to another subaddon.
     '''
-    
+    # =========================================================================
+    # >> AddonLoadedByDependency() CUSTOM CLASS METHODS
+    # =========================================================================
     def add(self, dependency, addon_name):
         '''
         We will only add dependencies (subaddons) that were not loaded via
@@ -156,40 +165,43 @@ loadedByDependency = AddonLoadedByDependency()
 
 
 class DependencyError(Exception):
-   """
-   We want a nice, descriptive error for dependency problems
-   Due to the fact this error is unique it will need to be referenced by module
-   If we want this error excepted we must except:
-   gungame.DependencyError
-   """
-   pass
+    """
+    We want a nice, descriptive error for dependency problems
+    Due to the fact this error is unique it will need to be referenced by module
+    If we want this error excepted we must except:
+    gungame.DependencyError
+    """
+    pass
 
 
 class AddonCompatibility(dict):
-   '''
-   This class holds sub-addons that are depended on or will conflict with
-   a sub-addon being loaded. The loaded sub-addon will be stored under each
-   dependency or conflict so we know what addons rely or conflict with other
-   addons.
-   '''
-   def add(self, addon_name, namelist):
-      '''
-      Adds a list of dependencies or conflicts, storing the
-      addon name under each entry so we know which addons depend on
-      or conflict with other addons.
-      '''
-      for name in namelist:
-         self[name] = self.get(name, []) + [addon_name]
+    '''
+    This class holds sub-addons that are depended on or will conflict with
+    a sub-addon being loaded. The loaded sub-addon will be stored under each
+    dependency or conflict so we know what addons rely or conflict with other
+    addons.
+    '''
+    # =========================================================================
+    # >> AddonCompatibility() CUSTOM CLASS METHODS
+    # =========================================================================
+    def add(self, addon_name, namelist):
+        '''
+        Adds a list of dependencies or conflicts, storing the
+        addon name under each entry so we know which addons depend on
+        or conflict with other addons.
+        '''
+        for name in namelist:
+            self[name] = self.get(name, []) + [addon_name]
 
-   def remove(self, addon_name):
-      '''
-      Removes every dependency or conflict for a sub-addon
-      '''
-      for sub_addon in list(self):
-         if addon_name in self[sub_addon]:
-            self[sub_addon].remove(addon_name)
-            if not self[sub_addon]:
-               del self[sub_addon]
+    def remove(self, addon_name):
+        '''
+        Removes every dependency or conflict for a sub-addon
+        '''
+        for sub_addon in list(self):
+            if addon_name in self[sub_addon]:
+                self[sub_addon].remove(addon_name)
+                if not self[sub_addon]:
+                    del self[sub_addon]
 
 
 dependencies = AddonCompatibility()
@@ -198,11 +210,17 @@ conflicts = AddonCompatibility()
 ### Addon managing classes """
 
 class AddonManager(object):
+    # =========================================================================
+    # >> AddonManager() CLASS INITIALIZATION
+    # =========================================================================
     def __init__(self):
         self.__loaded__ = {}
         self.__events__ = {}
         self.__order__ = []
 
+    # =========================================================================
+    # >> AddonManager() CUSTOM CLASS METHODS
+    # =========================================================================
     def load(self, name):
         '''
         Loads a GunGame sub-addon by name
@@ -437,7 +455,7 @@ class AddonManager(object):
         return mod
         
     # ========================================================================
-    # AddonManager() Static Class Methods
+    # AddonManager() STATIC CLASS METHODS
     # ========================================================================
     @staticmethod
     def getAddonInfo(addon=None):
@@ -523,6 +541,10 @@ def unload(*a, **kw):
 unload.__doc__ = AddonManager.unload.__doc__
 
 def getValidAddons():
+    '''
+    Returns a list of valid addon names from the included and custom addons
+    directory.
+    '''
     included = getGameDir('addons/eventscripts/gungame51/scripts/included')
     custom = getGameDir('addons/eventscripts/gungame51/scripts/custom')
     

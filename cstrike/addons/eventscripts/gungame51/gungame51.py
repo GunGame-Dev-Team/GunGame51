@@ -46,7 +46,7 @@ def load():
     # Load custom events
     es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
-    currentOrder = setWeaponOrder('default_weapon_order')
+    currentOrder = setWeaponOrder('default_weapon_order', '#reversed')
     currentOrder.echo()
     es.dbgmsg(0, '(current) The weapon for level 7 is: %s' %currentOrder.getWeapon(7))
     es.dbgmsg(0, '(current) The multikill for level 7 is: %s' %currentOrder.getMultiKill(7))

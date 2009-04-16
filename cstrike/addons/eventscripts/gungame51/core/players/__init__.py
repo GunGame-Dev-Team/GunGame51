@@ -76,7 +76,10 @@ class CustomAttributeCallbacks(dict):
 setHooks = CustomAttributeCallbacks()
 
 
-class BasePlayer(object): 
+class BasePlayer(object):
+    # =========================================================================
+    # >> BasePlayer() CLASS INITIALIZATION
+    # =========================================================================
     def __init__(self, userid): 
         self.userid = userid 
         self.level = 1
@@ -84,53 +87,56 @@ class BasePlayer(object):
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
         self.weapon = None
-      
+
+    # =========================================================================
+    # >> BasePlayer() CLASS ATTRIBUTE METHODS
+    # =========================================================================
     def __setattr__(self, name, value):
-        '''
-        #Setting an attribute is equivalent to setting an item
-        '''
         # First, we execute the custom attribute callbacks
         if name in setHooks:
             setHooks[name][0](name, value)
             
         # Set the attribute value
         object.__setattr__(self, name, value)
-        
+
     def __getattr__(self, name):
         if name == 'weapon':
             self.weapon = getWeapon(self.level)
         # Return the attribute value
         return object.__getattribute__(self, name)
-        
+
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
         if name in ['userid', 'level', 'preventlevel', 'steamid', 'multikill']:
             raise AttributeError('Unable to delete attribute "%s". '
                 % attribute + 'This is a required attribute for GunGame.')
-        
+
         # Remove this attribute from the custom attribute callbacks, if any
         if name in setHooks:
             del setHooks[name]
-            
+
         # Delete the attribute
         object.__delattr__(self, name)
-        
+
     def __setitem__(self, name, value):
         # Forward to __setattr__
         self.__setattr__(name, value)
-        
+
     def __getitem__(self, name):
         # Return using __getattr__
         return self.__getattr__(name)
-        
+
     def __delitem__(self, name):
         # Forward to __delattr__
         self.__delattr__(name)
-        
+
+    # =========================================================================
+    # >> BasePlayer() CUSTOM CLASS METHODS
+    # =========================================================================
     def levelup(self, levelsAwarded, victim=0, reason=''):
         '''
         Adds a declared number of levels to the attacker.
-        
+
         Arguments:
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.
@@ -142,14 +148,14 @@ class BasePlayer(object):
         # Return false if we can't level up
         if len(self.preventlevel):
             return False
-            
+
         # Use the EventManager to call the gg_levelup event
         events.gg_levelup(self, levelsAwarded, victim, reason)
-        
+
     def leveldown(self, levelsTaken, attacker=0, reason=''):
         '''
         Removes a declared number of levels from the victim.
-        
+
         Arguments:
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.
@@ -161,40 +167,44 @@ class BasePlayer(object):
         # Return false if we can't level down
         if len(self.preventlevel):
             return False
-            
+
         # Use the EventManager to call the gg_leveldown event
         events.gg_leveldown(self, levelsTaken, attacker, reason)
-        
+
     def msg(self):
         # This is where we will handle/send translated GunGame messages
         es.msg('We just sent %s a message!' %es.getplayername(self.userid))
-        
+
     def hudhint(self):
         # This is where we will handle/send translated GunGame hudhints
         es.msg('We just sent %s a hudhint!' %es.getplayername(self.userid))
-        
+
     def getWeapon(self):
         return getWeapon(self.level)
-        
+
     def giveWeapon(self):
-        '''Gives a player their current weapon.'''
+        '''
+        Gives a player their current level's weapon.
+        '''
         # Make sure player is on a team
         if isSpectator(self.userid):
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not on a team.')
-        
+
         # Make sure player is alive
         if isDead(self.userid):
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not alive.')
-        
+
         # Get active weapon
         if self.weapon != 'knife':
             es.delayed(0, 'es_xgive %s weapon_%s; es_xsexec %s "use weapon_%s"'
                 %(self.userid, self.weapon, self.userid, self.weapon))
-                
-    def stripPlayer(self):
-        '''Strips the player of his primary and secondary weapon.'''
+
+    def strip(self):
+        '''
+        Strips the player of their primary and secondary weapon.
+        '''
         if getOS() == 'posix':
             stripFormat  = 'es_xgive %s weapon_knife;' % self.userid
             stripFormat += 'es_xgive %s player_weaponstrip;' % self.userid
@@ -202,16 +212,16 @@ class BasePlayer(object):
             stripFormat += 'es_xfire %s player_weaponstrip Kill' % self.userid
             es.server.cmd(stripFormat)
             return
-        
+
         # Get player handle
         playerHandle = es.getplayerhandle(self.userid)
-        
+
         # Strip primary weapon
         for weaponType in ('primary', 'secondary'):
             weaponIndex = self.getWeaponIndex(playerHandle, weaponType)
             if weaponIndex:
                 es.server.cmd('es_xremove %i' % weaponIndex)
-    
+
     def getWeaponIndex(self, playerHandle, flag):
         for weapon in getWeaponList(flag):
             for weaponIndex in es.createentitylist('weapon_%s' % weapon):
@@ -223,10 +233,13 @@ class BasePlayer(object):
 class PlayerDict(dict):
     '''
     A class-based dictionary to contain instances of BasePlayer.
-    
+
     Note:
         This class is meant for private use.
     '''
+    # =========================================================================
+    # >> PlayerDict() CLASS ATTRIBUTE METHODS
+    # =========================================================================
     def __getitem__(self, userid): 
         '''
         When we get an item in the dictionary BasePlayer is instantiated if it
@@ -235,7 +248,7 @@ class PlayerDict(dict):
         userid = int(userid) 
         if userid not in self: 
             self[userid] = BasePlayer(userid) 
-            
+
         # We don't want to call our __getitem__ again 
         return super(PlayerDict, self).__getitem__(userid)
 
@@ -278,17 +291,23 @@ class Player(object):
     Note:
         For class methods, see the gungame.core.players.BasePlayer class.
     '''
+    # =========================================================================
+    # >> Player() CLASS INITIALIZATION
+    # =========================================================================
     def __init__(self, userid):
         self.userid = int(userid)
-        
+
+    # =========================================================================
+    # >> Player() CLASS ATTRIBUTE METHODS
+    # =========================================================================
     def __getitem__(self, item):
         # We only directly allow the attribute "userid" to be set
         return players[self.userid][item]
-        
+
     def __setitem__(self, item, value):
         # We only directly allow the attribute "userid" to be set
         players[self.userid][item] = value
-    
+
     def __getattr__(self, name):
         if name == 'userid':
             # We only directly allow the attribute "userid" to be retrieved
@@ -296,7 +315,7 @@ class Player(object):
         else:
             # Redirect to the PlayerDict instance
             return players[self.userid][name]
-      
+
     def __setattr__(self, name, value):
         if name == 'userid':
             # We only directly allow the attribute "userid" to be set
@@ -304,17 +323,17 @@ class Player(object):
         else:
             # Redirect to the PlayerDict instance
             players[self.userid][name] = value
-            
+
     def __delitem__(self, name):
         # Redirect to the PlayerDict instance
         del players[self.userid][name]
-        
+
     def __delattr__(self, name):
         # Redirect to the PlayerDict instance
         del players[self.userid][name]
-            
+
     # ========================================================================
-    # Player() Static Class Methods
+    # Player() STATIC CLASS METHODS
     # ========================================================================
     @staticmethod
     def addAttributeCallBack(attribute, function, addon):
@@ -324,7 +343,7 @@ class Player(object):
         must have 2 arguments declared. The first argument will be the
         actual name of the attribute. The second argument will be the value
         that it was set to.
-            
+
         Notes:
             * If an error is raised in your callback, the value will not be
               set.
@@ -333,11 +352,11 @@ class Player(object):
             * The intention of this method is to be able to check the value of
               custom attributes, and raise errors if they are not within
               certain ranges/specifications.
-        
+
         Usage:
             Player.addAttributeCallBack('attributeName', callbackFunction,
                                         'gg_addon_name')
-            
+
             def callbackFunction(name_of_the_attribute, value_to_be_checked):
                 if name_of_the_attribute == 'attributeName':
                     if value_to_be_checked > 0 and value_to_be_checked < 10:
@@ -347,33 +366,33 @@ class Player(object):
         '''
         # Add the attribute callback to the CustomAttributeCallbacks instance
         setHooks.add(attribute, function, addon)
-        
+
     @staticmethod
     def removeAttributeCallBack(attribute):
         '''
         Removes a callback function that is called when a named attribute is
         set using the class-based dictionary CustomAttributeCallbacks.
-        
+
         Note:
             Attempting to remove a non-existant attribute callback will not
             raise an exception.
-            
+
         Usage:
             Player.removeAttributeCallBack('attributeName')
         '''
         # Remove the callback from the CustomAttributeCallbacks instance
         setHooks.remove(attribute)
-        
+
     @staticmethod
     def removeCallBacksForAddon(addon):
         '''
         Removes all attribute callbacks from the class-based dictionary
         CustomAttributeCallBacks that have been associated with the named
         addon.
-        
+
         Usage:
             Player.removeCallBacksForAddon('gg_addon_name')
-            
+
         Note:
             Attempting to remove attributes from an addon that does not exist
             or if no attributes exist that are associated with the addon will
@@ -384,6 +403,6 @@ class Player(object):
             # Continue to the next attribute if the addon name is not found
             if not addon in setHooks[attribute]:
                 continue
-                
+
             # Remove the custom attribute callback
             setHooks.remove(attribute)
