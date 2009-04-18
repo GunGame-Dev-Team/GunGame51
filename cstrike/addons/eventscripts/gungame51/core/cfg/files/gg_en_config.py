@@ -57,7 +57,7 @@ def load():
     config.text('     order.')
     config.text('Default Value: "default_weapon_order"')
     config.cvar('gg_weapon_order_file', 'default_weapon_order', 'The file ' +
-                'that will be used for the weapon order.').addFlag('notify')
+                'that will be used for the weapon order.')
 
     # Random Weapon Order File
     config.text('')
@@ -70,7 +70,7 @@ def load():
     config.text('   1 = (Enabled) get a new weapon order each map change.')
     config.text('Default Value: 0')
     config.cvar('gg_weapon_order_random', 0, 'Randomly select a new weapon ' +
-                'order file each map.').addFlag('notify')
+                'order file each map.')
 
     # Weapon Order Sort Type
     config.text('')
@@ -83,7 +83,7 @@ def load():
     config.text('   #random   = Order will be randomly shuffled.')
     config.text('Default Value: "#default"')
     config.cvar('gg_weapon_order_sort_type', '#default', 'The order in which' +
-                ' the weapons and levels will be sorted.').addFlag('notify')
+                ' the weapons and levels will be sorted.')
 
     # Multikill Override
     config.text('')
@@ -98,7 +98,7 @@ def load():
                 'always 1.')
     config.text('Default Value: 0')
     config.cvar('gg_multikill_override', 0, 'The amount of kills a player ' +
-                'needs to level up per weapon.').addFlag('notify')
+                'needs to level up per weapon.')
 
     # Weapon Removal
     config.text('')
@@ -110,7 +110,7 @@ def load():
     config.text('Default Value: "hegrenade,flashbang,smokegrenade"')
     config.cvar('gg_map_strip_exceptions', 'hegrenade,flashbang,smokegrenade',
                 'The weapons that will not be removed from the ' +
-                'map.').addFlag('notify')
+                'map.')
 
     config.text('')
     config.text('')
@@ -131,7 +131,7 @@ def load():
     config.text('       occurs.')
     config.text('Default Value: 0')
     config.cvar('gg_afk_rounds', 0, 'The number of rounds a player can be ' +
-                'AFK before punishment occurs.').addFlag('notify')
+                'AFK before punishment occurs.')
 
     # AFK Rounds Punishment
     config.text('')
@@ -144,7 +144,7 @@ def load():
     config.text('   2 = Move the player to spectator.')
     config.text('Default Value: 0')
     config.cvar('gg_afk_action', 0, 'The punishment for players who are AFK ' +
-                'longer than "gg_afk_rounds".').addFlag('notify')
+                'longer than "gg_afk_rounds".')
 
     # Suicide Punishment
     config.text('')
@@ -157,7 +157,7 @@ def load():
                 'commit suicide.')
     config.text('Default Value: 0')
     config.cvar('gg_suicide_punish', 0, 'The number of levels a player ' +
-                'will lose if they commit suicide.').addFlag('notify')
+                'will lose if they commit suicide.')
 
     # Team Kill Punishment
     config.text('')
@@ -171,7 +171,7 @@ def load():
     config.text('       teammate.')
     config.text('Default Value: 0')
     config.cvar('gg_tk_punish', 0, 'The number of levels a player will lose ' +
-                'if they kill a teammate.').addFlag('notify')
+                'if they kill a teammate.')
 
     # Retry Punishment
     config.text('')
@@ -185,7 +185,7 @@ def load():
     config.text('       in the same round.')
     config.text('Default Value: 0')
     config.cvar('gg_retry_punish', 0, 'The number of levels a player will ' +
-                'lose if they reconnect in the same round.').addFlag('notify')
+                'lose if they reconnect in the same round.')
 
     config.text('')
     config.text('')
@@ -206,7 +206,7 @@ def load():
     config.text('   3 = No objectives disabled.')
     config.text('Default Value: 0')
     config.cvar('gg_map_obj', 0, 'Controls which objectives will be' +
-                'disabled.').addFlag('notify')
+                'disabled.')
 
     # Multi-Round
     config.text('')
@@ -225,7 +225,7 @@ def load():
     config.text('       change.')
     config.text('Default Value: 0')
     config.cvar('gg_multi_round', 0, 'The number of rounds that need to be ' +
-                'played before a map change.').addFlag('notify')
+                'played before a map change.')
 
     # Multi-Round Intermission
     config.text('')
@@ -245,7 +245,7 @@ def load():
     config.text('       between rounds.')
     config.text('Default Value: 20')
     config.cvar('gg_multi_round', 20, 'The amount of time (in seconds) that ' +
-                'the intermission lasts between rounds.').addFlag('notify')
+                'the intermission lasts between rounds.')
 
     # Warmup Round
     config.text('')
@@ -261,7 +261,7 @@ def load():
     config.text('   1 = Enabled.')
     config.text('Default Value: 0')
     config.cvar('gg_warmup_round', 0, 'Enables or disables warmup' +
-                'round.').addFlag('notify')
+                'round.')
 
     # Warmup Round Timer
     config.text('')
@@ -273,7 +273,7 @@ def load():
                 'round will last.')
     config.text('Default Value: 30')
     config.cvar('gg_warmup_timer', 30, 'The amount of time (in seconds) ' +
-                'that the the warmup round will last.').addFlag('notify')
+                'that the the warmup round will last.')
 
     # Warmup Round Weapon
     config.text('')
@@ -293,7 +293,7 @@ def load():
     config.text('\t0 = The first level weapon')
     config.text('Default Value: "hegrenade"')
     config.cvar('gg_warmup_weapon', 'hegrenade', 'The weapon that players ' +
-                'will use during the warmup round.').addFlag('notify')
+                'will use during the warmup round.')
 
     # Warmup Round Deathmatch Mode
     config.text('')
@@ -314,7 +314,7 @@ def load():
     config.text('   1 = Enabled.')
     config.text('Default Value: 0')
     config.cvar('gg_warmup_deathmatch', 0, 'Enable deathmatch during warmup ' +
-                'round only.').addFlag('notify')
+                'round only.')
 
     # Warmup Round Elimination Mode
     config.text('')
@@ -335,7 +335,7 @@ def load():
     config.text('   1 = Enabled.')
     config.text('Default Value: 0')
     config.cvar('gg_warmup_elimination', 0, 'Enable elimination during ' +
-                'warmup round only.').addFlag('notify')
+                'warmup round only.')
 
     # Dynamic End of Map Chat Time
     config.text('')
@@ -355,7 +355,7 @@ def load():
                 'file.')
     config.text('Default Value: 0')
     config.cvar('gg_dynamic_chattime', 0, 'Enables dynamic end of round chat' +
-                ' time based on the winner music.').addFlag('notify')
+                ' time based on the winner music.')
     config.text('')
     config.text('')
 
@@ -377,7 +377,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_player_defuser', 0, 'Automatically equip Counter-' +
                 'Terrorist players with defusal kits on bomb ' +
-                'maps.').addFlag('notify')
+                'maps.')
 
     # Armor
     config.text('')
@@ -390,7 +390,7 @@ def load():
     config.text('   2 = Assaultsuit (Kevlar + Helmet)')
     config.text('Default Value: 2')
     config.cvar('gg_player_defuser', 2, 'The type of armor players are ' +
-                'equipped with when they spawn.').addFlag('notify')
+                'equipped with when they spawn.')
     config.text('')
     config.text('')
 
@@ -417,7 +417,7 @@ def load():
                 ' are played.')
     config.text('Default Value: "default"')
     config.cvar('gg_soundpack', 'default', 'The controls which sound pack ' +
-                'will be used by default.').addFlag('notify')
+                'will be used by default.')
     config.text('')
 
     # Leader Weapon Warning
@@ -434,7 +434,7 @@ def load():
     config.text('   1 = Enabled.')
     config.text('Default Value: 0')
     config.cvar('gg_leaderweapon_warning', 0, 'Play a sound when a player ' +
-                'reaches "hegrenade" or "knife" level.').addFlag('notify')
+                'reaches "hegrenade" or "knife" level.')
     config.text('')
     config.text('')
 
@@ -474,7 +474,7 @@ def load():
     config.text('\t"est_spawn"\t"gg_spawn"\t"sm_respawn #"')
     config.text('Default Value: "est_spawn"')
     config.cvar('gg_respawn_cmd', 'est_spawn', 'The console command that is ' +
-                'used to respawn a player.').addFlag('notify')
+                'used to respawn a player.')
 
     # This line creates/updates the .cfg file
     config.write()

@@ -41,27 +41,41 @@ class ConfigManager(object):
         # Retrieve the config module
         config = self.getConfigByName(name)
         
-        # Load the config
-        config.load()
+        # Load the config if it has a load function
+        if config.__dict__.has_key('load'):
+            config.load()
         
         # Make sure that no DependencyErrors are raised by GunGame itself due
         # to the order in which the configs are executed
         for item in config.__dict__:
             if isinstance(config.__dict__[item], AddonCFG):
                 cfg = config.__dict__[item]
+                # Loop through the CVARs in the configlib.AddonCFG instance
+                for cvar, value, description in cfg.getCvars().values():
+                    # Add the CVAR and default value to the dictionary
+                    self.__cvardefaults__[cvar] = value
+                    # Add the "notify" flag to the CVAR
+                    es.ServerVar(cvar).addFlag('notify')
                 global cfgExecuting
                 cfgExecuting = True
                 gamethread.delayed(0, self.resetConfigExecution, ())
                 cfg.execute()
-                for cvar, value, description in cfg.getCvars().values():
-                    self.__cvardefaults__[cvar] = value
 
     def unload(self, name):
         # Retrieve the config module
         config = self.getConfigByName(name)
         
-        # Unload the config
-        config.unload()
+        for item in config.__dict__:
+            if isinstance(config.__dict__[item], AddonCFG):
+                cfg = config.__dict__[item]
+                # Loop through the CVARs in the configlib.AddonCFG instance
+                for cvar, value, description in cfg.getCvars().values():
+                    # Remove the "notify" flag for the CVAR
+                    es.ServerVar(cvar).removeFlag('notify')
+        
+        # Unload the config if it has an unload function
+        if config.__dict__.has_key('unload'):
+            config.unload()
         
         # Remove the stored config module
         del self.__loaded__[name]
@@ -148,7 +162,7 @@ def getConfigList(type=None):
     Retrieves a list of configlib configs of the following types:
         * main (the primary GunGame configs)
         * included (included addon configs)
-        * custom (custom addon configs)
+        * custom (custom addon configs)a
         
     Note:
         If no argument is provided, all possible configs will be returned in the list.

@@ -1,4 +1,4 @@
-# ../cstrike/addons/eventscripts/gungame/gungame.py
+# ../<MOD>/addons/eventscripts/gungame/gungame.py
 
 '''
 $Rev$
@@ -17,40 +17,32 @@ import es
 import gamethread
 
 # GunGame Imports
+#    Weapon Function Imports
 from core.weapons.shortcuts import setWeaponOrder
 from core.weapons.shortcuts import getWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
-from core.weapons.shortcuts import getWeapon
+from core.weapons.shortcuts import getLevelWeapon
 
+#    Load and Execute GunGame Configs
 from core.cfg.files import *
 from scripts.cfg.included import *
 from scripts.cfg.custom import *
 
+#    Config Function Imports
 from core.cfg import __configs__
 from core.cfg import getConfigList
 
+#    Addon Function Imports
 from core.addons.shortcuts import loadAddon
 from core.addons.shortcuts import unloadAddon
 from core.addons.shortcuts import getAddonInfo
 from core.addons.shortcuts import addonExists
 
+#    Core Function Imports
 from core import isDead, isSpectator
+
+#    Player Function Imports
 from core.players import Player
-'''
-import core.addons.unittest as addons
-
-addons.testAddonInfo()
-addons.testAddonExists()
-addons.testGetAddonType()
-'''
-
-# ==================================
-#      THIS WILL BE IMPORTANT LATER
-# LOAD WEAPON ORDERS
-# LOAD CONFIGS
-# LOAD ADDONS
-# LOAD PLAYER CLASS
-# ==================================
 
 # ============================================================================
 # >> TEST CODE
@@ -71,18 +63,24 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
         es.unload('gungame')
+    '''
+    currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
+    currentOrder.echo()
+    
+    diffOrder = getWeaponOrder('weapon_short')
+    diffOrder.echo()
+    diffOrder.type = '#random'
+    
+    es.dbgmsg(0, 'This should be "m249": %s' %getLevelWeapon(1, 'reverse_weapon_order'))
+    es.dbgmsg(0, 'This should be "15": %s' %getLevelMultiKill(1))
+    '''
     
 def es_map_start(event_var):
     # Load custom GunGame events
     es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
-    equipPlayer()
-def listAddons():
-    from core.addons import __addons__
-    list_addons = __addons__.__order__[:]
-    for addon in list_addons:
-        es.dbgmsg(0, '\t%s' %addon)
-    es.dbgmsg(0, '# of addons remaining: %i' %len(getAddonInfo()))
     
+    equipPlayer()
+
 def unload():
     from core.addons import __addons__
     es.dbgmsg(0, '')
@@ -102,7 +100,10 @@ def unload():
     es.dbgmsg(0, '')
     
     # Testing the unloading of configs and removal of flags
-    __configs__.unload('gg_en_config')
+    # Flags are automatically removed when using this method
+    from core.cfg import getConfigList
+    for name in getConfigList():
+        __configs__.unload(name)
     
 def equipPlayer():
     userid = es.getuserid()
@@ -134,7 +135,7 @@ def round_start(event_var):
     # Disable Buyzones
     userid = es.getuserid()
     es.server.cmd('es_xfire %d func_buyzone Disable' %userid)
-    
+
     '''
     # Remove weapons
     for weapon in gungamelib.getWeaponList('all'):
@@ -146,6 +147,7 @@ def round_start(event_var):
         # Remove the weapon from the map
         es.server.cmd('es_xfire %d weapon_%s kill' % (userid, weapon))
     '''
+    
     # Equip players
     equipPlayer()
 
@@ -175,6 +177,7 @@ def round_start(event_var):
             if len(es.createentitylist('func_hostage_rescue')):
                 es.server.cmd('es_xfire %d func_hostage_rescue Disable' %userid)
                 es.server.cmd('es_xfire %d hostage_entity Kill' % userid)
+    
     '''
     if gungamelib.getVariableValue('gg_leaderweapon_warning'):
         leaderWeapon = gungamelib.getLevelWeapon(gungamelib.leaders.getLeaderLevel())
@@ -187,7 +190,7 @@ def round_start(event_var):
         if leaderWeapon == 'hegrenade':
             gungamelib.playSound('#all', 'nadelevel')
     '''
-    
+
 def player_spawn(event_var):
     userid = event_var['userid']
     
@@ -216,7 +219,7 @@ def player_spawn(event_var):
                 # Make sure the player doesn't already have a defuser
                 if not playerlib.getPlayer(userid).get('defuser'):
                     es.server.queuecmd('es_xgive %d item_defuser' % userid)
-                    
+
 def player_death(event_var):
     # Warmup Round Check
     # ....
@@ -233,8 +236,8 @@ def player_death(event_var):
     gungameVictim = Player(userid)
     
     '''
-    Shall we move this to an included addon?
-        - Suicide check comment
+    #Shall we move this to an included addon?
+    #    - Suicide check comment
     '''
     # =============
     # SUICIDE CHECK
@@ -257,8 +260,8 @@ def player_death(event_var):
     # Get attacker object
     gungameAttacker = Player(attacker)
     '''
-    Shall we move this to an included addon?
-        - TeamKill check comment
+    #Shall we move this to an included addon?
+    #    - TeamKill check comment
     '''
     # ===============
     # TEAM-KILL CHECK
@@ -332,7 +335,7 @@ def player_death(event_var):
         # Play the multikill sound
         #gungamelib.playSound(attacker, 'multikill')
         es.tell(attacker, 'something')
-        
+
 def gg_levelup(event_var):
     es.msg('%s leveled up by killing %s!' %(event_var['es_attackername'], event_var['es_username']))
     
@@ -353,30 +356,6 @@ def initialize():
     es.loadevents('declare', 'addons/eventscripts/gungame/events/es_gungame_events.res')
     
     '''
-    # Loop through included addons
-    # NOTE TO DEVS: Move this over to gungamelib?
-    for includedAddon in os.listdir(gungamelib.getGameDir('addons/eventscripts/gungame/included_addons/')):
-        if includedAddon[:3] == 'gg_':
-            list_includedAddonsDir.append(includedAddon)
-    
-    # Loop through custom addons
-    # NOTE TO DEVS: Move this over to gungamelib?
-    for customAddon in os.listdir(gungamelib.getGameDir('addons/eventscripts/gungame/custom_addons/')):
-        if customAddon[:3] == 'gg_':
-            list_customAddonsDir.append(customAddon)
-    '''
-    '''
-    # Load and execute configs
-    import core.cfg.files
-    import scripts.config.included
-    import scripts.config.custom
-    '''
-    '''
-    gungamelib.echo('gungame', 0, 0, 'Load_Configs')
-    gungamelib.getConfig('gg_en_config.cfg')
-    gungamelib.getConfig('gg_default_addons.cfg')
-    gungamelib.getConfig('gg_map_vote.cfg')
-    
     # Execute addon configs
     #gungamelib.echo('gungame', 0, 0, 'Load_CustomConfigs')
     
@@ -395,20 +374,6 @@ def initialize():
     gungamelib.echo('gungame', 0, 0, 'Load_WeaponOrders')
     '''
     
-    # Get weapon order files
-    # ------> This should already be done
-    '''
-    baseDir = gungamelib.getGameDir('cfg/gungame5/weapon_orders/')
-    files = filter(lambda x: os.path.splitext(x)[1] == '.txt', os.listdir(baseDir))
-    
-    # Loop through the weapon order files
-    for x in files:
-        # Get file and extension
-        file, ext = os.path.splitext(x)
-        
-        # Parse the file
-        weaponOrder = gungamelib.getWeaponOrder(file)
-    '''
     # Set this as the weapon order and set the weapon order type
     currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
     
@@ -418,6 +383,11 @@ def initialize():
         
     # Echo the weapon order to console
     currentOrder.echo()
+    
+    someOrder = getWeaponOrder('weapon_short')
+    someOrder.type = '#random'
+    es.dbgmsg(0, 'ZOMG BLAH!')
+    
     '''
     gungamelib.echo('gungame', 0, 0, 'Load_Commands')
     

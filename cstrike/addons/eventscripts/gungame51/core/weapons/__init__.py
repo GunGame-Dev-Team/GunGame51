@@ -244,6 +244,9 @@ class BaseWeaponOrders(object):
         delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
         
     def restartRound(self):
+        if not self.file == weaponorders.gungameorder:
+            return
+            
         es.server.cmd('mp_restartgame 5')
         es.msg('Weapon Order Changed! Restarting in 5 seconds!')
         
@@ -325,14 +328,14 @@ class WeaponManager(object):
     # =========================================================================
     def __init__(self):
         self.__weaponorders__ = {}
-        self.currentorder = None
         self.gungameorder = 'default_weapon_order'
+        self.currentorder = None
 
     # =========================================================================
     # >> WeaponManager() CLASS ATTRIBUTE METHODS
     # =========================================================================
     def __getitem__(self, item):
-        if name in ['currentorder', '__weaponorders__']:
+        if name in ['currentorder', '__weaponorders__', 'gungameorder']:
             return object.__getattr__(self, item)
         else:
             if not self.currentorder:
@@ -382,8 +385,6 @@ class WeaponManager(object):
         Note:
             This does not set the weapon order to be used by GunGame, it only
             loads and parses the weapon order.
-            
-        Usage:
         '''
         self.__weaponorders__[name] = orders[name]
         self.currentorder = name

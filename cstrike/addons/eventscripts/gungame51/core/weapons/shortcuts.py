@@ -26,6 +26,8 @@ def getWeaponOrder(name=None):
         return weaponorders.load(name)
     else:
         if weaponorders.gungameorder:
+            import es
+            es.dbgmsg(0, 'Weapon Order: %s' %weaponorders.gungameorder)
             return weaponorders.__weaponorders__[weaponorders.gungameorder]
         return None
 
@@ -65,14 +67,14 @@ def setWeaponOrder(name, type='#default'):
     weaponorders.type = type
     return getWeaponOrder()
     
-def getWeapon(level):
+def getLevelWeapon(level, weaponOrderName=None):
     '''
     Returns the name of the level's weapon set in GunGame's weapon order.
     '''
-    return getWeaponOrder().getWeapon(level)
+    return getWeaponOrder(weaponOrderName).getWeapon(level)
     
-def getLevelMultiKill(level):
+def getLevelMultiKill(level, weaponOrderName=None):
     '''
     Returns the multikill value of the level set in GunGame's weapon order.
     '''
-    return getWeaponOrder().getMultiKill(level)
+    return getWeaponOrder(weaponOrderName).getMultiKill(level)

@@ -15,7 +15,7 @@ from playerlib import uniqueid
 
 # GunGame Imports
 from gungame51.core.events import events
-from gungame51.core.weapons.shortcuts import getWeapon
+from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import isDead
 from gungame51.core import isSpectator
@@ -101,7 +101,7 @@ class BasePlayer(object):
 
     def __getattr__(self, name):
         if name == 'weapon':
-            self.weapon = getWeapon(self.level)
+            self.weapon = getLevelWeapon(self.level)
         # Return the attribute value
         return object.__getattribute__(self, name)
 
@@ -180,7 +180,7 @@ class BasePlayer(object):
         es.msg('We just sent %s a hudhint!' %es.getplayername(self.userid))
 
     def getWeapon(self):
-        return getWeapon(self.level)
+        return getLevelWeapon(self.level)
 
     def giveWeapon(self):
         '''
