@@ -48,13 +48,10 @@ from core.players import Player
 # >> TEST CODE
 # ============================================================================
 def load():
-    # Load custom events
-    #es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
-    
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
     es.server.cmd('exec server.cfg')
-    
+
     try:
         initialize()
     except:
@@ -63,18 +60,7 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
         es.unload('gungame')
-    '''
-    currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
-    currentOrder.echo()
-    
-    diffOrder = getWeaponOrder('weapon_short')
-    diffOrder.echo()
-    diffOrder.type = '#random'
-    
-    es.dbgmsg(0, 'This should be "m249": %s' %getLevelWeapon(1, 'reverse_weapon_order'))
-    es.dbgmsg(0, 'This should be "15": %s' %getLevelMultiKill(1))
-    '''
-    
+
 def es_map_start(event_var):
     # Load custom GunGame events
     es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
@@ -220,7 +206,7 @@ def player_spawn(event_var):
                 if not playerlib.getPlayer(userid).get('defuser'):
                     es.server.queuecmd('es_xgive %d item_defuser' % userid)
 
-def player_death(event_var):
+def player_death(event_var):    
     # Warmup Round Check
     # ....
     
@@ -383,10 +369,6 @@ def initialize():
         
     # Echo the weapon order to console
     currentOrder.echo()
-    
-    someOrder = getWeaponOrder('weapon_short')
-    someOrder.type = '#random'
-    es.dbgmsg(0, 'ZOMG BLAH!')
     
     '''
     gungamelib.echo('gungame', 0, 0, 'Load_Commands')

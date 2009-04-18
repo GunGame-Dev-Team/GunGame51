@@ -115,8 +115,9 @@ class BasePlayer(object):
         if name in setHooks:
             del setHooks[name]
 
-        # Delete the attribute
-        object.__delattr__(self, name)
+        # Delete the attribute only if it exists (we don't want to raise errors)
+        if hasattr(self, name):
+            object.__delattr__(self, name)
 
     def __setitem__(self, name, value):
         # Forward to __setattr__

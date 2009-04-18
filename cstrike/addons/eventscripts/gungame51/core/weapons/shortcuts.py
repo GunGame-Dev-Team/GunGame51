@@ -26,8 +26,6 @@ def getWeaponOrder(name=None):
         return weaponorders.load(name)
     else:
         if weaponorders.gungameorder:
-            import es
-            es.dbgmsg(0, 'Weapon Order: %s' %weaponorders.gungameorder)
             return weaponorders.__weaponorders__[weaponorders.gungameorder]
         return None
 
