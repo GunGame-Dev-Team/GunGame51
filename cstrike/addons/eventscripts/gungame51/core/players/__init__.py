@@ -219,14 +219,14 @@ class BasePlayer(object):
         playerHandle = es.getplayerhandle(self.userid)
 
         # Strip primary weapon
-        for weaponType in ('primary', 'secondary'):
+        for weaponType in ('#primary', '#secondary'):
             weaponIndex = self.getWeaponIndex(playerHandle, weaponType)
             if weaponIndex:
                 es.server.cmd('es_xremove %i' % weaponIndex)
 
     def getWeaponIndex(self, playerHandle, flag):
         for weapon in getWeaponList(flag):
-            for weaponIndex in es.createentitylist('weapon_%s' % weapon):
+            for weaponIndex in es.createentitylist(weapon):
                 # Check the owner against the handle
                 if es.getindexprop(weaponIndex, 'CBaseEntity.m_hOwnerEntity') == playerHandle:
                     return weaponIndex
