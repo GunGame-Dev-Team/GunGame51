@@ -12,6 +12,7 @@ $LastChangedDate$
 # EventScripts Imports
 import es
 from playerlib import uniqueid
+from weaponlib import getWeaponList
 
 # GunGame Imports
 from gungame51.core.events import events
