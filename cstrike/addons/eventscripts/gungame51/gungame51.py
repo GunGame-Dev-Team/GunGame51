@@ -23,10 +23,13 @@ from core.weapons.shortcuts import getWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
 from core.weapons.shortcuts import getLevelWeapon
 
-#    Load and Execute GunGame Configs
-from core.cfg.files import *
-from scripts.cfg.included import *
-from scripts.cfg.custom import *
+#    Load, Execute and Reload GunGame Configs
+import core.cfg.files
+reload(core.cfg.files)
+import scripts.cfg.included
+reload(scripts.cfg.included)
+import scripts.cfg.custom
+reload(scripts.cfg.custom)
 
 #    Config Function Imports
 from core.cfg import __configs__
@@ -39,19 +42,22 @@ from core.addons.shortcuts import getAddonInfo
 from core.addons.shortcuts import addonExists
 
 #    Core Function Imports
-from core import isDead, isSpectator
+from core import isDead, isSpectator, inMap
 
 #    Player Function Imports
-from core.players import Player
+from core.players.shortcuts import Player
 
 # ============================================================================
-# >> TEST CODE
+# >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    # Load translation file for gungame
+    #gungamelib.loadTranslations('gungame')
+    
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
     es.server.cmd('exec server.cfg')
-
+    
     try:
         initialize()
     except:
@@ -60,54 +66,151 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
         es.unload('gungame')
+        
+def unload():
+    # Unload all enabled addons
+    from core.addons import __addons__
 
+    # Create a copy of the list of addons
+    list_addons = __addons__.__order__[:]
+    
+    # We need to unload in reverse due to DependencyErrors
+    list_addons.reverse()
+    
+    for name in list_addons:
+        if name not in __addons__.__order__:
+            continue
+        unloadAddon(name)
+    
+    # Unload configs (removes flags from CVARs)
+    from core.cfg import getConfigList
+    
+    for name in getConfigList():
+        __configs__.unload(name)
+    
+    # Grab a random userid for the below commands
+    userid = es.getuserid()
+    
+    # Enable Buyzones
+    es.server.queuecmd('es_xfire %d func_buyzone Enable' %userid)
+    
+    # Get map if
+    try:
+        mapObjectives = int(es.ServerVar('gg_map_obj'))
+        
+        # Re-enable objectives
+        if mapObjectives < 3:
+            # Re-enable all objectives
+            if mapObjectives == 0:
+                if len(es.createentitylist('func_bomb_target')):
+                    es.server.queuecmd('es_xfire %d func_bomb_target Enable' %userid)
+                elif len(es.createentitylist('func_hostage_rescue')):
+                    es.server.queuecmd('es_xfire %d func_hostage_rescue Enable' %userid)
+            
+            # Enable bomb zone 
+            elif mapObjectives == 1:
+                if len(es.createentitylist('func_bomb_target')):
+                    es.server.queuecmd('es_xfire %d func_bomb_target Enable' %userid)
+            
+            # Enable hostage objectives
+            elif mapObjectives == 2:
+                if len(es.createentitylist('func_hostage_rescue')):
+                    es.server.queuecmd('es_xfire %d func_hostage_rescue Enable' %userid)
+    except:
+        pass
+    
+    # Fire gg_unload event
+    '''
+    We need to add this to the EventManager
+    '''
+    es.event('initialize', 'gg_unload')
+    es.event('fire', 'gg_unload')
+    
+    '''
+    gungamelib.clearGunGame()
+    '''
+
+def initialize():
+    '''
+    #global countBombDeathAsSuicide
+    #global list_stripExceptions
+    '''
+    
+    # Print load started
+    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+    #gungamelib.echo('gungame', 0, 0, 'Load_Start', {'version': __version__})
+    
+    # Load custom events
+    es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    
+    # Fire the gg_server.cfg
+    es.server.cmd('exec gungame51/gg_server.cfg')
+    
+    # Get strip exceptions
+    if str(es.ServerVar('gg_map_strip_exceptions')) != '0':
+        list_stripExceptions = str(es.ServerVar('gg_map_strip_exceptions')).split(',')
+    
+    # Get weapon order file
+    # Set this as the weapon order and set the weapon order type
+    currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
+    
+    # Set multikill override
+    if int(es.ServerVar('gg_multikill_override')) > 1:
+        currentOrder.setMultiKillOverride(int(es.ServerVar('gg_multikill_override')))
+        
+    # Echo the weapon order to console
+    es.dbgmsg(0, '[GunGame]')
+    currentOrder.echo()
+    es.dbgmsg(0, '[GunGame]')
+    
+    '''
+    gungamelib.echo('gungame', 0, 0, 'Load_Commands')
+    '''
+    
+    # Clear out the GunGame system
+    #gungamelib.resetGunGame()
+    
+    '''
+    gungamelib.echo('gungame', 0, 0, 'Load_Warmup')
+    '''
+
+    # We will mess with this later...
+    '''
+    # Start warmup timer
+    if inMap():
+        # Check to see if the warmup round needs to be activated
+        if int(es.ServerVar('gg_warmup_timer')) > 0:
+        
+            es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
+        else:
+            # Fire gg_start event
+            es.event('initialize','gg_start')
+            es.event('fire','gg_start')
+    '''
+    
+    # Restart map
+    #gungamelib.msg('gungame', '#all', 'Loaded')
+    
+    # Fire gg_load event
+    '''
+    Need to port this to the EventManager
+    '''
+    es.event('initialize', 'gg_load')
+    es.event('fire', 'gg_load')
+    
+    # Print load completed
+    #gungamelib.echo('gungame', 0, 0, 'Load_Completed')
+    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+    
+# ============================================================================
+# >> GAME EVENTS
+# ============================================================================
 def es_map_start(event_var):
     # Load custom GunGame events
     es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
     equipPlayer()
-
-def unload():
-    from core.addons import __addons__
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, 'UNLOADING ADDONS:')
-    es.dbgmsg(0, '-'*30)
-    es.dbgmsg(0, '# of addons loaded: %i' %len(getAddonInfo()))
-    # Create a copy of the list of addons
-    list_addons = __addons__.__order__[:]
-    # We need to unload in reverse due to DependencyErrors
-    list_addons.reverse()
-    for name in list_addons:
-        if name not in __addons__.__order__:
-            continue
-        unloadAddon(name)
-        es.dbgmsg(0, '# of addons remaining: %i' %len(getAddonInfo()))
-    es.dbgmsg(0, '-'*30)
-    es.dbgmsg(0, '')
     
-    # Testing the unloading of configs and removal of flags
-    # Flags are automatically removed when using this method
-    from core.cfg import getConfigList
-    for name in getConfigList():
-        __configs__.unload(name)
-    
-def equipPlayer():
-    userid = es.getuserid()
-    es.server.cmd('es_xremove game_player_equip')
-    es.server.cmd('es_xgive %s game_player_equip' % userid)
-    es.server.cmd('es_xfire %s game_player_equip AddOutput "weapon_knife 1"' % userid)
-    
-    # Retrieve the armor type
-    armorType = int(es.ServerVar('gg_player_armor'))
-    
-    # Give the player full armor
-    if armorType == 2:
-        es.server.cmd('es_xfire %s game_player_equip AddOutput "item_assaultsuit 1"' % userid)
-    
-    # Give the player kevlar only
-    elif armorType == 1:
-        es.server.cmd('es_xfire %s game_player_equip AddOutput "item_kevlar 1"' % userid)
-
 def round_start(event_var):
     #global list_stripExceptions
     #global countBombDeathAsSuicide
@@ -190,7 +293,6 @@ def player_spawn(event_var):
     # ....
     
     # Give the player their weapon
-    es.dbgmsg(0, '%s should have a %s.' %(event_var['es_username'], Player(userid).weapon))
     Player(userid).giveWeapon()
     
     # Send the level information hudhint
@@ -325,109 +427,25 @@ def player_death(event_var):
 def gg_levelup(event_var):
     es.msg('%s leveled up by killing %s!' %(event_var['es_attackername'], event_var['es_username']))
     
-def initialize():
-    global countBombDeathAsSuicide
-    global list_stripExceptions
+# ============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# ============================================================================
+def equipPlayer():
+    userid = es.getuserid()
+    cmdFormat = 'es_xremove game_player_equip;' + \
+                'es_xgive %s game_player_equip;' %userid + \
+                'es_xfire %s game_player_equip AddOutput "weapon_knife 1"' \
+                    %userid
+    es.server.cmd(cmdFormat)
     
-    '''
-    # Register addon
-    gungame = gungamelib.registerAddon('gungame')
-    gungame.setDisplayName('GunGame')
-    '''
-    # Print load started
-    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
-    #gungamelib.echo('gungame', 0, 0, 'Load_Start', {'version': __version__})
+    # Retrieve the armor type
+    armorType = int(es.ServerVar('gg_player_armor'))
     
-    # Load custom events
-    es.loadevents('declare', 'addons/eventscripts/gungame/events/es_gungame_events.res')
+    # Give the player full armor
+    if armorType == 2:
+        es.server.cmd('es_xfire %s game_player_equip AddOutput "item_assaultsuit 1"' % userid)
     
-    '''
-    # Execute addon configs
-    #gungamelib.echo('gungame', 0, 0, 'Load_CustomConfigs')
-    
-    for addon in list_customAddonsDir:
-        gungamelib.echo('gungame', 0, 0, 'ExecuteCustomConfig', {'addon': addon})
-        gungamelib.getConfig('custom_addon_configs/%s.cfg' % addon)
-    '''
-    
-    # Fire the gg_server.cfg
-    es.server.cmd('exec gungame5/gg_server.cfg')
-    
-    # Get strip exceptions
-    if int(es.ServerVar('gg_map_strip_exceptions')) != 0:
-        list_stripExceptions = str(es.ServerVar('gg_map_strip_exceptions')).split(',')
-    '''
-    gungamelib.echo('gungame', 0, 0, 'Load_WeaponOrders')
-    '''
-    
-    # Set this as the weapon order and set the weapon order type
-    currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
-    
-    # Set multikill override
-    if int(es.ServerVar('gg_multikill_override')) > 1:
-        currentOrder.setMultiKillOverride(int(es.ServerVar('gg_multikill_override')))
-        
-    # Echo the weapon order to console
-    currentOrder.echo()
-    
-    '''
-    gungamelib.echo('gungame', 0, 0, 'Load_Commands')
-    
-    # Register commands
-    gungame.registerPublicCommand('weapons', gungamelib.sendWeaponOrderMenu)
-    '''
-    # Clear out the GunGame system
-    # gungamelib.resetGunGame() # TODO
-    
-    # Set Up a custom variable for voting in dict_variables
-    #dict_variables['gungame_voting_started'] = False
-    
-    # Set up a custom variable for tracking multi-rounds
-    #dict_variables['roundsRemaining'] = gungamelib.getVariableValue('gg_multi_round')
-    
-    #gungamelib.echo('gungame', 0, 0, 'Load_Warmup')
-    
-    '''
-    # Start warmup timer
-    if gungamelib.inMap():
-        # Check to see if the warmup round needs to be activated
-        if gungamelib.getVariableValue('gg_warmup_timer') > 0:
-            es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
-        else:
-            # Fire gg_start event
-            es.event('initialize','gg_start')
-            es.event('fire','gg_start')
-    '''
-    # Restart map
-    '''
-    This should all be done by the weapon order file being set/changed
-    gungamelib.msg('gungame', '#all', 'Loaded')
-    es.server.queuecmd('mp_restartgame 2')
-    '''
-    
-    '''
-    Moving all of this to an included addon
-    # Create a variable to prevent bomb explosion deaths from counting a suicides
-    countBombDeathAsSuicide = False
-    '''
-    
-    '''
-    # Load sound pack
-    gungamelib.echo('gungame', 0, 0, 'Load_SoundSystem')
-    gungamelib.getSoundPack(gungamelib.getVariableValue('gg_soundpack'))
-    
-    # Load gg_info_menus -- creates and sends ingame menus (!top, !leader, !score, !ranks, etc)
-    es.server.queuecmd('es_xload gungame/included_addons/gg_info_menus')
-    
-    # Load gg_thanks -- credits
-    es.server.queuecmd('es_xload gungame/included_addons/gg_thanks')
-    '''
-    # Fire gg_load event
-    es.event('initialize', 'gg_load')
-    es.event('fire', 'gg_load')
-    
-    # Print load completed
-    '''
-    gungamelib.echo('gungame', 0, 0, 'Load_Completed')
-    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
-    '''
+    # Give the player kevlar only
+    elif armorType == 1:
+        es.server.cmd('es_xfire %s game_player_equip AddOutput "item_kevlar 1"' % userid)
+

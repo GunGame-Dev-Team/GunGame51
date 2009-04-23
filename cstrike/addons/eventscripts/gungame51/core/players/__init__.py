@@ -86,7 +86,7 @@ class BasePlayer(object):
         self.preventlevel = []
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
-        self.weapon = None
+        self.weapon = getLevelWeapon(self.level)
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
