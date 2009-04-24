@@ -83,14 +83,3 @@ def getLevelMultiKill(level, weaponOrderName=None):
     
 def getTotalLevels(weaponOrderName=None):
     return getWeaponOrder(weaponOrderName).getTotalLevels()
-    
-def getWeaponIndex(playerHandle, flag):
-    '''
-    Returns the entity index that matches the player's index
-    '''
-    for weapon in getWeaponList(flag):
-        for weaponIndex in es.createentitylist(weapon):
-            # Check the owner against the handle
-            if es.getindexprop(weaponIndex, 'CBaseEntity.m_hOwnerEntity') == playerHandle:
-                es.dbgmsg(0, weaponIndex)
-                return weaponIndex

@@ -12,13 +12,13 @@ $LastChangedDate$
 # EventScripts Imports
 import es
 from playerlib import uniqueid
+from playerlib import getPlayer
 from weaponlib import getWeaponList
 
 # GunGame Imports
 from gungame51.core.events import events
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
-from gungame51.core.weapons.shortcuts import getWeaponIndex
 from gungame51.core import isDead
 from gungame51.core import isSpectator
 from gungame51.core import getOS
@@ -209,21 +209,25 @@ class BasePlayer(object):
         Strips the player of their primary and secondary weapon.
         '''
         if getOS() == 'posix':
-            stripFormat  = 'es_xgive %s weapon_knife;' % self.userid
-            stripFormat += 'es_xgive %s player_weaponstrip;' % self.userid
-            stripFormat += 'es_xfire %s player_weaponstrip Strip;' % self.userid
-            stripFormat += 'es_xfire %s player_weaponstrip Kill' % self.userid
-            es.server.cmd(stripFormat)
+            stripFormat = 'es_xgive %s weapon_knife;' %self.userid + \
+                'es_xgive %s player_weaponstrip;' %self.userid + \
+                'es_xfire %s player_weaponstrip Strip;' %self.userid + \
+                'es_xfire %s player_weaponstrip Kill' %self.userid
             return
 
-        # Get player handle
-        playerHandle = es.getplayerhandle(self.userid)
+        # Retrieve a playerlib.Player() instance
+        pPlayer = getPlayer(self.userid)
+
+        # Get the primary and secondary weapon indexes
+        pWeapon, sWeapon = pPlayer.getPrimary(), pPlayer.getSecondary()
 
         # Strip primary weapon
-        for weaponType in ('#primary', '#secondary'):
-            weaponIndex = getWeaponIndex(playerHandle, weaponType)
-            if weaponIndex:
-                es.server.cmd('es_xremove %i' % weaponIndex)
+        if pWeapon:
+            es.server.cmd('es_xremove %i' %pPlayer.getWeaponIndex(pWeapon))
+
+        # Strip secondary weapon
+        if sWeapon:
+            es.server.cmd('es_xremove %i' %pPlayer.getWeaponIndex(sWeapon))
 
 
 class PlayerDict(dict):
