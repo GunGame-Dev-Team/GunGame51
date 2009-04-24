@@ -18,6 +18,7 @@ from weaponlib import getWeaponList
 from gungame51.core.events import events
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
+from gungame51.core.weapons.shortcuts import getWeaponIndex
 from gungame51.core import isDead
 from gungame51.core import isSpectator
 from gungame51.core import getOS
@@ -200,7 +201,7 @@ class BasePlayer(object):
 
         # Get active weapon
         if self.weapon != 'knife':
-            es.delayed(0, 'es_xgive %s weapon_%s; es_xsexec %s "use weapon_%s"'
+            es.delayed(0, 'es_xgive %s weapon_%s;es_xsexec %s "use weapon_%s"'
                 %(self.userid, self.weapon, self.userid, self.weapon))
 
     def strip(self):
@@ -220,16 +221,9 @@ class BasePlayer(object):
 
         # Strip primary weapon
         for weaponType in ('#primary', '#secondary'):
-            weaponIndex = self.getWeaponIndex(playerHandle, weaponType)
+            weaponIndex = getWeaponIndex(playerHandle, weaponType)
             if weaponIndex:
                 es.server.cmd('es_xremove %i' % weaponIndex)
-
-    def getWeaponIndex(self, playerHandle, flag):
-        for weapon in getWeaponList(flag):
-            for weaponIndex in es.createentitylist(weapon):
-                # Check the owner against the handle
-                if es.getindexprop(weaponIndex, 'CBaseEntity.m_hOwnerEntity') == playerHandle:
-                    return weaponIndex
 
 
 class PlayerDict(dict):

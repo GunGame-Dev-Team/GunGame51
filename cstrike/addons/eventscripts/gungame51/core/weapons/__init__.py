@@ -277,6 +277,9 @@ class BaseWeaponOrders(object):
             raise ValueError('Can not get multikill value for level: "%s".'
                 %level + ' Level is out of range (1-%s).' %len(self.order))
         return self.order[level][1]
+        
+    def getTotalLevels(self):
+        return len(self.order)
 
 
 class WeaponOrdersDict(dict):

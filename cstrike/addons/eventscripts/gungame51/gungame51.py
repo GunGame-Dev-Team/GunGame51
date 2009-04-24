@@ -19,9 +19,7 @@ import gamethread
 # GunGame Imports
 #    Weapon Function Imports
 from core.weapons.shortcuts import setWeaponOrder
-from core.weapons.shortcuts import getWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
-from core.weapons.shortcuts import getLevelWeapon
 
 #    Load, Execute and Reload GunGame Configs
 import core.cfg.files
@@ -33,13 +31,9 @@ reload(scripts.cfg.custom)
 
 #    Config Function Imports
 from core.cfg import __configs__
-from core.cfg import getConfigList
 
 #    Addon Function Imports
-from core.addons.shortcuts import loadAddon
 from core.addons.shortcuts import unloadAddon
-from core.addons.shortcuts import getAddonInfo
-from core.addons.shortcuts import addonExists
 
 #    Core Function Imports
 from core import isDead, isSpectator, inMap
@@ -162,7 +156,6 @@ def initialize():
     es.dbgmsg(0, '[GunGame]')
     currentOrder.echo()
     es.dbgmsg(0, '[GunGame]')
-    
     '''
     gungamelib.echo('gungame', 0, 0, 'Load_Commands')
     '''
