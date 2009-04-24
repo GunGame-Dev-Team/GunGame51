@@ -36,10 +36,13 @@ from core.cfg import __configs__
 from core.addons.shortcuts import unloadAddon
 
 #    Core Function Imports
-from core import isDead, isSpectator, inMap
+from core import inMap
 
 #    Player Function Imports
 from core.players.shortcuts import Player
+from core.players.shortcuts import resetPlayers
+from core.players.shortcuts import isDead
+from core.players.shortcuts import isSpectator
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -161,7 +164,7 @@ def initialize():
     '''
     
     # Clear out the GunGame system
-    #gungamelib.resetGunGame()
+    resetPlayers()
     
     '''
     gungamelib.echo('gungame', 0, 0, 'Load_Warmup')

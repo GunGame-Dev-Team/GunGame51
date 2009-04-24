@@ -22,7 +22,7 @@ class EventManager(object):
     def gg_levelup(self, playerInstance, levelsAwarded, victim, reason):
         '''
         Adds a declared number of levels to the attacker.
-        
+
         Arguments:
             * playerInstance: (required)
                 The stored BasePlayer instance contained within the PlayerDict.
@@ -38,7 +38,10 @@ class EventManager(object):
         oldLevel = playerInstance.level
         newLevel = playerInstance.level + int(levelsAwarded)
         playerInstance.level = newLevel
-        
+
+        # Reset multikill
+        playerInstance.multikill = 0
+
         # Fire the event
         es.event('initialize', 'gg_levelup')
         es.event('setint', 'gg_levelup', 'attacker', playerInstance.userid)
@@ -48,12 +51,13 @@ class EventManager(object):
         es.event('setint', 'gg_levelup', 'userid', victim)
         es.event('setstring', 'gg_levelup', 'reason', reason)
         es.event('fire', 'gg_levelup')
+
         return True
-        
+
     def gg_leveldown(self, playerInstance, levelsTaken, attacker, reason):
         '''
         Removes a declared number of levels from the victim.
-        
+
         Arguments:
             * playerInstance: (required)
                 The stored BasePlayer instance contained within the PlayerDict.
@@ -71,7 +75,10 @@ class EventManager(object):
             playerInstance.level = oldLevel - int(levelsTaken)
         else:
             playerInstance.level = 1
-        
+
+        # Reset multikill
+        playerInstance.multikill = 0
+
         # Fire the event
         es.event('initialize', 'gg_leveldown')
         es.event('setint', 'gg_leveldown', 'userid', playerInstance.userid)
@@ -81,5 +88,7 @@ class EventManager(object):
         es.event('setint', 'gg_leveldown', 'attacker', attacker)
         es.event('setstring', 'gg_leveldown', 'reason', reason)
         es.event('fire', 'gg_leveldown')
-        
+
+        return True
+
 events = EventManager()
