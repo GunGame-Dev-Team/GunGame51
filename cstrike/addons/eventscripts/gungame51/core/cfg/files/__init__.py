@@ -10,7 +10,6 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # GunGame Imports
-from gungame51.core.cfg import __configs__
 from gungame51.core.cfg import getConfigList
 
 # ============================================================================
@@ -18,10 +17,3 @@ from gungame51.core.cfg import getConfigList
 # ============================================================================
 # Declare all config *.py files located in the "core.cfg.files" directory
 __all__ = getConfigList('main')
-
-# ============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
-for config in __all__:
-    # Load and execute all configs in the "core.cfg.files" directory
-    __configs__.load(config)

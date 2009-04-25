@@ -1,0 +1,1 @@
+# ../cstrike/addons/eventscripts/gungame/scripts/__init__.py

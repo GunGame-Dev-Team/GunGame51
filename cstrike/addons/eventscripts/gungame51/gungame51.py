@@ -21,16 +21,10 @@ import gamethread
 from core.weapons.shortcuts import setWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
 
-#    Load, Execute and Reload GunGame Configs
-import core.cfg.files
-reload(core.cfg.files)
-import scripts.cfg.included
-reload(scripts.cfg.included)
-import scripts.cfg.custom
-reload(scripts.cfg.custom)
-
 #    Config Function Imports
-from core.cfg import __configs__
+from core.cfg.shortcuts import loadConfig
+from core.cfg.shortcuts import unloadConfig
+from core.cfg.shortcuts import getConfigList
 
 #    Addon Function Imports
 from core.addons.shortcuts import unloadAddon
@@ -63,7 +57,7 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
         es.unload('gungame')
-        
+    
 def unload():
     # Unload all enabled addons
     from core.addons import __addons__
@@ -80,10 +74,7 @@ def unload():
         unloadAddon(name)
     
     # Unload configs (removes flags from CVARs)
-    from core.cfg import getConfigList
-    
-    for name in getConfigList():
-        __configs__.unload(name)
+    unloadConfig(getConfigList())
     
     # Grab a random userid for the below commands
     userid = es.getuserid()
@@ -132,7 +123,7 @@ def initialize():
     #global countBombDeathAsSuicide
     #global list_stripExceptions
     '''
-    
+    loadConfig(getConfigList())
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
     #gungamelib.echo('gungame', 0, 0, 'Load_Start', {'version': __version__})
