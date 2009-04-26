@@ -17,7 +17,7 @@ import es
 
 # GunGame Imports
 from gungame51.core import getGameDir
-from gungame51.core.players import Player
+from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
 # >> GLOBAL VARIABLES

@@ -28,15 +28,25 @@ from gungame51.core import getGameDir
 
 configExecuting = False
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================
+# =============================================================================
 class ConfigManager(object):
+    '''
+    Class designed to handle the loading, unloading, and executing of python
+    configs coded using cfglib.AddonCFG().
+    '''
+    # =========================================================================
+    # >> ConfigManager() CLASS INITIALIZATION
+    # =========================================================================
     def __init__(self):
         self.__loaded__ = {}
         self.__cvardefaults__ = {}
         es.addons.registerForEvent(self, 'server_cvar', self.server_cvar)
 
+    # =========================================================================
+    # >> ConfigManager() CUSTOM CLASS METHODS
+    # =========================================================================
     def load(self, name):
         '''
         Loads the config's python file.
@@ -91,6 +101,8 @@ class ConfigManager(object):
                 cfg = config.__dict__[item]
                 # Loop through the CVARs in the configlib.AddonCFG instance
                 for cvar, value, description in cfg.getCvars().values():
+                    # Remove the CVAR and default value from the dictionary
+                    del self.__cvardefaults__[cvar]
                     # Remove the "notify" flag for the CVAR
                     es.ServerVar(cvar).removeFlag('notify')
 
@@ -102,12 +114,16 @@ class ConfigManager(object):
         del self.__loaded__[name]
 
     def resetConfigExecution(self):
+        '''
+        Resets the global veriable cfgExecuting for when configs are being
+        executed via cfglib.AddonCFG().execute().
+        '''
         global cfgExecuting
         cfgExecuting = False
 
     def getConfigByName(self, name):
         '''
-        Returns the module of a config by name
+        Returns the module of a config by name.
         '''
         # If the config is loaded we have stored the module
         if name in self.__loaded__:
@@ -130,6 +146,9 @@ class ConfigManager(object):
         return self.__loaded__[name]
 
     def server_cvar(self, event_var):
+        '''
+        Handles CVARs that are loaded via GunGame's ConfigManager.
+        '''
         cvarName = event_var['cvarname']
         cvarValue = event_var['cvarvalue']
 
@@ -164,6 +183,9 @@ class ConfigManager(object):
 
             unload(cvarName)
 
+    # =========================================================================
+    # ConfigManager() STATIC CLASS METHODS
+    # =========================================================================
     @staticmethod
     def configExists(name):
         '''
@@ -202,6 +224,9 @@ class ConfigManager(object):
 
 __configs__ = ConfigManager()
 
+# ============================================================================
+# >> FUNCTIONS
+# ============================================================================
 def getConfigList(type=None):
     '''
     Retrieves a list of configlib configs of the following types:

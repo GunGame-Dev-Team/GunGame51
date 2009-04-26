@@ -12,6 +12,10 @@ $LastChangedDate$
 # EventScripts Imports
 import es
 
+# GunGame imports
+from gungame51.core.leaders.shortcuts import leaders
+from gungame51.core.leaders.shortcuts import getLeaderLevel
+
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -42,6 +46,10 @@ class EventManager(object):
         # Reset multikill
         playerInstance.multikill = 0
 
+        # Check to see if the player is a leader
+        if newLevel >= getLeaderLevel():
+            leaders.add(playerInstance.userid)
+        
         # Fire the event
         es.event('initialize', 'gg_levelup')
         es.event('setint', 'gg_levelup', 'attacker', playerInstance.userid)

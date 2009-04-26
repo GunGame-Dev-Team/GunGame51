@@ -44,3 +44,7 @@ def inMap():
     @retval True The server is in a map.
     @retval False The server is not in a map.'''
     return (str(es.ServerVar('eventscripts_currentmap')) != '')
+    
+def removeReturnChars(text):
+    text = text.replace('\\r', '')
+    return text.replace('\\n', '')

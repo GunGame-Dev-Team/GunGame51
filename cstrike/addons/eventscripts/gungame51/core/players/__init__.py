@@ -15,7 +15,6 @@ from playerlib import uniqueid
 from playerlib import getPlayer
 
 # GunGame Imports
-from gungame51.core.events import events
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import getOS
@@ -445,3 +444,5 @@ def isSpectator(userid):
                 es.msg('This player is on a team!')
     '''
     return es.getplayerteam(userid) <= 1
+    
+from gungame51.core.events.shortcuts import events
