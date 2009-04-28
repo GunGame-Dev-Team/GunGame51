@@ -24,6 +24,6 @@
 	        __init__.py
                 scriptname.py
             
-----> $Rev: 13 $ <----
+----> $Rev$ <----
 
 Should say 11 above.

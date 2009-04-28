@@ -1,9 +1,9 @@
 # gungame/scripts/included/gg_knife_rookie.py
 
 '''
-$Rev: 13 $
-$LastChangedBy: micbarr $
-$LastChangedDate: 2009-04-07 01:31:04 -0400 (Tue, 07 Apr 2009) $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================

@@ -1,9 +1,9 @@
 # gungame/scripts/included/gg_dissolver.py
 
 '''
-$Rev: 13 $
-$LastChangedBy: micbarr $
-$LastChangedDate: 2009-04-06 20:23:27 -0400 (Mon, 06 Apr 2009) $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================
