@@ -17,6 +17,7 @@ import es
 import gamethread
 
 # GunGame Imports
+
 #    Weapon Function Imports
 from core.weapons.shortcuts import setWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
@@ -29,14 +30,16 @@ from core.cfg.shortcuts import getConfigList
 #    Addon Function Imports
 from core.addons.shortcuts import unloadAddon
 
-#    Core Function Imports
-from core import inMap
-
 #    Player Function Imports
 from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
 from core.players.shortcuts import isDead
 from core.players.shortcuts import isSpectator
+
+#    Core Function Imports
+from core import inMap
+
+
 
 # ============================================================================
 # >> LOAD & UNLOAD
