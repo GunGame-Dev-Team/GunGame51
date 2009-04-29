@@ -42,7 +42,6 @@ class ConfigManager(object):
     def __init__(self):
         self.__loaded__ = {}
         self.__cvardefaults__ = {}
-        es.addons.registerForEvent(self, 'server_cvar', self.server_cvar)
 
     # =========================================================================
     # >> ConfigManager() CUSTOM CLASS METHODS
@@ -145,7 +144,11 @@ class ConfigManager(object):
 
         return self.__loaded__[name]
 
-    def server_cvar(self, event_var):
+    # =========================================================================
+    # ConfigManager() STATIC CLASS METHODS
+    # =========================================================================
+    @staticmethod
+    def server_cvar(event_var):
         '''
         Handles CVARs that are loaded via GunGame's ConfigManager.
         '''
@@ -164,7 +167,7 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in conflicts.keys():
-                if int(self.__cvardefaults__[cvarName]) == int(cvarValue):
+                if int(__configs__.__cvardefaults__[cvarName]) == int(cvarValue):
                     return
 
             load(cvarName)
@@ -178,14 +181,11 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in dependencies.keys():
-                if int(self.__cvardefaults__[cvarName]) == int(cvarValue):
+                if int(__configs__.__cvardefaults__[cvarName]) == int(cvarValue):
                     return
 
             unload(cvarName)
 
-    # =========================================================================
-    # ConfigManager() STATIC CLASS METHODS
-    # =========================================================================
     @staticmethod
     def configExists(name):
         '''
@@ -223,6 +223,8 @@ class ConfigManager(object):
             return 'custom'
 
 __configs__ = ConfigManager()
+# Register the ConfigManager instance for the "server_cvar" event
+es.addons.registerForEvent(__configs__, 'server_cvar', __configs__.server_cvar)
 
 # ============================================================================
 # >> FUNCTIONS
