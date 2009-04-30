@@ -45,10 +45,10 @@
 //----------------------------------------------------------------------------
 
 @ Default Weapon Order
-glock // Testing to make sure this works
-usp                 4  // Oh look! Another comment AAAAAAAAAAAAAND too many spaces!
-p228           2
-deagle 1
+glock
+usp
+p228
+deagle
 fiveseven
 elite
 m3

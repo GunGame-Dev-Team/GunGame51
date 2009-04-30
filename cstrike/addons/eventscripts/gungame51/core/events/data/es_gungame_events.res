@@ -50,18 +50,27 @@
     }
     "gg_new_leader"
     {
-        "userid"    "short" // The userid of the player that became the new leader
-        "leveler"   "short" // The userid of the player that is leveling
+        "userid"        "short"     // The userid of the player that became the new leader
+        "leveler"       "short"     // The userid of the player that leveled up to become the new leader
+        "leaders"       "string"    // String of current leaders' userids separated by "," e.g. "2,7,9"
+        "old_leaders"   "string"    // String of old userids separated by "," e.g. "2,7,9"
+        "leader_level"  "short"     // The current leader's level
     }
     "gg_tied_leader"
     {
-        "userid"    "short" // The userid of the player that tied the leader(s)
-        "leveler"   "short" // The userid of the player that is leveling
+        "userid"        "short"     // The userid of the player that tied the leader(s)
+        "leveler"       "short"     // The userid of the player that leveled up to tie then leaders
+        "leaders"       "string"    // String of current leaders' userids separated by "," e.g. "2,7,9"
+        "old_leaders"   "string"    // String of old leaders' userids separated by "," e.g. "2,7,9"
+        "leader_level"  "short"     // The current leader's level
     }
     "gg_leader_lostlevel"
     {
-        "userid"    "short" // The userid of the leader that lost a level
-        "leveler"   "short" // The userid of the player that is leveling
+        "userid"        "short"     // The userid of the leader that lost a level
+        "leveler"       "short"     // The userid of the player that is leveling
+        "leaders"       "string"    // String of current leaders' userids separated by "," e.g. "2,7,9"
+        "old_leaders"   "string"    // String of old leaders' userids separated by "," e.g. "2,7,9"
+        "leader_level"  "short"     // The current leader's level
     }
     "gg_start"
     {
@@ -84,17 +93,22 @@
     {
         // Fires at the end of a map when there is no winner
     }
-    "gg_variable_changed"
-    {
-        "cvarname"  "string"    // The name of the cvar that was changed
-        "value"     "string"    // The new value of the cvar
-    }        
     "gg_load"
     {
-        // Fires when gungame is loaded
+        // Fires when gungame is successfully loaded
     }
     "gg_unload"
     {
-        // Fires when gungame is unloaded
+        // Fires when gungame is successfully unloaded
+    }
+    "gg_addon_loaded"
+    {
+        "addon"     "string"    // The name of the addon that was loaded
+        "type"      "string"    // The type of addon that was loaded (included or custom)
+    }
+    "gg_addon_unloaded"
+    {
+        "addon"     "string"    // The name of the addon that was unloaded
+        "type"      "string"    // The type of addon that was unloaded (included or custom)
     }
 }

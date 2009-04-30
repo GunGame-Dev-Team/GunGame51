@@ -147,6 +147,10 @@ class BasePlayer(object):
         # Return false if we can't level up
         if len(self.preventlevel):
             return False
+            
+        # Get the victim's Player() instance
+        if victim:
+            victim = Player(victim)
 
         # Use the EventManager to call the gg_levelup event
         events.gg_levelup(self, levelsAwarded, victim, reason)
@@ -167,6 +171,10 @@ class BasePlayer(object):
         if len(self.preventlevel):
             return False
 
+        # Get the attacker's Player() instance
+        if attacker:
+            attacker = Player(attacker)
+            
         # Use the EventManager to call the gg_leveldown event
         events.gg_leveldown(self, levelsTaken, attacker, reason)
 

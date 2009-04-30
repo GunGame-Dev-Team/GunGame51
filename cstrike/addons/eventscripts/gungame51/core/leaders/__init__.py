@@ -17,6 +17,7 @@ import es
 # GunGame Imports
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import players
+from gungame51.core.events.shortcuts import events
 
 # =============================================================================
 # >> CLASSES
@@ -97,9 +98,7 @@ class LeaderManager(object):
         '''
         
         # Fire gg_tied_leader
-        es.event('initialize', 'gg_tied_leader')
-        es.event('setint', 'gg_tied_leader', 'userid', userid)
-        es.event('fire', 'gg_tied_leader')
+        events.gg_tied_leader(userid)
         
             
     def setNew(self, userid):
@@ -137,9 +136,7 @@ class LeaderManager(object):
         '''
         
         # Fire gg_new_leader
-        es.event('initialize', 'gg_new_leader')
-        es.event('setint', 'gg_new_leader', 'userid', userid)
-        es.event('fire', 'gg_new_leader')
+        events.gg_new_leader(userid)
         
     def remove(self, userid):
         '''
@@ -162,14 +159,12 @@ class LeaderManager(object):
         # Remove the userid from the current leaders list
         self.current.remove(userid)
         
-        # Fire gg_leader_lostlevel
-        es.event('initialize', 'gg_leader_lostlevel')
-        es.event('setint', 'gg_leader_lostlevel', 'userid', userid)
-        es.event('fire', 'gg_leader_lostlevel')
-        
         # Check to see if we need to find new leaders
         if not len(self.current):
             self.refresh()
+            
+        # Fire gg_leader_lostlevel
+        events.gg_leader_lostlevel(userid)
         
     def reset(self):
         '''
@@ -234,6 +229,10 @@ class LeaderManager(object):
             elif level == self.leaderlevel:
                 self.leaders.append(userid)
         
+        # Set old leaders, if they have changed
+        if self.current[:] != self.previous[:]:
+            self.previous = self.current[:]
+        
         # 1 new leader
         if len(self.current) == 1:
             '''
@@ -241,13 +240,7 @@ class LeaderManager(object):
             saytext2('gungame', '#all', getPlayer(self.current[0])['index'], 'NewLeader', {'player': getPlayer(self.current[0])['name'], 'level': self.leaderlevel}, False)
             '''
             # Fire gg_new_leader
-            es.event('initialize', 'gg_new_leader')
-            es.event('setint', 'gg_new_leader', 'userid', userid)
-            es.event('fire', 'gg_new_leader')
-        
-        # Set old leaders, if they have changed
-        if self.leaders[:] != self.oldLeaders[:]:
-            self.oldLeaders = self.leaders[:]
+            events.gg_new_leader(userid)
         
     # =========================================================================
     # LeaderManager() STATIC CLASS METHODS

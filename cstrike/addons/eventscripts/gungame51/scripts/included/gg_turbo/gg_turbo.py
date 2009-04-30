@@ -77,6 +77,31 @@ def gg_levelup(event_var):
     es.dbgmsg(0, 'Leader names: %s' %getLeaderNames())
     es.dbgmsg(0, '='*40)
     es.dbgmsg(0, '')
+    
+def gg_new_leader(event_var):
+    es.dbgmsg(0, '')
+    es.dbgmsg(0, 'gg_new_leader:')
+    es.dbgmsg(0, '='*40)
+    es.dbgmsg(0, 'Userid: %s' %event_var['userid'])
+    es.dbgmsg(0, 'Leveler: %s' %event_var['leveler'])
+    es.dbgmsg(0, 'Leaders: "%s"' %event_var['leaders'])
+    es.dbgmsg(0, 'Old Leaders: "%s"' %event_var['old_leaders'])
+    es.dbgmsg(0, 'Leader Level: %s' %event_var['leader_level'])
+    es.dbgmsg(0, '='*40)
+    es.dbgmsg(0, '')
+    
+def gg_tied_leader(event_var):
+    es.dbgmsg(0, '')
+    es.dbgmsg(0, 'gg_tied_leader:')
+    es.dbgmsg(0, '='*40)
+    es.dbgmsg(0, 'Userid: %s' %event_var['userid'])
+    es.dbgmsg(0, 'Leveler: %s' %event_var['leveler'])
+    es.dbgmsg(0, 'Leaders: "%s"' %event_var['leaders'])
+    es.dbgmsg(0, 'Old Leaders: "%s"' %event_var['old_leaders'])
+    es.dbgmsg(0, 'Leader Level: %s' %event_var['leader_level'])
+    es.dbgmsg(0, '='*40)
+    es.dbgmsg(0, '')
+    
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================

@@ -417,6 +417,16 @@ def player_death(event_var):
 def gg_levelup(event_var):
     es.msg('%s leveled up by killing %s!' %(event_var['es_attackername'], event_var['es_username']))
     
+def gg_win(event_var):
+    es.dbgmsg(0, '')
+    es.dbgmsg(0, 'WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT!!!')
+    es.dbgmsg(0, 'Attacker: %s' %event_var['attacker'])
+    es.dbgmsg(0, 'Winner: %s' %event_var['winner'])
+    es.dbgmsg(0, 'Userid: %s' %event_var['userid'])
+    es.dbgmsg(0, 'Loser: %s' %event_var['loser'])
+    es.dbgmsg(0, 'WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT!!!')
+    es.dbgmsg(0, '')
+    
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
