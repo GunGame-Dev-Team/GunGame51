@@ -427,6 +427,12 @@ def gg_win(event_var):
     es.dbgmsg(0, 'WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT!!!')
     es.dbgmsg(0, '')
     
+def gg_addon_loaded(event_var):
+    es.dbgmsg(0, 'gg_addon_loaded: "%s" of type "%s"' %(event_var['addon'], event_var['type']))
+    
+def gg_addon_unloaded(event_var):
+    es.dbgmsg(0, 'gg_addon_unloaded: "%s" of type "%s"' %(event_var['addon'], event_var['type']))
+    
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================

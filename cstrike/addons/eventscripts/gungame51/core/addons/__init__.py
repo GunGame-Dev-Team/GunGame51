@@ -18,6 +18,7 @@ import es
 # GunGame Imports
 from gungame51.core import getGameDir
 from gungame51.core.players.shortcuts import Player
+from gungame51.core.events.shortcuts import events
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -248,6 +249,9 @@ class AddonManager(object):
         # We do this last because if there is a load error we don't want to
         # stop loading the sub-addon
         self.callBlock(addon, 'load')
+        
+        # Fire the event "gg_addon_loaded"
+        events.gg_addon_loaded(name, self.getAddonType(name))
 
     def unload(self, name):
         '''
@@ -281,6 +285,9 @@ class AddonManager(object):
         # Call the unload block as is normally done by ES
         # Again, we do this last so it doesn't matter if the block errors
         self.callBlock(addon, 'unload')
+        
+        # Fire the event "gg_addon_unloaded"
+        events.gg_addon_unloaded(name, self.getAddonType(name))
 
     def registerEvents(self, addon, name):
         '''
