@@ -19,6 +19,7 @@ from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
+#from gungame51.core.messaging import __messages__
 
 # ============================================================================
 # >> CLASSES
