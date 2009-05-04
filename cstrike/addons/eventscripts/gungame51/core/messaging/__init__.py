@@ -313,7 +313,7 @@ class MessageManager(object):
                     self.__formatString(string, tokens, filter))
             
             # Send message to the userids from the playerlib filter
-            for userid in getUseridList(self.filter):
+            for userid in getUseridList(filter):
                 es.toptext(userid, duration, color,
                     self.__formatString(string, tokens, userid))
                     
@@ -346,7 +346,7 @@ class MessageManager(object):
                 usermsg.echo(userid, '%s%s' % (prefix, string))
         else:
             # Console or Userid
-            if isinstance(self.filter, int):
+            if isinstance(filter, int):
                 # Get clean string
                 string = self.__cleanString(self.__formatString(string, tokens, filter))
                 
