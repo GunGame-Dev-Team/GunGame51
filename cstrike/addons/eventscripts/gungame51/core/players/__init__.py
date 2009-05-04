@@ -19,7 +19,7 @@ from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
-#from gungame51.core.messaging import __messages__
+
 
 # ============================================================================
 # >> CLASSES
@@ -179,9 +179,10 @@ class BasePlayer(object):
         # Use the EventManager to call the gg_leveldown event
         events.gg_leveldown(self, levelsTaken, attacker, reason)
 
-    def msg(self):
+    def msg(self, string, tokens={}, prefix=False):
         # This is where we will handle/send translated GunGame messages
-        es.msg('We just sent %s a message!' %es.getplayername(self.userid))
+        __messages__.msg(self.userid, string, tokens, prefix)
+        #es.msg('We just sent %s a message!' %es.getplayername(self.userid))
 
     def hudhint(self):
         # This is where we will handle/send translated GunGame hudhints
@@ -454,4 +455,5 @@ def isSpectator(userid):
     '''
     return es.getplayerteam(userid) <= 1
     
+from gungame51.core.messaging import __messages__
 from gungame51.core.events.shortcuts import events

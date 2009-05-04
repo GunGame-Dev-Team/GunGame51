@@ -20,8 +20,7 @@ from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core import getGameDir
-from gungame51.core.players.shortcuts import Player
-from gungame51.core.addons.shortcuts import getAddonInfo
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -120,12 +119,11 @@ class MessageManager(object):
         # Remove the translation file from the loaded translations dictionary
         del self.__loaded__[name]
             
-    def __formatfilter(self, filter):
+    def __formatFilter(self, filter):
         filter = str(filter)
         
         if filter.isdigit():
-            filter = int(filter)
-            return filter
+            return int(filter)
             
         return filter
     
@@ -154,235 +152,61 @@ class MessageManager(object):
         '''
         # Return the string
         return string
-
-    def msg(self, filter, string, tokens={}, showPrefix=False):
+        
+    def __formatPrefix(self, prefix, string):
+        if prefix:
+            from gungame51.core.addons import __addons__
+            from gungame51.core.addons.shortcuts import getAddonInfo
+            if prefix == True:
+                # Retrieve the addon title that contains the message string
+                for addon in self.__loaded__:
+                    if not string in self.__loaded__[addon].strings:
+                        continue
+                        
+                    if not addon in __addons__.__loaded__:
+                        continue
+                        
+                    return '\4[%s]\1 ' %getAddonInfo(addon).title
+                    
+                return ''
+            else:
+                if not prefix in __addons__.__loaded__:
+                    return ''
+                    
+                # Get the addon title that we were given
+                return '\4[%s]\1 ' %getAddonInfo(prefix).title
+        else:
+            return ''
+            
+    def msg(self, filter, string, tokens={}, prefix=False):
+        # Format the filter
+        filter = self.__formatFilter(filter)
+        
+        # Format the message with the prefix if needed
+        prefix = self.__formatPrefix(prefix, string)
+        
+        # Check if this is a normal message
         if not str(string) in __strings__:
-            # Send the message as-as
-            es.msg(string)
-            return
-            
-        # Format the message
-        if showPrefix:
-            '''
-            NEED TO FIGURE OUT THE BEST WAY TO DO THIS (get the addon title)
-            '''
-            message = '\4[%s]\1 ' % getAddonInfo(self.addonName)
+            # Send the message "as-is"
+            if isinstance(filter, int):
+                # Just a userid
+                es.tell(filter, '#multi', '%s%s' %(prefix, string))
+            else:
+                # Send message to the userids from the playerlib filter
+                for userid in playerlib.getUseridList(filter):
+                    es.tell(userid, '#multi', '%s%s' %(prefix, string))
         else:
-            message = ''
-            
-        # Just a userid
-        if isinstance(self.filter, int):
-            es.tell(self.filter, '#multi', '%s%s' % (message, self.__formatString(string, tokens, self.filter)))
-        
-        # Playerlib filter
-        else:
-            # Send message
-            for userid in playerlib.getUseridList(self.filter):
-                es.tell(userid, '#multi', '%s%s' % (message, self.__formatString(string, tokens, userid)))
-        
-        
+            if isinstance(filter, int):
+                # Just a userid
+                es.tell(filter, '#multi', '%s%s'
+                    %(prefix, self.__formatString(string, tokens, filter)))
+            else:
+                # Send message to the userids from the playerlib filter
+                for userid in playerlib.getUseridList(filter):
+                    es.tell(userid, '#multi', '%s%s'
+                        %(prefix, self.__formatString(string, tokens, userid)))
+
+
 __messages__ = MessageManager()
 
-'''
-
-class BaseMessage(object):
-    """Message class is used to broadcast linguistic messages around the server,
-    with the use of translation files."""
-    
-    def __init__(self, addon):
-        """Initializes the class."""
-        self.addon = addon
-        self.strings = None
-        
-        # Load the addon's translations via langlib.Strings() if they exist
-        if not os.path.isfile(getGameDir('cfg/gungame5/translations/%s.ini'
-            % self.addon)):
-        self.strings = Strings(getGameDir('cfg/gungame5/translations/%s.ini' % self.addon))
-        
-    def __formatFilter(self, filter):
-        # Format filter
-        filter = str(filter)
-        if filter.isdigit():
-            self.filter = int(filter)
-        else:
-            self.filter = filter
-    
-    def __loadStrings(self):
-        """Loads the Strings instance into the class."""
-        # Does the language file exist?
-        if os.path.isfile(getGameDir('cfg/gungame5/translations/%s.ini' % self.addonName)):
-            self.strings = langlib.Strings(getGameDir('cfg/gungame5/translations/%s.ini' % self.addonName))
-        else:
-            raise IOError('Cannot load strings (%s): no string file exists.' % self.addonName)
-    
-    def __cleanString(self, string):
-        """Cleans the string for output to the console."""
-        return string.replace('\3', '').replace('\4', '').replace('\1', '')
-    
-    def __formatString(self, string, tokens, userid=None):
-        """Retrieves and formats the string."""
-        # Set the default string (generally english)
-        rtnStr = self.strings(string, tokens)
-        
-        # Is the console, use the value of "eventscripts_language"
-        if userid == 'CONSOLE':
-            # !!!DO NOT EDIT BELOW!!!
-            var = es.ServerVar('eventscripts_language')
-            var = str(var)
-            # !!!DO NOT EDIT ABOVE!!!
-            
-            # Get language and get the string
-            langAbrv = langlib.getLangAbbreviation(var)
-            rtnStr = self.strings(string, tokens, langAbrv)
-        
-        # Get the player's language (if we were supplied with a userid)
-        elif userid:
-            if playerExists(userid):
-                assert playerExists(userid), ('__formatString called with invalid userid: %s' % userid)
-                rtnStr = self.strings(string, tokens, getPlayer(userid).language)
-        
-        # Format it
-        rtnStr = rtnStr.replace('#lightgreen', '\3').replace('#green', '\4').replace('#default', '\1')
-        rtnStr = encodings.codecs.escape_decode(rtnStr)
-        
-        # Crash prevention
-        # !! DO NOT REMOVE !!
-        if isinstance(rtnStr, tuple):
-            rtnStr = list(rtnStr)
-            return rtnStr[0] + ' '
-        
-        # Return the string
-        return rtnStr + ' '
-    
-    def lang(self, string, tokens={}, usePlayerLang=None):
-        return self.__formatString(string, tokens, usePlayerLang)
-    
-    def msg(self, filter, string, tokens, showPrefix = False):
-        # Setup filter
-        self.__formatFilter(filter)
-        
-        # Format the message
-        if showPrefix:
-            message = '\4[%s]\1 ' % getAddonDisplayName(self.addonName)
-        else:
-            message = ''
-        
-        # Just a userid
-        if isinstance(self.filter, int):
-            es.tell(self.filter, '#multi', '%s%s' % (message, self.__formatString(string, tokens, self.filter)))
-        
-        # Playerlib filter
-        else:
-            # Send message
-            for userid in playerlib.getUseridList(self.filter):
-                es.tell(userid, '#multi', '%s%s' % (message, self.__formatString(string, tokens, userid)))
-        
-        # Show in console
-        if self.filter == '#all':
-            self.echo(0, 0, string, tokens, showPrefix)
-    
-    def toptext(self, filter, duration, color, string, tokens):
-        # Setup filter
-        self.__formatFilter(filter)
-        
-        # Just a userid
-        if isinstance(self.filter, int):
-            es.toptext(self.filter, duration, color, self.__formatString(string, tokens, self.filter))
-        
-        # Playerlib filter
-        else:
-            # Send message
-            for userid in playerlib.getUseridList(self.filter):
-                es.toptext(userid, duration, color, self.__formatString(string, tokens, userid))
-    
-    def hudhint(self, filter, string, tokens):
-        # Setup filter
-        self.__formatFilter(filter)
-        
-        # Just a userid
-        if isinstance(self.filter, int):
-            usermsg.hudhint(self.filter, self.__formatString(string, tokens, self.filter))
-        
-        # Playerlib filter
-        else:
-            # Send message
-            for userid in playerlib.getUseridList(self.filter):
-                usermsg.hudhint(userid, self.__formatString(string, tokens, userid))
-    
-    def saytext2(self, filter, index, string, tokens, showPrefix = False):
-        # Setup filter
-        self.__formatFilter(filter)
-        
-        # Format the message
-        if showPrefix:
-            message = '\4[%s]\1 ' % getAddonDisplayName(self.addonName)
-        else:
-            message = ''
-        
-        # Just a userid
-        if isinstance(self.filter, int):
-            usermsg.saytext2(self.filter, index, '\1%s%s' % (message, self.__formatString(string, tokens, self.filter)))
-        
-        # Playerlib filter
-        else:
-            # Send message
-            for userid in playerlib.getUseridList(self.filter):
-                usermsg.saytext2(userid, index, '\1%s%s' % (message, self.__formatString(string, tokens, userid)))
-        
-        # Show in console
-        if self.filter == '#all':
-            self.echo(0, 0, string, tokens, showPrefix)
-    
-    def centermsg(self, filter, string, tokens):
-        # Setup filter
-        self.__formatFilter(filter)
-        
-        # Just a userid
-        if isinstance(self.filter, int):
-            usermsg.centermsg(self.filter, self.__formatString(string, tokens, self.filter))
-        
-        # Playerlib filter
-        else:
-            # Send message
-            for player in playerlib.getPlayerList(self.filter):
-                usermsg.centermsg(player.userid, self.__formatString(string, tokens, player.userid))
-    
-    def echo(self, filter, level, string, tokens, showPrefix = False):
-        # Setup filter
-        self.__formatFilter(filter)
-        
-        # Is the debug level high enough?
-        if int(gungameDebugLevel) < level:
-            return
-        
-        # Format the message
-        if showPrefix:
-            message = '[%s] ' % getAddonDisplayName(self.addonName)
-        else:
-            message = ''
-        
-        # Just a userid
-        if isinstance(self.filter, int) and self.filter != 0:
-            # Get clean string
-            cleanStr = self.__cleanString(self.__formatString(string, tokens, self.filter))
-            
-            # Send message
-            usermsg.echo(self.filter, '%s%s' % (message, cleanStr))
-        
-        # Console
-        elif self.filter == 0:
-            # Get clean string
-            cleanStr = self.__cleanString(self.__formatString(string, tokens, 'CONSOLE'))
-            
-            # Print message
-            es.dbgmsg(0, '%s%s' % (message, cleanStr))
-        
-        # Playerlib filter
-        else:
-            for userid in playerlib.getUseridList(self.filter):
-                # Get clean string
-                cleanStr = self.__cleanString(self.__formatString(string, tokens, userid))
-                
-                # Send message
-                usermsg.echo(userid, '%s%s' % (message, cleanStr))
-'''
+from gungame51.core.players.shortcuts import Player

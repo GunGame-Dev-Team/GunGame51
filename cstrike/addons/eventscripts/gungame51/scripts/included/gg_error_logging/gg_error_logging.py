@@ -23,8 +23,8 @@ from gungame51.core.addons.shortcuts import AddonInfo
 # ============================================================================
 info = AddonInfo()
 info.name = 'gg_error_logging'
-info.title = 'GG Error Logging' 
-info.author = 'GG Dev Team' 
+info.title = 'GG Error Logging'
+info.author = 'GG Dev Team'
 info.version = '0.1'
 
 # ============================================================================

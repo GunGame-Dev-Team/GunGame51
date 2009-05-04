@@ -17,7 +17,7 @@ import es
 
 # GunGame Imports
 from gungame51.core import getGameDir
-from gungame51.core.players.shortcuts import Player
+
 from gungame51.core.events.shortcuts import events
 
 # ============================================================================
@@ -568,3 +568,5 @@ def getValidAddons():
                 
             list_addons.append(item)
     return list_addons
+    
+from gungame51.core.players.shortcuts import Player

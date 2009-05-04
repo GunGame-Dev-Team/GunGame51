@@ -36,6 +36,8 @@ from core.players.shortcuts import resetPlayers
 from core.players.shortcuts import isDead
 from core.players.shortcuts import isSpectator
 
+from core.messaging.shortcuts import loadTranslation
+
 #    Core Function Imports
 from core import inMap
 
@@ -46,7 +48,7 @@ from core import inMap
 # ============================================================================
 def load():
     # Load translation file for gungame
-    #gungamelib.loadTranslations('gungame')
+    loadTranslation()
     
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
@@ -455,3 +457,11 @@ def equipPlayer():
     elif armorType == 1:
         es.server.cmd('es_xfire %s game_player_equip AddOutput "item_kevlar 1"' % userid)
 
+def player_say(event_var):
+    userid = event_var['userid']
+    if event_var['text'] == 'test1':
+        Player(userid).msg('ExceptionCaught', prefix=True)
+    elif event_var['text'] == 'test2':
+        Player(userid).msg('ExceptionCaught', prefix='gg_deathmatch')
+    elif event_var['text'] == 'test3':
+        Player(userid).msg('HelpCommands', prefix=True)

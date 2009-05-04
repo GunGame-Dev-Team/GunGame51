@@ -87,16 +87,15 @@ class LeaderManager(object):
         # Add the userid to the current leaders list
         self.current.append(userid)
             
-        '''
         # Tied leader messaging
         leaderCount = len(self.current)
         gungamePlayer = getPlayer(userid)
+        '''
         if leaderCount == 2:
             saytext2('gungame', '#all', gungamePlayer.index, 'TiedLeader_Singular', {'player': gungamePlayer.name, 'level': self.leaderLevel}, False)
         else:
             saytext2('gungame', '#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': gungamePlayer.name, 'level': self.leaderLevel}, False)
         '''
-        
         # Fire gg_tied_leader
         events.gg_tied_leader(userid)
         
