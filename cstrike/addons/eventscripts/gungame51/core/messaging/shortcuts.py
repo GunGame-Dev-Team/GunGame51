@@ -2,6 +2,24 @@ import os.path
 from gungame51.core import getGameDir
 from gungame51.core.messaging import __messages__
 
+def msg(filter, string, tokens={}, prefix=False):
+    __messages__.msg(filter, string, tokens, prefix)
+    
+def saytext2(filter, index, string, tokens={}, prefix=False):
+    __messages__.saytext2(filter, index, string, tokens, prefix)
+    
+def centermsg(filter, string, tokens={}):
+    __messages__.centermsg(filter, string, tokens)
+    
+def hudhint(filter, string, tokens={}):
+    __messages__.hudhint(filter, string, tokens)
+    
+def toptext(filter, duration, color, string, tokens={}):
+    __messages__.toptext(filter, duration, color, string, tokens)
+    
+def echo(filter, level, string, tokens={}, prefix=False):
+    __messages__.echo(filter, level, string, tokens, prefix)
+
 def loadTranslation(name=None):
     '''
     Returns a list of valid addon names from the included and custom addons

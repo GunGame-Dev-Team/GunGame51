@@ -55,9 +55,9 @@ class MessageStrings(Strings):
 __strings__ = MessageStrings()
 
 
-class AddonMessage(object):
+class AddonStrings(object):
     # =========================================================================
-    # >> AddonMessage() CLASS INITIALIZATION
+    # >> AddonStrings() CLASS INITIALIZATION
     # =========================================================================
     def __init__(self, addon):
         '''Initializes the class.'''
@@ -100,8 +100,8 @@ class MessageManager(object):
             raise NameError('GunGame translation file "%s" is already loaded.'
                 %name)
             
-        # Import strings to MessageStrings() class via AddonMessage()
-        strings = AddonMessage(name)
+        # Import strings to MessageStrings() class via AddonStrings()
+        strings = AddonStrings(name)
         
         # Save the translation file by name so we know that it is loaded
         self.__loaded__[name] = strings
