@@ -17,6 +17,8 @@ import es
 from langlib import Strings
 from langlib import getLangAbbreviation
 from playerlib import getPlayer
+from playerlib import getUseridList
+import usermsg
 
 # GunGame Imports
 from gungame51.core import getGameDir
@@ -126,6 +128,10 @@ class MessageManager(object):
             return int(filter)
             
         return filter
+        
+    def __cleanString(self, string):
+        '''Cleans the string for output to the console.'''
+        return string.replace('\3', '').replace('\4', '').replace('\1', '')
     
     def __formatString(self, string, tokens, userid=0):
         '''Retrieves and formats the string.'''
@@ -187,26 +193,170 @@ class MessageManager(object):
         
         # Check if this is a normal message
         if not str(string) in __strings__:
-            # Send the message "as-is"
             if isinstance(filter, int):
-                # Just a userid
-                es.tell(filter, '#multi', '%s%s' %(prefix, string))
-            else:
-                # Send message to the userids from the playerlib filter
-                for userid in playerlib.getUseridList(filter):
-                    es.tell(userid, '#multi', '%s%s' %(prefix, string))
+                # Send message to the userid
+                return es.tell(filter, '#multi', '%s%s' %(prefix, string))
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                es.tell(userid, '#multi', '%s%s' %(prefix, string))
         else:
             if isinstance(filter, int):
-                # Just a userid
-                es.tell(filter, '#multi', '%s%s'
+                # Send message to the userid
+                return es.tell(filter, '#multi', '%s%s'
                     %(prefix, self.__formatString(string, tokens, filter)))
-            else:
-                # Send message to the userids from the playerlib filter
-                for userid in playerlib.getUseridList(filter):
-                    es.tell(userid, '#multi', '%s%s'
-                        %(prefix, self.__formatString(string, tokens, userid)))
+                    
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                es.tell(userid, '#multi', '%s%s'
+                    %(prefix, self.__formatString(string, tokens, userid)))
+                        
+    def saytext2(self, filter, index, string, tokens={}, prefix=False):
+        # Setup filter
+        self.__formatFilter(filter)
+        
+        # Format the message with the prefix if needed
+        prefix = self.__formatPrefix(prefix, string)
+        
+        # Check if this is a normal message
+        if not str(string) in __strings__:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return usermsg.saytext2(filter, index, '\1%s%s'
+                    %(prefix, string))
+            
+            # Playerlib filter
+            for userid in getUseridList(filter):
+                usermsg.saytext2(userid, index, '\1%s%s' %(prefix, string))
+        else:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return usermsg.saytext2(filter, index, '\1%s%s'
+                    %(prefix, self.__formatString(string, tokens, filter)))
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                usermsg.saytext2(userid, index, '\1%s%s'
+                    %(prefix, self.__formatString(string, tokens, userid)))
+        
+        # Show in console
+        '''
+        if self.filter == '#all':
+            self.echo(0, 0, string, tokens, showPrefix)
+        '''
+        
+    def centermsg(self, filter, string, tokens={}):
+        # Setup filter
+        filter = self.__formatFilter(filter)
+        
+        # Check if this is a normal message
+        if not str(string) in __strings__:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return usermsg.centermsg(filter, string)
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                usermsg.centermsg(userid, string)
+        else:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return usermsg.centermsg(filter,
+                    self.__formatString(string, tokens, filter))
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                usermsg.centermsg(userid,
+                    self.__formatString(string, tokens, userid))
+                    
+    def hudhint(self, filter, string, tokens={}):
+        # Setup filter
+        filter = self.__formatFilter(filter)
+        
+        # Check if this is a normal message
+        if not str(string) in __strings__:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return usermsg.hudhint(filter, string)
+        
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(self.filter):
+                usermsg.hudhint(userid, string)
+        else:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return usermsg.hudhint(filter,
+                    self.__formatString(string, tokens, filter))
+        
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                usermsg.hudhint(userid,
+                    self.__formatString(string, tokens, userid))
+                    
+    def toptext(self, filter, duration, color, string, tokens={}):
+        # Setup filter
+        filter = self.__formatFilter(filter)
+        
+        # Check if this is a normal message
+        if not str(string) in __strings__:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return es.toptext(filter, duration, color, string)
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                es.toptext(userid, duration, color, string)
+        else:
+            # Send message to the userid
+            if isinstance(filter, int):
+                return es.toptext(filter, duration, color,
+                    self.__formatString(string, tokens, filter))
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(self.filter):
+                es.toptext(userid, duration, color,
+                    self.__formatString(string, tokens, userid))
+                    
+    def echo(self, filter, level, string, tokens={}, prefix=False):
+        # Setup filter
+        filter = self.__formatFilter(filter)
+        
+        '''
+        # Is the debug level high enough?
+        if int(gungameDebugLevel) < level:
+            return
+        '''
+        
+        # Format the message with the prefix if needed
+        prefix = self.__formatPrefix(prefix, string)
+        
+        # Check if this is a normal message
+        if not str(string) in __strings__:
+            # Get clean string
+            string = self.__cleanString(string)
+                
+            # Console or Userid
+            if isinstance(filter, int):
+                # Send message
+                return usermsg.echo(filter, '%s%s' % (prefix, string))
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                # Send message
+                usermsg.echo(userid, '%s%s' % (prefix, string))
+        else:
+            # Console or Userid
+            if isinstance(self.filter, int):
+                # Get clean string
+                string = self.__cleanString(self.__formatString(string, tokens, filter))
+                
+                # Send message
+                return usermsg.echo(filter, '%s%s' %(prefix, string))
+            
+            # Send message to the userids from the playerlib filter
+            for userid in getUseridList(filter):
+                # Send message
+                usermsg.echo(userid, '%s%s' %(prefix, self.__cleanString(self.__formatString(string, tokens, userid))))
 
 
 __messages__ = MessageManager()
-
-from gungame51.core.players.shortcuts import Player

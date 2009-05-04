@@ -18,6 +18,7 @@ import es
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import players
 from gungame51.core.events.shortcuts import events
+from gungame51.core.messaging import __messages__
 
 # =============================================================================
 # >> CLASSES
@@ -89,13 +90,13 @@ class LeaderManager(object):
             
         # Tied leader messaging
         leaderCount = len(self.current)
-        gungamePlayer = getPlayer(userid)
-        '''
+        gungamePlayer = Player(userid)
+        
         if leaderCount == 2:
-            saytext2('gungame', '#all', gungamePlayer.index, 'TiedLeader_Singular', {'player': gungamePlayer.name, 'level': self.leaderLevel}, False)
+            __messages__.saytext2('#all', gungamePlayer.index, 'TiedLeader_Singular', {'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
         else:
-            saytext2('gungame', '#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': gungamePlayer.name, 'level': self.leaderLevel}, False)
-        '''
+            __messages__.saytext2('#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
+        
         # Fire gg_tied_leader
         events.gg_tied_leader(userid)
         
@@ -128,11 +129,9 @@ class LeaderManager(object):
         # Set leader level
         self.leaderlevel = Player(userid).level
         
-        '''
         # Message about new leader
-        gungamePlayer = getPlayer(userid)
-        saytext2('gungame', '#all', gungamePlayer.index, 'NewLeader', {'player': gungamePlayer.name, 'level': self.leaderLevel}, False)
-        '''
+        gungamePlayer = Player(userid)
+        __messages__.saytext2('#all', gungamePlayer.index, 'NewLeader', {'player': es.getplayername(userid), 'level': self.leaderlevel}, False)
         
         # Fire gg_new_leader
         events.gg_new_leader(userid)

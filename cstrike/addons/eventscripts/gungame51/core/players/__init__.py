@@ -19,6 +19,7 @@ from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
+from gungame51.core.messaging import __messages__
 
 
 # ============================================================================
@@ -85,6 +86,7 @@ class BasePlayer(object):
         self.preventlevel = []
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
+        self.index = int(getPlayer(str(self.userid)).index)
         self.weapon = getLevelWeapon(self.level)
 
     # =========================================================================
