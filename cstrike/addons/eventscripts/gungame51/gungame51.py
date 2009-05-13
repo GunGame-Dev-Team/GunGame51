@@ -37,6 +37,7 @@ from core.players.shortcuts import isDead
 from core.players.shortcuts import isSpectator
 
 from core.messaging.shortcuts import loadTranslation
+from core.messaging.shortcuts import unloadTranslation
 
 #    Core Function Imports
 from core import inMap
@@ -64,6 +65,10 @@ def load():
         es.unload('gungame')
     
 def unload():
+
+    # Unload translation files
+    unloadTranslation()
+    
     # Unload all enabled addons
     from core.addons import __addons__
 
@@ -77,7 +82,7 @@ def unload():
         if name not in __addons__.__order__:
             continue
         unloadAddon(name)
-    
+
     # Unload configs (removes flags from CVARs)
     unloadConfig(getConfigList())
     

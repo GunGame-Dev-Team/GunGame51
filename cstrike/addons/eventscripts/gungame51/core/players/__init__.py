@@ -13,6 +13,7 @@ $LastChangedDate$
 import es
 from playerlib import uniqueid
 from playerlib import getPlayer
+from weaponlib import getWeaponNameList
 
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import getLevelWeapon
@@ -21,6 +22,11 @@ from gungame51.core import getOS
 from gungame51.core import GunGameError
 from gungame51.core.messaging import __messages__
 
+# ============================================================================
+# >> GLOBALS
+# ============================================================================
+list_pWeapons = getWeaponNameList("#primary")
+list_sWeapons = getWeaponNameList("#secondary")
 
 # ============================================================================
 # >> CLASSES
@@ -216,16 +222,25 @@ class BasePlayer(object):
             # Retrieve a playerlib.Player() instance
             pPlayer = getPlayer(self.userid)
 
-            # Get the primary and secondary weapon indexes
-            pWeapon, sWeapon = pPlayer.getPrimary(), pPlayer.getSecondary()
+            # Check to see if the weapon is a primary
+            if "weapon_%s" % self.weapon in list_pWeapons:
+                 
+                # Get primary weapon name
+                pWeapon = pPlayer.getPrimary()
+                
+                # Strip primary weapon
+                if pWeapon and str(pWeapon)[7:] != self.weapon:
+                    es.remove(pPlayer.getWeaponIndex(pWeapon))
+            
+            # Is the weapon a secondary weapon?
+            elif "weapon_%s" % self.weapon in list_sWeapons:
+                
+                # Get the secondary weapon name
+                sWeapon = pPlayer.getSecondary()
 
-            # Strip primary weapon
-            if pWeapon and str(pWeapon)[7:] != self.weapon:
-                es.remove(pPlayer.getWeaponIndex(pWeapon))
-
-            # Strip secondary weapon 
-            if sWeapon and str(sWeapon)[7:] != self.weapon:
-                es.remove(pPlayer.getWeaponIndex(sWeapon))
+                # Strip secondary weapon 
+                if sWeapon and str(sWeapon)[7:] != self.weapon:
+                    es.remove(pPlayer.getWeaponIndex(sWeapon))
 
         # Get active weapon
         if self.weapon != 'knife':

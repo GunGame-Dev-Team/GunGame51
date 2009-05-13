@@ -39,9 +39,9 @@ def unload():
 # ============================================================================
 # >> GUNGAME EVENTS
 # ============================================================================
-def player_death(event_var):
+def gg_levelup(event_var):
 
-    userid = int(event_var['attacker'])
+    userid = int(event_var['leveler'])
     
     # Strip and give weapon
     giveWeapon(userid)
