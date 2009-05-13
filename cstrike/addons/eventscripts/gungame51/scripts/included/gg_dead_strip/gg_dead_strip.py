@@ -59,7 +59,7 @@ def item_pickup(event_var):
     # Get variables
     item = event_var['item']
     userid = int(event_var['userid'])
-    
+
     # Is a weapon?
     if ("weapon_" + item) not in weaponlib.getWeaponNameList():
         return
@@ -107,9 +107,9 @@ def removeWeapon(userid, item):
     weapon = player.attributes['weapon']
     
     # Remove weapon
-    cmdFormat = 'es_xremove %d' % player.get('weaponindex', item)
-    es.server.queuecmd(cmdFormat)
-
+    #cmdFormat = 'es_xremove %d' % player.get('weaponindex', item)
+    es.remove(player.get('weaponindex', item))
+    
 def filterDrop(userid, args):
     # If command not drop, continue
     if args[0].lower() != 'drop':

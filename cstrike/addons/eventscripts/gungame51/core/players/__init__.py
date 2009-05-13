@@ -87,7 +87,7 @@ class BasePlayer(object):
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
         self.index = int(getPlayer(str(self.userid)).index)
-        self.weapon = getLevelWeapon(self.level)
+        self.weapon = self.getWeapon()
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
@@ -193,9 +193,9 @@ class BasePlayer(object):
     def getWeapon(self):
         return getLevelWeapon(self.level)
 
-    def giveWeapon(self):
+    def giveWeapon(self, strip=None):
         '''
-        Gives a player their current level's weapon.
+        Gives a player their current levels weapon.
         '''
         # Make sure player is on a team
         if isSpectator(self.userid):
@@ -206,37 +206,39 @@ class BasePlayer(object):
         if isDead(self.userid):
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not alive.')
+        
+        # Refresh player weapon
+        self.weapon = self.getWeapon()
+        
+        # Do we want to strip the player?
+        if strip:
+        
+            # Retrieve a playerlib.Player() instance
+            pPlayer = getPlayer(self.userid)
+
+            # Get the primary and secondary weapon indexes
+            pWeapon, sWeapon = pPlayer.getPrimary(), pPlayer.getSecondary()
+
+            # Strip primary weapon
+            if pWeapon and str(pWeapon)[7:] != self.weapon:
+                es.remove(pPlayer.getWeaponIndex(pWeapon))
+
+            # Strip secondary weapon 
+            if sWeapon and str(sWeapon)[7:] != self.weapon:
+                es.remove(pPlayer.getWeaponIndex(sWeapon))
 
         # Get active weapon
         if self.weapon != 'knife':
-            es.delayed(0, 'es_xgive %s weapon_%s;es_xsexec %s "use weapon_%s"'
-                %(self.userid, self.weapon, self.userid, self.weapon))
 
-    def strip(self):
-        '''
-        Strips the player of their primary and secondary weapon.
-        '''
-        if getOS() == 'posix':
-            stripFormat = 'es_xgive %s weapon_knife;' %self.userid + \
-                'es_xgive %s player_weaponstrip;' %self.userid + \
-                'es_xfire %s player_weaponstrip Strip;' %self.userid + \
-                'es_xfire %s player_weaponstrip Kill' %self.userid
-            return
+            # Give new weapon
+            es.give(self.userid, 'weapon_%s' %self.weapon)
+            
+            # If the player is a bot, we use server.cmd to make them use the new weapon.
+            if es.isbot(self.userid):
+                es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
+                return
 
-        # Retrieve a playerlib.Player() instance
-        pPlayer = getPlayer(self.userid)
-
-        # Get the primary and secondary weapon indexes
-        pWeapon, sWeapon = pPlayer.getPrimary(), pPlayer.getSecondary()
-
-        # Strip primary weapon
-        if pWeapon:
-            es.server.cmd('es_xremove %i' %pPlayer.getWeaponIndex(pWeapon))
-
-        # Strip secondary weapon
-        if sWeapon:
-            es.server.cmd('es_xremove %i' %pPlayer.getWeaponIndex(sWeapon))
-
+            es.sexec(self.userid, 'use weapon_%s' %self.weapon)
 
 class PlayerDict(dict):
     '''

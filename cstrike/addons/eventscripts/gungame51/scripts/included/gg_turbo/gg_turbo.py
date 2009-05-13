@@ -9,22 +9,15 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
+import gamethread
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
+from gungame51.core.players.shortcuts import isDead
 
-from gungame51.core.leaders.shortcuts import isLeader
-from gungame51.core.leaders.shortcuts import getLeaderCount
-from gungame51.core.leaders.shortcuts import getOldLeaderList
-from gungame51.core.leaders.shortcuts import getLeaderList
-from gungame51.core.leaders.shortcuts import getLeaderNames
-from gungame51.core.leaders.shortcuts import getLeaderLevel
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # ============================================================================
@@ -33,16 +26,6 @@ info.name = 'gg_turbo'
 info.title = 'GG Turbo' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
-
-# ============================================================================
-# >> GLOBAL VARIABLES
-# ============================================================================
-
-
-# ============================================================================
-# >> CLASSES
-# ============================================================================
-
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -54,54 +37,65 @@ def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
 # ============================================================================
-# >> GAME EVENTS
+# >> GUNGAME EVENTS
 # ============================================================================
 def player_death(event_var):
-    es.msg('(gg_turbo) %s died!' %event_var['es_username'])
+
+    userid = int(event_var['attacker'])
     
-def gg_levelup(event_var):
-    userid = event_var['leveler']
-    name = event_var['es_attackername']
-    myPlayer = Player(userid)
-    
-    myPlayer.strip()
-    myPlayer.giveWeapon()
-    
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, '='*40)
-    es.dbgmsg(0, '%s (%s) is a leader: %s' %(name, userid, isLeader(userid)))
-    es.dbgmsg(0, 'Leader count: %s' %getLeaderCount())
-    es.dbgmsg(0, 'Leader level: %s' %getLeaderLevel())
-    es.dbgmsg(0, 'Old leader list: %s' %getOldLeaderList())
-    es.dbgmsg(0, 'Current leader list: %s' %getLeaderList())
-    es.dbgmsg(0, 'Leader names: %s' %getLeaderNames())
-    es.dbgmsg(0, '='*40)
-    es.dbgmsg(0, '')
-    
-def gg_new_leader(event_var):
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, 'gg_new_leader:')
-    es.dbgmsg(0, '='*40)
-    es.dbgmsg(0, 'Userid: %s' %event_var['userid'])
-    es.dbgmsg(0, 'Leveler: %s' %event_var['leveler'])
-    es.dbgmsg(0, 'Leaders: "%s"' %event_var['leaders'])
-    es.dbgmsg(0, 'Old Leaders: "%s"' %event_var['old_leaders'])
-    es.dbgmsg(0, 'Leader Level: %s' %event_var['leader_level'])
-    es.dbgmsg(0, '='*40)
-    es.dbgmsg(0, '')
-    
-def gg_tied_leader(event_var):
-    es.dbgmsg(0, '')
-    es.dbgmsg(0, 'gg_tied_leader:')
-    es.dbgmsg(0, '='*40)
-    es.dbgmsg(0, 'Userid: %s' %event_var['userid'])
-    es.dbgmsg(0, 'Leveler: %s' %event_var['leveler'])
-    es.dbgmsg(0, 'Leaders: "%s"' %event_var['leaders'])
-    es.dbgmsg(0, 'Old Leaders: "%s"' %event_var['old_leaders'])
-    es.dbgmsg(0, 'Leader Level: %s' %event_var['leader_level'])
-    es.dbgmsg(0, '='*40)
-    es.dbgmsg(0, '')
-    
+    # Strip and give weapon
+    giveWeapon(userid)
+
+def gg_leveldown(event_var):
+
+    userid = int(event_var['leveler'])
+
+    # Strip and give weapon
+    giveWeapon(userid)
+
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def giveWeapon(userid):
+    
+    # Do player checks first
+    if not playerChecks(userid):
+        return
+    
+    # Get player
+    player = Player(userid)
+
+    # Give them their next weapon
+    player.giveWeapon(True)
+    
+    # Make them use it
+    es.sexec(userid, "use weapon_%s" % player.weapon)
+    
+def playerChecks(userid):
+
+    # Get player
+    player = Player(userid)
+
+    # Is player dead?
+    if isDead(userid):
+        # Return
+        return False
+        
+    # TODO: Add more checks here
+    # ...
+    return True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
