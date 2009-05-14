@@ -66,7 +66,7 @@ def giveWeapon(userid):
     player = Player(userid)
 
     # Give them their next weapon
-    player.giveWeapon(True)
+    player.giveWeapon()
     
     # Make them use it
     es.sexec(userid, "use weapon_%s" % player.weapon)

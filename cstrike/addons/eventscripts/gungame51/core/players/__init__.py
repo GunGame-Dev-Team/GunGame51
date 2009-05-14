@@ -199,7 +199,7 @@ class BasePlayer(object):
     def getWeapon(self):
         return getLevelWeapon(self.level)
 
-    def giveWeapon(self, strip=None):
+    def giveWeapon(self, strip=True):
         '''
         Gives a player their current levels weapon.
         '''
@@ -223,7 +223,7 @@ class BasePlayer(object):
             pPlayer = getPlayer(self.userid)
 
             # Check to see if the weapon is a primary
-            if "weapon_%s" % self.weapon in list_pWeapons:
+            if "weapon_%s" %self.weapon in list_pWeapons:
                  
                 # Get primary weapon name
                 pWeapon = pPlayer.getPrimary()
@@ -233,7 +233,7 @@ class BasePlayer(object):
                     es.remove(pPlayer.getWeaponIndex(pWeapon))
             
             # Is the weapon a secondary weapon?
-            elif "weapon_%s" % self.weapon in list_sWeapons:
+            elif "weapon_%s" %self.weapon in list_sWeapons:
                 
                 # Get the secondary weapon name
                 sWeapon = pPlayer.getSecondary()
@@ -242,18 +242,34 @@ class BasePlayer(object):
                 if sWeapon and str(sWeapon)[7:] != self.weapon:
                     es.remove(pPlayer.getWeaponIndex(sWeapon))
 
-        # Get active weapon
+        # Give the player their weapon if it is not a knife
         if self.weapon != 'knife':
-
+        
             # Give new weapon
             es.give(self.userid, 'weapon_%s' %self.weapon)
             
-            # If the player is a bot, we use server.cmd to make them use the new weapon.
-            if es.isbot(self.userid):
-                es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
-                return
+        # If the weapon is a knife or hegrenade, strip
+        if self.weapon in ['knife', 'hegrenade']:
+            self.strip()
 
-            es.sexec(self.userid, 'use weapon_%s' %self.weapon)
+        # Make them use the new weapon via es_xsexec
+        # We use this because es.sexec is too fast in some cases.
+        es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
+    
+    def strip(self):
+        '''
+        Strips/removes all weapons from the player minus the knife and their
+        current levels weapon.
+        '''
+        # Retrieve a playerlib.Player() instance
+        pPlayer = getPlayer(self.userid)
+        
+        for weapon in pPlayer.getWeaponList():
+            if 'weapon_%s' %self.weapon == weapon or weapon == 'weapon_knife':
+                continue
+                
+            # Remove the weapon
+            es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
 
 class PlayerDict(dict):
     '''
