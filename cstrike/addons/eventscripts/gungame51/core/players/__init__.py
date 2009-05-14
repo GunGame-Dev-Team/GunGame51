@@ -188,13 +188,22 @@ class BasePlayer(object):
         events.gg_leveldown(self, levelsTaken, attacker, reason)
 
     def msg(self, string, tokens={}, prefix=False):
-        # This is where we will handle/send translated GunGame messages
         __messages__.msg(self.userid, string, tokens, prefix)
-        #es.msg('We just sent %s a message!' %es.getplayername(self.userid))
 
-    def hudhint(self):
-        # This is where we will handle/send translated GunGame hudhints
-        es.msg('We just sent %s a hudhint!' %es.getplayername(self.userid))
+    def saytext2(self, index, string, tokens={}, prefix=False):
+        __messages__.saytext2(self.userid, index, string, tokens, prefix)
+        
+    def centermsg(self, string, tokens={}):
+        __messages__.centermsg(self.userid, string, tokens)
+        
+    def hudhint(self, string, tokens={}):
+        __messages__.hudhint(self.userid, string, tokens)
+        
+    def toptext(self, duration, color, string, tokens={}):
+        __messages__.toptext(self.userid, duration, color, string, tokens)
+        
+    def echo(self, level, string, tokens={}, prefix=False):
+        __messages__.echo(self.userid, level, string, tokens, prefix)
 
     def getWeapon(self):
         return getLevelWeapon(self.level)
@@ -216,7 +225,7 @@ class BasePlayer(object):
         # Refresh player weapon
         self.weapon = self.getWeapon()
         
-        # Do we want to strip the player?
+        # Do we want to strip the player's given weapon slot?
         if strip:
         
             # Retrieve a playerlib.Player() instance
@@ -234,7 +243,7 @@ class BasePlayer(object):
             
             # Is the weapon a secondary weapon?
             elif "weapon_%s" %self.weapon in list_sWeapons:
-                
+            
                 # Get the secondary weapon name
                 sWeapon = pPlayer.getSecondary()
 
@@ -490,5 +499,4 @@ def isSpectator(userid):
     '''
     return es.getplayerteam(userid) <= 1
     
-from gungame51.core.messaging import __messages__
 from gungame51.core.events.shortcuts import events

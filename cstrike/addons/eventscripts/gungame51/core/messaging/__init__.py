@@ -66,12 +66,13 @@ class AddonStrings(object):
         self.__denied__ = []
         
         # Load the addon's translations via langlib.Strings() if they exist
-        if not os.path.isfile(getGameDir('cfg/gungame5/translations/%s.ini'
-            % self.addon)):
+        if not os.path.isfile(getGameDir('cfg/gungame51/translations/%s.ini'
+            %self.addon)):
             return
             
         # Retrieve the langlib Strings()
-        self.strings = Strings(getGameDir('cfg/gungame5/translations/%s.ini' % self.addon))
+        self.strings = Strings(getGameDir('cfg/gungame51/translations/%s.ini'
+            %self.addon))
         
         # Loop through all strings
         for string in self.strings:
@@ -90,28 +91,52 @@ class MessageManager(object):
     # =========================================================================
     def __init__(self):
         self.__loaded__ = {}
+        self.__addontranslations__ = {}
         
     # =========================================================================
     # >> MessageManager() CUSTOM CLASS METHODS
     # =========================================================================
-    def load(self, name):
+    def load(self, name, addon):
         # If the translation file is loaded we cannot load it again
-        if name in self.__loaded__:
+        if name not in self.__loaded__:
+            '''
             raise NameError('GunGame translation file "%s" is already loaded.'
                 %name)
+            '''
             
-        # Import strings to MessageStrings() class via AddonStrings()
-        strings = AddonStrings(name)
+            # Import strings to MessageStrings() class via AddonStrings()
+            strings = AddonStrings(name)
         
-        # Save the translation file by name so we know that it is loaded
-        self.__loaded__[name] = strings
+            # Save the translation file by name so we know that it is loaded
+            self.__loaded__[name] = strings
+            
+            # Add a key for the translation file and create a list containing
+            #  this addon's name
+            self.__addontranslations__[name] = [addon]
+            
+        else:
+            # Append the addon to the addon translations list for this
+            #   translation file
+            self.__addontranslations__[name].append(addon)
         
-    def unload(self, name):
+    def unload(self, name, addon):
         # If the translation file is not loaded we cannot unload it
         if name not in self.__loaded__:
             raise NameError('GunGame translation file "%s" is not loaded.'
                 %name)
                 
+        # If the translation file is not loaded via an addon, we cannot unload
+        if addon not in self.__addontranslations__[name]:
+            raise NameError('GunGame translation file "%s" is not loaded '
+                %name + 'for addon "%s"' %addon)
+                
+        # Remove the addon from the addon translations list
+        self.__addontranslations__[name].remove(addon)
+        
+        # See if any more addons are using this translation file
+        if len(self.__addontranslations__[name]):
+            return
+            
         # Remove the strings from the MessageStrings() container
         for message in self.__loaded__[name].strings:
             # Only remove the string if it was not previously denied

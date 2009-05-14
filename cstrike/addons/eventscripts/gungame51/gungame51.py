@@ -36,20 +36,20 @@ from core.players.shortcuts import resetPlayers
 from core.players.shortcuts import isDead
 from core.players.shortcuts import isSpectator
 
-from core.messaging.shortcuts import loadTranslation
-from core.messaging.shortcuts import unloadTranslation
-
 #    Core Function Imports
 from core import inMap
 
+# Messaging imports
+from core.messaging.shortcuts import loadTranslation
+from core.messaging.shortcuts import unloadTranslation
 
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    # Load translation file for gungame
-    loadTranslation()
+    # Load translations
+    loadTranslation('gungame', 'gungame')
     
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
@@ -65,9 +65,8 @@ def load():
         es.unload('gungame')
     
 def unload():
-
-    # Unload translation files
-    unloadTranslation()
+    # Unload translations
+    unloadTranslation('gungame', 'gungame')
     
     # Unload all enabled addons
     from core.addons import __addons__

@@ -18,6 +18,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.messaging.shortcuts import msg
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -27,6 +28,7 @@ info.name = 'gg_friendlyfire'
 info.title = 'GG Friendly Fire' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_friendlyfire']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -75,9 +77,10 @@ def gg_levelup(event_var):
         if int(mp_friendlyfire) == 0:
             # Set mp_friendlyfire to 1
             mp_friendlyfire.set(1)
+            
+            msg('#all', 'WatchYourFire', prefix=True)
             '''
             # Show message and sound
-            gungamelib.msg('gg_friendlyfire', '#all', 'WatchYourFire')
             gungamelib.playSound('#all', 'friendlyfire')
             '''
 

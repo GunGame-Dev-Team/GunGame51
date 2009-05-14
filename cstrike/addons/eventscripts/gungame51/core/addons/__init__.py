@@ -19,6 +19,7 @@ import es
 from gungame51.core import getGameDir
 
 from gungame51.core.events.shortcuts import events
+from gungame51.core.messaging import __messages__
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -75,6 +76,7 @@ class AddonInfo(dict):
         self.version = '0.0'
         self.requires = []
         self.conflicts = []
+        self.translations = []
 
     # =========================================================================
     # >> AddonInfo() CLASS ATTRIBUTE METHODS
@@ -115,7 +117,8 @@ class AddonInfo(dict):
         '''
         Return a list of valid attributes.
         '''
-        return ['name', 'title', 'author', 'version', 'requires', 'conflicts']
+        return ['name', 'title', 'author', 'version', 'requires', 'conflicts',
+                'translations']
 
 
 class AddonLoadedByDependency(dict):
@@ -235,6 +238,9 @@ class AddonManager(object):
 
         # Add dependencies or conflicts of the sub-addon being unloaded
         self.addDependenciesConflicts(addon, name)
+        
+        # Load the translation files
+        self.loadTranslations(addon)
 
         # Register the events in the addon
         self.registerEvents(addon, name)
@@ -266,6 +272,9 @@ class AddonManager(object):
 
         # Remove dependencies or conflicts of the sub-addon being unloaded
         self.removeDependenciesConflicts(name)
+        
+        # Unload the translation files
+        self.unloadTranslations(addon)
         
         # Unload any subaddons that were loaded as dependencies
         self.removeLoadedByDependency(name)
@@ -463,6 +472,14 @@ class AddonManager(object):
         reload(mod)
         
         return mod
+        
+    def loadTranslations(self, addon):
+        for translation in self.getAddonInfo(addon).translations:
+            __messages__.load(translation, addon.__name__.split('.')[-1])
+        
+    def unloadTranslations(self, addon):
+        for translation in self.getAddonInfo(addon).translations:
+            __messages__.unload(translation, addon.__name__.split('.')[-1])
         
     # ========================================================================
     # AddonManager() STATIC CLASS METHODS
