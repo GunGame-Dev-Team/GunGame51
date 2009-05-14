@@ -51,6 +51,8 @@ class EventManager(object):
             Note: fix "round"
             '''
             self.gg_win(playerInstance, victimInstance, round=0)
+            return
+            
         playerInstance.level = newLevel
 
         # Reset multikill
@@ -121,6 +123,7 @@ class EventManager(object):
                  '0' if not victimInstance else victimInstance.userid)
         # Not sure how to handle this yet...commenting out for now
         #es.event('setint', 'gg_win', 'round', '1' if dict_variables['roundsRemaining'] > 1 else '0')
+        es.event('setint', 'gg_win', 'round', '0')
         es.event('fire', 'gg_win')
         
     # =========================================================================

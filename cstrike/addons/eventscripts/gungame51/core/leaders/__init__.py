@@ -61,7 +61,7 @@ class LeaderManager(object):
         else:
             self.setNew(userid)
     
-    def addTie(self, userid):
+    def addTie(self, userid, event=True):
         '''
         Adds a leader to the current leader list.
         
@@ -97,11 +97,12 @@ class LeaderManager(object):
         else:
             __messages__.saytext2('#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
         
-        # Fire gg_tied_leader
-        events.gg_tied_leader(userid)
+        if event:
+            # Fire gg_tied_leader
+            events.gg_tied_leader(userid)
         
             
-    def setNew(self, userid):
+    def setNew(self, userid, event=True):
         '''
         Sets the current leader list as the new leader's userid.
         
@@ -133,10 +134,11 @@ class LeaderManager(object):
         gungamePlayer = Player(userid)
         __messages__.saytext2('#all', gungamePlayer.index, 'NewLeader', {'player': es.getplayername(userid), 'level': self.leaderlevel}, False)
         
-        # Fire gg_new_leader
-        events.gg_new_leader(userid)
+        if event:
+            # Fire gg_new_leader
+            events.gg_new_leader(userid)
         
-    def remove(self, userid):
+    def remove(self, userid, event=True):
         '''
         Removes a player from the current leaders list.
         
@@ -161,8 +163,9 @@ class LeaderManager(object):
         if not len(self.current):
             self.refresh()
             
-        # Fire gg_leader_lostlevel
-        events.gg_leader_lostlevel(userid)
+        if event:
+            # Fire gg_leader_lostlevel
+            events.gg_leader_lostlevel(userid)
         
     def reset(self):
         '''
