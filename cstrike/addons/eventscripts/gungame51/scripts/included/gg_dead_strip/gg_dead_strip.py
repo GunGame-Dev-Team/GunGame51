@@ -32,6 +32,12 @@ info.author = 'GG Dev Team'
 info.version = '0.1'
 
 # ============================================================================
+# >> GLOBAL VARIABLES
+# ============================================================================
+
+gg_nade_bonus = es.ServerVar('gg_nade_bonus')
+
+# ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
@@ -85,14 +91,16 @@ def item_pickup(event_var):
     removeWeapon(userid, item)
 
     # If the player did not switch to the weapon they just picked up, no need to switch them back to their previous weapon
-    if currentWeapon:
-        es.dbgmsg(0, "Weapon name is %s" % currentWeapon)
-        if currentWeapon != item:
-            return
+    es.dbgmsg(0, "Weapon name is %s" % currentWeapon)
+    if currentWeapon != item:
+        return
     
-    # Switch to knife just incase they don't have their grenade
+    # Check if player is on nade level
     if weapon == 'hegrenade':
-        es.sexec(userid, 'use weapon_knife')
+        # Switch the player knife if they are on nade level but don't have a nade
+        if not playerlib.getPlayer(userid).get('he'):
+            es.sexec(userid, 'use weapon_knife')
+            return
     
     # Switch to their gungame weapon
     es.sexec(userid, 'use weapon_%s' % weapon)
@@ -129,7 +137,7 @@ def filterDrop(userid, args):
     # ================
     # NADE BONUS CHECK
     # ================
-    nadeBonusWeapons = str(es.ServerVar('gg_nade_bonus')).split(',')
+    nadeBonusWeapons = str(gg_nade_bonus).split(',')
     
     # Is nade bonus enabled?
     if nadeBonusWeapons[0] == '0':
@@ -147,7 +155,3 @@ def filterDrop(userid, args):
     
     # Allow them to drop it
     return 1
-
-
-
-
