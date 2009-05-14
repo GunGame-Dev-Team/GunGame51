@@ -33,7 +33,11 @@ info.version = '0.1'
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
+# Get the es.ServerVar() instance of "gg_nade_bonus"
 gg_nade_bonus = es.ServerVar('gg_nade_bonus')
+
+# Retrieve a list of all available weapon names
+list_weaponNameList = getWeaponNameList()
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -48,6 +52,7 @@ def unload():
 
     # Unregister the drop command
     es.addons.unregisterClientCommandFilter(filterDrop)
+    
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
 # ============================================================================
@@ -64,7 +69,7 @@ def item_pickup(event_var):
     userid = int(event_var['userid'])
 
     # Is a weapon?
-    if ("weapon_%s" %item) not in getWeaponNameList():
+    if ("weapon_%s" %item) not in list_weaponNameList:
         return
         
     # Don't strip the knife
@@ -94,11 +99,11 @@ def item_pickup(event_var):
     if weapon == 'hegrenade':
         # Switch the player knife if they are on nade level but don't have a nade
         if not getPlayer(userid).he:
-            es.sexec(userid, 'use weapon_knife')
+            es.sexec(userid, "use weapon_knife")
             return
     
     # Switch to their gungame weapon
-    es.sexec(userid, 'use weapon_%s' % weapon)
+    es.sexec(userid, "use weapon_%s" %weapon)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -120,7 +125,7 @@ def filterDrop(userid, args):
     
     # Check to see if their current weapon is their level weapon
     if weapon != 'hegrenade':
-        return int(curWeapon != 'weapon_%s' %weapon)
+        return int(curWeapon != "weapon_%s" %weapon)
     
     # ================
     # NADE BONUS CHECK
