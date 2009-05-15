@@ -13,6 +13,11 @@ $LastChangedDate$
 import es
 from playerlib import getPlayer
 
+# GunGame Imports
+from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.players.shortcuts import isDead
+from gungame51.core.players.shortcuts import isSpectator
+
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # ============================================================================
