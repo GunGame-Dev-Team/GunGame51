@@ -260,17 +260,7 @@ def es_map_start(event_var):
     equipPlayer()    
     
 def round_start(event_var):
-    #global list_stripExceptions
-    '''
-    MOVE THE BELOW CODE TO GG_SUICIDE_PUNISH INCLUDED ADDON
-    '''
-    global countBombDeathAsSuicide
-    
-    # Create a variable to prevent bomb explosion deaths from counting a suicides
-    countBombDeathAsSuicide = False
-    '''
-    END GG_SUICIDE_PUNISH CODE
-    '''
+    global list_stripExceptions
     
     # Disable Buyzones
     userid = es.getuserid()
@@ -304,31 +294,7 @@ def round_start(event_var):
             gungamelib.playSound('#all', 'nadelevel')
     '''
 
-# This is used for something that I feel we can eventually move out to an included addon
-def round_freeze_end(event_var):
-    '''
-    MOVE THE BELOW CODE TO GG_SUICIDE_PUNISH INCLUDED ADDON
-    '''
-    global countBombDeathAsSuicide
-    
-    # Create a variable to prevent bomb explosion deaths from counting a suicides
-    countBombDeathAsSuicide = True
-    '''
-    END GG_SUICIDE_PUNISH CODE
-    '''
-
 def round_end(event_var):
-    '''
-    MOVE THE BELOW CODE TO GG_SUICIDE_PUNISH INCLUDED ADDON
-    '''
-    global countBombDeathAsSuicide
-    
-    # Create a variable to prevent bomb explosion deaths from counting a suicides
-    countBombDeathAsSuicide = False
-    '''
-    END GG_SUICIDE_PUNISH CODE
-    '''
-    
     '''
     MOVE THE BELOW CODE TO GG_AFK INCLUDED ADDON
     '''
@@ -384,29 +350,9 @@ def player_death(event_var):
     # Get victim object
     ggVictim = Player(userid)
     
-    '''
-    MOVE THE BELOW CODE TO GG_SUICIDE_PUNISH INCLUDED ADDON
-    '''
-    # =============
-    # SUICIDE CHECK
-    # =============
+    # Suicide check
     if (attacker == 0 or attacker == userid): #and countBombDeathAsSuicide:
-        if int(es.ServerVar('gg_suicide_punish')) == 0:
             return
-            
-        # Trigger level down
-        ggVictim.leveldown(int(es.ServerVar('gg_suicide_punish')), userid, 'suicide')
-        
-        # Message
-        ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level})
-        
-        # Play the leveldown sound
-        #gungamelib.playSound(userid, 'leveldown')
-        
-        return
-    '''
-    END GG_SUICIDE_PUNISH CODE
-    '''
     
     # Get attacker object
     ggAttacker = Player(attacker)
@@ -634,17 +580,6 @@ def gg_vote(event_var):
 '''
     
 def gg_win(event_var):
-    '''
-    MOVE THIS TO GG_SUICIDE PUNISH INCLUDED ADDON
-    '''
-    global countBombDeathAsSuicide
-    
-    # Create a variable to prevent bomb explosion deaths from counting a suicides
-    countBombDeathAsSuicide = False
-    '''
-    MOVE THE ABOVE TO GG_SUICIDE_PUNISH INCLUDED ADDON
-    '''
-    
     # Get player info
     userid = int(event_var['winner'])
     index = getPlayer(userid).index
