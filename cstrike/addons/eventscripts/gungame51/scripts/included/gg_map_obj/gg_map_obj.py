@@ -64,13 +64,13 @@ def player_spawn(event_var):
     
     if isDead(userid):
         return
-    
-    # Check to see if this player is a CT
-    if not int(event_var['es_userteam']) == 3:
-        return
         
     # Are we in a map that has a bombzone?
     if not len(es.createentitylist('func_bomb_target')):
+        return
+            
+    # Check to see if this player is a CT
+    if not int(event_var['es_userteam']) == 3:
         return
         
     # Do we want to give a defuser?
@@ -101,21 +101,21 @@ def objectiveToggle(mode):
             
             elif len(es.createentitylist('func_hostage_rescue')):
                 cmd = 'es_xfire %d func_hostage_rescue %s;' %(userid, mode)
-                if mode == 'Disable'
+                if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d hostage_entity Kill;' %userid
         
         # Remove bomb objectives
         elif mapObjectives == 2:
             if len(es.createentitylist('func_bomb_target')):
                 cmd = 'es_xfire %d func_bomb_target %s;' %(userid, mode)
-                if mode == 'Disable'
+                if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d weapon_c4 Kill;' % userid
         
         # Remove hostage objectives
         elif mapObjectives == 3:
             if len(es.createentitylist('func_hostage_rescue')):
                 cmd = 'es_xfire %d func_hostage_rescue %s;' %(userid, mode)
-                if mode == 'Disable'
+                if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d hostage_entity Kill;' % userid
                     
     if cmd:
