@@ -100,31 +100,6 @@ def unload():
     # Enable Buyzones
     es.server.queuecmd('es_xfire %d func_buyzone Enable' %userid)
     
-    # Get map if
-    try:
-        mapObjectives = int(es.ServerVar('gg_map_obj'))
-        
-        # Re-enable objectives
-        if mapObjectives < 3:
-            # Re-enable all objectives
-            if mapObjectives == 0:
-                if len(es.createentitylist('func_bomb_target')):
-                    es.server.queuecmd('es_xfire %d func_bomb_target Enable' %userid)
-                elif len(es.createentitylist('func_hostage_rescue')):
-                    es.server.queuecmd('es_xfire %d func_hostage_rescue Enable' %userid)
-            
-            # Enable bomb zone 
-            elif mapObjectives == 1:
-                if len(es.createentitylist('func_bomb_target')):
-                    es.server.queuecmd('es_xfire %d func_bomb_target Enable' %userid)
-            
-            # Enable hostage objectives
-            elif mapObjectives == 2:
-                if len(es.createentitylist('func_hostage_rescue')):
-                    es.server.queuecmd('es_xfire %d func_hostage_rescue Enable' %userid)
-    except:
-        pass
-    
     # Fire gg_unload event
     '''
     We need to add this to the EventManager
@@ -194,7 +169,7 @@ def initialize():
     '''
     
     # Restart map
-    #gungamelib.msg('gungame', '#all', 'Loaded')
+    msg('#all', 'Loaded')
     
     # Fire gg_load event
     '''
@@ -288,10 +263,10 @@ def round_start(event_var):
     '''
     MOVE THE BELOW CODE TO GG_SUICIDE_PUNISH INCLUDED ADDON
     '''
-    #global countBombDeathAsSuicide
+    global countBombDeathAsSuicide
     
     # Create a variable to prevent bomb explosion deaths from counting a suicides
-    #countBombDeathAsSuicide = False
+    countBombDeathAsSuicide = False
     '''
     END GG_SUICIDE_PUNISH CODE
     '''
@@ -314,33 +289,6 @@ def round_start(event_var):
     
     # Equip players
     equipPlayer()
-
-    # Get map info
-    mapObjectives = int(es.ServerVar('gg_map_obj'))
-    
-    # If both the BOMB and HOSTAGE objectives are enabled, we don't do anything else
-    if mapObjectives < 3:
-        # Remove all objectives
-        if mapObjectives == 0:
-            if len(es.createentitylist('func_bomb_target')):
-                es.server.cmd('es_xfire %d func_bomb_target Disable' %userid)
-                es.server.cmd('es_xfire %d weapon_c4 Kill' %userid)
-            
-            elif len(es.createentitylist('func_hostage_rescue')):
-                es.server.cmd('es_xfire %d func_hostage_rescue Disable' %userid)
-                es.server.cmd('es_xfire %d hostage_entity Kill' %userid)
-        
-        # Remove bomb objectives
-        elif mapObjectives == 1:
-            if len(es.createentitylist('func_bomb_target')):
-                es.server.cmd('es_xfire %d func_bomb_target Disable' %userid)
-                es.server.cmd('es_xfire %d weapon_c4 Kill' % userid)
-        
-        # Remove hostage objectives
-        elif mapObjectives == 2:
-            if len(es.createentitylist('func_hostage_rescue')):
-                es.server.cmd('es_xfire %d func_hostage_rescue Disable' %userid)
-                es.server.cmd('es_xfire %d hostage_entity Kill' % userid)
     
     '''
     if int(es.ServerVar('gg_leaderweapon_warning')):
@@ -419,22 +367,6 @@ def player_spawn(event_var):
     
     # Send the level information hudhint
     # ....
-    
-    # Check to see if this player is a CT
-    if not int(event_var['es_userteam']) == 3:
-        return
-    
-    # Check for map objectives
-    if not int(es.ServerVar('gg_map_obj')) > 1:
-        return
-        
-    # Are we in a de_ map and want to give defuser?
-    if not len(es.createentitylist('func_bomb_target')) and not int(es.ServerVar('gg_player_defuser')):
-        return
-        
-    # Make sure the player doesn't already have a defuser
-    if not getPlayer(userid).defuser:
-        getPlayer(userid).defuser = 1
 
 def player_death(event_var):
     # Warmup Round Check
@@ -449,7 +381,7 @@ def player_death(event_var):
         return
         
     # Get victim object
-    gungameVictim = Player(userid)
+    ggVictim = Player(userid)
     
     '''
     MOVE THE BELOW CODE TO GG_SUICIDE_PUNISH INCLUDED ADDON
@@ -462,10 +394,10 @@ def player_death(event_var):
             return
             
         # Trigger level down
-        gungameVictim.leveldown(int(es.ServerVar('gg_suicide_punish')), userid, 'suicide')
+        ggVictim.leveldown(int(es.ServerVar('gg_suicide_punish')), userid, 'suicide')
         
         # Message
-        #gungamelib.msg('gungame', attacker, 'Suicide_LevelDown', {'newlevel':gungameVictim.level})
+        ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level})
         
         # Play the leveldown sound
         #gungamelib.playSound(userid, 'leveldown')
@@ -476,7 +408,7 @@ def player_death(event_var):
     '''
     
     # Get attacker object
-    gungameAttacker = Player(attacker)
+    ggAttacker = Player(attacker)
     '''
     #Shall we move this to an included addon?
     #    - TeamKill check comment
@@ -489,10 +421,10 @@ def player_death(event_var):
             return
             
         # Trigger level down
-        gungameAttacker.leveldown(int(es.ServerVar('gg_tk_punish')), userid, 'tk')
+        ggAttacker.leveldown(int(es.ServerVar('gg_tk_punish')), userid, 'tk')
         
         # Message
-        #gungamelib.msg('gungame', attacker, 'TeamKill_LevelDown', {'newlevel':gungameAttacker.level})
+        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level})
         
         # Play the leveldown sound
         #gungamelib.playSound(attacker, 'leveldown')
@@ -506,27 +438,27 @@ def player_death(event_var):
     weapon = event_var['weapon']
     
     # Check the weapon was correct
-    if weapon != gungameAttacker.weapon:
+    if weapon != ggAttacker.weapon:
         return
     
     '''
     # Don't continue if the victim is AFK
-    if gungameVictim.isPlayerAFK():
+    if ggVictim.isPlayerAFK():
         # Tell the attacker they were AFK
         gungamelib.hudhint('gungame', attacker, 'PlayerAFK', {'player': event_var['es_username']})
         
         # Check AFK punishment
-        if not gungameVictim.isbot and gungamelib.getVariableValue('gg_afk_rounds') > 0:
+        if not ggVictim.isbot and gungamelib.getVariableValue('gg_afk_rounds') > 0:
             afkPunishCheck(userid)
         
         return
     '''
     
     # No multikill? Just level up...
-    multiKill = getLevelMultiKill(gungameAttacker.level)
+    multiKill = getLevelMultiKill(ggAttacker.level)
     if multiKill == 1:
         # Level them up
-        gungameAttacker.levelup(1, userid, 'kill')
+        ggAttacker.levelup(1, userid, 'kill')
         
         # Play the levelup sound
         #gungamelib.playSound(attacker, 'levelup')
@@ -534,12 +466,12 @@ def player_death(event_var):
         return
     
     # Using multikill
-    gungameAttacker.multikill += 1
+    ggAttacker.multikill += 1
     
     # Finished the multikill
-    if gungameAttacker.multikill >= multiKill:
+    if ggAttacker.multikill >= multiKill:
         # Level them up
-        gungameAttacker.levelup(1, userid, 'kill')
+        ggAttacker.levelup(1, userid, 'kill')
             
         # Play the levelup sound
         #gungamelib.playSound(attacker, 'levelup')
@@ -547,12 +479,11 @@ def player_death(event_var):
     # Increment their current multikill value
     else:
         # Message the attacker
-        #multiKill = gungamelib.getLevelMultiKill(gungameAttacker['level'])
-        #gungamelib.hudhint('gungame', attacker, 'MultikillNotification', {'kills': gungameAttacker['multikill'], 'total': multiKill})
+        multiKill = getLevelMultiKill(ggAttacker.level)
+        ggAttacker.hudhint('MultikillNotification', {'kills': ggAttacker.multikill, 'total': multiKill})
             
         # Play the multikill sound
         #gungamelib.playSound(attacker, 'multikill')
-        es.tell(attacker, 'something')
         
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
@@ -800,26 +731,21 @@ def equipPlayer():
     userid = es.getuserid()
     cmdFormat = 'es_xremove game_player_equip;' + \
                 'es_xgive %s game_player_equip;' %userid + \
-                'es_xfire %s game_player_equip AddOutput "weapon_knife 1"' \
+                'es_xfire %s game_player_equip AddOutput "weapon_knife 1;"' \
                     %userid
-    es.server.cmd(cmdFormat)
     
     # Retrieve the armor type
     armorType = int(es.ServerVar('gg_player_armor'))
     
     # Give the player full armor
     if armorType == 2:
-        es.server.cmd('es_xfire %s game_player_equip AddOutput "item_assaultsuit 1"' % userid)
+        cmdFormat = cmdFormat + \
+            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1"'
+                %userid
     
     # Give the player kevlar only
     elif armorType == 1:
-        es.server.cmd('es_xfire %s game_player_equip AddOutput "item_kevlar 1"' % userid)
-
-def player_say(event_var):
-    userid = event_var['userid']
-    if event_var['text'] == 'test1':
-        Player(userid).msg('ExceptionCaught', prefix=True)
-    elif event_var['text'] == 'test2':
-        Player(userid).msg('ExceptionCaught', prefix='gg_deathmatch')
-    elif event_var['text'] == 'test3':
-        Player(userid).msg('HelpCommands', prefix=True)
+        cmdFormat = cmdFormat + \
+            'es_xfire %s game_player_equip AddOutput "item_kevlar 1"' %userid
+            
+    es.server.queuecmd(cmdFormat)

@@ -200,13 +200,12 @@ def load():
     config.text('>> MAP OBJECTIVES')
     config.text('='*76)
     config.text('Options:')
-    config.text('   0 = All objectives disabled.')
-    config.text('   1 = Bomb objective disabled.')
-    config.text('   2 = Hostage objectives disabled.')
-    config.text('   3 = No objectives disabled.')
+    config.text('   0 = No objectives disabled.')
+    config.text('   1 = All objectives disabled.')
+    config.text('   2 = Bomb objective disabled.')
+    config.text('   3 = Hostage objectives disabled.')
     config.text('Default Value: 0')
-    config.cvar('gg_map_obj', 0, 'Controls which objectives will be' +
-                'disabled.')
+    config.cvar('gg_map_obj', 0, 'Controls which objectives will be disabled.')
 
     # Multi-Round
     config.text('')

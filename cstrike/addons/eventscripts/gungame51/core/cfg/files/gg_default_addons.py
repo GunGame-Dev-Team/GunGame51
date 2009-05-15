@@ -567,29 +567,16 @@ def load():
     config.text('Description:')
     config.text('   Removes ragdolls by dissolving them with various effects.')
     config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_dissolver.')
-    config.text('   1 = (Enabled) Load gg_dissolver.')
+    config.text('   0 = Disabled')
+    config.text('   1 = No Effect')
+    config.text('   2 = Energy')
+    config.text('   3 = Heavy Electrical')
+    config.text('   4 = Light Electrical')
+    config.text('   5 = Core Effect')
+    config.text('   6 = Random Effect')
     config.text('Default Value: 0')
     config.cvar('gg_dissolver', 0, 'Enables/Disables ' +
                 'gg_dissolver.')
-    
-    # Dissolver Effect
-    config.text('')
-    config.text('='*76)
-    config.text('>> DISSOLVER EFFECT')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   The type of effect that will happen upon the ragdoll.')
-    config.text('Options:')
-    config.text('   0 = No Effect')
-    config.text('   1 = Energy')
-    config.text('   2 = Heavy Electrical')
-    config.text('   3 = Light Electrical')
-    config.text('   4 = Core Effect')
-    config.text('   5 = Random Effect')
-    config.text('Default Value: 5')
-    config.cvar('gg_dissolver_effect', 5, 'The type of effect that will ' +
-                'happen upon the ragdoll.')
     
     # Handicap
     config.text('')
