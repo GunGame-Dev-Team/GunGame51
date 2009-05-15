@@ -11,6 +11,8 @@ $LastChangedDate$
 # ============================================================================
 # Python imports
 import sys
+import os.path #gg_weapon_order_random
+import random # gg_weapon_order_random
 
 # EventScripts Imports
 import es
@@ -45,6 +47,7 @@ from core.leaders.shortcuts import isLeader
 
 #    Core Function Imports
 from core import inMap
+from core import getGameDir
 
 # Messaging imports
 from core.messaging.shortcuts import loadTranslation
@@ -204,36 +207,6 @@ def es_map_start(event_var):
     # Reset the "rounds remaining" variable for multi-rounds
     dict_variables['roundsRemaining'] = gungamelib.getVariableValue('gg_multi_round')
     '''
-    
-    '''
-    SHOULD WE PUT THIS IN AN INCLUDED ADDON?!??!
-    
-    GG_WEAPON_ORDER_RANDOM
-    '''
-    # Is a random weapon order file
-    if int(es.ServerVar('gg_weapon_order_random')):
-        # Get weapon order file
-        baseDir = getGameDir('cfg/gungame5/weapon_orders/')
-        files = filter(lambda x: os.path.splitext(x)[1] == '.txt', os.listdir(baseDir))
-        
-        # Get random file
-        currentFile = getWeaponOrder().file
-        newFile = random.choice(files)
-        
-        # Make sure we only loop 50 times as there may only be one weapon order
-        for x in xrange(0, 50):
-            # See if they match
-            if newFile != currentFile:
-                break
-            
-            # Get a new file
-            newFile = random.choice(files)
-        
-        # Set the new file
-        currentOrder = setWeaponOrder(newFile, str(es.ServerVar('gg_weapon_order_sort_type')))
-        
-        # Echo the new weapon order
-        currentOrder.echo()
     
     '''
     # Check to see if the warmup round needs to be activated
