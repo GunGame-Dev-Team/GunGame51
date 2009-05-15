@@ -52,6 +52,7 @@ from core.messaging.shortcuts import unloadTranslation
 from core.messaging.shortcuts import saytext2
 from core.messaging.shortcuts import centermsg
 from core.messaging.shortcuts import toptext
+from core.messaging.shortcuts import msg
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -75,7 +76,7 @@ def load():
     
 def unload():
     # Unload translations
-    unloadTranslation('gungame', 'gungame')
+    unloadTranslation('gungame')
     
     # Unload all enabled addons
     from core.addons import __addons__
@@ -740,12 +741,12 @@ def equipPlayer():
     # Give the player full armor
     if armorType == 2:
         cmdFormat = cmdFormat + \
-            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1"'
+            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1;"' \
                 %userid
     
     # Give the player kevlar only
     elif armorType == 1:
         cmdFormat = cmdFormat + \
-            'es_xfire %s game_player_equip AddOutput "item_kevlar 1"' %userid
+            'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' %userid
             
     es.server.queuecmd(cmdFormat)
