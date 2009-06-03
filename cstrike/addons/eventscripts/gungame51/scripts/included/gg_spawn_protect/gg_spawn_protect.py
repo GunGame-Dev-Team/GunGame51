@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_spawn_protect.py
+# ../addons/eventscripts/gungame/scripts/included/gg_spawn_protect/gg_spawn_protect.py
 
 '''
 $Rev$

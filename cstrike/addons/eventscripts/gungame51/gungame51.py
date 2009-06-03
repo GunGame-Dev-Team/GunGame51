@@ -1,4 +1,4 @@
-# ../<MOD>/addons/eventscripts/gungame/gungame.py
+# ../addons/eventscripts/gungame/gungame.py
 
 '''
 $Rev$

@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_map_vote.py
+# ../addons/eventscripts/gungame/scripts/included/gg_map_vote/gg_map_vote.py
 
 '''
 $Rev$

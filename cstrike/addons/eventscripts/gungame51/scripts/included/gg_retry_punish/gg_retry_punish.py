@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_retry_punish.py
+# ../addons/eventscripts/gungame/scripts/included/gg_retry_punish/gg_retry_punish.py
 
 '''
 $Rev$

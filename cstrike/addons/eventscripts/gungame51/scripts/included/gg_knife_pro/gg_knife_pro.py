@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_knife_pro.py
+# ../addons/eventscripts/gungame/scripts/included/gg_knife_pro/gg_knife_pro.py
 
 '''
 $Rev$

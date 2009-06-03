@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_elimination.py
+# ../addons/eventscripts/gungame/scripts/included/gg_elimination/gg_elimination.py
 
 '''
 $Rev$

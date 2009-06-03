@@ -1,6 +1,23 @@
+# ../addons/eventscripts/gungame/core/cfg/files/gg_map_vote.py
+
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
+
+# ============================================================================
+# >> IMPORTS
+# ============================================================================
+# EventScripts Imports
+import es
+import cfglib
+
+# ============================================================================
+# >> LOAD & UNLOAD
+# ============================================================================
+
 def load():
-    import es
-    import cfglib
     config = cfglib.AddonCFG('%s/cfg/gungame51/gg_map_vote.cfg' %es.ServerVar('eventscripts_gamedir'))
 
     config.text('*'*70)

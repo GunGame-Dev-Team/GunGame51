@@ -1,9 +1,9 @@
-# ../cstrike/addons/eventscripts/gungame51/core/messaging/__init__.py
+# ../addons/eventscripts/gungame/core/messaging/__init__.py
 
 '''
-$Rev$
-$LastChangedBy$
-$LastChangedDate$
+$Rev: 84 $
+$LastChangedBy: WarrenAlpert $
+$LastChangedDate: 2009-06-03 13:08:04 -0400 (Wed, 3 Jun 2009) $
 '''
 
 # =============================================================================

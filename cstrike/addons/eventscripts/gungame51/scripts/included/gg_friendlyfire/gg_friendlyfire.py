@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_friendlyfire.py
+# ../addons/eventscripts/gungame/scripts/included/gg_friendlyfire/gg_friendlyfire.py
 
 '''
 $Rev$

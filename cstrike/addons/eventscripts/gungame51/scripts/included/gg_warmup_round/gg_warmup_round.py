@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_warmup_round.py
+# ../addons/eventscripts/gungame/scripts/included/gg_warmup_round/gg_warmup_round.py
 
 '''
 $Rev$

@@ -1,4 +1,10 @@
-# ../cstrike/addons/eventscripts/gungame51/core/addons/shortcuts.py
+# ../addons/eventscripts/gungame/core/addons/shortcuts.py
+
+'''
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
+'''
 
 # ============================================================================
 # >> IMPORTS

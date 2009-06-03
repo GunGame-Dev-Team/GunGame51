@@ -1,9 +1,9 @@
-# gungame/scripts/included/gg_random_points.py
+# ../addons/eventscripts/gungame/scripts/included/gg_random_spawn/gg_random_spawn.py
 
 '''
-$Rev: 
-$LastChangedBy: 
-$LastChangedDate: 
+$Rev: 84 $
+$LastChangedBy: WarrenAlpert $
+$LastChangedDate: 2009-06-03 13:08:04 -0400 (Wed, 3 Jun 2009) $
 '''
 
 # ============================================================================

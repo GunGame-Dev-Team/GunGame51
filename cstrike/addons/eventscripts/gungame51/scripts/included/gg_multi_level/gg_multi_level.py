@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_multi_level.py
+# ../addons/eventscripts/gungame/scripts/included/gg_multi_level/gg_multi_level.py
 
 '''
 $Rev$

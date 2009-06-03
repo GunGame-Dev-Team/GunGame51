@@ -1,4 +1,4 @@
-# ../cstrike/addons/eventscripts/gungame/core/cfg/files/gg_default_addons.py
+# ../addons/eventscripts/gungame/core/cfg/files/gg_default_addons.py
 
 '''
 $Rev$

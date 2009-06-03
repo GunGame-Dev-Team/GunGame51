@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_info_menus.py
+# ../addons/eventscripts/gungame/scripts/included/gg_info_menus/gg_info_menus.py
 
 '''
 $Rev$

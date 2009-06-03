@@ -1,4 +1,4 @@
-# ../cstrike/addons/eventscripts/gungame51/core/weapons/shortcuts.py
+# ../addons/eventscripts/gungame/core/weapons/shortcuts.py
 
 '''
 $Rev$

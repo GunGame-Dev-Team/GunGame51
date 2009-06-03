@@ -1,4 +1,4 @@
-# ../cstrike/addons/eventscripts/gungame51/scripts/custom/gg_assist.py
+# ../addons/eventscripts/gungame/scripts/custom/gg_assist/gg_assist.py
 
 '''
 $Rev$

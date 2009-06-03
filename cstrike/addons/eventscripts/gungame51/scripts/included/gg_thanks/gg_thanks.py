@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_thanks.py
+# ../addons/eventscripts/gungame/scripts/included/gg_thanks/gg_thanks.py
 
 '''
 $Rev$

@@ -1,4 +1,4 @@
-# ../cstrike/addons/eventscripts/gungame51/core/players/__init__.py
+# ../addons/eventscripts/gungame/core/players/__init__.py
 
 '''
 $Rev$

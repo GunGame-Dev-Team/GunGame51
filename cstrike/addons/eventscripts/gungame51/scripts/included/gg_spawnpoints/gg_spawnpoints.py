@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_spawnpoints.py
+# ../addons/eventscripts/gungame/scripts/included/gg_spawnpoints/gg_spawnpoints.py
 
 '''
 $Rev$

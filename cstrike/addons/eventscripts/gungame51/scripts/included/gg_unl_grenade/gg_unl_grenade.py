@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_unl_grenade.py
+# ../addons/eventscripts/gungame/scripts/included/gg_unl_grenade/gg_unl_grenade.py
 
 '''
 $Rev$

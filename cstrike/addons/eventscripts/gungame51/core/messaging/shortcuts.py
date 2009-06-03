@@ -1,3 +1,11 @@
+# ../addons/eventscripts/gungame/core/messaging/shortcuts.py
+
+'''
+$Rev: 84 $
+$LastChangedBy: WarrenAlpert $
+$LastChangedDate: 2009-06-03 13:08:04 -0400 (Wed, 3 Jun 2009) $
+'''
+
 from gungame51.core.messaging import __messages__
 
 def msg(filter, string, tokens={}, prefix=False):
@@ -21,5 +29,5 @@ def echo(filter, level, string, tokens={}, prefix=False):
 def loadTranslation(name, addon):
     __messages__.load(name, addon)
 
-def unloadTranslation(name_addon):
+def unloadTranslation(name, addon):
     __messages__.unload(name, addon)

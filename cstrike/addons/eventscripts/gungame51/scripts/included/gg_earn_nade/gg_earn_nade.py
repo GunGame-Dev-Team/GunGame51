@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_earn_nade.py
+# ../addons/eventscripts/gungame/scripts/included/gg_earn_nade/gg_earn_nade.py
 
 '''
 $Rev$
@@ -56,7 +56,7 @@ def player_death(event_var):
     if Player(attackerid).weapon == 'hegrenade':
     
         # Make sure the player didn't kill with an hegrenade
-        if event_var['weapon'] == 'weapon_hegrenade':
+        if event_var['weapon'] == 'hegrenade':
             return 
         
         # Are we in warmup?

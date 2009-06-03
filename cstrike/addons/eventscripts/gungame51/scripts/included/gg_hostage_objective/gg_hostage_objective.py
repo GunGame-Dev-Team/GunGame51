@@ -1,4 +1,4 @@
-# gungame/scripts/included/gg_hostage_objective.py
+# ../addons/eventscripts/gungame/scripts/included/gg_hostage_objective/gg_hostage_objective.py
 
 '''
 $Rev$
