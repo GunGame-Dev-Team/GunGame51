@@ -54,6 +54,10 @@ def player_death(event_var):
     # If the kill was a suicide, return
     if attackerid == victimid:
         return
+
+    # If the kill was a teamkill, return
+    if event_var['es_attackerteam'] == event_var['es_userteam']:
+        return
     
     # Get the name of the weapon used to get the kill
     weapon = event_var['weapon']
