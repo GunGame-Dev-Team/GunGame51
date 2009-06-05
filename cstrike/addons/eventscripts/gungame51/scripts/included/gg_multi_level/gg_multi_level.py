@@ -94,11 +94,8 @@ class gravityManager(object):
                 else:
                     newaval = 0
                     newmval = 2
-                if self.gravityList[player]['lastairvalue'] != newaval:
-                    """ Player has jumped """
-                    self._resetGravity(player, self.gravityList[player]['gravity'])
-                elif self.gravityList[player]['lastmovementvalue'] != newmval and newmval == 2:
-                    """ Player has changed move type and is back to normal (I.E, just came off a ladder) """
+                if self.gravityList[player]['lastairvalue'] != newaval or self.gravityList[player]['lastmovementvalue'] != newmval:
+                    """ Player has jumped or came off a ladder """
                     self._resetGravity(player, self.gravityList[player]['gravity'])
                 self.gravityList[player]['lastairvalue']      = newaval
                 self.gravityList[player]['lastmovementvalue'] = newmval
