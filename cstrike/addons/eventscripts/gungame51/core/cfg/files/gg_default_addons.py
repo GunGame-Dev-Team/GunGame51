@@ -611,6 +611,19 @@ def load():
     config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
                 'players\' levels using handicap.')
     
+    # Thanks
+    config.text('')
+    config.text('='*76)
+    config.text('>> THANKS')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Allows players to type !thanks to display a list of those involved with development and testing of GunGame.')
+    config.text('Options:')
+    config.text('   0 = Disabled')
+    config.text('   1 = Enabled')
+    config.text('Default Value: 1')
+    config.cvar('gg_thanks', 1, 'Allows players to type !thanks to display a list of those involved with development and testing of GunGame.')
+    
     config.write()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
 '''
