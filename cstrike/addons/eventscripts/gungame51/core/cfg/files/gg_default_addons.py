@@ -80,7 +80,23 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_multi_level', 0, 'The # of levels it takes to get the ' +
                 'multi-level bonus.')
-    
+
+    # Multi-Level Gravity
+    config.text('')
+    config.text('='*76)
+    config.text('>> MULTI-LEVEL GRAVITY')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The percentage of gravity that players receieving the ' +
+                'multi-level bonus will have.')
+    config.text('Options:')
+    config.text('   100 = (Disabled) Keep the player\'s gravity unchanged.')
+    config.text('   # = (Enabled) The percentage of normal gravity the player ' +
+                'will have.')
+    config.text('Default Value: 100')
+    config.cvar('gg_multi_level_gravity', 100, 'The percentage of gravity included ' +
+                'with the multi-level bonus.')
+
     # Turbo Mode
     config.text('')
     config.text('='*76)
@@ -417,7 +433,7 @@ def load():
                 'kill a player.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_spawn_protect.')
-    config.text('   1 = (Enabled) Load gg_spawn_protect.')
+    config.text('   # = Time (in seconds) for players to be spawn protected.')
     config.text('Default Value: 0')
     config.cvar('gg_spawn_protect', 0, 'Enables/Disables spawn ' +
                 'protection.')

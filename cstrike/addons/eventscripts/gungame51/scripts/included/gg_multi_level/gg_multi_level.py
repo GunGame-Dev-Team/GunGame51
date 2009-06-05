@@ -34,6 +34,84 @@ info.version = '0.1'
 # >> GLOBAL VARIABLES
 # ============================================================================
 multiLevelSound = "null.wav"
+list_currentMultiLevel = []
+
+# ============================================================================
+# >> CLASSES
+# ============================================================================
+
+class gravityManager(object):
+    """ Class to manager the tick listener, and to manage the players gravity """
+    def __init__(self):
+        """ Create 2 self. variables """
+        self.gravityList = {}
+       
+    def addGravityChange(self, userid, amount):
+        """ Check if there are already any players in the gravityChange list.
+            If there isn't, start the tick listener. Following this, check
+            if the userid is in the dictionary, if so, remove them. Then create
+            a new instance. """
+        userid = str(userid)
+        if not len(self.gravityList):
+            gamethread.delayedname(0.25, 'gravity_check', self._ticker)
+        if userid in self.gravityList:
+            self.removeGravityChange(userid)
+        if es.exists('userid', userid):
+            self.gravityList[userid] = {'lastairvalue': es.getplayerprop(userid, 'CBasePlayer.m_fFlags'), 'gravity': amount, 'lastmovementvalue': es.getplayerprop(userid, 'CBaseEntity.movetype')}
+        else:
+            self.gravityList[userid] = {'lastairvalue': 0, 'gravity': amount, 'lastmovementvalue': 2}
+        self._resetGravity(userid, amount)
+       
+    def removeGravityChange(self, userid):
+        """ Check if the player is in the dictioanry. If so, reset their gravity to 1
+            and delete their instance from the dictionary. If there are no more players
+            within the gravityList, remove the tick listener """
+        userid = str(userid)
+        if userid in self.gravityList:
+            del self.gravityList[userid]
+            self._resetGravity(userid, 1.0)
+        else:
+            es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, 1.0))
+        if not len(self.gravityList):
+            for player in self.gravityList:
+                _resetGravity(player, 1.0)
+            gamethread.cancelDelayed('gravity_check')
+       
+    def deleteGravityList(self):
+        """ Loop through all the players, reset their gravity to 1, delete the gravity
+            list then unregister the tick listener. """
+        for player in self.gravityList:
+            _resetGravity(player, 1.0)
+        del self.gravityList
+        gamethread.cancelDelayed('gravity_check')
+       
+    def _ticker(self):
+        """ Here we loop through all of the players, and check their gravity etc. """
+        for player in self.gravityList:
+            try:
+                if es.exists('userid', player):
+                    newaval = es.getplayerprop(player, 'CBasePlayer.m_fFlags')
+                    newmval = es.getplayerprop(player, 'CBaseEntity.movetype')
+                else:
+                    newaval = 0
+                    newmval = 2
+                if self.gravityList[player]['lastairvalue'] != newaval:
+                    """ Player has jumped """
+                    self._resetGravity(player, self.gravityList[player]['gravity'])
+                elif self.gravityList[player]['lastmovementvalue'] != newmval and newmval == 2:
+                    """ Player has changed move type and is back to normal (I.E, just came off a ladder) """
+                    self._resetGravity(player, self.gravityList[player]['gravity'])
+                self.gravityList[player]['lastairvalue']      = newaval
+                self.gravityList[player]['lastmovementvalue'] = newmval
+            except:
+                continue
+        gamethread.delayedname(0.25, 'gravity_check', self._ticker)
+
+    def _resetGravity(self, userid, amount):
+        """ Change the players gravity to value amount. """
+        es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, amount))
+
+gravity = gravityManager()
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -52,6 +130,14 @@ def load():
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
+    for userid in list_currentMultiLevel:
+        # Cancel the gamethread
+        gamethread.cancelDelayed("%i_multilevel" % userid)
+        
+        removeMultiLevel(userid)
+    
+    gravity.deleteGravityList()
+    
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
@@ -66,26 +152,41 @@ def player_disconnect(event_var):
     userid = int(event_var['userid'])
     
     # Remove this player and any of their entities
-    if Player(userid).multiKillEntities:
+    if userid in list_currentMultiLevel:
         # Get rid of their multilevel
         removeMultiLevel(userid)
+    
+        gravity.removeGravityChange(userid)
+    
+        # Cancel the gamethread
+        gamethread.cancelDelayed("%i_multilevel" % userid)
+
+def player_death(event_var):
+    userid = int(event_var['userid'])
+    
+    if userid in list_currentMultiLevel:
+        # Cancel the gamethread
+        gamethread.cancelDelayed("%i_multilevel" % userid)
+        
+        removeMultiLevel(userid)
+
+def round_start(event_var):
+    global list_currentMultiLevel
+    
+    for userid in es.getUseridList():
+        user = Player(userid)
+        user.multiKills = 0
+        if userid in list_currentMultiLevel:
+            # Cancel the gamethread
+            gamethread.cancelDelayed("%i_multilevel" % userid)
+            
+            removeMultiLevel(userid)
+    
+    list_currentMultiLevel = []
 
 def gg_levelup(event_var):
     userid = int(event_var['userid'])
     attackerid = int(event_var['attacker'])   
-    
-    # Remove the multi-level for the victim
-    victim = Player(userid)
-    if victim.multiKillEntities:
-        
-        # Remove the multiLevel
-        removeMultiLevel(userid)
-        
-        # Cancel the gamethread
-        gamethread.cancelDelayed("%i_multilevel" % userid)
-        
-        # Reset their kills
-        victim.multiKills = 0
         
     # Was it a suicide?
     if userid == attackerid:
@@ -104,8 +205,17 @@ def gg_levelup(event_var):
     
     # Is it greater than or equal to our threshold?
     if attacker.multiKills >= int(es.ServerVar("gg_multi_level")):
+        if attackerid in list_currentMultiLevel:
+            # Cancel the gamethread
+            gamethread.cancelDelayed("%i_multilevel" % attackerid)
+            
+            removeMultiLevel(attackerid)
+        
         # Multi-Level them
         doMultiLevel(attackerid)
+        
+        # Add the player to the multi level list
+        list_currentMultiLevel.append(attackerid)
         
         # Reset their kills
         attacker.multiKills = 0
@@ -118,8 +228,6 @@ def gg_levelup(event_var):
 # ============================================================================
 def doMultiLevel(userid):
     global multiLevelSound
-    
-    es.msg(userid)
     
     # Check userid validity
     if es.exists('userid', userid):
@@ -148,6 +256,11 @@ def doMultiLevel(userid):
         cmdFormat += 'es_xfire %i player_speedmod ModifySpeed 1.5; ' %userid
         es.server.cmd(cmdFormat)
         
+        # If gg_multi_level_gravity is enabled, ajust the player's gravity
+        gg_multi_level_gravity = es.ServerVar('gg_multi_level_gravity')
+        if gg_multi_level_gravity != 100 and gg_multi_level_gravity >= 0:
+            gravity.addGravityChange(userid, int(gg_multi_level_gravity) * 0.01)
+        
         # Grab it's index
         speedmod_index = int(es.ServerVar("eventscripts_lastgive"))
         
@@ -170,7 +283,7 @@ def removeMultiLevel(userid):
 
         # Reset player speed and gravity (yes, I know this is the lame way but hey ;D
         playerlib.getPlayer(userid).set('speed', 1.0)
-        es.server.queuecmd('es_xfire %s !self "gravity 400"' % userid)
+        gravity.removeGravityChange(userid)
         
         # Remove the ent indexes
         while Player(userid).multiKillEntities:
@@ -191,3 +304,6 @@ def removeMultiLevel(userid):
             
         # Clear the list
         del Player(userid).multiKillEntities[:]
+        
+        # Remove the player from the current multi level list
+        list_currentMultiLevel.remove(userid)

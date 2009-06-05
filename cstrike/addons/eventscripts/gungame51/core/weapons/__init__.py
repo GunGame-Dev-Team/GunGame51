@@ -247,8 +247,8 @@ class BaseWeaponOrders(object):
         if not self.file == weaponorders.gungameorder:
             return
             
-        es.server.cmd('mp_restartgame 5')
-        es.msg('Weapon Order Changed! Restarting in 5 seconds!')
+        es.server.cmd('mp_restartgame 2')
+        es.msg('Weapon Order Changed! Restarting in 2 seconds!')
         
     def echo(self):
         '''
