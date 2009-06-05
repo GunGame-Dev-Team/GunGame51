@@ -79,7 +79,7 @@ def load():
     
 def unload():
     # Unload translations
-    unloadTranslation('gungame')
+    unloadTranslation('gungame', 'gungame')
     
     # Unload all enabled addons
     from core.addons import __addons__

@@ -18,7 +18,7 @@ import es
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import players
 from gungame51.core.events.shortcuts import events
-from gungame51.core.messaging import __messages__
+from gungame51.core.messaging.shortcuts import saytext2
 
 # =============================================================================
 # >> CLASSES
@@ -34,14 +34,14 @@ class LeaderManager(object):
         self.leaderlevel = 1
         self.current = []
         self.previous = []
-        
+
     # =========================================================================
     # >> LeaderManager() CUSTOM CLASS METHODS
     # =========================================================================
     def add(self, userid):
         '''
         Adds a leader to the current leader list.
-        
+
         Notes:
             * Automatically determines which method to use:
                 - LeaderManager.addTie(userid)
@@ -54,17 +54,20 @@ class LeaderManager(object):
                 %userid + 'The leader level "%s" is not greater than or '
                 %self.leaderlevel + 'equal to the player\'s level "%s".'
                 %level)
-        
+
         # Determine if this is a tied leader or new leader
         if level == self.leaderlevel:
-            self.addTie(userid)
+            if userid not in self.current:
+                self.addTie(userid)
+            else:
+                self.setNew(userid, False)
         else:
             self.setNew(userid)
-    
+
     def addTie(self, userid, event=True):
         '''
         Adds a leader to the current leader list.
-        
+
         Notes:
             * This should only be used when there is a tie for the leader.
             * If the player is a new leader, use the setNew() method.
@@ -78,34 +81,34 @@ class LeaderManager(object):
                 %userid + 'The leader level "%s" is not equal to '
                 %self.leaderlevel + 'the player\'s level "%s".'
                 %Player(userid).level)
-        
+
         # Make sure the player is not a leader
         if self.isLeader(userid):
             raise ValueError('Unable to set "%s" as a current leader. '
                 %userid + 'The userid "%s" is already a current leader.'
                 %userid)
-                
+
         # Add the userid to the current leaders list
         self.current.append(userid)
-            
+
         # Tied leader messaging
         leaderCount = len(self.current)
         gungamePlayer = Player(userid)
-        
+
         if leaderCount == 2:
-            __messages__.saytext2('#all', gungamePlayer.index, 'TiedLeader_Singular', {'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
+            saytext2('#all', gungamePlayer.index, 'TiedLeader_Singular', {'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
         else:
-            __messages__.saytext2('#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
-        
+            saytext2('#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
+
         if event:
             # Fire gg_tied_leader
             events.gg_tied_leader(userid)
-        
-            
+
+
     def setNew(self, userid, event=True):
         '''
         Sets the current leader list as the new leader's userid.
-        
+
         Notes:
             * Copies the contents of the "current" leaders list to the
               "previous" leaders list.
@@ -120,28 +123,28 @@ class LeaderManager(object):
                 %userid + 'The leader level "%s" is higher than '
                 %self.leaderlevel + 'the player\'s level "%s".'
                 %Player(userid).level)
-        
+
         # Set previous leaders list
         self.previous = self.current[:]
-        
+
         # Set current leaders list
         self.current = [userid]
-        
+
         # Set leader level
         self.leaderlevel = Player(userid).level
-        
+
         # Message about new leader
         gungamePlayer = Player(userid)
-        __messages__.saytext2('#all', gungamePlayer.index, 'NewLeader', {'player': es.getplayername(userid), 'level': self.leaderlevel}, False)
-        
+        saytext2('#all', gungamePlayer.index, 'NewLeader', {'player': es.getplayername(userid), 'level': self.leaderlevel}, False)
+
         if event:
             # Fire gg_new_leader
             events.gg_new_leader(userid)
-        
+
     def remove(self, userid, event=True):
         '''
         Removes a player from the current leaders list.
-        
+
         Notes:
             * Copies the contents of the "current" leaders list to the
               "previous" leaders list.
@@ -152,28 +155,28 @@ class LeaderManager(object):
         if not self.isLeader(userid):
             raise ValueError('Unable to remove "%s" from the current leaders. '
                 %userid + 'The userid "%s" is not a current leader.' %userid)
-            
+
         # Set previous leaders
         self.previous = self.current[:]
-        
+
         # Remove the userid from the current leaders list
         self.current.remove(userid)
-        
+
         # Check to see if we need to find new leaders
         if not len(self.current):
             self.refresh()
-            
+
         if event:
             # Fire gg_leader_lostlevel
             events.gg_leader_lostlevel(userid)
-        
+
     def reset(self):
         '''
         Resets the LeaderManager for a clean start of GunGame.
         '''
         # Call the __init__ to reset the LeaderManager instance
         super(LeaderManager, self).__init__()
-        
+
     def cleanup(self, listname):
         '''
         Removes disconnected userids from the list.
@@ -181,24 +184,24 @@ class LeaderManager(object):
         if not listname in ['current', 'previous']:
             raise AttributeError('LevelManager has no attribute: "%s".'
                 %listname)
-                
+
         leaderList = getattr(self, listname)
         for userid in leaderList[:]:
             if not es.exists('userid', userid):
                 leaderList.remove(userid)
-                
+
         return leaderList[:]
-        
+
     def isLeader(self, userid):
         '''
         Returns True/False if the userid is a current leader.
         '''
         return (userid in self.current)
-        
+
     def refresh(self):
         '''
         Repopulates the current leaders list from the players available.
-        
+
         Notes:
             * This method is intended to be used when the current leaders list
               becomes empty and needs to be repopulated while in the middle of
@@ -208,43 +211,42 @@ class LeaderManager(object):
         '''
         # Reset the leader level
         self.leaderlevel = 1
-        
+
         # Reset the current leaders list
         self.current = []
-        
+
         # Loop through the players
         for userid in players:
             # Is the player on the server?
             if not es.exists('userid', userid):
                 continue
-                
+
             # Get player info
             level = Player(userid).level
-            
+
             # Create new leader variable and set new level
             if level > self.leaderlevel:
                 self.current = [userid]
                 self.leaderlevel = level
-            
+
             # Another leader
             elif level == self.leaderlevel:
                 self.leaders.append(userid)
-        
+
         # Set old leaders, if they have changed
         if self.current[:] != self.previous[:]:
             self.previous = self.current[:]
-        
+
         # 1 new leader
         if len(self.current) == 1:
-            '''
             # Message about new leader
-            saytext2('gungame', '#all', getPlayer(self.current[0])['index'], 'NewLeader', {'player': getPlayer(self.current[0])['name'], 'level': self.leaderlevel}, False)
-            '''
+            saytext2('#all', Player(self.current[0]).index, 'NewLeader', {'player': es.getplayername(self.current[0]), 'level': self.leaderlevel}, False)
+            
             # Fire gg_new_leader
             events.gg_new_leader(userid)
-        
+
     # =========================================================================
     # LeaderManager() STATIC CLASS METHODS
     # =========================================================================
-        
+
 leaders = LeaderManager()

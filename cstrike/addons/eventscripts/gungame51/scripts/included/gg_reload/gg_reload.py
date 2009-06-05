@@ -14,6 +14,7 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
+import weaponlib
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -42,27 +43,38 @@ def unload():
 # ============================================================================
 
 def player_death(event_var):
-    # Get event info
+    # Get the userids of the attacker and victim
     attackerid = int(event_var['attacker'])
     victimid = int(event_var['userid'])
     
-    # Fallen to death?
+    # If there is no attacker (falling to death), return
     if not attackerid:
         return
     
-    # Killed self?
+    # If the kill was a suicide, return
     if attackerid == victimid:
         return
     
-    # Get weapon
+    # Get the name of the weapon used to get the kill
     weapon = event_var['weapon']
     
-    # We will only reload weapons that the attacker is on the level for
+    # If the weapon name doesn't match the player's level's weapon name, return
     if weapon != Player(attackerid).weapon:
         return
     
-    # Is a hegrenade or knife kill?
+    # If the player is on hegrenade or knife level, return
     if weapon in ('hegrenade', 'knife'):
         return
     
-    # DEV NOTE: We need to add a weapon info system to find the ammo / slots etc for each weapon
+    # Get the weapon object and the size if its clip
+    weaponObject = weaponlib.getWeapon(weapon)
+    clip = weaponObject.clip
+    
+    # Find the attacker's weapon index to be used to reload the weapon
+    playerHandle = es.getplayerhandle(attackerid)
+    for index in weaponObject.indexlist:
+        # When the attacker's handle matches the index handle we have found the attacker's weapon index
+        if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') == playerHandle:
+            # When a match is found, reload the clip
+            es.setindexprop(index, 'CBaseCombatWeapon.LocalWeaponData.m_iClip1', clip)
+            break
