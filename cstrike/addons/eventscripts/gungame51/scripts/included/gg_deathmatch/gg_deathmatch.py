@@ -20,6 +20,8 @@ import repeat
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import hudhint
+from gungame51.core.players.shortcuts import isDead
+from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -153,9 +155,39 @@ def player_death(event_var):
     userid = event_var['userid']
     
     # Respawn the player if the round hasn't ended
-    if gungamelib.getGlobal('respawn_allowed'):
+    if respawnAllowed:
         repeat.start('gungameRespawnPlayer%s' % userid, 1, respawnDelay)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+
+def respawnCountDown(userid):
+    # Make sure that the repeat exists
+    respawnRepeat = repeat.find('gungameRespawnPlayer%s' %userid)
+    if not respawnRepeat:
+        return
+    
+    # Not dead?
+    if not isDead(userid):
+        respawnRepeat.stop()
+        return
+    
+    # Round finished?
+    if not respawnAllowed:
+        # Tell them the round has ended
+        hudhint(userid, 'RespawnCountdown_RoundEnded')
+        respawnRepeat.stop()
+        return
+    
+    # More than 1 remaining?
+    if respawnRepeat['remaining'] > 1:
+        hudhint(userid, 'RespawnCountdown_Plural', {'time': respawnRepeat['remaining']})
+    
+    # Is the counter 1?
+    elif respawnRepeat['remaining'] == 1:
+        hudhint(userid, 'RespawnCountdown_Singular')
+    
+    # Respawn the player
+    elif respawnRepeat['remaining'] == 0:
+        Player(userid).respawn()

@@ -27,6 +27,7 @@ from gungame51.core.messaging import __messages__
 # ============================================================================
 list_pWeapons = getWeaponNameList("#primary")
 list_sWeapons = getWeaponNameList("#secondary")
+respawnCommand = es.ServerVar("gg_respawn_cmd")
 
 # ============================================================================
 # >> CLASSES
@@ -279,6 +280,18 @@ class BasePlayer(object):
                 
             # Remove the weapon
             es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
+    
+    def respawn(self):
+        '''
+        Respawns the player.
+        '''
+        # Check if the respawn command requires the "#" symbol
+        if '#' not in str(respawnCommand):
+            # Userids not requiring the "#" symbol
+            es.server.queuecmd('%s %s' % (respawnCommand, self.userid))
+        else:
+            # SourceMod Workaround
+            es.server.queuecmd('%s%s' % (respawnCommand, self.userid))
 
 class PlayerDict(dict):
     '''
