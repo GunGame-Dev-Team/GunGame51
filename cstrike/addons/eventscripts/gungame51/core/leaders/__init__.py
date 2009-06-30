@@ -231,7 +231,7 @@ class LeaderManager(object):
 
             # Another leader
             elif level == self.leaderlevel:
-                self.leaders.append(userid)
+                self.current.append(userid)
 
         # Set old leaders, if they have changed
         if self.current[:] != self.previous[:]:

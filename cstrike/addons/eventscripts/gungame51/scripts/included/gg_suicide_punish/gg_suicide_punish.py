@@ -56,7 +56,6 @@ def player_death(event_var):
         return
     
     # If the attacker is not "world or the userid of the victim, it is not a suicide
-    es.msg('if not %s' %(((attacker == 0) or(attacker == userid))))
     if not ((attacker == 0) or (attacker == userid)):
         return
         
