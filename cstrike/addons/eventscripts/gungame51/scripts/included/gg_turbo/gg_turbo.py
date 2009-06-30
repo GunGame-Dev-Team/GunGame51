@@ -33,17 +33,17 @@ info.version = '0.1'
 # ============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-    
+
 # ============================================================================
 # >> GUNGAME EVENTS
 # ============================================================================
 def gg_levelup(event_var):
 
     userid = int(event_var['leveler'])
-    
+
     # Strip and give weapon
     giveWeapon(userid)
 
@@ -58,20 +58,20 @@ def gg_leveldown(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def giveWeapon(userid):
-    
+
     # Do player checks first
     if not playerChecks(userid):
         return
-    
+
     # Get player
     player = Player(userid)
 
     # Give them their next weapon
     player.giveWeapon()
-    
+
     # Make them use it
     es.sexec(userid, "use weapon_%s" % player.weapon)
-    
+
 def playerChecks(userid):
 
     # Get player
@@ -79,26 +79,10 @@ def playerChecks(userid):
 
     # Is player dead?
     if isDead(userid):
-        # Return
         return False
-    
+
     # Is player a spectator?
     if isSpectator(userid):
         return False
 
     return True
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
