@@ -17,6 +17,8 @@ import playerlib
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players import Player
+from gungame51.core.players.shortcuts import setAttribute
+from gungame51.core.players.shortcuts import deleteAttribute
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -115,10 +117,10 @@ gravity = gravityManager()
 def load():
     # Load up each player and set their multikill attribute
     for userid in es.getUseridList():
-        Player(userid).multiKills = 0
+        Player(userid).multiLevels = 0
         
         # Also add the userid to our playerList
-        Player(userid).multiKillEntities = []
+        Player(userid).multiLevelEntities = []
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
@@ -130,9 +132,14 @@ def unload():
 
         # Remove bonus effects
         removeMultiLevel(userid)
-
+        
     # Make sure that the listener shuts down
     gravity.deleteGravityList()
+    
+    # Kill off our custom attributes
+    deleteAttribute("#all", "multiLevels")
+    deleteAttribute("#all", "multiLevelEntities")
+    
     
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
@@ -143,8 +150,8 @@ def player_activate(event_var):
 
     # Add the player's multikill attribute
     userid = int(event_var['userid'])
-    Player(userid).multiKills = 0
-    Player(userid).multiKillEntities = []
+    Player(userid).multiLevels = 0
+    Player(userid).multiLevelEntities = []
 
 def player_disconnect(event_var):
     # Get event information
@@ -159,6 +166,10 @@ def player_disconnect(event_var):
 
         # Cancel the gamethread
         gamethread.cancelDelayed("%i_multilevel" % userid)
+        
+    # Kill off our custom attributes
+    deleteAttribute(userid, "multiLevels")
+    deleteAttribute(userid, "multiLevelEntities")
 
 def player_death(event_var):
     # Get event information
@@ -187,7 +198,7 @@ def round_start(event_var):
     for userid in es.getUseridList():
         # Make sure they 
         user = Player(userid)
-        user.multiKills = 0
+        user.multiLevels = 0
         if userid in list_currentMultiLevel:
             # Cancel the gamethread
             gamethread.cancelDelayed("%i_multilevel" % userid)
@@ -217,10 +228,10 @@ def gg_levelup(event_var):
 
     # Increment multi-kills for attacker
     attacker = Player(attackerid)
-    attacker.multiKills += 1
+    attacker.multiLevels += 1
 
     # Is it greater than or equal to our threshold?
-    if attacker.multiKills >= int(es.ServerVar("gg_multi_level")):
+    if attacker.multiLevels >= int(es.ServerVar("gg_multi_level")):
         # If they currently have the bonus
         if attackerid in list_currentMultiLevel:
             # Cancel the gamethread
@@ -236,7 +247,7 @@ def gg_levelup(event_var):
         list_currentMultiLevel.append(attackerid)
 
         # Reset their kills
-        attacker.multiKills = 0
+        attacker.multiLevels = 0
 
         # Remove multilevel in 10
         gamethread.delayedname(10, "%i_multilevel" % attackerid, removeMultiLevel, attackerid)
@@ -284,9 +295,9 @@ def doMultiLevel(userid):
 
         # Append it to this player's list
         if spark_index:
-            Player(userid).multiKillEntities.append(spark_index)
+            Player(userid).multiLevelEntities.append(spark_index)
         if speedmod_index:
-            Player(userid).multiKillEntities.append(speedmod_index)
+            Player(userid).multiLevelEntities.append(speedmod_index)
 
         # Fire gg_multi_level
         es.dbgmsg(0, "Firing gg_multi_level event!")
@@ -304,8 +315,8 @@ def removeMultiLevel(userid):
         gravity.removeGravityChange(userid)
 
         # Remove the ent indexes
-        while Player(userid).multiKillEntities:
-            ind = Player(userid).multiKillEntities.pop()
+        while Player(userid).multiLevelEntities:
+            ind = Player(userid).multiLevelEntities.pop()
 
             # Create entitylists for the speed and sparks
             validIndexes = es.createentitylist('player_speedmod')

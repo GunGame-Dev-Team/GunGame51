@@ -17,6 +17,7 @@ import gamethread
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import isDead
+from gungame51.core.players.shortcuts import isSpectator
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -80,9 +81,11 @@ def playerChecks(userid):
     if isDead(userid):
         # Return
         return False
-        
-    # TODO: Add more checks here
-    # ...
+    
+    # Is player a spectator?
+    if isSpectator(userid):
+        return False
+
     return True
 
 
