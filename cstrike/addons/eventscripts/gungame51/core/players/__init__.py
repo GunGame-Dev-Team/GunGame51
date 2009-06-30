@@ -309,19 +309,29 @@ class PlayerDict(dict):
         hasn't been already.
         '''
         userid = int(userid) 
-        if userid not in self: 
-            self[userid] = BasePlayer(userid) 
+        if userid not in self:
+            # Get the uniqueid
+            steamid = uniqueid(str(userid), 1)
+            
+            # Search for the player's uniqueid to see if they played previously
+            if not steamid in [self[playerid].steamid for playerid in self]:
+                self[userid] = BasePlayer(userid)
+            else:
+                for playerid in self.copy():
+                    if self[playerid].steamid == steamid:
+                        # Copy the BasePlayer() instance to the current userid
+                        self[userid] = self[playerid]
+
+                        # Delete the old BasePlayer() instance
+                        del self[playerid]
+
+                        # Set the BasePlayer() instance userid to the current
+                        self[userid].userid = userid
+
+                        break
 
         # We don't want to call our __getitem__ again 
         return super(PlayerDict, self).__getitem__(userid)
-
-    def __delitem__(self, userid): 
-        '''
-        Putting the existence check here makes it easier to delete players.
-        '''
-        userid = int(userid)
-        if userid in self:
-            del super(PlayerDict, self)[userid]
 
     def clear(self): 
         '''
@@ -489,7 +499,7 @@ def isDead(userid):
             else:   
                 es.msg('This player is alive!')
     '''
-    return es.getplayerprop(userid, 'CBasePlayer.pl.deadflag')
+    return getPlayer(userid).isdead
 
 def isSpectator(userid):
     '''
