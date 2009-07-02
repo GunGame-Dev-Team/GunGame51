@@ -9,9 +9,6 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
 from playerlib import getPlayer
@@ -45,14 +42,15 @@ list_weaponNameList = getWeaponNameList()
 def load():
     # Register the drop command to prevent it from being used.
     es.addons.registerClientCommandFilter(filterDrop)
+
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
 def unload():
     # Unregister the drop command
     es.addons.unregisterClientCommandFilter(filterDrop)
-    
+
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-    
+
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================

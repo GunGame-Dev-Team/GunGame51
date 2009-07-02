@@ -45,51 +45,53 @@ gg_player_defuser = es.ServerVar('gg_player_defuser')
 def load():
     # Disable objectives
     objectiveToggle('Disable')
+
     es.dbgmsg(0, 'Loaded: %s' %info.name)
 
 def unload():
     # Enable objectives
     objectiveToggle('Enable')
+
     es.dbgmsg(0, 'Unloaded: %s' %info.name)
 
 def round_start(event_var):
     # Disable objectives
     objectiveToggle('Disable')
-                
+
 def player_spawn(event_var):
     userid = event_var['userid']
-    
+
     if isSpectator(userid):
         return
-    
+
     if isDead(userid):
         return
-        
+
     # Are we in a map that has a bombzone?
     if not len(es.createentitylist('func_bomb_target')):
         return
-            
+
     # Check to see if this player is a CT
     if not int(event_var['es_userteam']) == 3:
         return
-        
+
     # Do we want to give a defuser?
     if not int(gg_player_defuser):
         return
-        
+
     # Make sure the player doesn't already have a defuser
     if not getPlayer(userid).defuser:
         getPlayer(userid).defuser = 1
-        
+
 def objectiveToggle(mode):
     userid = es.getuserid()
 
     # Get map info
     mapObjectives = int(gg_map_obj)
-    
+
     # Set up the command to format
     cmd = None
-    
+
     # If both the BOMB and HOSTAGE objectives are enabled, we don't do anything else
     if mapObjectives in range(1, 4):
         # Remove all objectives
@@ -98,25 +100,25 @@ def objectiveToggle(mode):
                 cmd = 'es_xfire %d func_bomb_target %s;' %(userid, mode)
                 if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d weapon_c4 Kill;' %userid
-            
+
             elif len(es.createentitylist('func_hostage_rescue')):
                 cmd = 'es_xfire %d func_hostage_rescue %s;' %(userid, mode)
                 if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d hostage_entity Kill;' %userid
-        
+
         # Remove bomb objectives
         elif mapObjectives == 2:
             if len(es.createentitylist('func_bomb_target')):
                 cmd = 'es_xfire %d func_bomb_target %s;' %(userid, mode)
                 if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d weapon_c4 Kill;' % userid
-        
+
         # Remove hostage objectives
         elif mapObjectives == 3:
             if len(es.createentitylist('func_hostage_rescue')):
                 cmd = 'es_xfire %d func_hostage_rescue %s;' %(userid, mode)
                 if mode == 'Disable':
                     cmd = cmd + 'es_xfire %d hostage_entity Kill;' % userid
-                    
+
     if cmd:
         es.server.queuecmd(cmd)
