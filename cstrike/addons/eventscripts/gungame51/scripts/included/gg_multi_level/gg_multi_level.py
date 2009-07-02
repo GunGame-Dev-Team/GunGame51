@@ -19,6 +19,8 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players import Player
 from gungame51.core.players.shortcuts import setAttribute
 from gungame51.core.players.shortcuts import deleteAttribute
+from gungame51.core.messaging.shortcuts import centermsg
+from gungame51.core.messaging.shortcuts import saytext2
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -28,6 +30,7 @@ info.name = 'gg_multi_level'
 info.title = 'GG Multi Level' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_multi_level']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -42,52 +45,73 @@ list_currentMultiLevel = []
 # Manages and maintains Gravity when it is reset by touching specific entities
 # Thanks to Freddukes for creating the original
 class gravityManager(object):
-    """ Class to manager the tick listener, and to manage the players gravity """
+    '''
+    Class to manager the tick listener, and to manage the players gravity
+    '''
     def __init__(self):
-        """ Create 2 self. variables """
+        '''
+        Create 2 self. variables
+        '''
         self.gravityList = {}
 
     def addGravityChange(self, userid, amount):
-        """ Check if there are already any players in the gravityChange list.
-            If there isn't, start the tick listener. Following this, check
-            if the userid is in the dictionary, if so, remove them. Then create
-            a new instance. """
-        userid = str(userid)
+        '''
+        Check if there are already any players in the gravityChange list.
+        If there isn't, start the tick listener. Following this, check
+        if the userid is in the dictionary, if so, remove them. Then create
+        a new instance.
+        '''
+        userid = int(userid)
+
         if not len(self.gravityList):
             gamethread.delayedname(0.25, 'gravity_check', self._ticker)
+
         if userid in self.gravityList:
             self.removeGravityChange(userid)
+
         if es.exists('userid', userid):
             self.gravityList[userid] = {'lastairvalue': es.getplayerprop(userid, 'CBasePlayer.m_fFlags'), 'gravity': amount, 'lastmovementvalue': es.getplayerprop(userid, 'CBaseEntity.movetype')}
         else:
             self.gravityList[userid] = {'lastairvalue': 0, 'gravity': amount, 'lastmovementvalue': 2}
+
         self._resetGravity(userid, amount)
 
     def removeGravityChange(self, userid):
-        """ Check if the player is in the dictioanry. If so, reset their gravity to 1
-            and delete their instance from the dictionary. If there are no more players
-            within the gravityList, remove the tick listener """
-        userid = str(userid)
+        '''
+        Check if the player is in the dictioanry. If so, reset their gravity to 1
+        and delete their instance from the dictionary. If there are no more players
+        within the gravityList, remove the tick listener.
+        '''
+        userid = int(userid)
+
         if userid in self.gravityList:
             del self.gravityList[userid]
             self._resetGravity(userid, 1.0)
         else:
             es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, 1.0))
+
         if not len(self.gravityList):
             for player in self.gravityList:
                 _resetGravity(player, 1.0)
             gamethread.cancelDelayed('gravity_check')
 
     def deleteGravityList(self):
-        """ Loop through all the players, reset their gravity to 1, delete the gravity
-            list then unregister the tick listener. """
+        '''
+        Loop through all the players, reset their gravity to 1, delete the gravity
+        list then unregister the tick listener.
+        '''
         for player in self.gravityList:
             _resetGravity(player, 1.0)
+
         del self.gravityList
+
         gamethread.cancelDelayed('gravity_check')
 
     def _ticker(self):
-        """ Here we loop through all of the players, and check their gravity etc. """
+        '''
+        Here we loop through all of the players, and check their gravity etc.
+        '''
+        # Loop through all players in the gravity dictionary
         for player in self.gravityList:
             try:
                 if es.exists('userid', player):
@@ -96,17 +120,20 @@ class gravityManager(object):
                 else:
                     newaval = 0
                     newmval = 2
+
                 if self.gravityList[player]['lastairvalue'] != newaval or self.gravityList[player]['lastmovementvalue'] != newmval:
-                    """ Player has jumped or came off a ladder """
+                    # Player has jumped or came off a ladder
                     self._resetGravity(player, self.gravityList[player]['gravity'])
+
                 self.gravityList[player]['lastairvalue']      = newaval
                 self.gravityList[player]['lastmovementvalue'] = newmval
             except:
                 continue
+
         gamethread.delayedname(0.25, 'gravity_check', self._ticker)
 
     def _resetGravity(self, userid, amount):
-        """ Change the players gravity to value amount. """
+        # Change the players gravity to value amount.
         es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, amount))
 
 gravity = gravityManager()
@@ -115,10 +142,10 @@ gravity = gravityManager()
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    # Load up each player and set their multikill attribute
+    # Load up each player and set their multilevel attributes
     for userid in es.getUseridList():
         Player(userid).multiLevels = 0
-        
+
         # Also add the userid to our playerList
         Player(userid).multiLevelEntities = []
 
@@ -132,24 +159,23 @@ def unload():
 
         # Remove bonus effects
         removeMultiLevel(userid)
-        
+
     # Make sure that the listener shuts down
     gravity.deleteGravityList()
-    
+
     # Kill off our custom attributes
     deleteAttribute("#all", "multiLevels")
     deleteAttribute("#all", "multiLevelEntities")
-    
-    
+
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
 def player_activate(event_var):
-
-    # Add the player's multikill attribute
     userid = int(event_var['userid'])
+    
+    # Add the player's multikill attribute
     Player(userid).multiLevels = 0
     Player(userid).multiLevelEntities = []
 
@@ -185,7 +211,7 @@ def player_death(event_var):
 
 def player_spawn(event_var):
     # Get event information
-    userid = event_var['userid']
+    userid = int(event_var['userid'])
 
     # Reset gravity if it is on after a map change
     if userid in gravity.gravityList:
@@ -212,45 +238,45 @@ def round_start(event_var):
 def gg_levelup(event_var):
     # Get event information
     userid = int(event_var['userid'])
-    attackerid = int(event_var['attacker'])   
+    attacker = int(event_var['attacker'])   
 
     # Was it a suicide?
-    if userid == attackerid:
+    if userid == attacker:
         return
 
     # Did the player fall to their death?
-    if not attackerid:
+    if not attacker:
         return
 
     # Teamkill?
-    if int(es.getplayerteam(userid)) == int(es.getplayerteam(attackerid)):
+    if int(es.getplayerteam(userid)) == int(es.getplayerteam(attacker)):
         return
 
     # Increment multi-kills for attacker
-    attacker = Player(attackerid)
+    attacker = Player(attacker)
     attacker.multiLevels += 1
 
     # Is it greater than or equal to our threshold?
     if attacker.multiLevels >= int(es.ServerVar("gg_multi_level")):
         # If they currently have the bonus
-        if attackerid in list_currentMultiLevel:
+        if attacker in list_currentMultiLevel:
             # Cancel the gamethread
-            gamethread.cancelDelayed("%i_multilevel" % attackerid)
+            gamethread.cancelDelayed("%i_multilevel" % attacker)
 
             # Remove the bonus
-            removeMultiLevel(attackerid)
+            removeMultiLevel(attacker)
 
         # Multi-Level them
-        doMultiLevel(attackerid)
+        doMultiLevel(attacker)
 
         # Add the player to the multi level list
-        list_currentMultiLevel.append(attackerid)
+        list_currentMultiLevel.append(attacker)
 
         # Reset their kills
         attacker.multiLevels = 0
 
         # Remove multilevel in 10
-        gamethread.delayedname(10, "%i_multilevel" % attackerid, removeMultiLevel, attackerid)
+        gamethread.delayedname(10, "%i_multilevel" % attacker, removeMultiLevel, attacker)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -260,22 +286,25 @@ def doMultiLevel(userid):
 
     # Check userid validity
     if es.exists('userid', userid):
+        # Retrieve the player's name
+        name = es.getplayername(userid)
 
         # Tell everyone we leveled!
-        es.centermsg("%s multi-leveled!" % es.getplayername(userid))
+        centermsg('#all', "CenterMultiLevelled", {'name':name})
+        saytext2('#all', Player(userid).index, 'MultiLevelled', {'name': name})
 
         # Play game sound
         # ...
 
         # Create env_spark
-        cmdFormat = 'es_xgive %s env_spark; ' % userid
-        cmdFormat += 'es_xfire %s env_spark SetParent !activator;' % userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "spawnflags 896";' % userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' % userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "magnitude 8"; ' % userid
-        cmdFormat += 'es_xfire %s env_spark AddOutput "traillength 3";' % userid
-        cmdFormat += 'es_xfire %s env_spark StartSpark' % userid
-        es.server.cmd(cmdFormat)
+        cmd = 'es_xgive %s env_spark; ' %userid
+        cmd += 'es_xfire %s env_spark SetParent !activator;' %userid
+        cmd += 'es_xfire %s env_spark AddOutput "spawnflags 896";' %userid
+        cmd += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' %userid
+        cmd += 'es_xfire %s env_spark AddOutput "magnitude 8"; ' %userid
+        cmd += 'es_xfire %s env_spark AddOutput "traillength 3";' %userid
+        cmd += 'es_xfire %s env_spark StartSpark' %userid
+        es.server.cmd(cmd)
 
         # Grab it's index
         spark_index = int(es.ServerVar("eventscripts_lastgive"))
