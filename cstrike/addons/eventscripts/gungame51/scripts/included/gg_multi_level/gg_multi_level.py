@@ -44,7 +44,8 @@ list_currentMultiLevel = []
 
 # Manages and maintains Gravity when it is reset by touching specific entities
 # Thanks to Freddukes for creating the original
-class gravityManager(object):
+# http://forums.eventscripts.com/viewtopic.php?t=23958
+class GravityManager(object):
     '''
     Class to manager the tick listener, and to manage the players gravity
     '''
@@ -122,7 +123,7 @@ class gravityManager(object):
                     newmval = 2
 
                 if self.gravityList[player]['lastairvalue'] != newaval or self.gravityList[player]['lastmovementvalue'] != newmval:
-                    # Player has jumped or came off a ladder
+                    # Player has jumped or come off of a ladder
                     self._resetGravity(player, self.gravityList[player]['gravity'])
 
                 self.gravityList[player]['lastairvalue']      = newaval
@@ -136,7 +137,7 @@ class gravityManager(object):
         # Change the players gravity to value amount.
         es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, amount))
 
-gravity = gravityManager()
+gravity = GravityManager()
 
 # ============================================================================
 # >> LOAD & UNLOAD

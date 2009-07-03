@@ -11,13 +11,12 @@ $LastChangedDate$
 # ============================================================================
 # Python imports
 import sys
-import os.path #gg_weapon_order_random
-import random # gg_weapon_order_random
 
 # EventScripts Imports
 import es
 import gamethread
 from playerlib import getPlayer
+from weaponlib import getWeaponList
 
 # GunGame Imports
 
@@ -41,7 +40,7 @@ from core.players.shortcuts import isDead
 from core.players.shortcuts import isSpectator
 
 #    Leaders Function Imports
-from core.leaders import leaders
+from core.leaders.shortcuts import leaders
 from core.leaders.shortcuts import resetLeaders
 from core.leaders.shortcuts import isLeader
 
@@ -56,6 +55,16 @@ from core.messaging.shortcuts import saytext2
 from core.messaging.shortcuts import centermsg
 from core.messaging.shortcuts import toptext
 from core.messaging.shortcuts import msg
+
+# ============================================================================
+# >> GLOBAL VARIABLES
+# ============================================================================
+gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
+gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
+gg_multikill_override = es.ServerVar('gg_multikill_override')
+gg_player_armor = es.ServerVar('gg_player_armor')
+sv_alltalk = es.ServerVar('sv_alltalk')
+gg_win_alltalk = es.ServerVar('gg_win_alltalk')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -116,10 +125,6 @@ def unload():
     '''
 
 def initialize():
-    '''
-    #global countBombDeathAsSuicide
-    #global list_stripExceptions
-    '''
     loadConfig(getConfigList())
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
@@ -131,17 +136,13 @@ def initialize():
     # Fire the gg_server.cfg
     es.server.cmd('exec gungame51/gg_server.cfg')
     
-    # Get strip exceptions
-    if str(es.ServerVar('gg_map_strip_exceptions')) != '0':
-        list_stripExceptions = str(es.ServerVar('gg_map_strip_exceptions')).split(',')
-    
     # Get weapon order file
     # Set this as the weapon order and set the weapon order type
-    currentOrder = setWeaponOrder(str(es.ServerVar('gg_weapon_order_file')), str(es.ServerVar('gg_weapon_order_sort_type')))
+    currentOrder = setWeaponOrder(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
     
     # Set multikill override
-    if int(es.ServerVar('gg_multikill_override')) > 1:
-        currentOrder.setMultiKillOverride(int(es.ServerVar('gg_multikill_override')))
+    if int(gg_multikill_override) > 1:
+        currentOrder.setMultiKillOverride(int(gg_multikill_override))
         
     # Echo the weapon order to console
     es.dbgmsg(0, '[GunGame]')
@@ -229,29 +230,39 @@ def es_map_start(event_var):
     gungamelib.addDownloadableSounds()
     '''
     
-    # Equip the players
+    # =========================================================================
+    # Equip players with a knife and possibly item_kevalr or item_assaultsuit
+    # =========================================================================
     equipPlayer()    
     
 def round_start(event_var):
-    global list_stripExceptions
-    
-    # Disable Buyzones
+    # Retrieve a random userid
     userid = es.getuserid()
+
+    # =========================================================================
+    # Disable Buyzones
+    # =========================================================================
     es.server.cmd('es_xfire %d func_buyzone Disable' %userid)
 
-    '''
-    # Remove weapons
-    for weapon in gungamelib.getWeaponList('all'):
-        # Make sure that the admin doesn't want the weapon left on the map
-        if weapon in list_stripExceptions:
-            continue
+    # =========================================================================
+    # Remove weapons from the map
+    # =========================================================================
+    list_noStrip = [x.strip() for x in str(gg_map_strip_exceptions).split(',')]
+
+    if list_noStrip:
+        for weapon in getWeaponList('#all'):
+            # Make sure that the admin doesn't want the weapon left on the map
+            if weapon in list_noStrip:
+                continue
+
+            # Remove the weapon from the map
+            es.server.queuecmd('es_xfire %d weapon_%s kill' % (userid, weapon))
+    else:
+        es.server.queuecmd('es_xfire %d weapon_* kill' %userid)
     
-            
-        # Remove the weapon from the map
-        es.server.cmd('es_xfire %d weapon_%s kill' % (userid, weapon))
-    '''
-    
-    # Equip players
+    # =========================================================================
+    # Equip players with a knife and possibly item_kevalr or item_assaultsuit
+    # =========================================================================
     equipPlayer()
     
     '''
@@ -272,7 +283,7 @@ def round_end(event_var):
     MOVE THE BELOW CODE TO GG_AFK INCLUDED ADDON
     '''
     # Was a ROUND_DRAW or GAME_COMMENCING?
-    if int(event_var['reason']) == 10 or int(event_var['reason']) == 16:
+    if int(event_var['reason']) in [10, 16]:
         return
     
     # Do we punish AFKers?
@@ -314,7 +325,7 @@ def player_death(event_var):
     
     # Set player ids
     userid = int(event_var['userid'])
-    attacker = (event_var['attacker'])
+    attacker = int(event_var['attacker'])
     
     # Is the attacker on the server?
     if not es.exists('userid', attacker):
@@ -324,31 +335,16 @@ def player_death(event_var):
     ggVictim = Player(userid)
     
     # Suicide check
-    if (attacker == 0 or attacker == userid): #and countBombDeathAsSuicide:
+    if (attacker == 0 or attacker == userid):
             return
     
     # Get attacker object
     ggAttacker = Player(attacker)
-    '''
-    #Shall we move this to an included addon?
-    #    - TeamKill check comment
-    '''
+
     # ===============
     # TEAM-KILL CHECK
     # ===============
     if (event_var['es_userteam'] == event_var['es_attackerteam']):
-        if int(es.ServerVar('gg_tk_punish')) == 0:
-            return
-            
-        # Trigger level down
-        ggAttacker.leveldown(int(es.ServerVar('gg_tk_punish')), userid, 'tk')
-        
-        # Message
-        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level})
-        
-        # Play the leveldown sound
-        #gungamelib.playSound(attacker, 'leveldown')
-        
         return
         
     # ===========
@@ -374,8 +370,13 @@ def player_death(event_var):
         return
     '''
     
-    # No multikill? Just level up...
+    # ===============
+    # MULTIKILL CHECK
+    # ===============
+    # Get the current level's multikill value
     multiKill = getLevelMultiKill(ggAttacker.level)
+    
+    # If set to 1, level the player up
     if multiKill == 1:
         # Level them up
         ggAttacker.levelup(1, userid, 'kill')
@@ -385,7 +386,7 @@ def player_death(event_var):
         
         return
     
-    # Using multikill
+    # Multikill value is > 1 ... add 1 to the multikill attribute
     ggAttacker.multikill += 1
     
     # Finished the multikill
@@ -468,25 +469,6 @@ def gg_levelup(event_var):
     
     # Temporary message
     es.msg('%s leveled up by killing %s!' %(event_var['es_attackername'], event_var['es_username']))
-    '''
-    THIS IS NOW HANDLED BY THE EVENT MANAGER. LEAVING THIS HERE FOR REFERENCE
-    FOR RIGHT NOW.
-    
-    # ============
-    # WINNER CHECK
-    # ============
-    if int(event_var['old_level']) == gungamelib.getTotalLevels() and newLevel > gungamelib.getTotalLevels():
-        es.event('initialize', 'gg_win')
-        es.event('setint', 'gg_win', 'attacker', event_var['attacker'])
-        es.event('setint', 'gg_win', 'winner', event_var['attacker'])
-        es.event('setint', 'gg_win', 'userid', event_var['userid'])
-        es.event('setint', 'gg_win', 'loser', event_var['userid'])
-        es.event('setint', 'gg_win', 'round', '1' if dict_variables['roundsRemaining'] > 1 else '0')
-        es.event('fire', 'gg_win')
-        
-        return
-    '''
-    
     
     # ===============
     # REGULAR LEVELUP
@@ -608,8 +590,8 @@ def gg_win(event_var):
     # ALL WINS
     # ====================================================
     # Enable alltalk
-    if not int(es.ServerVar('sv_alltalk')) and int(es.ServerVar('gg_win_alltalk')):
-        es.server.cmd('sv_alltalk 1')
+    if not int(sv_alltalk) and int(gg_win_alltalk):
+        es.server.queuecmd('sv_alltalk 1')
     
     # Tell the world (center message)
     centermsg('#all', 'PlayerWon_Center', {'player': playerName})
