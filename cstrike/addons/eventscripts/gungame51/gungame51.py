@@ -61,6 +61,7 @@ from core.messaging.shortcuts import msg
 # ============================================================================
 gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
+gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
 sv_alltalk = es.ServerVar('sv_alltalk')
