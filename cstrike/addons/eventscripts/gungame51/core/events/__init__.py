@@ -41,6 +41,10 @@ class EventManager(object):
             * reason: (required)
                 The string reason for leveling up the attacker.
         '''
+        # Do not allow levelup if the player's preventlevel list is not empty
+        if playerInstance.preventlevel:
+            return False
+        
         # Set old level and the new level
         oldLevel = playerInstance.level
         newLevel = playerInstance.level + int(levelsAwarded)
@@ -51,7 +55,7 @@ class EventManager(object):
             Note: fix "round"
             '''
             self.gg_win(playerInstance, victimInstance, round=0)
-            return
+            return True
             
         playerInstance.level = newLevel
 
@@ -90,6 +94,10 @@ class EventManager(object):
             * reason: (required)
                 The string reason for leveling up the attacker.
         '''
+        # Do not allow leveldown if the player's preventlevel list is not empty
+        if playerInstance.preventlevel:
+            return False
+        
         # Set old level and the new level
         oldLevel = playerInstance.level
         if (oldLevel - int(levelsTaken)) > 0:
