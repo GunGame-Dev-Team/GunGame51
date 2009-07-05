@@ -48,13 +48,16 @@ from core.leaders.shortcuts import isLeader
 from core import inMap
 from core import getGameDir
 
-# Messaging imports
+#   Messaging Function Imports
 from core.messaging.shortcuts import loadTranslation
 from core.messaging.shortcuts import unloadTranslation
 from core.messaging.shortcuts import saytext2
 from core.messaging.shortcuts import centermsg
 from core.messaging.shortcuts import toptext
 from core.messaging.shortcuts import msg
+
+#   Event Function imports
+from core.events.shortcuts import EventManager
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -115,11 +118,7 @@ def unload():
     es.server.queuecmd('es_xfire %d func_buyzone Enable' %userid)
     
     # Fire gg_unload event
-    '''
-    We need to add this to the EventManager
-    '''
-    es.event('initialize', 'gg_unload')
-    es.event('fire', 'gg_unload')
+    EventManager().gg_unload
     
     '''
     gungamelib.clearGunGame()
@@ -170,19 +169,14 @@ def initialize():
             es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
         else:
             # Fire gg_start event
-            es.event('initialize','gg_start')
-            es.event('fire','gg_start')
+            EventManager().gg_start()
     '''
     
     # Restart map
     msg('#all', 'Loaded')
     
     # Fire gg_load event
-    '''
-    Need to port this to the EventManager
-    '''
-    es.event('initialize', 'gg_load')
-    es.event('fire', 'gg_load')
+    EventManager().gg_load()
     
     # Print load completed
     #gungamelib.echo('gungame', 0, 0, 'Load_Completed')
@@ -216,8 +210,7 @@ def es_map_start(event_var):
         es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
     else:
         # Fire gg_start event
-        es.event('initialize','gg_start')
-        es.event('fire','gg_start')
+        EventManager().gg_start()
     '''
     
     # Reset the GunGame players
@@ -521,8 +514,7 @@ def gg_levelup(event_var):
             return
         
         if dict_variables['roundsRemaining'] < 2:
-            es.event('initialize', 'gg_vote')
-            es.event('fire', 'gg_vote')
+            EventManager().gg_vote()
     '''
     
 '''
