@@ -17,7 +17,7 @@ import es
 # GunGame Imports
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import players
-from gungame51.core.EventManager().shortcuts import EventManager
+from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging.shortcuts import saytext2
 
 # =============================================================================
