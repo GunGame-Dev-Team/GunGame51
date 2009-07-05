@@ -615,16 +615,16 @@ def equipPlayer():
     userid = es.getuserid()
     cmdFormat = 'es_xremove game_player_equip;' + \
                 'es_xgive %s game_player_equip;' %userid + \
-                'es_xfire %s game_player_equip AddOutput "weapon_knife 1;"' \
+                'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' \
                     %userid
     
     # Retrieve the armor type
-    armorType = int(es.ServerVar('gg_player_armor'))
+    armorType = int(gg_player_armor)
     
     # Give the player full armor
     if armorType == 2:
         cmdFormat = cmdFormat + \
-            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1;"' \
+            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";' \
                 %userid
     
     # Give the player kevlar only
