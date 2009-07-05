@@ -82,6 +82,31 @@ class CustomAttributeCallbacks(dict):
 
 setHooks = CustomAttributeCallbacks()
 
+class PreventLevel(list):
+    '''
+    Class designed to handle the PreventLevel player attribute. This class is a
+    list type, which allows us to potentially catch errors such as duplicate
+    entries of addons in the preventlevel list, as well as preventing errors
+    when scripters attempt to remove an entry that does not exist.
+    '''
+    # =========================================================================
+    # >> PreventLevel() CUSTOM CLASS METHODS
+    # =========================================================================
+    def append(self, name):
+        if name not in self:
+            list.append(self, name)
+            
+    def extend(self, names):
+        for name in names:
+            if name in self:
+                continue
+                
+            list.append(self, name)
+            
+    def remove(self, name):
+        if name in self:
+            list.remove(self, name)
+            
 
 class BasePlayer(object):
     # =========================================================================
@@ -90,7 +115,7 @@ class BasePlayer(object):
     def __init__(self, userid): 
         self.userid = userid 
         self.level = 1
-        self.preventlevel = []
+        self.preventlevel = PreventLevel()
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
         self.index = int(getPlayer(str(self.userid)).index)
