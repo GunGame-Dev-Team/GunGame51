@@ -211,7 +211,7 @@ class EventManager(object):
         '''
         Usage:
             from gungame.core.players.shortcuts import Player
-            from gungame.core.events import events
+            from gungame.core.events import EventManager
             
             def player_death(event_var):
                 # Make sure this was a knife kill
@@ -225,7 +225,7 @@ class EventManager(object):
                 vInstance = Player(event_var['userid'])
                 
                 # Trigger the event "gg_knife_steal"
-                events.gg_knife_steal(aInstance, vInstance)
+                EventManager().gg_knife_steal(aInstance, vInstance)
         '''
         es.event('initialize', 'gg_knife_steal')
         es.event('setint', 'gg_knife_steal', 'attacker',
@@ -242,7 +242,7 @@ class EventManager(object):
         Usage:
             import es
             from gungame.core.players.shortcuts import Player
-            from gungame.core.events import events
+            from gungame.core.events import EventManager
             
             def gg_levelup(event_var):
                 # Get the attacker's Player() instance
@@ -265,12 +265,12 @@ class EventManager(object):
                     return
                 
                 # Trigger the event "gg_knife_steal"
-                events.gg_multi_level(aInstance, vInstance)
+                EventManager().gg_multi_level(aInstance, vInstance)
         '''
         es.event('initialize', 'gg_multi_level')
         es.event('setint', 'gg_multi_level', 'userid', attacker)
         es.event('setint', 'gg_multi_level', 'leveler', attacker)
         es.event('fire', 'gg_multi_level')
 
-events = EventManager()
+
 from gungame51.core.leaders.shortcuts import leaders

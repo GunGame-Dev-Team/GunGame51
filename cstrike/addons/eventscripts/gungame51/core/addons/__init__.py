@@ -18,7 +18,7 @@ import es
 # GunGame Imports
 from gungame51.core import getGameDir
 
-from gungame51.core.events.shortcuts import events
+from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging import __messages__
 
 # ============================================================================
@@ -257,7 +257,7 @@ class AddonManager(object):
         self.callBlock(addon, 'load')
         
         # Fire the event "gg_addon_loaded"
-        events.gg_addon_loaded(name, self.getAddonType(name))
+        EventManager().gg_addon_loaded(name, self.getAddonType(name))
 
     def unload(self, name):
         '''
@@ -296,7 +296,7 @@ class AddonManager(object):
         self.callBlock(addon, 'unload')
         
         # Fire the event "gg_addon_unloaded"
-        events.gg_addon_unloaded(name, self.getAddonType(name))
+        EventManager().gg_addon_unloaded(name, self.getAddonType(name))
 
     def registerEvents(self, addon, name):
         '''

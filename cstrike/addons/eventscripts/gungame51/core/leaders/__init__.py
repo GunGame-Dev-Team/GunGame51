@@ -17,7 +17,7 @@ import es
 # GunGame Imports
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import players
-from gungame51.core.events.shortcuts import events
+from gungame51.core.EventManager().shortcuts import EventManager
 from gungame51.core.messaging.shortcuts import saytext2
 
 # =============================================================================
@@ -102,7 +102,7 @@ class LeaderManager(object):
 
         if event:
             # Fire gg_tied_leader
-            events.gg_tied_leader(userid)
+            EventManager().gg_tied_leader(userid)
 
 
     def setNew(self, userid, event=True):
@@ -139,7 +139,7 @@ class LeaderManager(object):
 
         if event:
             # Fire gg_new_leader
-            events.gg_new_leader(userid)
+            EventManager().gg_new_leader(userid)
 
     def remove(self, userid, event=True):
         '''
@@ -168,7 +168,7 @@ class LeaderManager(object):
 
         if event:
             # Fire gg_leader_lostlevel
-            events.gg_leader_lostlevel(userid)
+            EventManager().gg_leader_lostlevel(userid)
 
     def reset(self):
         '''
@@ -243,7 +243,7 @@ class LeaderManager(object):
             saytext2('#all', Player(self.current[0]).index, 'NewLeader', {'player': es.getplayername(self.current[0]), 'level': self.leaderlevel}, False)
             
             # Fire gg_new_leader
-            events.gg_new_leader(userid)
+            EventManager().gg_new_leader(userid)
 
     # =========================================================================
     # LeaderManager() STATIC CLASS METHODS

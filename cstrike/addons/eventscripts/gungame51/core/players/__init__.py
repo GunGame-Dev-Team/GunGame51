@@ -163,7 +163,7 @@ class BasePlayer(object):
             victim = Player(victim)
 
         # Use the EventManager to call the gg_levelup event
-        events.gg_levelup(self, levelsAwarded, victim, reason)
+        EventManager().gg_levelup(self, levelsAwarded, victim, reason)
 
     def leveldown(self, levelsTaken, attacker=0, reason=''):
         '''
@@ -186,7 +186,7 @@ class BasePlayer(object):
             attacker = Player(attacker)
             
         # Use the EventManager to call the gg_leveldown event
-        events.gg_leveldown(self, levelsTaken, attacker, reason)
+        EventManager().gg_leveldown(self, levelsTaken, attacker, reason)
 
     def msg(self, string, tokens={}, prefix=False):
         __messages__.msg(self.userid, string, tokens, prefix)
@@ -522,4 +522,4 @@ def isSpectator(userid):
     '''
     return es.getplayerteam(userid) <= 1
     
-from gungame51.core.events.shortcuts import events
+from gungame51.core.events.shortcuts import EventManager
