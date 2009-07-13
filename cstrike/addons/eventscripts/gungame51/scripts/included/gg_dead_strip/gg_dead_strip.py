@@ -75,11 +75,14 @@ def item_pickup(event_var):
     if not es.exists('userid', userid):
         return
 
+    # Check to see if the weapon is in the player's strip exceptions
+    if item in Player(userid).stripexceptions + ['flashbang', 'smokegrenade']:
+        return
+
     # Get the player's GunGame weapon
     currentWeapon = Player(userid).weapon
 
-    # Check to see if the weapon is their gungame weapon or in their strip exceptions
-    #if item == weapon or item in gungamePlayer.stripexceptions + ['flashbang', 'smokegrenade']:
+    # Check to see if the weapon is their gungame weapon
     if item == currentWeapon:
         return
 

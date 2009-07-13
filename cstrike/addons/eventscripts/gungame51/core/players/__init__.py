@@ -120,6 +120,7 @@ class BasePlayer(object):
         self.steamid = uniqueid(str(self.userid), 1)
         self.index = int(getPlayer(str(self.userid)).index)
         self.weapon = self.getWeapon()
+        self.stripexceptions = []
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
@@ -290,7 +291,34 @@ class BasePlayer(object):
         # Make them use the new weapon via es_xsexec
         # We use this because es.sexec is too fast in some cases.
         es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
-    
+
+    def give(self, weapon, useWeapon=0):
+        '''
+        Gives a player the specified weapon.
+        Weapons given by this method will not be stripped by gg_dead_strip.
+        '''
+        # Check if the weapon is valid
+        weapon = weapon.replace('weapon_', '')
+
+        if weapon not in list_pWeapons + list_sWeapons + \
+            ['hegrenade', 'flashbang', 'smokegrenade']:
+                raise PlayerError('Unable to give (%s): is not a valid weapon'
+                    %weapon)
+
+        # Add weapon to strip exceptions so gg_dead_strip will not strip the weapon
+        self.stripexceptions.append(weapon)
+
+        # Delay removing the weapon long enough for gg_dead_strip to fire
+        gamethread.delayed(0.1, self.stripexceptions.remove, (weapon))
+
+        # Give the player the weapon
+        cmd = 'es_xgive %s weapon_%s;' %(self.userid, weapon)
+
+        if useWeapon:
+            cmd += 'es_xsexec %s "use weapon_%s"' %(self.userid, weapon)
+
+        es.server.queuecmd(cmd)
+
     def strip(self):
         '''
         Strips/removes all weapons from the player minus the knife and their
@@ -328,12 +356,12 @@ class PlayerDict(dict):
     # =========================================================================
     # >> PlayerDict() CLASS ATTRIBUTE METHODS
     # =========================================================================
-    def __getitem__(self, userid): 
+    def __getitem__(self, userid):
         '''
         When we get an item in the dictionary BasePlayer is instantiated if it
         hasn't been already.
         '''
-        userid = int(userid) 
+        userid = int(userid)
         if userid not in self:
             # Get the uniqueid
             steamid = uniqueid(str(userid), 1)
@@ -355,7 +383,7 @@ class PlayerDict(dict):
 
                         break
 
-        # We don't want to call our __getitem__ again 
+        # We don't want to call our __getitem__ again
         return super(PlayerDict, self).__getitem__(userid)
 
     def clear(self): 
