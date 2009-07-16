@@ -47,6 +47,9 @@ def setAttribute(filter, attribute, value):
         es.msg('myattribute for %s = %s'
             %(event_var['es_username'], Player(event_var['userid']).myattribute))
     '''
+    if isinstance(filter, int):
+        filter = str(filter)
+
     if '#' in filter:
         for userid in getPlayerList(filter):
             import es
@@ -54,7 +57,7 @@ def setAttribute(filter, attribute, value):
             Player(userid)[attribute] = value
         return
     Player(filter)[attribute] = value
-    
+
 def deleteAttribute(filter, attribute):
     '''
     Deletes a Player() attribute by userid or by filter:
@@ -72,12 +75,15 @@ def deleteAttribute(filter, attribute):
         # Delete a custom attribute from one player
         deleteAttribute(event_var['userid'], 'myattribute')
     '''
+	if isinstance(filter, int):
+		filter = str(filter)
+
     if '#' in filter:
         for userid in getPlayerList(filter):
             del Player(userid)[attribute]
         return
     del Player(filter)[attribute]
-    
+
 def resetPlayers():
     '''
     Resets the PlayerDict instance, deleting all instances of BasePlayer

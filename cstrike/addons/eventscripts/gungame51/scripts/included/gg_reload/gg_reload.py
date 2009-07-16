@@ -19,7 +19,7 @@ from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.players import Player
+from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
