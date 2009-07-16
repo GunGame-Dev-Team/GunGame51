@@ -495,11 +495,12 @@ def load():
     config.text('Description:')
     config.text('   Players can level up while spawn protected.')
     config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_spawn_protect_can_level_up.')
-    config.text('   1 = (Enabled) Load gg_spawn_protect_can_level_up.')
+    config.text('   0 = (Disabled) Do not allow players to level up while ' +
+                'spawn protected.')
+    config.text('   1 = (Enabled) Allow players to level up while spawn protected.')
     config.text('Default Value: 0')
-    config.cvar('gg_spawn_protect_can_level_up', 0, 'Cancels spawn ' +
-                'protection when the weapon is fired.')
+    config.cvar('gg_spawn_protect_can_level_up', 1, 'Allow players ' +
+                'to level up while spawn protected')
     
     # Deathmatch
     config.text('')
