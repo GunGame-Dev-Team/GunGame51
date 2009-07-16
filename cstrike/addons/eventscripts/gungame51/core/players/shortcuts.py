@@ -75,8 +75,8 @@ def deleteAttribute(filter, attribute):
         # Delete a custom attribute from one player
         deleteAttribute(event_var['userid'], 'myattribute')
     '''
-	if isinstance(filter, int):
-		filter = str(filter)
+    if isinstance(filter, int):
+        filter = str(filter)
 
     if '#' in filter:
         for userid in getPlayerList(filter):
