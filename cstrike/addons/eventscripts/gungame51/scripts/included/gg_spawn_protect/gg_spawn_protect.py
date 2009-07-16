@@ -76,7 +76,7 @@ def server_cvar(event_var):
             es.ServerVar('eventscripts_noisy').set(1)
         else:
             # Set noisy back
-            es.ServerVar('eventscripts_noisy').set(noisyBefore)
+            es.ServerVar('eventscripts_noisy').set(noisySave)
 
 def weapon_fire(event_var):
     if not cancelonfire:
