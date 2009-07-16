@@ -16,6 +16,7 @@ import sys
 import es
 import gamethread
 from playerlib import getPlayer
+from playerlib import getPlayerList
 from weaponlib import getWeaponList
 
 # GunGame Imports
@@ -288,8 +289,9 @@ def round_end(event_var):
         gungamePlayer = Player(userid)
         
         # Check to see if the player was AFK
-        if gungamePlayer.isPlayerAFK():
-            afkPunishCheck(userid)    
+        if gungamePlayer.afk():
+            es.msg('PUNISH TIME!!!!!!!!!!!!!!!!!!!')
+            #afkPunishCheck(userid)    
     '''
     END GG_AFK CODE
     '''
@@ -309,24 +311,28 @@ def player_spawn(event_var):
     # Give the player their weapon
     Player(userid).giveWeapon()
     
+    # Reset the player's AFK calculation
+    if not es.isbot(userid):
+        gamethread.delayed(0.6, Player(userid).afk.reset, ())
+    
     # Send the level information hudhint
     # ....
 
 def player_death(event_var):
     # Warmup Round Check
     # ....
-    
+
     # Set player ids
     userid = int(event_var['userid'])
     attacker = int(event_var['attacker'])
-    
+
     # Is the attacker on the server?
     if not es.exists('userid', attacker):
         return
-        
+
     # Get victim object
     ggVictim = Player(userid)
-    
+
     # Suicide check
     if (attacker == 0 or attacker == userid):
             return
@@ -352,7 +358,7 @@ def player_death(event_var):
     
     '''
     # Don't continue if the victim is AFK
-    if ggVictim.isPlayerAFK():
+    if ggVictim.afk():
         # Tell the attacker they were AFK
         gungamelib.hudhint('gungame', attacker, 'PlayerAFK', {'player': event_var['es_username']})
         
@@ -615,19 +621,19 @@ def equipPlayer():
     cmd = 'es_xremove game_player_equip;' + \
           'es_xgive %s game_player_equip;' %userid + \
           'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' %userid
-    
+
     # Retrieve the armor type
     armorType = int(gg_player_armor)
-    
+
     # Give the player full armor
     if armorType == 2:
         cmd = cmd + \
-            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";'
+            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";' \
                 %userid
-    
+
     # Give the player kevlar only
     elif armorType == 1:
         cmd = cmd + \
             'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' %userid
-            
+
     es.server.queuecmd(cmd)
