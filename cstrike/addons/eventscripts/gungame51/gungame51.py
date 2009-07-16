@@ -16,7 +16,6 @@ import sys
 import es
 import gamethread
 from playerlib import getPlayer
-from playerlib import getPlayerList
 from weaponlib import getWeaponList
 
 # GunGame Imports
