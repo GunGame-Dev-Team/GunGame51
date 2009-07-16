@@ -170,7 +170,7 @@ class ConfigManager(object):
                 if int(__configs__.__cvardefaults__[cvarName]) == int(cvarValue):
                     return
 
-            load(cvarName)
+            gamethread.delayed(0, load, (cvarName))
             
         # Unload addons with the value of 0
         elif int(cvarValue) == 0:
@@ -184,7 +184,7 @@ class ConfigManager(object):
                 if int(__configs__.__cvardefaults__[cvarName]) == int(cvarValue):
                     return
 
-            unload(cvarName)
+            gamethread.delayed(0, unload, (cvarName))
 
     @staticmethod
     def configExists(name):
