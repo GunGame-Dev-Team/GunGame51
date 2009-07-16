@@ -29,7 +29,7 @@ class GunGameError(Exception):
 # ============================================================================
 # >> FILES, DIRECTORIES, & OS FUNCTIONS
 # ============================================================================
-def getGameDir(dir):
+def getGameDir(dir=None):
     '''!Gets an absolute path to a game directory.
 
     @remark Implicitly replaces \\ with / (linux support)
@@ -37,11 +37,10 @@ def getGameDir(dir):
     @param dir Directory to append to the game directory.
 
     @return An absolute path to the game directory plus \p dir.'''
-    # Linux path seperators
-    dir = dir.replace('\\', '/')
-
-    # Return
-    return '%s/%s' % (gamePath, dir)
+    if dir:
+        # Return
+        return '%s/%s' % (gamePath, dir.replace('\\', '/'))
+    return gamePath
 
 def getOS():
     return platform

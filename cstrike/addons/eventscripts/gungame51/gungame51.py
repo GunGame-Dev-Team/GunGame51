@@ -165,7 +165,6 @@ def initialize():
     if inMap():
         # Check to see if the warmup round needs to be activated
         if int(es.ServerVar('gg_warmup_timer')) > 0:
-        
             es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
         else:
             # Fire gg_start event
@@ -173,7 +172,7 @@ def initialize():
     '''
     
     # Restart map
-    msg('#all', 'Loaded')
+    msg('#human', 'Loaded')
     
     # Fire gg_load event
     EventManager().gg_load()
@@ -265,11 +264,11 @@ def round_start(event_var):
         
         # Play knife sound
         if leaderWeapon == 'knife':
-            gungamelib.playSound('#all', 'knifelevel')
+            gungamelib.playSound('#human', 'knifelevel')
         
         # Play nade sound
         if leaderWeapon == 'hegrenade':
-            gungamelib.playSound('#all', 'nadelevel')
+            gungamelib.playSound('#human', 'nadelevel')
     '''
 
 def round_end(event_var):
@@ -475,11 +474,11 @@ def gg_levelup(event_var):
     
     # Player on knife level?
     if ggPlayer.weapon == 'knife':
-        gungamelib.playSound('#all', 'knifelevel')
+        gungamelib.playSound('#human', 'knifelevel')
     
     # Player on nade level?
     if ggPlayer.weapon == 'hegrenade':
-        gungamelib.playSound('#all', 'nadelevel')
+        gungamelib.playSound('#human', 'nadelevel')
     '''
     
     '''
@@ -546,16 +545,16 @@ def gg_win(event_var):
             %(userid, userid))
         
         # Tell the world
-        saytext2('#all', index, 'PlayerWon', {'player':playerName})
+        saytext2('#human', index, 'PlayerWon', {'player':playerName})
         
         '''
         # Play the winner sound
-        gungamelib.playSound('#all', 'winner')
+        gungamelib.playSound('#human', 'winner')
         '''
     else:
-        # ====================================================
+        # =====================================================================
         # ROUND WIN
-        # ====================================================
+        # =====================================================================
         '''
         # Calculate rounds remaining
         dict_variables['roundsRemaining'] -= 1
@@ -572,31 +571,31 @@ def gg_win(event_var):
             es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
             '''
         # Tell the world
-        saytext2('#all', index, 'PlayerWonRound', {'player':playerName})
+        saytext2('#human', index, 'PlayerWonRound', {'player':playerName})
         
         '''
         # Play the winner sound
-        gungamelib.playSound('#all', 'roundwinner')
+        gungamelib.playSound('#human', 'roundwinner')
         '''
     
-    # ====================================================
+    # =========================================================================
     # ALL WINS
-    # ====================================================
+    # =========================================================================
     # Enable alltalk
     if not int(sv_alltalk) and int(gg_win_alltalk):
         es.server.queuecmd('sv_alltalk 1')
     
     # Tell the world (center message)
-    centermsg('#all', 'PlayerWon_Center', {'player': playerName})
-    gamethread.delayed(1, centermsg, ('#all', 'PlayerWon_Center', {'player': playerName}))
-    gamethread.delayed(2, centermsg, ('#all', 'PlayerWon_Center', {'player': playerName}))
-    gamethread.delayed(3, centermsg, ('#all', 'PlayerWon_Center', {'player': playerName}))
+    centermsg('#human', 'PlayerWon_Center', {'player': playerName})
+    gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center', {'player': playerName}))
+    gamethread.delayed(2, centermsg, ('#human', 'PlayerWon_Center', {'player': playerName}))
+    gamethread.delayed(3, centermsg, ('#human', 'PlayerWon_Center', {'player': playerName}))
     
     # Toptext
     if int(event_var['es_attackerteam']) == 2:
-        toptext('#all', 10, '#red', 'PlayerWon_Center', {'player': playerName})
+        toptext('#human', 10, '#red', 'PlayerWon_Center', {'player': playerName})
     else:
-        toptext('#all', 10, '#blue', 'PlayerWon_Center', {'player': playerName})
+        toptext('#human', 10, '#blue', 'PlayerWon_Center', {'player': playerName})
         
 def gg_start(event_var):
     # Reset all the players
@@ -613,23 +612,22 @@ def gg_addon_unloaded(event_var):
 # ============================================================================
 def equipPlayer():
     userid = es.getuserid()
-    cmdFormat = 'es_xremove game_player_equip;' + \
-                'es_xgive %s game_player_equip;' %userid + \
-                'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' \
-                    %userid
+    cmd = 'es_xremove game_player_equip;' + \
+          'es_xgive %s game_player_equip;' %userid + \
+          'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' %userid
     
     # Retrieve the armor type
     armorType = int(gg_player_armor)
     
     # Give the player full armor
     if armorType == 2:
-        cmdFormat = cmdFormat + \
-            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";' \
+        cmd = cmd + \
+            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";'
                 %userid
     
     # Give the player kevlar only
     elif armorType == 1:
-        cmdFormat = cmdFormat + \
+        cmd = cmd + \
             'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' %userid
             
-    es.server.queuecmd(cmdFormat)
+    es.server.queuecmd(cmd)
