@@ -270,30 +270,6 @@ def round_start(event_var):
         if leaderWeapon == 'hegrenade':
             gungamelib.playSound('#human', 'nadelevel')
     '''
-
-def round_end(event_var):
-    '''
-    MOVE THE BELOW CODE TO GG_AFK INCLUDED ADDON
-    '''
-    # Was a ROUND_DRAW or GAME_COMMENCING?
-    if int(event_var['reason']) in [10, 16]:
-        return
-    
-    # Do we punish AFKers?
-    if not int(es.ServerVar('gg_afk_rounds')):
-        return
-    
-    # Now, we will loop through the userid list and run the AFK Punishment Checks on them
-    for userid in playerlib.getUseridList('#alive,#human'):
-        gungamePlayer = Player(userid)
-        
-        # Check to see if the player was AFK
-        if gungamePlayer.afk():
-            es.msg('PUNISH TIME!!!!!!!!!!!!!!!!!!!')
-            #afkPunishCheck(userid)    
-    '''
-    END GG_AFK CODE
-    '''
     
 def player_spawn(event_var):
     userid = event_var['userid']
@@ -334,43 +310,43 @@ def player_death(event_var):
 
     # Suicide check
     if (attacker == 0 or attacker == userid):
-            return
+        return
     
     # Get attacker object
     ggAttacker = Player(attacker)
 
-    # ===============
+    # =========================================================================
     # TEAM-KILL CHECK
-    # ===============
+    # =========================================================================
     if (event_var['es_userteam'] == event_var['es_attackerteam']):
         return
         
-    # ===========
-    # NORMAL KILL
-    # ===========
-    # Get weapon name
-    weapon = event_var['weapon']
-    
+    # =========================================================================
+    # >> NORMAL KILL
+    # =========================================================================
     # Check the weapon was correct
-    if weapon != ggAttacker.weapon:
+    if event_var['weapon'] != ggAttacker.weapon:
         return
     
     '''
+    # =========================================================================
+    # AFK CHECK
+    # =========================================================================
     # Don't continue if the victim is AFK
-    if ggVictim.afk():
-        # Tell the attacker they were AFK
-        gungamelib.hudhint('gungame', attacker, 'PlayerAFK', {'player': event_var['es_username']})
-        
-        # Check AFK punishment
-        if not ggVictim.isbot and gungamelib.getVariableValue('gg_afk_rounds') > 0:
-            afkPunishCheck(userid)
-        
-        return
+    if int(gg_allow_afk_levels):
+        if es.isbot(userid):
+            return
+
+        if ggVictim.afk():
+            # Tell the attacker they were AFK
+            ggAttacker.hudhint('PlayerAFK', {'player': event_var['es_username']})
+
+            return
     '''
     
-    # ===============
+    # =========================================================================
     # MULTIKILL CHECK
-    # ===============
+    # =========================================================================
     # Get the current level's multikill value
     multiKill = getLevelMultiKill(ggAttacker.level)
     

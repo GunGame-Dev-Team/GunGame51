@@ -42,7 +42,7 @@ class CustomAttributeCallbacks(dict):
         '''
         Adds a callback to execute when a previously created attribute is set
         via the BasePlayer class' __setitem__ or __setattr__ methods.
-        
+
         Note:
             You can not add callbacks for primary GunGame attributes:
                 * userid
@@ -56,19 +56,19 @@ class CustomAttributeCallbacks(dict):
                          'steamid', 'multikill']:
             raise AttributeError('No callbacks are allowed to be set for "%s".'
                 %attribute)
-        
+
         # Make sure that the function is callable
         if not callable(function):
             raise AttributeError('Callback "%s" is not callable.' %function)
-            
+
         # Create the attribute callback
         self[attribute] = (function, addon)
-            
+
     def remove(self, attribute):
         '''
         Removes a callback to execute when a previously created attribute is
         set via the BasePlayer class' __getitem__ or __getattr__ methods.
-        
+
         Note:
             No exceptions are raised if you attempt to delete a non-existant
             callback.
@@ -76,7 +76,7 @@ class CustomAttributeCallbacks(dict):
         # Make sure the attribute callback exists
         if not attribute in self:
             return
-            
+
         # Delete the attribtue callback
         del self[attribute]
 
@@ -96,28 +96,28 @@ class PreventLevel(list):
     def append(self, name):
         if name not in self:
             list.append(self, name)
-            
+
     def extend(self, names):
         for name in names:
             if name in self:
                 continue
-                
+
             list.append(self, name)
-            
+
     def remove(self, name):
         if name in self:
             list.remove(self, name)
-            
+
 
 class AFK(object):
     def __init__(self, userid):
         self.userid = int(userid)
         self.total = None
         self.rounds = 0
-        
+
     def __call__(self):
         return (self.total == self.calculate())
-        
+
     def reset(self):
         '''Resets a players AFK math total.'''
         # Check the player exists
@@ -126,19 +126,19 @@ class AFK(object):
 
         # Update the AFK math total
         self.total = self.calculate()
-        
+
     def calculate(self):
         # Check the player exists
         if not es.exists('userid', self.userid):
             return
-        
+
         # Get the player's location
         x, y, z = es.getplayerlocation(self.userid)
-        
+
         return int(x) + int(y) + int(es.getplayerprop(self.userid,
                    'CCSPlayer.m_angEyeAngles[0]')) + \
                     int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[1]'))
-                   
+
     def isActive(self):
         '''
         Sets the player to a state that is NOT AFK.
@@ -150,7 +150,7 @@ class AFK(object):
         # Make sure player is on a team
         if isSpectator(self.userid):
             raise ValueError('Unable to make player active (%s): not on a team.' % self.userid)
-        
+
         # Reset player math total
         self.total = 0
         self.afkrounds = 0
@@ -158,40 +158,46 @@ class AFK(object):
     def teleport(self, x, y, z, eyeangle0=0, eyeangle1=0):
         '''
         Teleport the player.
-        
+
         Recalculates the player's location automatically for the scripter.
         '''
         # Make sure player is on a team
         if isSpectator(self.userid):
-            raise ValueError('Unable to teleport player (%s): not on a team.' % self.userid)
-        
+            raise ValueError('Unable to teleport player (%s): not on a team.'
+                %self.userid)
+
         # Make sure the player is alive
         if isDead(self.userid):
-            raise ValueError('Unable to teleport player (%s): not alive.' % self.userid)
-        
+            raise ValueError('Unable to teleport player (%s): not alive.'
+                %self.userid)
+
         # Set position
         es.server.queuecmd('es_xsetpos %d %s %s %s' % (self.userid, x, y, z))
-        
+
         # Set eye angles
         if eyeangle0 != 0 or eyeangle1 != 0:
-            es.server.queuecmd('es_xsetang %d %s %s' % (self.userid, eyeangle0, eyeangle1))
-        
+            es.server.queuecmd('es_xsetang %d %s %s' %(self.userid, eyeangle0,
+                                                       eyeangle1))
+
         # Reset player AFK calculation
         gamethread.delayed(0.1, self.reset, ())
-        
+
     def eyeangles(self, eyeAngle0=0, eyeAngle1=0):
         '''Sets a players view angle.'''
         # Make sure player is on a team
         if isSpectator(self.userid):
-            raise ValueError('Unable to set player angles (%s): not on a team' % self.userid)
-        
+            raise ValueError('Unable to set player angles (%s): not on a team'
+                %self.userid)
+
         # Make sure player is alive
         if isDead(self.userid):
-            raise ValueError('Unable to set player angles (%s): not alive.' % self.userid)
-        
+            raise ValueError('Unable to set player angles (%s): not alive.'
+                %self.userid)
+
         # Set angles
-        es.server.queuecmd('es_xsetang %d %s %s' % (self.userid, eyeangle0, eyeangle1))
-        
+        es.server.queuecmd('es_xsetang %d %s %s' %(self.userid, eyeangle0,
+                                                   eyeangle1))
+
         # Reset player AFK calculation
         gamethread.delayed(0.1, self.reset, ())
 
@@ -218,7 +224,7 @@ class BasePlayer(object):
         # First, we execute the custom attribute callbacks
         if name in setHooks:
             setHooks[name][0](name, value)
-            
+
         # Set the attribute value
         object.__setattr__(self, name, value)
 
@@ -299,7 +305,7 @@ class BasePlayer(object):
         # Get the attacker's Player() instance
         if attacker:
             attacker = Player(attacker)
-            
+
         # Use the EventManager to call the gg_leveldown event
         EventManager().gg_leveldown(self, levelsTaken, attacker, reason)
 
@@ -308,18 +314,21 @@ class BasePlayer(object):
 
     def saytext2(self, index, string, tokens={}, prefix=False):
         __messages__.saytext2(self.userid, index, string, tokens, prefix)
-        
+
     def centermsg(self, string, tokens={}):
         __messages__.centermsg(self.userid, string, tokens)
-        
+
     def hudhint(self, string, tokens={}):
         __messages__.hudhint(self.userid, string, tokens)
-        
+
     def toptext(self, duration, color, string, tokens={}):
         __messages__.toptext(self.userid, duration, color, string, tokens)
-        
+
     def echo(self, level, string, tokens={}, prefix=False):
         __messages__.echo(self.userid, level, string, tokens, prefix)
+
+    def langstring(self, string, tokens={}, prefix=False):
+        __messages__.langstring(self.userid, string, tokens, prefix)
 
     def getWeapon(self):
         return getLevelWeapon(self.level)

@@ -26,6 +26,9 @@ def toptext(filter, duration, color, string, tokens={}):
 def echo(filter, level, string, tokens={}, prefix=False):
     __messages__.echo(filter, level, string, tokens, prefix)
     
+def langstring(userid, string, tokens={}, prefix=False):
+    __messages__.langstring(userid, string, tokens, prefix)
+    
 def loadTranslation(name, addon):
     __messages__.load(name, addon)
 

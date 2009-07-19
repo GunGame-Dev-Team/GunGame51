@@ -35,6 +35,13 @@ info.translations = ['gg_multi_level']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
+# Get the es.ServerVar() instance of "gg_multi_level"
+gg_multi_level = es.ServerVar("gg_multi_level")
+# Get the es.ServerVar() instance of "gg_multi_level_gravity"
+gg_multi_level_gravity = es.ServerVar("gg_multi_level_gravity")
+# Get the es.ServerVar() instance of "eventscripts_lastgive"
+eventscripts_lastgive = es.ServerVar("eventscripts_lastgive")
+
 multiLevelSound = "null.wav"
 list_currentMultiLevel = []
 
@@ -224,8 +231,8 @@ def round_start(event_var):
     # For all players
     for userid in es.getUseridList():
         # Make sure they 
-        user = Player(userid)
-        user.multiLevels = 0
+        Player(userid).multiLevels = 0
+        
         if userid in list_currentMultiLevel:
             # Cancel the gamethread
             gamethread.cancelDelayed("%i_multilevel" % userid)
@@ -254,11 +261,11 @@ def gg_levelup(event_var):
         return
 
     # Increment multi-kills for attacker
-    attacker = Player(attacker)
-    attacker.multiLevels += 1
+    ggPlayer = Player(attacker)
+    ggPlayer.multiLevels += 1
 
     # Is it greater than or equal to our threshold?
-    if attacker.multiLevels >= int(es.ServerVar("gg_multi_level")):
+    if ggPlayer.multiLevels >= int(gg_multi_level):
         # If they currently have the bonus
         if attacker in list_currentMultiLevel:
             # Cancel the gamethread
@@ -274,7 +281,7 @@ def gg_levelup(event_var):
         list_currentMultiLevel.append(attacker)
 
         # Reset their kills
-        attacker.multiLevels = 0
+        ggPlayer.multiLevels = 0
 
         # Remove multilevel in 10
         gamethread.delayedname(10, "%i_multilevel" % attacker, removeMultiLevel, attacker)
@@ -302,26 +309,25 @@ def doMultiLevel(userid):
         cmd += 'es_xfire %s env_spark SetParent !activator;' %userid
         cmd += 'es_xfire %s env_spark AddOutput "spawnflags 896";' %userid
         cmd += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' %userid
-        cmd += 'es_xfire %s env_spark AddOutput "magnitude 8"; ' %userid
+        cmd += 'es_xfire %s env_spark AddOutput "magnitude 8";' %userid
         cmd += 'es_xfire %s env_spark AddOutput "traillength 3";' %userid
         cmd += 'es_xfire %s env_spark StartSpark' %userid
-        es.server.cmd(cmd)
+        es.server.queuecmd(cmd)
 
         # Grab it's index
-        spark_index = int(es.ServerVar("eventscripts_lastgive"))
+        spark_index = int(eventscripts_lastgive)
 
         # Create player_speedmod
         cmdFormat = 'es_xgive %i player_speedmod; ' %userid
         cmdFormat += 'es_xfire %i player_speedmod ModifySpeed 1.5; ' %userid
-        es.server.cmd(cmdFormat)
+        es.server.queuecmd(cmdFormat)
 
         # If gg_multi_level_gravity is enabled, ajust the player's gravity
-        gg_multi_level_gravity = es.ServerVar('gg_multi_level_gravity')
-        if gg_multi_level_gravity != 100 and gg_multi_level_gravity >= 0:
+        if int(gg_multi_level_gravity) != 100 and int(gg_multi_level_gravity) >= 0:
             gravity.addGravityChange(userid, int(gg_multi_level_gravity) * 0.01)
 
         # Grab it's index
-        speedmod_index = int(es.ServerVar("eventscripts_lastgive"))
+        speedmod_index = int(eventscripts_lastgive)
 
         # Append it to this player's list
         if spark_index:

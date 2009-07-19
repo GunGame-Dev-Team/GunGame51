@@ -136,14 +136,14 @@ def load():
     # AFK Rounds Punishment
     config.text('')
     config.text('='*76)
-    config.text('>> AFK ROUNDS PUNISHMENT ACTION')
+    config.text('>> AFK PUNISHMENT')
     config.text('='*76)
     config.text('Options:')
     config.text('   0 = No punishment.')
     config.text('   1 = Kick the player.')
     config.text('   2 = Move the player to spectator.')
     config.text('Default Value: 0')
-    config.cvar('gg_afk_action', 0, 'The punishment for players who are AFK ' +
+    config.cvar('gg_afk_punish', 0, 'The punishment for players who are AFK ' +
                 'longer than "gg_afk_rounds".')
 
     # Suicide Punishment
