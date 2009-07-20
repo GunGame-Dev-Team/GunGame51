@@ -69,6 +69,9 @@ gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
 sv_alltalk = es.ServerVar('sv_alltalk')
 gg_win_alltalk = es.ServerVar('gg_win_alltalk')
+gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
+gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
+gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -320,30 +323,45 @@ def player_death(event_var):
     # =========================================================================
     if (event_var['es_userteam'] == event_var['es_attackerteam']):
         return
-        
+
     # =========================================================================
     # >> NORMAL KILL
     # =========================================================================
     # Check the weapon was correct
     if event_var['weapon'] != ggAttacker.weapon:
         return
-    
-    '''
+
     # =========================================================================
     # AFK CHECK
     # =========================================================================
     # Don't continue if the victim is AFK
-    if int(gg_allow_afk_levels):
-        if es.isbot(userid):
-            return
+    if not int(gg_allow_afk_levels):
+        # Make sure the victim is not a bot
+        if not es.isbot(userid):
+            if ggVictim.afk():
+                # Is their weapon an hegrenade and do we allow AFK leveling?
+                if ggAttacker.weapon == 'hegrenade' and \
+                    int(gg_allow_afk_levels_nade):
+                        # Pass if we are allowing AFK leveling on hegrenade level
+                        pass
 
-        if ggVictim.afk():
-            # Tell the attacker they were AFK
-            ggAttacker.hudhint('PlayerAFK', {'player': event_var['es_username']})
+                # Is their weapon a knife and do we allow AFK leveling?
+                elif ggAttacker.weapon == 'knife' and \
+                    int(gg_allow_afk_levels_knife):
+                        # Pass if we are allowing AFK leveling on knife level
+                        pass
 
-            return
-    '''
-    
+                # None of the above checks apply --- continue with hudhint
+                else:
+                    # Make sure the attacker is not a bot
+                    if es.isbot(attacker):
+                        return
+
+                    # Tell the attacker they victim was AFK
+                    ggAttacker.hudhint('PlayerAFK', {'player':
+                                                     event_var['es_username']})
+                    return
+
     # =========================================================================
     # MULTIKILL CHECK
     # =========================================================================

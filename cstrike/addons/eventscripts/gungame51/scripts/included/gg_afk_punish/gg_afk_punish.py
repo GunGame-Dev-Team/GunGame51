@@ -12,6 +12,7 @@ $LastChangedDate$
 # Eventscripts Imports
 import es
 import popuplib
+from playerlib import getUseridList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -21,10 +22,11 @@ from gungame51.core.players.shortcuts import Player
 # >> ADDON REGISTRATION/INFORMATION
 # ============================================================================
 info = AddonInfo()
-info.name = 'gg_dead_strip'
-info.title = 'GG Dead Strip' 
+info.name = 'gg_afk_punish'
+info.title = 'GG AFK Punish' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_afk_punish']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -83,7 +85,7 @@ def round_end(event_var):
         return
     
     # Now, we will loop through the userid list and run the AFK Punishment Checks on them
-    for userid in playerlib.getUseridList('#alive,#human'):
+    for userid in getUseridList('#alive,#human'):
         # See if the player was AFK
         if Player(userid).afk():
             # Check AFK punishment
@@ -106,22 +108,19 @@ def afkPunishCheck(userid):
 def punish(userid):
     ggPlayer = Player(userid)
     
-    # Kick the player
+    # Kick Punishment
     if int(gg_afk_punish) == 1:
-        es.server.queuecmd('kickid %d "%s"' %(userid,
-            ggPlayer.langstring('KickedForAFK'))
+        es.server.queuecmd('kickid %d %s' %(userid,
+                           ggPlayer.langstring('KickedForAFK')))
 
+    # Spectate Punishment
     elif int(gg_afk_punish) == 2:
         # Send them to spectator
         es.server.queuecmd('es_xfire %d !self SetTeam 1' %userid)
 
         # Send a popup saying they were switched
-        popuplib.quicksend(0, userid, ggPlayer.langstring('SwitchedToSpectator'))
-        '''
-        menu = popuplib.create('gungame_afk')
-        menu.addline(ggPlayer.langstring('SwitchedToSpectator'))
-        menu.send(userid)
-        '''
+        popuplib.quicksend(0, userid,
+                           ggPlayer.langstring('SwitchedToSpectator'))
 
     # Reset the AFK rounds back to 0
     ggPlayer.afk.rounds = 0

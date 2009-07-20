@@ -328,7 +328,7 @@ class BasePlayer(object):
         __messages__.echo(self.userid, level, string, tokens, prefix)
 
     def langstring(self, string, tokens={}, prefix=False):
-        __messages__.langstring(self.userid, string, tokens, prefix)
+        return __messages__.langstring(self.userid, string, tokens, prefix)
 
     def getWeapon(self):
         return getLevelWeapon(self.level)
@@ -478,6 +478,9 @@ class PlayerDict(dict):
 
                         # Set the BasePlayer() instance userid to the current
                         self[userid].userid = userid
+
+                        # Set the BasePlayer() .AFK() instance userid
+                        self[userid].afk.userid = userid
 
                         break
 

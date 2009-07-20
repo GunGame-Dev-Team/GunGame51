@@ -384,15 +384,13 @@ class MessageManager(object):
                 usermsg.echo(userid, '%s%s' %(prefix,
                     self.__cleanString(self.__formatString(string, tokens, userid))))
 
-    def langstring(self, userid=0, string, tokens={}, prefix=False):
+    def langstring(self, userid=0, string='', tokens={}, prefix=False):
         # Format the message with the prefix if needed
         prefix = self.__formatPrefix(prefix, string)
 
-        # Get clean string
-        string = self.__cleanString(string)
-
         # Return the formatted language string
-        return '%s%s' %(prefix, self.__formatString(string, tokens, userid))
+        return '%s%s' %(prefix, self.__cleanString(self.__formatString(string,
+            tokens, userid)))
 
 
 __messages__ = MessageManager()
