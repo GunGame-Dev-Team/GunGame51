@@ -189,7 +189,7 @@ def initialize():
 # ============================================================================
 def es_map_start(event_var):
     # Load custom GunGame events
-    es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    es.loadevents('addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
     # Execute GunGame's autoexec.cfg
     es.delayed('1', 'exec gungame51/gg_server.cfg')

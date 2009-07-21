@@ -82,6 +82,9 @@ def addonExists(name):
     '''
     return AddonManager.addonExists(name)
 
+def getLoadedAddonList():
+    return AddonManager.getAddonInfo().keys()
+
 # These are only here temporarily. Do not use them in scripts.
 def loadAddon(name):
    '''
