@@ -30,7 +30,7 @@ info.version = '0.1'
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
+# Get the es.ServerVar() instance of "gg_dissolver"
 gg_dissolver = es.ServerVar("gg_dissolver")
 
 # ============================================================================
@@ -38,54 +38,56 @@ gg_dissolver = es.ServerVar("gg_dissolver")
 # ============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-    
+
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
 def round_start(event_var):
-    
     setupDissolver()
 
 def player_death(event_var):
-
-    # Get userid
-    userid = int(event_var['userid'])
-
     # Dissolve ragdoll
-    dissolveRagdoll(userid)
+    dissolveRagdoll(event_var['userid'])
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-
 def setupDissolver():
-    
     # Get a userid
     userid = es.getuserid()
-    
+
     #Give the dissolver entity and set some keyvalues
-    cmdFormat = 'es_xgive %s env_entity_dissolver; ' % userid
-    cmdFormat += 'es_xfire %s env_entity_dissolver AddOutput "target cs_ragdoll"; ' % userid
-    cmdFormat += 'es_xfire %s env_entity_dissolver AddOutput "magnitude 1"; ' % userid
-    es.server.queuecmd(cmdFormat)
+    cmd = 'es_xgive %s env_entity_dissolver;' %userid + \
+          'es_xfire %s env_entity_dissolver ' %userid + \
+          'AddOutput "target cs_ragdoll";' + \
+          'es_xfire %s env_entity_dissolver AddOutput "magnitude 1"' %userid
+
+    # Run the command
+    es.server.queuecmd(cmd)
 
 def dissolveRagdoll(userid):
-
     # Get dissolver effect
     effect = int(gg_dissolver)
 
     # Just remove the ragdoll?
     if effect == 1:
-        es.delayed('2', 'es_xfire %s cs_ragdoll Kill' % userid)
+        es.delayed(2, 'es_xfire %s cs_ragdoll Kill' %userid)
+
+        return
+
+    # Check to see what effect to use and set up the command
+    if effect == 6:
+        cmd = 'es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' \
+            %(userid, random.randint(0, 3))
     else:
-        # Check to see what effect to use
-        if effect == 5:
-            es.server.queuecmd('es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' % (userid, random.randint(0, 3)))
-        else:
-            es.server.queuecmd('es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' % (userid, int(effect) - 2))
-        
-        # Dissolve the ragdoll then kill the dissolver
-        es.delayed('0.01', 'es_xfire %s env_entity_dissolver Dissolve' % userid)
+        cmd = 'es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' \
+            %(userid, int(effect) - 2)
+
+    # Run the command
+    es.server.queuecmd(cmd)
+
+    # Dissolve the ragdoll then kill the dissolver
+    es.delayed('0.01', 'es_xfire %s env_entity_dissolver Dissolve' %userid)

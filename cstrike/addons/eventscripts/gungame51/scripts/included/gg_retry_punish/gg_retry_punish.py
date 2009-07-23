@@ -9,9 +9,6 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
 
@@ -56,10 +53,11 @@ def es_map_start(event_var):
     dict_savedLevels.clear()
 
 def player_activate(event_var):
-    userid = int(event_var['userid'])
+    # Get the Player() object
+    ggPlayer = Player(event_var['userid'])
 
     # Get the player's uniqueid
-    steamid = Player(userid).steamid
+    steamid = ggPlayer.steamid
 
     # We don't want this to happen for BOTs
     if 'BOT' in steamid:
@@ -70,23 +68,24 @@ def player_activate(event_var):
         return
 
     # Reset level
-    Player(userid).level = dict_savedLevels[steamid]
+    ggPlayer.level = dict_savedLevels[steamid]
 
     # Delete the saved level
     del dict_savedLevels[steamid]
 
 def player_disconnect(event_var):
-    userid = int(event_var['userid'])
+    # Get the Player() object
+    ggPlayer = Player(event_var['userid'])
 
     # Get the player's uniqueid
-    steamid = Player(userid).steamid
+    steamid = ggPlayer.steamid
 
     # Don't save level
     if 'BOT' in steamid:
         return
 
     # Set reconnect level
-    reconnectLevel = Player(userid).level - int(gg_retry_punish)
+    reconnectLevel = ggPlayer.level - int(gg_retry_punish)
 
     if reconnectLevel > 0:
         dict_savedLevels[steamid] = reconnectLevel

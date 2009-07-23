@@ -12,7 +12,7 @@ $LastChangedDate$
 # Eventscripts Imports
 import es
 import gamethread
-import playerlib
+from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -181,11 +181,11 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def player_activate(event_var):
-    userid = int(event_var['userid'])
+    ggPlayer = Player(event_var['userid'])
     
     # Add the player's multikill attribute
-    Player(userid).multiLevels = 0
-    Player(userid).multiLevelEntities = []
+    ggPlayer.multiLevels = 0
+    ggPlayer.multiLevelEntities = []
 
 def player_disconnect(event_var):
     # Get event information
@@ -226,8 +226,6 @@ def player_spawn(event_var):
         removeMultiLevel(userid)
 
 def round_start(event_var):
-    global list_currentMultiLevel
-
     # For all players
     for userid in es.getUseridList():
         # Make sure they 
@@ -241,7 +239,7 @@ def round_start(event_var):
             removeMultiLevel(userid)
 
     # Clear the list of players currently multi-leveling
-    list_currentMultiLevel = []
+    del list_currentMultiLevel[:]
 
 def gg_levelup(event_var):
     # Get event information
@@ -318,9 +316,9 @@ def doMultiLevel(userid):
         spark_index = int(eventscripts_lastgive)
 
         # Create player_speedmod
-        cmdFormat = 'es_xgive %i player_speedmod; ' %userid
-        cmdFormat += 'es_xfire %i player_speedmod ModifySpeed 1.5; ' %userid
-        es.server.queuecmd(cmdFormat)
+        cmd = 'es_xgive %i player_speedmod; ' %userid
+        cmd += 'es_xfire %i player_speedmod ModifySpeed 1.5; ' %userid
+        es.server.queuecmd(cmd)
 
         # If gg_multi_level_gravity is enabled, ajust the player's gravity
         if int(gg_multi_level_gravity) != 100 and int(gg_multi_level_gravity) >= 0:
@@ -347,12 +345,15 @@ def removeMultiLevel(userid):
     if es.exists('userid', userid):
 
         # Reset player speed and gravity (yes, I know this is the lame way but hey ;D
-        playerlib.getPlayer(userid).set('speed', 1.0)
+        getPlayer(userid).set('speed', 1.0)
         gravity.removeGravityChange(userid)
 
+        # Get the Player() object
+        ggPlayer = Player(userid)
+
         # Remove the ent indexes
-        while Player(userid).multiLevelEntities:
-            ind = Player(userid).multiLevelEntities.pop()
+        while ggPlayer.multiLevelEntities:
+            ind = ggPlayer.multiLevelEntities.pop()
 
             # Create entitylists for the speed and sparks
             validIndexes = es.createentitylist('player_speedmod')

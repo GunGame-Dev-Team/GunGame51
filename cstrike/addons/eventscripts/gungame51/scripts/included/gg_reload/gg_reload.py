@@ -9,9 +9,6 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
 from weaponlib import getWeapon
@@ -42,7 +39,6 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-
 def player_death(event_var):
     # Get the userids of the attacker and victim
     attacker = int(event_var['attacker'])

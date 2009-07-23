@@ -24,6 +24,7 @@ info.name = 'gg_suicide_punish'
 info.title = 'GG Suicide Punish' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_suicide_punish']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -36,7 +37,7 @@ gg_suicide_punish = es.ServerVar('gg_suicide_punish')
 # ============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
@@ -50,23 +51,23 @@ def player_death(event_var):
     # Set player ids
     userid = int(event_var['userid'])
     attacker = int(event_var['attacker'])
-    
+
     # Is the attacker on the server?
     if not es.exists('userid', attacker):
         return
-    
+
     # If the attacker is not "world or the userid of the victim, it is not a suicide
     if not ((attacker == 0) or (attacker == userid)):
         return
-        
+
     # Get victim object
     ggVictim = Player(userid)
-    
+
     # Trigger level down
     ggVictim.leveldown(int(gg_suicide_punish), userid, 'suicide')
-        
+
     # Message
     ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level}, prefix='gg_suicide_punish')
-        
+
     # Play the leveldown sound
     #gungamelib.playSound(userid, 'leveldown')

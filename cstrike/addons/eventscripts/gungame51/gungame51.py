@@ -238,7 +238,7 @@ def round_start(event_var):
     # =========================================================================
     # Disable Buyzones
     # =========================================================================
-    es.server.cmd('es_xfire %d func_buyzone Disable' %userid)
+    es.server.queuecmd('es_xfire %d func_buyzone Disable' %userid)
 
     # =========================================================================
     # Remove weapons from the map
@@ -255,25 +255,12 @@ def round_start(event_var):
             es.server.queuecmd('es_xfire %d weapon_%s kill' % (userid, weapon))
     else:
         es.server.queuecmd('es_xfire %d weapon_* kill' %userid)
-    
+
     # =========================================================================
     # Equip players with a knife and possibly item_kevalr or item_assaultsuit
     # =========================================================================
     equipPlayer()
-    
-    '''
-    if int(es.ServerVar('gg_leaderweapon_warning')):
-        leaderWeapon = gungamelib.getLevelWeapon(gungamelib.leaders.getLeaderLevel())
-        
-        # Play knife sound
-        if leaderWeapon == 'knife':
-            gungamelib.playSound('#human', 'knifelevel')
-        
-        # Play nade sound
-        if leaderWeapon == 'hegrenade':
-            gungamelib.playSound('#human', 'nadelevel')
-    '''
-    
+
 def player_spawn(event_var):
     userid = event_var['userid']
     
@@ -467,18 +454,6 @@ def gg_levelup(event_var):
     # ===============
     # Get attacker info
     ggPlayer = Player(event_var['attacker'])
-    
-    '''
-    STILL HAVE TO FIGURE OUT HOW TO IMPLEMENT SOUNDS
-    
-    # Player on knife level?
-    if ggPlayer.weapon == 'knife':
-        gungamelib.playSound('#human', 'knifelevel')
-    
-    # Player on nade level?
-    if ggPlayer.weapon == 'hegrenade':
-        gungamelib.playSound('#human', 'nadelevel')
-    '''
     
     '''
     WILL ADD THIS A LITTLE LATER -- I HAVE TO FIGURE OUT THE DEAL WITH THE

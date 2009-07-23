@@ -9,15 +9,13 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.weapons.shortcuts import getTotalLevels
 from gungame51.core.messaging.shortcuts import msg
 
 # ============================================================================
@@ -33,15 +31,13 @@ info.translations = ['gg_friendlyfire']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
+# Get the es.ServerVar() instance of "gg_friendlyfire"
 gg_friendlyfire = es.ServerVar('gg_friendlyfire')
+# Get the es.ServerVar() instance of "mp_friendlyfire"
 mp_friendlyfire = es.ServerVar('mp_friendlyfire')
+
+# Backup the value of "mp_friendlyfire"
 oldFriendlyFire = int(mp_friendlyfire)
-
-# ============================================================================
-# >> CLASSES
-# ============================================================================
-
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -58,32 +54,29 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-
 def es_map_start(event_var):
     # Set mp_friendlyfire to 0
     mp_friendlyfire.set(0)
-    
+
 def gg_start(event_var):
     # Set mp_friendlyfire to 0
     mp_friendlyfire.set(0)
 
 def gg_levelup(event_var):
     # Get activation level
-    activateLevel = gungamelib.getTotalLevels()+1 - int(gg_friendlyfire)
-    
+    activateLevel = (getTotalLevels() + 1) - int(gg_friendlyfire)
+
     # If the Leader is on the friendlyfire level?
     if getLeaderLevel() >= activateLevel:
         # Check whether mp_friendlyfire is enabled
         if int(mp_friendlyfire) == 0:
             # Set mp_friendlyfire to 1
             mp_friendlyfire.set(1)
-            
-            msg('#all', 'WatchYourFire', prefix=True)
+
+            # Send the message
+            msg('#human', 'WatchYourFire', prefix=True)
+
             '''
             # Show message and sound
             gungamelib.playSound('#all', 'friendlyfire')
             '''
-
-# ============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
