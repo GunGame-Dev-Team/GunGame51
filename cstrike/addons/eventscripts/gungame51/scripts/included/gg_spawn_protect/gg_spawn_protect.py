@@ -58,7 +58,7 @@ protectedList = []
 def load():
     global noisySave
 
-    if cancelonfire:
+    if gg_spawn_protect_cancelonfire:
         noisySave = int(eventscripts_noisy)
         eventscripts_noisy.set(1)
 
