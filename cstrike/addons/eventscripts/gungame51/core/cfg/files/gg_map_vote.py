@@ -31,9 +31,20 @@ def load():
     config.text('')
     config.text('')
     
-    config.write()
-    es.dbgmsg(0, '\tgg_map_vote.cfg')
-    
+    # Error Logging
+    config.text('='*76)
+    config.text('>> GG MAP VOTE')
+    config.text('='*76)
+    config.text('Description:')
+
+    config.text('Notes:')
+
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not use voting.')
+    config.text('   1 = (Enabled) Use GunGame\'s map voting system.')
+    config.text('   2 = (Enabled) Use a 3rd-party voting system.')
+    config.text('Default Value: 0')
+    config.cvar('gg_map_vote', 0, 'Controls GunGame\'s map voting.')
 '''
 //----------------------------------------------------------------------------
 // gg_map_vote.cfg -- Holds map voting options.
@@ -164,3 +175,5 @@ gg_show_player_vote 1
 
 gg_vote_bots_vote 0
 '''
+    config.write()
+    es.dbgmsg(0, '\tgg_map_vote.cfg')
