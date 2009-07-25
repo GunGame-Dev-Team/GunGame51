@@ -45,6 +45,19 @@ def load():
     config.text('   2 = (Enabled) Use a 3rd-party voting system.')
     config.text('Default Value: 0')
     config.cvar('gg_map_vote', 0, 'Controls GunGame\'s map voting.')
+    
+    config.write()
+    es.dbgmsg(0, '\tgg_map_vote.cfg')
+    
+def unload():
+    global config
+    
+    # Remove the "notify" flags as set by addFlag('notify')
+    for cvar in config.getCvars().keys():
+        es.flags('remove', 'notify', cvar)
+    
+    # Delete the cfglib.AddonCFG instance
+    del config
 '''
 //----------------------------------------------------------------------------
 // gg_map_vote.cfg -- Holds map voting options.
@@ -175,5 +188,3 @@ gg_show_player_vote 1
 
 gg_vote_bots_vote 0
 '''
-    config.write()
-    es.dbgmsg(0, '\tgg_map_vote.cfg')
