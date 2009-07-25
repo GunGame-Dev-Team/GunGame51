@@ -11,7 +11,8 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
-import playerlib
+import gamethread
+from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -63,18 +64,17 @@ def player_death(event_var):
             return 
 
         # Are we in warmup?
-        if int(gg_warmup_round) > 0:
-            return
+        # ------------- ADD WARMUP CODE HERE! --------------
 
         # Give them another grenade
-        giveGrenade(attacker)
+        gamethread.delayed(0.08, giveGrenade, (attacker))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def giveGrenade(userid):
     # Does this player already have a grenade?
-    if int(playerlib.getPlayer(userid).get('he')) != 0:
+    if int(getPlayer(userid).get('he')) != 0:
         # Don't give them one, return
         return
 
