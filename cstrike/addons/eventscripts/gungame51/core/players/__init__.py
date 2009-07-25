@@ -363,7 +363,7 @@ class BasePlayer(object):
                 pWeapon = pPlayer.getPrimary()
                 
                 # Strip primary weapon
-                if pWeapon and str(pWeapon)[7:] != self.weapon:
+                if pWeapon:
                     es.remove(pPlayer.getWeaponIndex(pWeapon))
             
             # Is the weapon a secondary weapon?
@@ -373,15 +373,19 @@ class BasePlayer(object):
                 sWeapon = pPlayer.getSecondary()
 
                 # Strip secondary weapon 
-                if sWeapon and str(sWeapon)[7:] != self.weapon:
+                if sWeapon:
                     es.remove(pPlayer.getWeaponIndex(sWeapon))
 
         # Give the player their weapon if it is not a knife
         if self.weapon != 'knife':
-        
-            # Give new weapon
-            es.give(self.userid, 'weapon_%s' %self.weapon)
             
+            # Register weaponCheck to ensure that the correct weapon was received
+            es.addons.registerForEvent(self, 'item_pickup', self.weaponCheck)
+            
+            # Give new weapon
+            gamethread.delayed(0, es.give, (self.userid, 'weapon_%s' %self.weapon))
+            
+            #gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
         # If the weapon is a knife or hegrenade, strip
         if self.weapon in ['knife', 'hegrenade']:
             self.strip()
@@ -389,6 +393,31 @@ class BasePlayer(object):
         # Make them use the new weapon via es_xsexec
         # We use this because es.sexec is too fast in some cases.
         es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
+    
+    def weaponCheck(self, event_var):
+        '''
+        Ensures the correct weapon is received, and if not, repeats giveWeapon
+        '''
+        item = event_var['item']
+        
+        # Unregister weaponCheck, since we already caught the pickup
+        gamethread.delayed(0, es.addons.unregisterForEvent, (self, 'item_pickup'))
+
+        # If the item picked up is the item you want, or a knife, return
+        if event_var['item'] in [self.weapon, 'knife']:
+            return
+
+        # Format the item picked up, and the weapon the player is on
+        weapon = 'weapon_%s' % item
+        levelWeapon = 'weapon_%s' % self.weapon
+
+        # Make sure that we only repeat giveWeapon if the item picked up
+        # Is taking up the slot we need to receive our weapon in
+        if ((weapon in list_pWeapons and levelWeapon in list_pWeapons) or \
+           (weapon in list_sWeapons and levelWeapon in list_sWeapons)):
+
+            # Repeat giveWeapon to re-strip the slot and give your weapon
+            self.giveWeapon()
 
     def give(self, weapon, useWeapon=0):
         '''
@@ -424,14 +453,14 @@ class BasePlayer(object):
         '''
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
-        
+
         for weapon in pPlayer.getWeaponList():
             if 'weapon_%s' %self.weapon == weapon or weapon == 'weapon_knife':
                 continue
-                
+
             # Remove the weapon
             es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
-    
+
     def respawn(self):
         '''
         Respawns the player.
