@@ -223,6 +223,8 @@ def player_spawn(event_var):
 
     # Reset gravity if it is on after a map change
     if userid in gravity.gravityList:
+        gamethread.cancelDelayed("%i_multilevel" % userid)
+        
         removeMultiLevel(userid)
 
 def round_start(event_var):
@@ -310,7 +312,7 @@ def doMultiLevel(userid):
         cmd += 'es_xfire %s env_spark AddOutput "magnitude 8";' %userid
         cmd += 'es_xfire %s env_spark AddOutput "traillength 3";' %userid
         cmd += 'es_xfire %s env_spark StartSpark' %userid
-        es.server.queuecmd(cmd)
+        es.server.cmd(cmd)
 
         # Grab it's index
         spark_index = int(eventscripts_lastgive)
@@ -318,7 +320,7 @@ def doMultiLevel(userid):
         # Create player_speedmod
         cmd = 'es_xgive %i player_speedmod; ' %userid
         cmd += 'es_xfire %i player_speedmod ModifySpeed 1.5; ' %userid
-        es.server.queuecmd(cmd)
+        es.server.cmd(cmd)
 
         # If gg_multi_level_gravity is enabled, ajust the player's gravity
         if int(gg_multi_level_gravity) != 100 and int(gg_multi_level_gravity) >= 0:
