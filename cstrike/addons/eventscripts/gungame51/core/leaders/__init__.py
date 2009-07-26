@@ -118,7 +118,7 @@ class LeaderManager(object):
             * Fires the GunGame event "gg_new_leader".
         '''
         # Make sure that the player's level is higher than the leader level
-        if not Player(userid).level > self.leaderlevel:
+        if not Player(userid).level >= self.leaderlevel:
             raise ValueError('Unable to set "%s" as a new leader. '
                 %userid + 'The leader level "%s" is higher than '
                 %self.leaderlevel + 'the player\'s level "%s".'

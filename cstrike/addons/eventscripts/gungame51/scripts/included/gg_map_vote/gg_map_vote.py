@@ -65,7 +65,7 @@ eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 
 # TEMP TEMP TEMP TEMP TEMP
 gg_map_vote_file.set('cfg/gungame51/gg_maplist.txt')
-gg_map_vote.set(1)
+#gg_map_vote.set(1)
 gg_map_vote_size.set(4)
 gg_map_vote_dont_show_last_maps.set(4)
 gg_map_vote_time.set(30)
