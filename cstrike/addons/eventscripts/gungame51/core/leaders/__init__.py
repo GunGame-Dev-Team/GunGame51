@@ -175,7 +175,7 @@ class LeaderManager(object):
         Resets the LeaderManager for a clean start of GunGame.
         '''
         # Call the __init__ to reset the LeaderManager instance
-        super(LeaderManager, self).__init__()
+        self.__init__()
 
     def cleanup(self, listname):
         '''
