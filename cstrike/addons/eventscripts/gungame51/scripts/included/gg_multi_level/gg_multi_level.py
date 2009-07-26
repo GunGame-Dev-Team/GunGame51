@@ -217,15 +217,14 @@ def player_death(event_var):
         # Remove bonus effects
         removeMultiLevel(userid)
 
-def player_spawn(event_var):
-    # Get event information
-    userid = int(event_var['userid'])
-
-    # Reset gravity if it is on after a map change
-    if userid in gravity.gravityList:
+def es_map_start(event_var):
+    # For all players
+    for userid in list_currentMultiLevel:
+        # Cancel the gamethread
         gamethread.cancelDelayed("%i_multilevel" % userid)
         
-        removeMultiLevel(userid)
+        # Remove them from the gravity class
+        gravity.removeGravityChange(userid)
 
 def round_start(event_var):
     # For all players
