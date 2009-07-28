@@ -28,7 +28,10 @@ info.version = '0.1'
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
+# Get the es.ServerVar() instance of "gg_warmup_round"
 gg_warmup_round = es.ServerVar('gg_warmup_round')
+# Get the es.ServerVar() instance of "gg_tk_punish"
+gg_tk_punish = es.ServerVar('gg_tk_punish')
 
 # ============================================================================
 # >> LOAD & UNLOAD
