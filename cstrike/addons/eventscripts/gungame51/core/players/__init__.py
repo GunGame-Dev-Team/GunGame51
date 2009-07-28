@@ -26,9 +26,10 @@ from gungame51.core.messaging import __messages__
 # ============================================================================
 # >> GLOBALS
 # ============================================================================
-list_pWeapons = getWeaponNameList("#primary")
-list_sWeapons = getWeaponNameList("#secondary")
-respawnCommand = es.ServerVar("gg_respawn_cmd")
+list_pWeapons = getWeaponNameList('#primary')
+list_sWeapons = getWeaponNameList('#secondary')
+eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
+gg_respawn_cmd = es.ServerVar('gg_respawn_cmd')
 
 # ============================================================================
 # >> CLASSES
@@ -346,10 +347,10 @@ class BasePlayer(object):
         if isDead(self.userid):
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not alive.')
-        
+
         # Refresh player weapon
         self.weapon = self.getWeapon()
-        
+
         # Do we want to strip the player's given weapon slot?
         if strip:
         
@@ -358,34 +359,40 @@ class BasePlayer(object):
 
             # Check to see if the weapon is a primary
             if "weapon_%s" %self.weapon in list_pWeapons:
-                 
+
                 # Get primary weapon name
                 pWeapon = pPlayer.getPrimary()
-                
+
                 # Strip primary weapon
                 if pWeapon:
-                    es.remove(pPlayer.getWeaponIndex(pWeapon))
-            
+                    if self.steamid[0:4] != 'BOT_':
+                        es.remove(pPlayer.getWeaponIndex(pWeapon))
+                    else:
+                        es.server.queuecmd('es_xremove %s' % pPlayer.getWeaponIndex(pWeapon))
+
             # Is the weapon a secondary weapon?
             elif "weapon_%s" %self.weapon in list_sWeapons:
-            
+
                 # Get the secondary weapon name
                 sWeapon = pPlayer.getSecondary()
 
-                # Strip secondary weapon 
+                # Strip secondary weapon
                 if sWeapon:
-                    es.remove(pPlayer.getWeaponIndex(sWeapon))
+                    if self.steamid[0:4] != 'BOT_':
+                        es.remove(pPlayer.getWeaponIndex(sWeapon))
+                    else:
+                        es.server.queuecmd('es_xremove %s' % pPlayer.getWeaponIndex(sWeapon))
 
         # Give the player their weapon if it is not a knife
         if self.weapon != 'knife':
             
-            # Register weaponCheck to ensure that the correct weapon was received
-            es.addons.registerForEvent(self, 'item_pickup', self.weaponCheck)
+            # Register wrongWeaponCheck to ensure that the correct weapon was received
+            es.addons.registerForEvent(self, 'item_pickup', self.wrongWeaponCheck)
             
             # Give new weapon
-            gamethread.delayed(0, es.give, (self.userid, 'weapon_%s' %self.weapon))
+            es.server.queuecmd('es_xgive %s %s' % (self.userid, 'weapon_%s' %self.weapon))
             
-            #gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
+            gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
         # If the weapon is a knife or hegrenade, strip
         if self.weapon in ['knife', 'hegrenade']:
             self.strip()
@@ -393,14 +400,59 @@ class BasePlayer(object):
         # Make them use the new weapon via es_xsexec
         # We use this because es.sexec is too fast in some cases.
         es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
+        
+        gamethread.delayed(0.05, self.noWeaponCheck)
     
-    def weaponCheck(self, event_var):
+    def noWeaponCheck(self):
+        # Retrieve a playerlib.Player() instance
+        pPlayer = getPlayer(self.userid)
+        
+        # Store the weapon you are holding in the weapon slot which your level's weapon
+        # should be in
+        if "weapon_%s" %self.weapon in list_pWeapons:
+            weapon = pPlayer.getPrimary()
+            slot = '2'
+        elif "weapon_%s" %self.weapon in list_sWeapons:
+            weapon = pPlayer.getSecondary()
+            slot = '1'
+        else:
+            return
+
+        # If you have a weapon, return
+        if weapon:
+            return
+
+        # Get the index of the last given entity
+        int_lastgive = int(eventscripts_lastgive)
+
+        # Repeat giveWeapon to re-strip the slot and give your weapon
+        self.giveWeapon()
+
+        # If there was no lastgive, return
+        if not int_lastgive:
+            return
+
+        # If the last given entity is held by someone other than you
+        owner = es.getindexprop(int_lastgive, 'CBaseEntity.m_hOwnerEntity')
+        if owner != es.getplayerhandle(self.userid):
+            userid = es.getuserid(owner)
+            es.server.queuecmd('es_xsexec %s "use weapon_%s"' %(userid, Player(userid).weapon))
+            # If the weapon on the ground is the same as the weapon that was dropped
+            if es.createentitylist()[int_lastgive]['classname'] == 'weapon_' + self.weapon:
+                # Remove the weapon
+                es.remove(int_lastgive)
+
+    def wrongWeaponCheck(self, event_var):
         '''
         Ensures the correct weapon is received, and if not, repeats giveWeapon
         '''
         item = event_var['item']
-        
-        # Unregister weaponCheck, since we already caught the pickup
+
+        # If this item_pickup was not for the user we want it to be for, return
+        if not int(event_var['userid']) != self.userid:
+            return
+
+        # Unregister wrongWeaponCheck, since we already caught the pickup
         gamethread.delayed(0, es.addons.unregisterForEvent, (self, 'item_pickup'))
 
         # If the item picked up is the item you want, or a knife, return
@@ -413,11 +465,29 @@ class BasePlayer(object):
 
         # Make sure that we only repeat giveWeapon if the item picked up
         # Is taking up the slot we need to receive our weapon in
-        if ((weapon in list_pWeapons and levelWeapon in list_pWeapons) or \
-           (weapon in list_sWeapons and levelWeapon in list_sWeapons)):
 
-            # Repeat giveWeapon to re-strip the slot and give your weapon
-            self.giveWeapon()
+        if weapon in list_pWeapons and levelWeapon in list_sWeapons:
+            return
+
+        if weapon in list_sWeapons and levelWeapon in list_pWeapons:
+            return
+
+        # Get the index of the last given entity
+        int_lastgive = int(eventscripts_lastgive)
+
+        # Repeat giveWeapon to re-strip the slot and give your weapon
+        self.giveWeapon()
+
+        # If there was no lastgive, return
+        if not int_lastgive:
+            return
+
+        # If the last given entity was the extra weapon on the floor
+        if es.getindexprop(int_lastgive, 'CBaseEntity.m_hOwnerEntity') == -1:
+            # If the weapon on the ground is the same as the weapon that was dropped
+            if es.createentitylist()[int_lastgive]['classname'] == 'weapon_' + self.weapon:
+                # Remove the weapon
+                es.remove(int_lastgive)
 
     def give(self, weapon, useWeapon=0):
         '''
@@ -466,12 +536,12 @@ class BasePlayer(object):
         Respawns the player.
         '''
         # Check if the respawn command requires the "#" symbol
-        if '#' not in str(respawnCommand):
+        if '#' not in str(gg_respawn_cmd):
             # Userids not requiring the "#" symbol
-            es.server.queuecmd('%s %s' % (respawnCommand, self.userid))
+            es.server.queuecmd('%s %s' % (gg_respawn_cmd, self.userid))
         else:
             # SourceMod Workaround
-            es.server.queuecmd('%s%s' % (respawnCommand, self.userid))
+            es.server.queuecmd('%s%s' % (gg_respawn_cmd, self.userid))
 
 class PlayerDict(dict):
     '''
