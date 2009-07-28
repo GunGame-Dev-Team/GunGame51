@@ -13,6 +13,7 @@ $LastChangedDate$
 import es
 
 # GunGame Imports
+from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.leaders.shortcuts import getLeaderLevel
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 
