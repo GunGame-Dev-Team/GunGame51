@@ -403,23 +403,34 @@ def load():
     # =========================================================================
     # SPAWN-RELATED CVARS
     # =========================================================================
+    # Random Spawnpoints
+    config.text('')
+    config.text('='*76)
+    config.text('>> RANDOM SPAWNPOINTS')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
+                'current map has been')
+    config.text('   created.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Do not load gg_random_spawn.')
+    config.text('   1 = (Enabled) Load gg_random_spawn.')
+    config.text('Default Value: 0')
+    config.cvar('gg_random_spawn', 0, 'Enables/Disables random spawn points')
+    
     # Spawnpoint Manager
     config.text('')
     config.text('='*76)
     config.text('>> SPAWNPOINT MANAGER')
     config.text('='*76)
     config.text('Description:')
-    config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
-                'current map has been')
-    config.text('   created.  This addon also adds commands and a menu to ' +
-                'allow admins to')
+    config.text('   This addon adds commands and a menu to allow admins to')
     config.text('   manage spawnpoints on the current map.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_spawnpoints.')
     config.text('   1 = (Enabled) Load gg_spawnpoints.')
     config.text('Default Value: 0')
-    config.cvar('gg_spawnpoints', 0, 'Enables/Disables random spawn points ' +
-                'and spawn point management.')
+    config.cvar('gg_spawnpoints', 0, 'Spawn point management.')
     
     # Spawn Protection
     config.text('')

@@ -74,7 +74,7 @@ def load():
     
     # Respawn all dead players
     for userid in getUseridList('#dead'):
-        repeat.start('gungameRespawnPlayer%s' % userid, 1, spawnDelay)
+        repeat.start('gungameRespawnPlayer%s' % userid, 1, respawnDelay)
     
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)

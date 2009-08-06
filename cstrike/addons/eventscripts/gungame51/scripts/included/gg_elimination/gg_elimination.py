@@ -14,13 +14,14 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
-from playerlib import getPlayer
+from playerlib import getPlayer as plPlayer
+import gamethread
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
-from gungame51.core.players.shortcuts import Player
+from gungame51.core.players.shortcuts import Player as ggPlayer
 from gungame51.core.players.shortcuts import isDead
 from gungame51.core.players.shortcuts import isSpectator
 
@@ -55,7 +56,7 @@ playersEliminated = {}
 def load():
     # Get userids of all connected players
     for userid in es.getUseridList():
-        dict_playersEliminated[str(userid)] = []
+        playersEliminated[str(userid)] = []
     
 # ============================================================================
 # >> GAME EVENTS
@@ -72,11 +73,11 @@ def round_start(event_var):
     global roundActive, currentRound
     
     # Round tracking
-    roundActive = 0
-    currentRound = 0
+    roundActive = 1
+    currentRound = +1
     
     # Reset all eliminated player counters
-    for player in dict_playersEliminated:
+    for player in playersEliminated:
         playersEliminated[player] = []
     
     msg('#all', 'RoundInfo')
@@ -97,7 +98,7 @@ def player_disconnect(event_var):
     # Remove diconnecting player from player dict
     if userid in playersEliminated:
         respawnEliminated(userid, currentRound)
-        del dict_playersEliminated[userid]
+        del playersEliminated[userid]
 
 def player_death(event_var):
     # Check to see if the round is active
@@ -124,8 +125,8 @@ def player_death(event_var):
         playersEliminated[attacker].append(userid)
         
         # Tell them they will respawn when their attacker dies
-        index = gungamelib.getPlayer(attacker)['index']
-        saytext2('gg_elimination', userid, index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']})
+        index = plPlayer(attacker).index
+        saytext2(userid, index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']})
     
     # Check if victim had any Eliminated players
     gamethread.delayed(1, respawnEliminated, (userid, currentRound))
@@ -147,13 +148,13 @@ def respawnPlayer(userid, respawnRound):
     if not isDead(userid) or not isSpectator(userid):
         return
     
-    index = getPlayer(userid).index
+    index = plPlayer(userid).index
     
     # Tell everyone that they are respawning
     saytext2('#all', index, 'RespawningPlayer', {'player': es.getplayername(userid)})
     
     # Respawn player
-    Player(userid).respawn()
+    ggPlayer(userid).respawn()
 
 def respawnEliminated(userid, respawnRound):    
     # Check if round is over
@@ -183,14 +184,14 @@ def respawnEliminated(userid, respawnRound):
             continue
         
         # Respawn player
-        Player(playerid).respawn()
+        ggPlayer(playerid).respawn()
         
         # Add to message format
         players.append('\3%s\1' % es.getplayername(playerid))
         
         # Get index
         if not index:
-            index = getPlayer(userid).index
+            index = plPlayer(userid).index
     
     # Tell everyone that they are respawning
     saytext2('#all', index, 'RespawningPlayer', {'player': ', '.join(players)})

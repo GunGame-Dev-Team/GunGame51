@@ -9,11 +9,14 @@ $LastChangedDate: 2009-06-03 13:08:04 -0400 (Wed, 3 Jun 2009) $
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+#Python Imports
+import es
+
 # Eventscripts Imports
 import os
 
 # GunGame Imports
-import es
+from gungame51.core.addons.shortcuts import AddonInfo
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -30,6 +33,7 @@ info.version = '0.1'
 
 spawnPoints = []
 pointsLoaded = 0
+es_gamedir = es.ServerVar('eventscripts_gamedir')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -45,7 +49,9 @@ def unload():
 # ============================================================================
 
 def es_map_start(event_var):
-
+    global pointsLoaded
+    
+    pointsLoaded = 0
     loadSpawnFile(event_var['mapname'])
 
 def player_activate(event_var):
@@ -65,7 +71,7 @@ def player_activate(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 
-def loadSpawnFire(mapname):
+def loadSpawnFile(mapName):
     global spawnPoints
     global pointsLoaded
     
@@ -73,14 +79,14 @@ def loadSpawnFire(mapname):
     pointsLoaded = 0
     
     # Get spawnpoint file
-    self.spawnFile = '%s/%s/%s.txt' % mapname.replace('\\', '/'), spawnPointDirectory, self.mapName)
+    spawnFile = '%s/cfg/gungame51/spawnpoints/%s.txt' % (str(es_gamedir).replace('\\', '/'), mapName)
     
     # Does the file exist?
-    if not self.exists():
+    if not os.path.isfile(spawnFile):
         return
     
     # Get spawnpoint lines
-    spawnPointFile = open(self.spawnFile, 'r')
+    spawnPointFile = open(spawnFile, 'r')
     fileLines = [x.strip() for x in spawnPointFile.readlines()]
     spawnPointFile.close()
     
@@ -88,7 +94,6 @@ def loadSpawnFire(mapname):
     spawnPoints = [x.split(' ', 6) for x in fileLines]
 
 def loadRandomPoints(userid):
-    
     # Remove existing spawnpoints
     for tSpawn in es.createentitylist('info_player_terrorist'):
         es.server.cmd('es_xremove info_player_terrorist')
