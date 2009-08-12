@@ -22,8 +22,6 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.players.shortcuts import Player as ggPlayer
-from gungame51.core.players.shortcuts import isDead
-from gungame51.core.players.shortcuts import isSpectator
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -145,7 +143,7 @@ def respawnPlayer(userid, respawnRound):
         return
     
     # Make sure the player is respawnable
-    if not isDead(userid) or not isSpectator(userid):
+    if not plPlayer(userid).isdead or not plPlayer(userid).isobserver:
         return
     
     index = plPlayer(userid).index
@@ -180,7 +178,7 @@ def respawnEliminated(userid, respawnRound):
     # Respawn all victims eliminated players
     for playerid in playersEliminated[userid]:
         # Make sure the player exists
-        if not isDead(userid) or not isSpectator(userid):
+        if not plPlayer(userid).isdead or not plPlayer(userid).isobserver:
             continue
         
         # Respawn player

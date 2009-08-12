@@ -15,8 +15,6 @@ from playerlib import getPlayerList
 # GunGame Imports
 from gungame51.core.players import Player
 from gungame51.core.players import players
-from gungame51.core.players import isDead
-from gungame51.core.players import isSpectator
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS

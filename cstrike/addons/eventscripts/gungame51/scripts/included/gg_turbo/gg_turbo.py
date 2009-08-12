@@ -18,8 +18,6 @@ from weaponlib import getWeaponNameList
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.players.shortcuts import isDead
-from gungame51.core.players.shortcuts import isSpectator
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 
 # ============================================================================
@@ -112,11 +110,11 @@ def playerChecks(userid):
     player = Player(userid)
 
     # Is player dead?
-    if isDead(userid):
+    if getPlayer(userid).isdead:
         return False
 
     # Is player a spectator?
-    if isSpectator(userid):
+    if getPlayer(userid).isobserver:
         return False
 
     return True

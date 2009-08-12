@@ -14,13 +14,13 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
+from playerlib import getPlayer
 from playerlib import getUseridList
 import repeat
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import hudhint
-from gungame51.core.players.shortcuts import isDead
 from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
@@ -169,7 +169,7 @@ def respawnCountDown(userid):
         return
     
     # Not dead?
-    if not isDead(userid):
+    if not getPlayer(userid).isdead:
         respawnRepeat.stop()
         return
     

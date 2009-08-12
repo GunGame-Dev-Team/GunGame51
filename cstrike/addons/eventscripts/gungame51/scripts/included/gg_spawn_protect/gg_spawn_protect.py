@@ -17,8 +17,6 @@ from playerlib import getPlayer
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.players.shortcuts import isDead
-from gungame51.core.players.shortcuts import isSpectator
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -104,7 +102,7 @@ def player_spawn(event_var):
     userid = int(event_var['userid'])
 
     # Is player alive?
-    if isDead(userid) or isSpectator(userid):
+    if getPlayer(userid).isdead or getPlayer(userid).isobserver:
         return
 
     if userid in protectedList:

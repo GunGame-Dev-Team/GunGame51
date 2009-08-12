@@ -250,12 +250,12 @@ class BasePlayer(object):
         Gives a player their current levels weapon.
         '''
         # Make sure player is on a team
-        if isSpectator(self.userid):
+        if getPlayer(self.userid).isobserver:
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not on a team.')
 
         # Make sure player is alive
-        if isDead(self.userid):
+        if getPlayer(self.userid).isdead:
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not alive.')
 
@@ -644,46 +644,6 @@ class Player(object):
 
             # Remove the custom attribute callback
             setHooks.remove(attribute)
-            
-def isDead(userid):
-    '''
-    Checks to see if the player is dead.
 
-    Notes:
-        * 1 = The player is dead.
-        * 0 = The player is alive.
-
-    Usage:
-        import es
-        from gungame.core.players.shortcuts import isDead
-        
-        def customFunction(userid):
-            if isDead(userid):
-                es.msg('This player is dead!')
-            else:   
-                es.msg('This player is alive!')
-    '''
-    return getPlayer(userid).isdead
-
-def isSpectator(userid):
-    '''
-    Checks to see if the is a spectator or unassigned.
-
-    Notes:
-        * True = The player is a spectator, currently connecting or not on the
-                 server.
-        * False = The player is on an active team.
-        
-    Usage:
-        import es
-        from gungame.core.players.shortcuts import isSpectator
-        
-        def player_spawn(event_var):
-            if isSpectator(event_var['userid']):
-                es.msg('This player is not on a team!')
-            else:   
-                es.msg('This player is on a team!')
-    '''
-    return getPlayer(userid).isobserver
     
 from gungame51.core.events.shortcuts import EventManager

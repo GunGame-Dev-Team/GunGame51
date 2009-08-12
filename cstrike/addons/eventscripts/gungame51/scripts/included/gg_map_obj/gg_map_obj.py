@@ -15,8 +15,6 @@ from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.players.shortcuts import isDead
-from gungame51.core.players.shortcuts import isSpectator
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -61,10 +59,10 @@ def round_start(event_var):
 def player_spawn(event_var):
     userid = event_var['userid']
 
-    if isSpectator(userid):
+    if getPlayer(userid).isobserver:
         return
 
-    if isDead(userid):
+    if getPlayer(userid).isdead:
         return
 
     # Are we in a map that has a bombzone?

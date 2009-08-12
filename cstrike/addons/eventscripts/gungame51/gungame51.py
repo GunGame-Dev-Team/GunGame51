@@ -36,8 +36,6 @@ from core.addons.shortcuts import unloadAddon
 #    Player Function Imports
 from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
-from core.players.shortcuts import isDead
-from core.players.shortcuts import isSpectator
 
 #    Leaders Function Imports
 from core.leaders.shortcuts import leaders
@@ -264,10 +262,10 @@ def round_start(event_var):
 def player_spawn(event_var):
     userid = event_var['userid']
     
-    if isSpectator(userid):
+    if getPlayer(userid).isobserver:
         return
     
-    if isDead(userid):
+    if getPlayer(userid).isdead:
         return
     
     # Warmup Round Check Would Go Here
