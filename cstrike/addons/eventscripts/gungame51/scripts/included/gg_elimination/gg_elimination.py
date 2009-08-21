@@ -78,7 +78,7 @@ def round_start(event_var):
     for player in playersEliminated:
         playersEliminated[player] = []
     
-    msg('#all', 'RoundInfo')
+    msg('#human', 'RoundInfo', prefix=True)
 
 def round_end(event_var):
     global roundActive
@@ -124,7 +124,7 @@ def player_death(event_var):
         
         # Tell them they will respawn when their attacker dies
         index = plPlayer(attacker).index
-        saytext2(userid, index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']})
+        saytext2(userid, index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']}, True)
     
     # Check if victim had any Eliminated players
     gamethread.delayed(1, respawnEliminated, (userid, currentRound))
@@ -143,13 +143,13 @@ def respawnPlayer(userid, respawnRound):
         return
     
     # Make sure the player is respawnable
-    if not plPlayer(userid).isdead or not plPlayer(userid).isobserver:
+    if plPlayer(userid).isdead or plPlayer(userid).isobserver:
         return
     
     index = plPlayer(userid).index
     
     # Tell everyone that they are respawning
-    saytext2('#all', index, 'RespawningPlayer', {'player': es.getplayername(userid)})
+    saytext2('#human', index, 'RespawningPlayer', {'player': es.getplayername(userid)}, True)
     
     # Respawn player
     ggPlayer(userid).respawn()
@@ -192,7 +192,7 @@ def respawnEliminated(userid, respawnRound):
             index = plPlayer(userid).index
     
     # Tell everyone that they are respawning
-    saytext2('#all', index, 'RespawningPlayer', {'player': ', '.join(players)})
+    saytext2('#human', index, 'RespawningPlayer', {'player': ', '.join(players)}, True)
     
     # Clear victims eliminated player list
     playersEliminated[userid] = []
