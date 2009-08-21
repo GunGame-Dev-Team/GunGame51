@@ -301,12 +301,12 @@ class BasePlayer(object):
             Commented out for now, as it does no harm for the time being.
             '''
             # Register wrongWeaponCheck to ensure that the correct weapon was received
-            #es.addons.registerForEvent(self, 'item_pickup', self.wrongWeaponCheck)
+            es.addons.registerForEvent(self, 'item_pickup', self.wrongWeaponCheck)
             
             # Give new weapon
             es.server.queuecmd('es_xgive %s %s' % (self.userid, 'weapon_%s' %self.weapon))
             
-            #gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
+            gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
         # If the weapon is a knife or hegrenade, strip
         if self.weapon in ['knife', 'hegrenade']:
             self.strip()
@@ -363,7 +363,7 @@ class BasePlayer(object):
         item = event_var['item']
 
         # If this item_pickup was not for the user we want it to be for, return
-        if not int(event_var['userid']) != self.userid:
+        if int(event_var['userid']) != self.userid:
             return
 
         # Unregister wrongWeaponCheck, since we already caught the pickup
