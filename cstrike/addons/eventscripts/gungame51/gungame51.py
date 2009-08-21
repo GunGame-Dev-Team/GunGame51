@@ -578,7 +578,19 @@ def gg_addon_loaded(event_var):
     
 def gg_addon_unloaded(event_var):
     es.dbgmsg(0, 'gg_addon_unloaded: "%s" of type "%s"' %(event_var['addon'], event_var['type']))
-    
+
+def server_cvar(event_var):
+    cvarName = event_var['cvarname']
+
+    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type', 'gg_multikill_override']:
+        # Get weapon order file
+        # Set this as the weapon order and set the weapon order type
+        currentOrder = setWeaponOrder(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
+
+        # Set multikill override
+        currentOrder.setMultiKillOverride(int(gg_multikill_override))
+
+
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================

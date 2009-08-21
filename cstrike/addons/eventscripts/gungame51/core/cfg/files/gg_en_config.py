@@ -435,7 +435,7 @@ def load():
     config.text('   1 = Kevlar only')
     config.text('   2 = Assaultsuit (Kevlar + Helmet)')
     config.text('Default Value: 2')
-    config.cvar('gg_player_defuser', 2, 'The type of armor players are ' +
+    config.cvar('gg_player_armor', 2, 'The type of armor players are ' +
                 'equipped with when they spawn.')
     config.text('')
     config.text('')

@@ -296,14 +296,17 @@ class BasePlayer(object):
 
         # Give the player their weapon if it is not a knife
         if self.weapon != 'knife':
-            
+            '''
+            The method of using item_pickup is causing considerable/massive lag on a live server.
+            Commented out for now, as it does no harm for the time being.
+            '''
             # Register wrongWeaponCheck to ensure that the correct weapon was received
-            es.addons.registerForEvent(self, 'item_pickup', self.wrongWeaponCheck)
+            #es.addons.registerForEvent(self, 'item_pickup', self.wrongWeaponCheck)
             
             # Give new weapon
             es.server.queuecmd('es_xgive %s %s' % (self.userid, 'weapon_%s' %self.weapon))
             
-            gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
+            #gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
         # If the weapon is a knife or hegrenade, strip
         if self.weapon in ['knife', 'hegrenade']:
             self.strip()

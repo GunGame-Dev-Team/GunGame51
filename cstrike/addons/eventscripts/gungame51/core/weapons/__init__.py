@@ -47,28 +47,28 @@ class BaseWeaponOrders(object):
     # =========================================================================
     def __getitem__(self, item):
         return object.__getattribute__(self, item)
-        
+
     def __setitem__(self, item, value):
         return self.__setattr__(item, value)
-    
+
     def __setattr__(self, name, value):
         if name == 'type':
             if value not in ['#default', '#reversed', '#random']:
                 raise AttributeError('Invalid attribute value for type: "%s".'
                     %value + ' Use only "%s".' %'", "'.join(['#default',
                         '#reversed', '#random']))
-                
+
             if not hasattr(self, name):
                 object.__setattr__(self, name, value)
-                
+
             # If the type is the same, do nothing
             if self.type == value and value != '#random':
                 return
-            
+
             object.__setattr__(self, name, self.__setWeaponOrderType(value))
         else:
             object.__setattr__(self, name, value)
-        
+
     # =========================================================================
     # >> BaseWeaponOrders() CUSTOM CLASS METHODS
     # =========================================================================
@@ -127,7 +127,7 @@ class BaseWeaponOrders(object):
 
             # Set level values as a list
             self.order[levelCounter] = [weapon, multikill]
-            
+
     def __setWeaponOrderType(self, type):
         # =====================================================================
         # RANDOM WEAPON ORDER
@@ -135,121 +135,124 @@ class BaseWeaponOrders(object):
         if type == '#random':
             # Get weapons
             weapons = self.order.values()
-            
+
             # Setup variables
             knifeData = None
             nadeData = None
-            
+
             # Get knife and grenade data
             for weapon in weapons[:]:
                 if weapon[0] == 'knife':
                     # Get data
                     knifeData = weapon
-                    
+
                     # Remove
                     weapons.remove(weapon)
-                
+
                 elif weapon[0] == 'hegrenade':
                     # Get data
                     nadeData = weapon
-                    
+
                     # Remove
                     weapons.remove(weapon)
-            
+
             # Shuffle
             random.shuffle(weapons)
-            
+
             # Set weapon order
             self.order = dict(zip(range(1, len(weapons)+1), weapons))
-            
+
             # Re-add knife and grenade to the end
             if nadeData != None:
                 self.order[len(self.order)+1] = nadeData
-            
+
             if knifeData != None:
                 self.order[len(self.order)+1] = knifeData
-        
+
         # =====================================================================
         # DEFAULT WEAPON ORDER
         # =====================================================================
         elif type == '#default':
             # Re-parse the file
             self.parse()
-        
+
         # =====================================================================
         # REVERSED WEAPON ORDER
         # =====================================================================
         elif type == '#reversed':
             # Get weapons
             weapons = self.order.values()
-            
+
             # Setup variables
             knifeData = None
             nadeData = None
-            
+
             # Get knife and grenade data
             for weapon in weapons[:]:
                 if weapon[0] == 'knife':
                     # Get data
                     knifeData = weapon
-                    
+
                     # Remove
                     weapons.remove(weapon)
-                
+
                 elif weapon[0] == 'hegrenade':
                     # Get data
                     nadeData = weapon
-                    
+
                     # Remove
                     weapons.remove(weapon)
-            
+
             # Reverse
             weapons.reverse()
-            
+
             # Set weapon order
             self.order = dict(zip(range(1, len(weapons)+1), weapons))
-            
+
             # Re-add knife and grenade to the end
             if nadeData != None:
                 self.order[len(self.order)+1] = nadeData
-            
+
             if knifeData != None:
                 self.order[len(self.order)+1] = knifeData
-        
+
         # When the weapon order changes, we create/cancel a delayed name so
         # that we do not restart the round multiple times due to one weapon
         # order change
         cancelDelayed('gg_mp_restartgame')
         delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
-        
+
         # Set the new order type
         return type
-        
+
     def setMultiKillOverride(self, value):
         '''
         Sets the multikill override.
         '''
         value = int(value)
-        
+
+        if not value > 1:
+            value = 1
+
         # Loop through the weapon order dictionary
         for level in self.order:
             # Set multikill if its not a knife or a hegrenade
             if self.order[level][0] != 'knife' and self.order[level][0] != 'hegrenade':
                 self.order[level][1] = value
-        
+
         # When the weapon order changes, we create/cancel a delayed name so
         # that we do not restart the round multiple times due to one weapon
         # order change
         cancelDelayed('gg_mp_restartgame')
         delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
-        
+
     def restartRound(self):
         if not self.file == weaponorders.gungameorder:
             return
-            
+
         es.server.cmd('mp_restartgame 2')
         es.msg('Weapon Order Changed! Restarting in 2 seconds!')
-        
+
     def echo(self):
         '''
         Echos (prints) the current weapon order to console.
@@ -277,7 +280,7 @@ class BaseWeaponOrders(object):
             raise ValueError('Can not get multikill value for level: "%s".'
                 %level + ' Level is out of range (1-%s).' %len(self.order))
         return self.order[level][1]
-        
+
     def getTotalLevels(self):
         return len(self.order)
 
@@ -301,7 +304,7 @@ class WeaponOrdersDict(dict):
 
         if name not in self:
             self[name] = BaseWeaponOrders(name)            
-            
+
         # We don't want to call our __getitem__ again 
         return super(WeaponOrdersDict, self).__getitem__(name)
 
@@ -343,20 +346,20 @@ class WeaponManager(object):
         else:
             if not self.currentorder:
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
-            
+
             # Return the item from the WeaponOrdersDict instance
             return orders[self.currentorder][item]
-        
+
     def __setitem__(self, item, value):
         if item in ['currentorder', '__weaponorders__', 'gungameorder']:
             object.__setattr__(self, item, value)
         else:
             if not self.currentorder:
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
-                
+
             # We only directly allow the attribute "userid" to be set
             orders[self.currentorder][item] = value
-    
+
     def __getattr__(self, name):
         if name in ['currentorder', '__weaponorders__', 'gungameorder']:
             # We only directly allow the attribute "userid" to be retrieved
@@ -366,7 +369,7 @@ class WeaponManager(object):
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
             # Redirect to the PlayerDict instance
             return orders[self.currentorder][name]
-      
+
     def __setattr__(self, name, value):
         if name in ['currentorder', '__weaponorders__', 'gungameorder']:
             # Set these attributes as they belong to this class
@@ -392,7 +395,7 @@ class WeaponManager(object):
         self.__weaponorders__[name] = orders[name]
         self.currentorder = name
         return self.__weaponorders__[name]
-        
+
     def unload(self, order):
         '''
         Unload a weapon order by name.
@@ -403,37 +406,25 @@ class WeaponManager(object):
         '''
         # Delete the weapon order instance from our dictionary
         del self.__weaponorders__[name]
-        
+
         if name == self.currentorder:
             self.currentorder = None
         if name == self.gungameorder:
             self.gungameorder = None
-        
+
     def setOrder(self, name):
         if name not in self.__weaponorders__:
             self.load(name)
             self.gungameorder = name
         else:
             self.gungameorder = name
-        
+
         # When the weapon order changes, we create/cancel a delayed name so
         # that we do not restart the round multiple times due to one weapon
         # order change
         cancelDelayed('gg_mp_restartgame')
         delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
-        
-        # Things that will restart the round:
-        '''
-        gg_multikill_override
-        Setting a new weapon order
-        Changing the weapon order type
-        
-        We can create a gamethread.delayedname any time one of these changes,
-        and delay the delayedname for 1 second. If another item changes (which
-        should happen within milliseconds), we can cancel the delayedname, and
-        create a new one.
-        '''
-    
+
 
 weaponorders = WeaponManager()
 
@@ -446,12 +437,12 @@ def loadWeaponOrders():
     directory.
     '''
     weaponOrderPath = getGameDir('cfg/gungame51/weapon_orders')
-    
+
     for item in os.listdir(weaponOrderPath):
         # Ignore subfolders
         if os.path.isdir(os.path.join(weaponOrderPath, item)):
             continue
-                
+
         weaponorders.load(item)
-        
+
 loadWeaponOrders()
