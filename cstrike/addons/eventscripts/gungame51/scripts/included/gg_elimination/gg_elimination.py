@@ -109,21 +109,27 @@ def player_death(event_var):
     # Was suicide?
     if userid == attacker or attacker == '0':
         gamethread.delayed(5, respawnPlayer, (userid, currentRound))
-        msg(userid, 'SuicideAutoRespawn')
+        msg(userid, 'SuicideAutoRespawn', prefix=True)
     
     # Was a teamkill?
     elif event_var['es_userteam'] == event_var['es_attackerteam']:
         gamethread.delayed(5, respawnPlayer, (userid, currentRound))
-        msg(userid, 'TeamKillAutoRespawn')
+        msg(userid, 'TeamKillAutoRespawn', prefix=True)
     
     # Was a normal death
     else:
+        es.msg('norm death 1')
         # Add victim to the attackers eliminated players
         playersEliminated[attacker].append(userid)
         
+        es.msg('norm death 2')
+        
         # Tell them they will respawn when their attacker dies
         index = plPlayer(attacker).index
+        
+        es.msg('norm death 3')
         saytext2(userid, index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']}, True)
+        es.msg('norm death 4')
     
     # Check if victim had any Eliminated players
     gamethread.delayed(1, respawnEliminated, (userid, currentRound))
