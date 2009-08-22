@@ -112,7 +112,6 @@ def player_death(event_var):
         return
         
     # Is victim on level 1?
-    es.msg(ggVictim.level)
     if ggVictim.level == 1:
         msg(attacker, 'VictimLevel1', prefix=True)
         return
