@@ -38,7 +38,6 @@ info.translations = ['gg_elimination']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
 roundActive = 0
 currentRound = 0
 playersEliminated = {}
@@ -143,7 +142,7 @@ def respawnPlayer(userid, respawnRound):
         return
     
     # Make sure the player is respawnable
-    if plPlayer(userid).isdead or plPlayer(userid).isobserver:
+    if not plPlayer(userid).isdead or not plPlayer(userid).isobserver:
         return
     
     index = plPlayer(userid).index
