@@ -31,7 +31,7 @@ from core.cfg.shortcuts import unloadConfig
 from core.cfg.shortcuts import getConfigList
 
 #    Addon Function Imports
-from core.addons.shortcuts import unloadAddon
+from core.addons import __addons__
 
 #    Player Function Imports
 from core.players.shortcuts import Player
@@ -94,9 +94,6 @@ def load():
 def unload():
     # Unload translations
     unloadTranslation('gungame', 'gungame')
-    
-    # Unload all enabled addons
-    from core.addons import __addons__
 
     # Create a copy of the list of addons
     list_addons = __addons__.__order__[:]
@@ -107,7 +104,7 @@ def unload():
     for name in list_addons:
         if name not in __addons__.__order__:
             continue
-        unloadAddon(name)
+        __addons__.unload(name)
 
     # Unload configs (removes flags from CVARs)
     unloadConfig(getConfigList())
