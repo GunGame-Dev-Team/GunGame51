@@ -481,11 +481,7 @@ class AddonManager(object):
         for translation in self.getAddonInfo(addon).translations:
             __messages__.unload(translation, addon.__name__.split('.')[-1])
 
-    # ========================================================================
-    # AddonManager() STATIC CLASS METHODS
-    # ========================================================================
-    @staticmethod
-    def getAddonInfo(addon=None):
+    def getAddonInfo(self, addon=None):
         '''
         Returns the AddonInfo instance in the module if present
         '''
@@ -493,25 +489,30 @@ class AddonManager(object):
             # Return a dictionary of all addons
             dict_addon = {}
             for name in __addons__.__loaded__:
-                addon = AddonManager().getAddonByName(name)
+                addon = self.getAddonByName(name)
                 addon_globals = addon.__dict__
                 for item in addon_globals:
                     if isinstance(addon_globals[item], AddonInfo):
                         dict_addon[name] =  addon_globals[item]
                         break
+
             return dict_addon
 
         if type(addon).__name__ == 'str':
-            addon = AddonManager().getAddonByName(addon)
+            addon = self.getAddonByName(addon)
 
         # If the addon info exists we return it
         addon_globals = addon.__dict__
+
         for name in addon_globals:
             if isinstance(addon_globals[name], AddonInfo):
                 return addon_globals[name]
 
         return None
 
+    # ========================================================================
+    # AddonManager() STATIC CLASS METHODS
+    # ========================================================================
     @staticmethod
     def getAddonType(name):
         '''

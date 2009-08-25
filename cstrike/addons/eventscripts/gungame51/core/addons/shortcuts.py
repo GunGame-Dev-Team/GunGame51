@@ -9,14 +9,10 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Eventscripts Imports
-import es
-
 # GunGame Imports
 from gungame51.core.addons import AddonInfo
 from gungame51.core.addons import AddonManager
-from gungame51.core.addons import load
-from gungame51.core.addons import unload
+from gungame51.core.addons import __addons__
 
 # ============================================================================
 # >> FUNCTIONS
@@ -51,7 +47,7 @@ def getAddonInfo(name=None):
     if name:
         name = str(name).lower()
     
-    return AddonManager.getAddonInfo(name)
+    return __addons__.getAddonInfo(name)
     
 def getAddonType(name):
     '''
@@ -83,17 +79,4 @@ def addonExists(name):
     return AddonManager.addonExists(name)
 
 def getLoadedAddonList():
-    return AddonManager.getAddonInfo().keys()
-
-# These are only here temporarily. Do not use them in scripts.
-def loadAddon(name):
-   '''
-   Loads GunGame Addons
-   '''
-   load(name)
-   
-def unloadAddon(name):
-   '''
-   Unloads GunGame Addons
-   '''
-   unload(name)
+    return __addons__.getAddonInfo().keys()
