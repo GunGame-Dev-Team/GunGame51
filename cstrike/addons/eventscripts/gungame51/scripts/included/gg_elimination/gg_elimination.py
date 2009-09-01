@@ -154,7 +154,7 @@ def respawnPlayer(userid, respawnRound):
     plPlayer = getPlayer(userid)
 
     # Make sure the player is respawnable
-    if not plPlayer.isdead or not plPlayer.isobserver:
+    if not plPlayer.isdead or plPlayer.isobserver:
         return
     
     # Retrieve the GunGame player object
@@ -189,21 +189,21 @@ def respawnEliminated(userid, respawnRound):
     # Respawn all victims eliminated players
     for playerid in ggPlayer.eliminated:
         # Make sure the player is respawnable
-        if not getPlayer(userid).isdead or not getPlayer(userid).isobserver:
+        if not getPlayer(playerid).isdead or getPlayer(playerid).isobserver:
             continue
 
         # Respawn player
-        ggPlayer.respawn()
+        Player(playerid).respawn()
 
         # Add to message format
         players.append('\3%s\1' % es.getplayername(playerid))
 
         # Get index
         if not index:
-            index = ggPlayer.index
+            index = Player(playerid).index
 
     # Tell everyone that they are respawning
-    saytext2('#human', ggPlayer.index, 'RespawningPlayer', {'player': ', '.join(players)}, True)
+    saytext2('#human', index, 'RespawningPlayer', {'player': ', '.join(players)}, True)
 
     # Clear victims eliminated player list
     ggPlayer.eliminated = []
