@@ -132,7 +132,7 @@ class MethodTracer(object):
         lines.append('')
         # The global variables
         lines.append('Global variables:')
-        for key, value in dict(globals).iteritems():
+        for key, value in dict(globals()).iteritems():
             lines.append('  %s: %s (%s)' % (key, value, type(value)))
         #TODO: What other information do we need? Time? Players?
         
@@ -146,9 +146,9 @@ class MethodTracer(object):
         If it fails, handle the exception and re-raise the initial exception.
         """
         try:
-            return self.method(*args, **kwags)
+            return self.method(*args, **kwargs)
         except:
-            _handle_exception(self.method, args, kwargs, *sys.exc_info)
+            self._handle_exception(args, kwargs, *exc_info())
             # Re-raise the excepted exception.
             raise
         
