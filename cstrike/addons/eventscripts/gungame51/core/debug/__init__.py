@@ -48,7 +48,7 @@ which the error happened (arguments to the method, global variables, platform...
 will be logged.
 """
 import es
-import hashlib
+from hashlib import md5
 from sys import exc_info
 from traceback import format_exception
 from gungame51.core import getGameDir, platform
@@ -93,8 +93,8 @@ class MethodTracer(object):
         one error to fill the folder in seconds (in the worst case). Having hashed
         filenames means that every (unique) traceback will only be logged once!
         """
-        traceback_lines = traceback.format_exception(extype, exvalue, extraceback)
-        filename = hashlib.md5(''.join(traceback_lines)).hexdigest() + '.txt'
+        traceback_lines = format_exception(extype, exvalue, extraceback)
+        filename = md5(''.join(traceback_lines)).hexdigest() + '.txt'
         self._write_dump(args, kwargs, traceback_lines, filename)
         
     def _write_dump(self, args, kwargs, traceback_lines, filename):
