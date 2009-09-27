@@ -55,6 +55,8 @@ def load():
     config.text('='*76)
     config.text('>> AFK PUNISHMENT')
     config.text('='*76)
+    config.text('Notes:')
+    config.text('  * Requires "gg_afk_rounds 1" or higher')
     config.text('Options:')
     config.text('   0 = No punishment.')
     config.text('   1 = Kick the player.')

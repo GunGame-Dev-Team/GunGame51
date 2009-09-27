@@ -125,13 +125,17 @@ class BasePlayer(object):
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)
         self.index = int(getPlayer(str(self.userid)).index)
-        self.weapon = self.getWeapon()
         self.stripexceptions = []
         self.options = PlayerOptions()
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
     # =========================================================================
+    @property
+    def weapon(self):
+        """Return the weapon name"""
+        return self.getWeapon()
+        
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
         if name in setHooks:
@@ -141,8 +145,6 @@ class BasePlayer(object):
         object.__setattr__(self, name, value)
 
     def __getattr__(self, name):
-        if name == 'weapon':
-            self.weapon = getLevelWeapon(self.level)
         # Return the attribute value
         return object.__getattribute__(self, name)
 
@@ -203,12 +205,12 @@ class BasePlayer(object):
         Removes a declared number of levels from the victim.
 
         Arguments:
-            * levelsAwarded: (required)
-                The number of levels to award to the attacker.
-            * victim: (default of 0)
-                The userid of the victim.
+            * levelsTaken: (required)
+                The number of levels to take from to the victim.
+            * attacker: (default of 0)
+                The userid of the attacker.
             * reason: (not required)
-                The string reason for leveling up the attacker.
+                The string reason for leveling down the victim.
         '''
         # Return false if we can't level down
         if len(self.preventlevel):
@@ -258,9 +260,6 @@ class BasePlayer(object):
         if getPlayer(self.userid).isdead:
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not alive.')
-
-        # Refresh player weapon
-        self.weapon = self.getWeapon()
 
         # Do we want to strip the player's given weapon slot?
         if strip:
