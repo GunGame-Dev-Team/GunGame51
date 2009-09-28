@@ -14,9 +14,11 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
+from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -27,16 +29,6 @@ info.title = 'GG Unlimited Grenades'
 info.author = 'GG Dev Team' 
 info.version = '0.1'
 info.conflicts = ['gg_earn_nade']
-
-# ============================================================================
-# >> GLOBAL VARIABLES
-# ============================================================================
-
-
-# ============================================================================
-# >> CLASSES
-# ============================================================================
-
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -50,8 +42,20 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-
-
-# ============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+def hegrenade_detonate(event_var):
+    userid = int(event_var['userid'])
+    
+    # If the player is not on an active team, return
+    if int(event_var['es_userteam']) <= 1:
+        return
+    
+    # If the player is not on hegrenade level, return
+    if Player(userid).weapon != 'hegrenade':
+        return
+    
+    # If the player is dead, return
+    if getPlayer(userid).isdead:
+        return
+    
+    # Give the player a new hegrenade
+    es.server.queuecmd('es_xgive %s weapon_hegrenade' % userid)
