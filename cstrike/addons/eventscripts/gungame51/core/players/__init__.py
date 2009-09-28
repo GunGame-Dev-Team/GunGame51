@@ -22,7 +22,7 @@ from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
 from gungame51.core.messaging import __messages__
-from options import PlayerOptions
+from gungame51.core.sound import SoundPack
 from afk import AFK
 
 # ============================================================================
@@ -126,7 +126,7 @@ class BasePlayer(object):
         self.steamid = uniqueid(str(self.userid), 1)
         self.index = int(getPlayer(str(self.userid)).index)
         self.stripexceptions = []
-        self.options = PlayerOptions()
+        self.soundpack = SoundPack('default')
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS

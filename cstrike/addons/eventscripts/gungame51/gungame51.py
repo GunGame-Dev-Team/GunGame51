@@ -32,6 +32,7 @@ from core.cfg.shortcuts import getConfigList
 
 #    Addon Function Imports
 from core.addons import __addons__
+from core.addons import priority_addons
 
 #    Player Function Imports
 from core.players.shortcuts import Player
@@ -183,6 +184,10 @@ def initialize():
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
+    # Check for priority addons
+    if priority_addons:
+        del priority_addons[:]
+
     # Load custom GunGame events
     es.loadevents('addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
@@ -274,13 +279,14 @@ def player_spawn(event_var):
     # Reset the player's AFK calculation
     if not es.isbot(userid):
         gamethread.delayed(0.6, Player(userid).afk.reset, ())
-    
+
     # Send the level information hudhint
     # ....
 
 def player_death(event_var):
-    # Warmup Round Check
-    # ....
+    # Check for priority addons
+    if priority_addons:
+        return
 
     # Set player ids
     userid = int(event_var['userid'])
@@ -387,13 +393,10 @@ def player_disconnect(event_var):
         leaders.remove(userid, False)
 
 def bomb_defused(event_var):
-    '''
-    Maybe we could add a variable for this? It seems like a good idea:
-    
-    gg_bomb_defused_level #
-    gg_bomb_defused_skip_knife 0|1
-    gg_bomb_defused_skip_hegrenade 0|1
-    '''
+    # Check for priority addons
+    if priority_addons:
+        return
+
     # Set vars
     ggPlayer = Player(event_var['userid'])
     weapon = ggPlayer.weapon
@@ -407,13 +410,10 @@ def bomb_defused(event_var):
     ggPlayer.levelup(1, 0, 'bomb_defused')
 
 def bomb_exploded(event_var):
-    '''
-    Maybe we could add a variable for this? It seems like a good idea:
-    
-    gg_bomb_exploded_level #
-    gg_bomb_exploded_skip_knife 0|1
-    gg_bomb_exploded_skip_hegrenade 0|1
-    '''
+    # Check for priority addons
+    if priority_addons:
+        return
+
     # Set vars
     ggPlayer = Player(event_var['userid'])
     weapon = ggPlayer.weapon
@@ -438,6 +438,10 @@ def player_team(event_var):
 '''
     
 def gg_levelup(event_var):
+    # Check for priority addons
+    if priority_addons:
+        return
+
     # Cache new level for later use
     newLevel = int(event_var['new_level'])
     

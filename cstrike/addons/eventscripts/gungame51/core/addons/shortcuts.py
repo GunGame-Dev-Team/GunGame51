@@ -13,6 +13,7 @@ $LastChangedDate$
 from gungame51.core.addons import AddonInfo
 from gungame51.core.addons import AddonManager
 from gungame51.core.addons import __addons__
+from gungame51.core.addons import priority_addons
 
 # ============================================================================
 # >> FUNCTIONS

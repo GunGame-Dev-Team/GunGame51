@@ -210,7 +210,38 @@ class AddonCompatibility(dict):
 dependencies = AddonCompatibility()
 conflicts = AddonCompatibility()
 
-### Addon managing classes """
+
+class PriorityAddon(list):
+    '''
+    Class designed to handle the PreventLevel player attribute. This class is a
+    list type, which allows us to potentially catch errors such as duplicate
+    entries of addons in the PriorityAddon list, as well as preventing errors
+    when scripters attempt to remove an entry that does not exist.
+    '''
+    # =========================================================================
+    # >> PriorityAddon() CUSTOM CLASS METHODS
+    # =========================================================================
+    def append(self, name):
+        if name not in self:
+            list.append(self, name)
+
+    def extend(self, names):
+        for name in names:
+            if name in self:
+                continue
+
+            list.append(self, name)
+
+    def remove(self, name):
+        if name in self:
+            list.remove(self, name)
+
+    def clear(self):
+        del list[:]
+
+
+priority_addons = PriorityAddon()
+
 
 class AddonManager(object):
     # =========================================================================
@@ -359,6 +390,12 @@ class AddonManager(object):
 
         # Loop through each addon in the __order__ list
         for name in self.__order__:
+            # Check to see if there is an addon taking priority
+            if priority_addons:
+                # The addon's event does not fire if it is not a priority addon
+                if name not in priority_addons:
+                    continue
+                
             # If the addon name is in the current event, call the function
             if name in current_event:
                 current_event[name](event_var)
