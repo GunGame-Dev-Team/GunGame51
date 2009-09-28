@@ -51,6 +51,7 @@ import es
 from hashlib import md5
 from sys import exc_info
 from traceback import format_exception
+from inspect import getargspec, ismethod, isclass, isfunction
 from gungame51.core import getGameDir, platform
 
 def _write_to_log(message):
@@ -87,7 +88,7 @@ class MethodTracer(object):
     def __init__(self, method):
         self.method = method
         
-    def _handle_exception(self, args, kwargs, extype, exvalue, extraceback):
+    def _handle_exception(self, arguments, kwargs, extype, exvalue, extraceback):
         """
         Get the hashsum of the traceback. This will become the filename to prevent
         one error to fill the folder in seconds (in the worst case). Having hashed
@@ -95,9 +96,9 @@ class MethodTracer(object):
         """
         traceback_lines = format_exception(extype, exvalue, extraceback)
         filename = md5(''.join(traceback_lines)).hexdigest() + '.txt'
-        self._write_dump(args, kwargs, traceback_lines, filename)
+        self._write_dump(arguments, kwargs, traceback_lines, filename)
         
-    def _write_dump(self, args, kwargs, traceback_lines, filename):
+    def _write_dump(self, arguments, kwargs, traceback_lines, filename):
         lines = []
         # Affected method and module
         lines.append("An error occured in %s.%s" % (self.method.__module__, self.method.__name__))
@@ -106,22 +107,38 @@ class MethodTracer(object):
         for line in traceback_lines:
             lines.append(line[:-1])
         lines.append('')
-        # Arguments and keyword arguments the function was called with
-        lines.append('The function was called with following arguments:')
-        i = 0
-        for argument in args:
-            i += 1
-            # Try...Except here because of things like CMDArgs messing up the logging.
-            try:
-                lines.append('  %s (%s)' % (argument, type(argument)))
-            except:
-                lines.append('  An error occured when trying to log the %snt argument' % i)
+        # Get argument specifications for this method
+        arg_names, varags, varkw, defaults = getargspec(self.method)
+        argdict = {}
+        for name, default in zip(arg_names, defaults):
+            argdict[name] = {'value': default, 'default': default}
+        for name, value in zip(arg_names, arguments):
+            if not name in argdict:
+                argdict[name] = {'value': value, 'default': 'NO_DEFAULT_PROVIDED'}
+            else:
+                argdict[name]['value'] = value
         for key, value in kwargs.iteritems():
+            if not name in argdict:
+                argdict[key] = {'value': value, 'default': 'NO_DEFAULT_PROVIDED'}
+            else:
+                argdict[key]['value'] = value
+        arglist = []
+        for name in arg_names:
+            value = argdict[name]['value']
+            default = argdict[name]['default']
             # Try...Except here because of things like CMDArgs messing up the logging.
-            try:
-                lines.append('  %s: %s (%s)' % (key, value, type(value)))
-            except:
-                lines.append('  An error occured when trying to log the keyword argument %s' % key)
+            things = [name, value, type(value), default, type(default)]
+            stringed = []
+            for thing in things:
+                try:
+                    stringed.append(str(thing))
+                except:
+                    stringed.append('???')
+            arglist.append(tuple(stringed))
+        # Add the arguments to the 
+        lines.append('The function was called with following arguments:')
+        for arg in arglist:
+            lines.append('  %s: %s (%s) [Default: %s (%s)]' % arg)
         lines.append('')
         # The server environment.
         #TODO: Does this need more information?
@@ -139,16 +156,16 @@ class MethodTracer(object):
         #TODO: real path! Should be a standalone file (timestamped)
         #logdir.joinpath(filename).write_lines(lines)
         
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *arguments, **kwargs):
         """
         When the decorated method gets called try to call the method.
         
         If it fails, handle the exception and re-raise the initial exception.
         """
         try:
-            return self.method(*args, **kwargs)
+            return self.method(*arguments, **kwargs)
         except:
-            self._handle_exception(args, kwargs, *exc_info())
+            self._handle_exception(arguments, kwargs, *exc_info())
             # Re-raise the excepted exception.
             raise
         
@@ -157,3 +174,14 @@ def trace(method):
     Decorates a method to be traced by a MethodTracer
     """
     return MethodTracer(method)
+
+def autotrace(obj):
+    """
+    Autotraces a object.
+    """
+    for name in dir(obj):
+        attr = getattr(obj, name)
+        if isfunction(attr) or ismethod(attr):
+            setattr(obj, name, trace(attr))
+        elif isclass(attr):
+            autotrace(attr)
