@@ -615,11 +615,8 @@ def load():
     config.text('   Helps newly connected players by adjusting their level.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap.')
-    config.text('   1 = Set player to the lowest level player other than ' +
-                'themself.')
-    config.text('       (Catch them up if they are behind)')
-    config.text('   2 = Set player to median level.')
-    config.text('   3 = Set player to average level.')
+    config.text('   1 = Set player to the level of the lowest level of all ' +
+                'the other players. Basically "catching them up".')
     config.text('Default Value: 0')
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
                 'adjusting their level.')
@@ -630,8 +627,9 @@ def load():
     config.text('>> HANDICAP UPDATE')
     config.text('='*76)
     config.text('Description:')
-    config.text('   A timer (in seconds) that updates players\' levels who ' +
-                'are below the handicap.')
+    config.text('   A timer (in seconds) that updates players with the ' +
+                'lowest level to the lowest level of the other players. ' +
+                'Basically "catching them up".')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap_update.')
     config.text('   1 = (Enabled) Load gg_handicap_update.')
