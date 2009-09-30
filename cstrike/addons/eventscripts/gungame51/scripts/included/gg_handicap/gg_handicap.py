@@ -25,6 +25,7 @@ info.name = 'gg_handicap'
 info.title = 'GG Handicap' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_handicap']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -55,12 +56,8 @@ def player_activate(event_var):
     if ggPlayer.level < handicapLevel:
         ggPlayer.level = handicapLevel
 
-        # Tell the player that their level was adjusted
-        """
-        REPLACE WHEN TRANSLATIONS ARE WORKING
+        # Tell the player that their level was adjustedG
         ggPlayer.msg('LevelLowest', {'level':handicapLevel})
-        """
-        es.tell(userid, '#multi', 'Your level was set to #green%s#default because it was below the rest.' % handicapLevel)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
