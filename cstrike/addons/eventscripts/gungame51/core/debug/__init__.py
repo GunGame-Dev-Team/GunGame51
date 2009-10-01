@@ -169,11 +169,26 @@ class MethodTracer(object):
             # Re-raise the excepted exception.
             raise
         
+        
+class NotTracer(object):
+    def __init__(self, method):
+        self.method = method
+        
+    def __call__(self, *args, **kwargs):
+        return self.method(*args, **kwargs)
+        
+        
 def trace(method):
     """
     Decorates a method to be traced by a MethodTracer
     """
     return MethodTracer(method)
+
+def notrace(method):
+    """
+    Decorate a method not to be traced by autotrace
+    """
+    return NotTracer(method)
 
 def autotrace(obj):
     """
@@ -184,4 +199,10 @@ def autotrace(obj):
         if isfunction(attr) or ismethod(attr):
             setattr(obj, name, trace(attr))
         elif isclass(attr):
-            autotrace(attr)
+            klass = getattr(obj, attr)
+            # Don't trace my own stuff!
+            if isinstance(klass, MethodTracer):
+                continue
+            if isinstance(klass, NotTracer):
+                continue
+            autotrace(klass)
