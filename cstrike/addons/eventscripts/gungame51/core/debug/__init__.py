@@ -170,7 +170,7 @@ class MethodTracer(object):
             raise
         
         
-class NotTracer(object):
+class NoTracer(object):
     def __init__(self, method):
         self.method = method
         
@@ -188,7 +188,7 @@ def notrace(method):
     """
     Decorate a method not to be traced by autotrace
     """
-    return NotTracer(method)
+    return NoTracer(method)
 
 def autotrace(obj):
     """
@@ -199,10 +199,10 @@ def autotrace(obj):
         if isfunction(attr) or ismethod(attr):
             setattr(obj, name, trace(attr))
         elif isclass(attr):
-            klass = getattr(obj, attr)
-            # Don't trace my own stuff!
-            if isinstance(klass, MethodTracer):
+            autotrace(attr)
+        elif type(attr).__name__ == 'instance':
+            if isinstance(attr, MethodTracer):
                 continue
-            if isinstance(klass, NotTracer):
+            if isinstance(attr, NoTracer):
                 continue
-            autotrace(klass)
+            autotrace(attr) 
