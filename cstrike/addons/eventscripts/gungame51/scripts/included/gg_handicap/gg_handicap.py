@@ -133,6 +133,10 @@ def getLevelAboveUser(uid):
         if not playerLevel in levels:
             levels.append(playerLevel)
 
+    # If no levels are in the list, set 1 as the handicap level
+    if len(levels) < 1:
+        levels.append(1)
+
     # Sort levels, and return the level above lowest
     levels.sort()
     return levels[0]
