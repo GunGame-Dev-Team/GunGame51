@@ -144,69 +144,6 @@ def load():
     # =========================================================================
     # KNIFE-RELATED CVARS
     # =========================================================================
-    # Knife Pro
-    config.text('')
-    config.text('='*76)
-    config.text('>> KNIFE PRO')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   When you kill a player with a knife, you will level up, ' +
-                'and the victim')
-    config.text('   will level down.')
-    config.text('Notes:')
-    config.text('   * Will not load with "gg_knife_rookie" enabled.')
-    config.text('   * See the variable "gg_knife_pro_limit" for further ' +
-                'enhancement of')
-    config.text('     gg_knife_pro.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_knife_pro.')
-    config.text('   1 = (Enabled) Load gg_knife_pro.')
-    config.text('Default Value: 0')
-    config.cvar('gg_knife_pro', 0, 'Enables/Disables gg_knife_pro')
-    
-    # Knife Pro Limit
-    config.text('')
-    config.text('='*76)
-    config.text('>> KNIFE PRO LIMIT')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   Limits level stealing to players close to your own ' +
-                'level.')
-    config.text('Example:')
-    config.text('   * If this is set to 3, you will not gain a level if you ' +
-                'knife someone')
-    config.text('     more than 3 levels below you.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not enable the knife pro limit.')
-    config.text('   # = (Enabled) Limit level stealing to this # of levels ' +
-                'below the')
-    config.text('                 attacker.')
-    config.text('Default Value: 0')
-    config.cvar('gg_knife_pro_limit', 0, 'Limit level stealing to this # of ' +
-                'levels below the attacker.')
-    
-    # Knife Rookie
-    config.text('')
-    config.text('='*76)
-    config.text('>> KNIFE ROOKIE')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   Similar to gg_knife_pro, but not as strict:')
-    config.text('      * The attacker will level up even when the victim is ' +
-                'on level 1.')
-    config.text('      * The attacker will level up even though the victim ' +
-                'cannot leveldown.')
-    config.text('      * The victim will level down even though the attacker' +
-                ' cannot levelup.')
-    config.text('Note:')
-    config.text('   * Will not load with "gg_knife_pro" enabled.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_knife_rookie.')
-    config.text('   1 = (Enabled) Load gg_knife_rookie.')
-    config.text('Default Value: 0')
-    config.cvar('gg_knife_rookie', 0, 'Enables/Disables ' +
-                'gg_knife_rookie.')
-                
     # Knife Elite
     config.text('')
     config.text('='*76)
