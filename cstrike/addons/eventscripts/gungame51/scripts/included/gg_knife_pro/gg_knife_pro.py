@@ -36,6 +36,7 @@ info.translations = ['gg_knife_pro']
 # ============================================================================
 gg_knife_pro_limit = es.ServerVar('gg_knife_pro_limit')
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
+gg_knife_pro_rookie = es.ServerVar('gg_knife_pro_rookie')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -70,12 +71,6 @@ def player_death(event_var):
     # ===================
     if event_var['weapon'] != 'knife':
         return
-        
-    # ==================
-    # Add warmup check
-    # here.
-    # ==================
-    # .. 
    
     # ===================
     # Attacker Info
@@ -87,10 +82,6 @@ def player_death(event_var):
     # ===================
     # Fix duplicate winning
     if ggAttacker.level >= getTotalLevels():
-        return
-    
-    # ',,|,,' ?
-    if ggAttacker.preventlevel:
         return
         
     # Is the attacker on knife or grenade level?
@@ -106,15 +97,14 @@ def player_death(event_var):
     # ===================
     # Victim checks
     # ===================
-    # Can the victim level down
-    if ggVictim.preventlevel:
-        msg(attacker, 'VictimPreventLevel', prefix=True)
-        return
         
     # Is victim on level 1?
     if ggVictim.level == 1:
-        msg(attacker, 'VictimLevel1', prefix=True)
-        return
+        
+        # Checking for knife rookie
+        if not int(gg_knife_pro_rookie):
+            msg(attacker, 'VictimLevel1', prefix=True)
+            return
         
     # Is the victim AFK?
     if ggVictim.afk():
@@ -122,22 +112,38 @@ def player_death(event_var):
         return
         
     # Is the level difference higher than the limit?
-    if (ggAttacker.level - ggVictim.level) >= int(gg_knife_pro_limit) and int(gg_knife_pro_limit) != 0:
-        msg(attacker, 'LevelDifferenceLimit', {'limit': int(gg_knife_pro_limit)}, prefix=True)
+    if (ggAttacker.level - ggVictim.level) >= int(gg_knife_pro_limit) and \
+                                                int(gg_knife_pro_limit) != 0:
+        msg(attacker, 'LevelDifferenceLimit', 
+            {'limit': int(gg_knife_pro_limit)}, prefix=True)
         return
         
     # ===================
     # Level changes
     # ===================
-    ggVictim.leveldown(1, attacker, 'steal')
-    ggAttacker.levelup(1, userid, 'steal')
+    
+    # Can the victim level down ?
+    if ggVictim.level > 1:
+        
+        # Send message to attacker if victim cannot level down?
+        if ggVictim.preventlevel:
+            if not int(gg_knife_pro_rookie):
+                msg(attacker, 'VictimPreventLevel', prefix=True)
+        
+        # Level down the victim
+        else:   
+            ggVictim.leveldown(1, attacker, 'steal')
+    
+    # Can the attacker level up ?
+    if not ggAttacker.preventlevel:
+        ggAttacker.levelup(1, userid, 'steal')
     
     # Prevent player from leveling twice from the same knife kill
     ggAttacker.preventlevel.append('gg_knife_pro')
     gamethread.delayed(0, ggAttacker.preventlevel.remove, ('gg_knife_pro'))
      
     # ===================
-    # Sounds go hurr
+    # Sounds
     # ===================
     # ...
 
@@ -152,11 +158,10 @@ def player_death(event_var):
     es.event('fire', 'gg_knife_steal')
     
     # Announce the level steal
-    saytext2('#human', ggAttacker.index, 'StoleLevel', {'attacker': event_var['es_attackername'], 'victim': event_var['es_username']})
-    
-# ============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+    saytext2('#human', ggAttacker.index, 'StoleLevel', 
+        {'attacker': event_var['es_attackername'], 
+        'victim': event_var['es_username']})
+
 
 
 
