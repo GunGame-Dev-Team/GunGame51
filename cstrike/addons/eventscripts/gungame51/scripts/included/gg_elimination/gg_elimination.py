@@ -53,6 +53,10 @@ class RoundInfo(object):
         self.active = False
         self.round = 0
 
+class Eliminated(list):
+    def __new__(cls, * args):
+        return list.__new__(cls, *args)
+
 
 roundInfo = RoundInfo()
 
@@ -65,6 +69,7 @@ def load():
 
     # Get userids of all connected players
     setAttribute('#all', 'eliminated', [])
+    
 
 # ============================================================================
 # >> GAME EVENTS
@@ -91,7 +96,8 @@ def round_end(event_var):
 
 def player_activate(event_var):
     # Create player dictionary
-    Player(event_var['userid']).eliminated = []
+    userid = int(event_var['userid'])
+    setAttribute(userid, 'eliminated', [])
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
@@ -105,6 +111,7 @@ def player_disconnect(event_var):
     del ggPlayer.eliminated
 
 def player_death(event_var):
+    
     # Check to see if the round is active
     if not roundInfo.active:
         return
@@ -119,21 +126,23 @@ def player_death(event_var):
     if userid == attacker or attacker == 0:
         gamethread.delayed(5, respawnPlayer, (userid, roundInfo.round))
         ggVictim.msg('SuicideAutoRespawn', prefix=True)
+        return
 
     # Was a teamkill?
-    elif event_var['es_userteam'] == event_var['es_attackerteam']:
+    if event_var['es_userteam'] == event_var['es_attackerteam']:
         gamethread.delayed(5, respawnPlayer, (userid, roundInfo.round))
         ggVictim.msg('TeamKillAutoRespawn', prefix=True)
+        return
 
-    # Was a normal death
-    else:
-        # Add victim to the attackers eliminated players
-        ggAttacker.eliminated.append(userid)
+    ''' Was a normal death '''
+    
+    # Add victim to the attackers eliminated players
+    ggAttacker.eliminated.append(userid)
 
-        # Tell them they will respawn when their attacker dies
-        index = ggAttacker.index
+    # Tell them they will respawn when their attacker dies
+    index = ggAttacker.index
 
-        ggVictim.saytext2(index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']}, True)
+    ggVictim.saytext2(index, 'RespawnWhenAttackerDies', {'attacker': event_var['es_attackername']}, True)
 
     # Check if victim had any Eliminated players
     gamethread.delayed(1, respawnEliminated, (userid, int(roundInfo.round)))
@@ -154,7 +163,7 @@ def respawnPlayer(userid, respawnRound):
     plPlayer = getPlayer(userid)
 
     # Make sure the player is respawnable
-    if not plPlayer.isdead or plPlayer.isobserver:
+    if not plPlayer.isdead or es.getplayerteam(userid) < 2:
         return
     
     # Retrieve the GunGame player object
@@ -166,7 +175,7 @@ def respawnPlayer(userid, respawnRound):
     # Respawn player
     ggPlayer.respawn()
 
-def respawnEliminated(userid, respawnRound):    
+def respawnEliminated(userid, respawnRound):       
     # Check if round is over
     if not roundInfo.active:
         return
@@ -189,14 +198,14 @@ def respawnEliminated(userid, respawnRound):
     # Respawn all victims eliminated players
     for playerid in ggPlayer.eliminated:
         # Make sure the player is respawnable
-        if not getPlayer(playerid).isdead or getPlayer(playerid).isobserver:
+        if not getPlayer(playerid).isdead or es.getplayerteam(playerid) < 2:
             continue
 
         # Respawn player
         Player(playerid).respawn()
 
         # Add to message format
-        players.append('\3%s\1' % es.getplayername(playerid))
+        players.append('\3%s\1' % getPlayer(playerid).name)
 
         # Get index
         if not index:

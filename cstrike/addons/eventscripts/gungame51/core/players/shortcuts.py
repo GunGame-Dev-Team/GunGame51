@@ -9,6 +9,9 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+# Python Imports
+from copy import copy
+
 # EventScripts Imports
 from playerlib import getPlayerList
 
@@ -50,9 +53,7 @@ def setAttribute(filter, attribute, value):
 
     if '#' in filter:
         for userid in getPlayerList(filter):
-            import es
-            es.dbgmsg(0, 'Set attribute "%s" for %s to "%s"' %(attribute, es.getplayername(userid), value))
-            Player(userid)[attribute] = value
+            Player(userid)[attribute] = copy(value)
         return
     Player(filter)[attribute] = value
 
