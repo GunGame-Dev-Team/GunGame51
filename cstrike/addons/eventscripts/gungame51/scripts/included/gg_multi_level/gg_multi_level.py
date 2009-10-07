@@ -38,9 +38,12 @@ info.translations = ['gg_multi_level']
 # Get the es.ServerVar() instance of "gg_multi_level"
 gg_multi_level = es.ServerVar("gg_multi_level")
 # Get the es.ServerVar() instance of "gg_multi_level_gravity"
+gg_multi_level_tk_reset = es.ServerVar("gg_multi_level_tk_reset")
+# Get the es.ServerVar() instance of "gg_multi_level_gravity"
 gg_multi_level_gravity = es.ServerVar("gg_multi_level_gravity")
 # Get the es.ServerVar() instance of "eventscripts_lastgive"
 eventscripts_lastgive = es.ServerVar("eventscripts_lastgive")
+
 
 multiLevelSound = "null.wav"
 list_currentMultiLevel = []
@@ -216,7 +219,15 @@ def player_death(event_var):
 
         # Remove bonus effects
         removeMultiLevel(userid)
-
+    
+    # Do we ignore team kills?
+    if event_var['es_attackerteam'] == event_var['es_userteam']:
+        if int(gg_multi_level_tk_reset):
+            return
+    
+    # Resetting the player's multi-kills
+    Player(userid).multiLevels = 0
+    
 def es_map_start(event_var):
     # For all players
     for userid in list_currentMultiLevel:

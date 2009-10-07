@@ -88,15 +88,36 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   The percentage of gravity that players receieving the ' +
-                'multi-level bonus will have.')
+                'multi-level bonus') 
+    config.text('   will have.')
     config.text('Options:')
     config.text('   100 = (Disabled) Keep the player\'s gravity unchanged.')
-    config.text('   # = (Enabled) The percentage of normal gravity the player ' +
-                'will have.')
+    config.text('   # = (Enabled) The percentage of normal gravity the ' +
+                'player') 
+    config.text('                 will have.')
     config.text('Default Value: 100')
-    config.cvar('gg_multi_level_gravity', 100, 'The percentage of gravity included ' +
-                'with the multi-level bonus.')
-
+    config.cvar('gg_multi_level_gravity', 100, 'The percentage of gravity ' + 
+                'included with the multi-level bonus.')
+    
+    # Multi-Level TK Victim Reset
+    config.text('')
+    config.text('='*76)
+    config.text('>> MULTI-LEVEL TK VICTIM RESET')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Victims of team killings will not have their level-up ' +
+                'count reset.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) All players will have their level-up ' +
+                'count reset') 
+    config.text('                  when they die.')
+    config.text('   1 = (Enabled) Team kill victims not have their level-up ' +
+                'count reset') 
+    config.text('when they die.')
+    config.text('Default Value: 0')
+    config.cvar('gg_multi_level_tk_reset', 0, 'Continue multi level count ' +
+                'for TK victims.')
+                
     # Turbo Mode
     config.text('')
     config.text('='*76)
@@ -253,8 +274,8 @@ def load():
     config.text('>> FRIENDLY FIRE')
     config.text('='*76)
     config.text('Description:')
-    config.text('   Automatically turn on friendly fire when a player reaches' +
-                ' "x" levels')
+    config.text('   Automatically turn on friendly fire when a player ' +
+                'reaches "x" levels')
     config.text('   below the last level (+1).')
     config.text('Examples:')
     config.text('   * gg_friendlyfire 1')
@@ -262,8 +283,8 @@ def load():
                 ' reaches the last')
     config.text('         level.')
     config.text('   * gg_friendlyfire 2')
-    config.text('        - The above will turn on friendly fire when a player' +
-                ' reaches one')
+    config.text('        - The above will turn on friendly fire when a ' +
+                'player reaches one')
     config.text('          level before the last.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_friendlyfire.')
@@ -347,8 +368,8 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
-                'current map has been')
-    config.text('   created.')
+                'current map has')
+    config.text('    been created.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_random_spawn.')
     config.text('   1 = (Enabled) Load gg_random_spawn.')
@@ -445,7 +466,8 @@ def load():
     config.text('Options:')
     config.text('   0 = (Disabled) Do not allow players to level up while ' +
                 'spawn protected.')
-    config.text('   1 = (Enabled) Allow players to level up while spawn protected.')
+    config.text('   1 = (Enabled) Allow players to level up while spawn ' + 
+                'protected.')
     config.text('Default Value: 0')
     config.cvar('gg_spawn_protect_can_level_up', 1, 'Allow players ' +
                 'to level up while spawn protected')
@@ -553,7 +575,8 @@ def load():
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap.')
     config.text('   1 = Set player to the level of the lowest level of all ' +
-                'the other players. Basically "catching them up".')
+                'the other players.') 
+    config.text('       Basically "catching them up".')
     config.text('Default Value: 0')
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
                 'adjusting their level.')
@@ -565,8 +588,9 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   A timer (in seconds) that updates players with the ' +
-                'lowest level to the lowest level of the other players. ' +
-                'Basically "catching them up".')
+                'lowest level to the') 
+    config.text('   lowest level of the other players. Basically "catching ' +
+                'them up".')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap_update.')
     config.text('   1 = (Enabled) Load gg_handicap_update.')
@@ -580,12 +604,15 @@ def load():
     config.text('>> THANKS')
     config.text('='*76)
     config.text('Description:')
-    config.text('   Allows players to type !thanks to display a list of those involved with development and testing of GunGame.')
+    config.text('   Allows players to type !thanks to display a list of ' +
+                'those involved with') 
+    config.text('   development and testing of GunGame.')
     config.text('Options:')
     config.text('   0 = Disabled')
     config.text('   1 = Enabled')
     config.text('Default Value: 1')
-    config.cvar('gg_thanks', 1, 'Allows players to type !thanks to display a list of those involved with development and testing of GunGame.')
+    config.cvar('gg_thanks', 1, 'Displays a list of those involved with ' + 
+                'development and testing of GunGame.')
     
     config.write()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
