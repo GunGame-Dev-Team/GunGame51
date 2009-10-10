@@ -158,7 +158,8 @@ class BasePlayer(object):
         if name in setHooks:
             del setHooks[name]
 
-        # Delete the attribute only if it exists (we don't want to raise errors)
+        # Delete the attribute only if it exists 
+        #   (we don't want to raise errors)
         if hasattr(self, name):
             object.__delattr__(self, name)
 
@@ -252,7 +253,7 @@ class BasePlayer(object):
         Gives a player their current levels weapon.
         '''
         # Make sure player is on a team
-        if getPlayer(self.userid).isobserver:
+        if es.getplayerteam(self.userid) < 2:
             raise GunGameError('Unable to give player weapon (%s):'
                 %self.userid + ' is not on a team.')
 
@@ -278,7 +279,8 @@ class BasePlayer(object):
                     if self.steamid[0:4] != 'BOT_':
                         es.remove(pPlayer.getWeaponIndex(pWeapon))
                     else:
-                        es.server.queuecmd('es_xremove %s' % pPlayer.getWeaponIndex(pWeapon))
+                        es.server.queuecmd('es_xremove %s' \
+                        % pPlayer.getWeaponIndex(pWeapon))
 
             # Is the weapon a secondary weapon?
             elif "weapon_%s" %self.weapon in list_sWeapons:
@@ -291,28 +293,35 @@ class BasePlayer(object):
                     if self.steamid[0:4] != 'BOT_':
                         es.remove(pPlayer.getWeaponIndex(sWeapon))
                     else:
-                        es.server.queuecmd('es_xremove %s' % pPlayer.getWeaponIndex(sWeapon))
+                        es.server.queuecmd('es_xremove %s' \
+                        % pPlayer.getWeaponIndex(sWeapon))
 
         # Give the player their weapon if it is not a knife
         if self.weapon != 'knife':
             '''
-            The method of using item_pickup is causing considerable/massive lag on a live server.
-            Commented out for now, as it does no harm for the time being.
+            The method of using item_pickup is causing considerable/massive lag 
+            on a live server.  Commented out for now, as it does no harm for 
+            the time being.
             '''
-            # Register wrongWeaponCheck to ensure that the correct weapon was received
-            es.addons.registerForEvent(self, 'item_pickup', self.wrongWeaponCheck)
+            # Register wrongWeaponCheck to ensure that the correct 
+            #  weapon was received
+            es.addons.registerForEvent(self, 'item_pickup', 
+            self.wrongWeaponCheck)
             
             # Give new weapon
-            es.server.queuecmd('es_xgive %s %s' % (self.userid, 'weapon_%s' %self.weapon))
+            es.server.queuecmd('es_xgive %s %s' % (self.userid, 
+            'weapon_%s' %self.weapon))
             
-            gamethread.delayed(0.05, es.addons.unregisterForEvent, (self, 'item_pickup'))
+            gamethread.delayed(0.05, es.addons.unregisterForEvent, 
+            (self, 'item_pickup'))
         # If the weapon is a knife or hegrenade, strip
         if self.weapon in ['knife', 'hegrenade']:
             self.strip()
 
         # Make them use the new weapon via es_xsexec
         # We use this because es.sexec is too fast in some cases.
-        es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, self.weapon))
+        es.delayed(0, 'es_xsexec %s "use weapon_%s"' %(self.userid, 
+        self.weapon))
         
         gamethread.delayed(0.05, self.noWeaponCheck)
     
@@ -320,7 +329,8 @@ class BasePlayer(object):
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
         
-        # Store the weapon you are holding in the weapon slot which your level's weapon
+        # Store the weapon you are holding in the weapon slot which your 
+        #  level's weapon
         # should be in
         if "weapon_%s" %self.weapon in list_pWeapons:
             weapon = pPlayer.getPrimary()
@@ -349,9 +359,12 @@ class BasePlayer(object):
         owner = es.getindexprop(int_lastgive, 'CBaseEntity.m_hOwnerEntity')
         if owner != es.getplayerhandle(self.userid):
             userid = es.getuserid(owner)
-            es.server.queuecmd('es_xsexec %s "use weapon_%s"' %(userid, Player(userid).weapon))
-            # If the weapon on the ground is the same as the weapon that was dropped
-            if es.createentitylist()[int_lastgive]['classname'] == 'weapon_' + self.weapon:
+            es.server.queuecmd('es_xsexec %s "use weapon_%s"' %(userid, 
+            Player(userid).weapon))
+            # If the weapon on the ground is the same as the weapon that was 
+            #   dropped
+            if es.createentitylist()[int_lastgive]['classname'] == \
+            'weapon_' + self.weapon:
                 # Remove the weapon
                 es.remove(int_lastgive)
 
@@ -366,7 +379,8 @@ class BasePlayer(object):
             return
 
         # Unregister wrongWeaponCheck, since we already caught the pickup
-        gamethread.delayed(0, es.addons.unregisterForEvent, (self, 'item_pickup'))
+        gamethread.delayed(0, es.addons.unregisterForEvent, 
+        (self, 'item_pickup'))
 
         # If the item picked up is the item you want, or a knife, return
         if event_var['item'] in [self.weapon, 'knife']:
@@ -397,8 +411,10 @@ class BasePlayer(object):
 
         # If the last given entity was the extra weapon on the floor
         if es.getindexprop(int_lastgive, 'CBaseEntity.m_hOwnerEntity') == -1:
-            # If the weapon on the ground is the same as the weapon that was dropped
-            if es.createentitylist()[int_lastgive]['classname'] == 'weapon_' + self.weapon:
+            # If the weapon on the ground is the same as the weapon that was 
+            #   dropped
+            if es.createentitylist()[int_lastgive]['classname'] == \
+            'weapon_' + self.weapon:
                 # Remove the weapon
                 es.remove(int_lastgive)
 
@@ -408,14 +424,15 @@ class BasePlayer(object):
         Weapons given by this method will not be stripped by gg_dead_strip.
         '''
         # Check if the weapon is valid
-        weapon = weapon.replace('weapon_', '')
+        weapon = str(weapon).replace('weapon_', '')
 
         if weapon not in list_pWeapons + list_sWeapons + \
             ['hegrenade', 'flashbang', 'smokegrenade']:
-                raise PlayerError('Unable to give (%s): is not a valid weapon'
+                raise ValueError('Unable to give (%s): is not a valid weapon'
                     %weapon)
 
-        # Add weapon to strip exceptions so gg_dead_strip will not strip the weapon
+        # Add weapon to strip exceptions so gg_dead_strip will not 
+        #   strip the weapon
         self.stripexceptions.append(weapon)
 
         # Delay removing the weapon long enough for gg_dead_strip to fire
@@ -429,16 +446,18 @@ class BasePlayer(object):
 
         es.server.queuecmd(cmd)
 
-    def strip(self):
+    def strip(self, fullStrip=False):
         '''
         Strips/removes all weapons from the player minus the knife and their
-        current levels weapon.
+        current levels weapon. Unless True is specified, and their level weapon
+        is also stripped.
         '''
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
 
         for weapon in pPlayer.getWeaponList():
-            if 'weapon_%s' %self.weapon == weapon or weapon == 'weapon_knife':
+            if ('weapon_%s' %self.weapon == weapon and not fullStrip) or \
+            weapon == 'weapon_knife':
                 continue
 
             # Remove the weapon

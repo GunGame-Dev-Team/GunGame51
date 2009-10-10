@@ -170,8 +170,8 @@ loadedByDependency = AddonLoadedByDependency()
 class DependencyError(Exception):
     """
     We want a nice, descriptive error for dependency problems
-    Due to the fact this error is unique it will need to be referenced by module
-    If we want this error excepted we must except:
+    Due to the fact this error is unique it will need to be referenced by 
+    module.  If we want this error excepted we must except:
     gungame.DependencyError
     """
     pass
@@ -237,8 +237,7 @@ class PriorityAddon(list):
             list.remove(self, name)
 
     def clear(self):
-        del list[:]
-
+        del self[:]
 
 priority_addons = PriorityAddon()
 
@@ -351,7 +350,8 @@ class AddonManager(object):
                 #   self.callEvent() to handle ALL events
                 es.addons.registerForEvent(self, item, self.callEvent)
 
-            # Add the addon to the list of addons to call when the event triggers
+            # Add the addon to the list of addons to call when the event 
+            #   triggers
             self.__events__[item][name] = addon_globals[item]
 
     def unregisterEvents(self, addon, name):
