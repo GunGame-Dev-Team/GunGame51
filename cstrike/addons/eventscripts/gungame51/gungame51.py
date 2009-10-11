@@ -55,8 +55,11 @@ from core.messaging.shortcuts import centermsg
 from core.messaging.shortcuts import toptext
 from core.messaging.shortcuts import msg
 
-#   Event Function imports
+#   Event Function Imports
 from core.events.shortcuts import EventManager
+
+#   Sound Function Imports
+from core.sound import make_downloadable
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -187,6 +190,8 @@ def es_map_start(event_var):
     # Check for priority addons
     if priority_addons:
         del priority_addons[:]
+
+    make_downloadable()
 
     # Load custom GunGame events
     es.loadevents('addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')

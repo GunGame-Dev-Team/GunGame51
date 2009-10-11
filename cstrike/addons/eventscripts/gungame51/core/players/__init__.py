@@ -176,7 +176,7 @@ class BasePlayer(object):
         self.__delattr__(name)
 
     # =========================================================================
-    # >> BasePlayer() CUSTOM CLASS METHODS
+    # >> BasePlayer() LEVELING CLASS METHODS
     # =========================================================================
     def levelup(self, levelsAwarded, victim=0, reason=''):
         '''
@@ -224,6 +224,9 @@ class BasePlayer(object):
         # Use the EventManager to call the gg_leveldown event
         EventManager().gg_leveldown(self, levelsTaken, attacker, reason)
 
+    # =========================================================================
+    # >> BasePlayer() MESSAGING CLASS METHODS
+    # =========================================================================
     def msg(self, string, tokens={}, prefix=False):
         __messages__.msg(self.userid, string, tokens, prefix)
 
@@ -245,6 +248,9 @@ class BasePlayer(object):
     def langstring(self, string, tokens={}, prefix=False):
         return __messages__.langstring(self.userid, string, tokens, prefix)
 
+    # =========================================================================
+    # >> BasePlayer() WEAPON CLASS METHODS
+    # =========================================================================
     def getWeapon(self):
         return getLevelWeapon(self.level)
 
@@ -463,6 +469,9 @@ class BasePlayer(object):
             # Remove the weapon
             es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
 
+    # =========================================================================
+    # >> BasePlayer() MISCELLANEOUS CLASS METHODS
+    # =========================================================================
     def respawn(self):
         '''
         Respawns the player.
@@ -474,6 +483,42 @@ class BasePlayer(object):
         else:
             # SourceMod Workaround
             es.server.queuecmd('%s%s' % (gg_respawn_cmd, self.userid))
+
+    # =========================================================================
+    # >> BasePlayer() SOUND CLASS METHODS
+    # =========================================================================
+    def playsound(self, sound, volume=1.0):
+        '''
+        Plays the declared sound to the player.
+        '''
+        # Make sure the sound exists
+        if self._format_sound(sound):
+            # Play the sound
+            es.playsound(self.userid, sound, volume)
+
+    def emitsound(self, sound, volume=1.0, attenuation=0.0):
+        '''
+        Emits the declared sound from the player.
+        '''
+        # Make sure the sound exists
+        if self._format_sound(sound):
+            # Play the sound
+            es.emitsound('player', self.userid, sound, volume, attenuation)
+    
+    def stopsound(self, sound):
+        '''
+        Plays the declared sound to the player.
+        '''
+        # Make sure the sound exists
+        if self._format_sound(sound):
+            # Play the sound
+            es.stopsound(self.userid, sound)
+
+    def _format_sound(self, sound):
+        if not self.soundpack[sound]:
+            return sound
+        return self.soundpack[sound]
+
 
 class PlayerDict(dict):
     '''
