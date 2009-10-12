@@ -17,6 +17,7 @@ import es
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.players import Player
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -30,16 +31,6 @@ info.requires = ['gg_dead_strip']
 info.conflicts = ['gg_turbo']
 
 # ============================================================================
-# >> GLOBAL VARIABLES
-# ============================================================================
-
-
-# ============================================================================
-# >> CLASSES
-# ============================================================================
-
-
-# ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
@@ -51,8 +42,13 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-
-
-# ============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+def gg_levelup(event_var):
+    # Get userid
+    attacker = int(event_var['attacker'])
+    
+    # Switch the player to knife
+    es.server.queuecmd('es_xsexec %s "use weapon_knife"' % attacker)
+    
+    # Strip player of all weapons but a knife
+    Player(attacker).strip(True)
+    
