@@ -492,7 +492,7 @@ class BasePlayer(object):
         Plays the declared sound to the player.
         '''
         # Format the sound
-        sound = self._format_sound(sound):
+        sound = self._format_sound(sound)
         
         # Make sure the sound exists
         if sound:
@@ -504,7 +504,7 @@ class BasePlayer(object):
         Emits the declared sound from the player.
         '''
         # Format the sound
-        sound = self._format_sound(sound):
+        sound = self._format_sound(sound)
         
         # Make sure the sound exists
         if sound:
@@ -516,7 +516,7 @@ class BasePlayer(object):
         Plays the declared sound to the player.
         '''
         # Format the sound
-        sound = self._format_sound(sound):
+        sound = self._format_sound(sound)
         
         # Make sure the sound exists
         if sound:
