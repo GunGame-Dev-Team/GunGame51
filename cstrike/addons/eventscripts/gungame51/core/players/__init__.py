@@ -119,8 +119,8 @@ class BasePlayer(object):
     # =========================================================================
     def __init__(self, userid): 
         self.userid = userid 
-        self.level = 1
         self.preventlevel = PreventLevel()
+        self.level = 1
         self.afk = AFK(self.userid)
         self.multikill = 0
         self.steamid = uniqueid(str(self.userid), 1)

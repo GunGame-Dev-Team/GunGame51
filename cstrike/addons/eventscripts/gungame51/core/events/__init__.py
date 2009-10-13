@@ -61,10 +61,6 @@ class EventManager(object):
 
         # Reset multikill
         playerInstance.multikill = 0
-
-        # Check to see if the player is a leader
-        if newLevel >= leaders.leaderlevel:
-            leaders.add(playerInstance.userid)
         
         # Fire the event
         es.event('initialize', 'gg_levelup')
@@ -107,10 +103,6 @@ class EventManager(object):
 
         # Reset multikill
         playerInstance.multikill = 0
-        
-        # Check to see if the player is a leader
-        if oldLevel == leaders.leaderlevel and playerInstance.userid in leaders.current:
-            leaders.remove(playerInstance.userid)
 
         # Fire the event
         es.event('initialize', 'gg_leveldown')
