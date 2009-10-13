@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
+import repeat
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -30,15 +31,28 @@ info.translations = ['gg_handicap']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
+gg_handicap_update = es.ServerVar('gg_handicap_update')
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    # Creating repeat loop
+    repeat.create('gungameHandicapLoop', handicapUpdate)
+    
+    # Start repeat loop?
+    if int(gg_handicap_update):
+        repeat.start('gungameHandicapLoop', int(gg_handicap_update), 0)
+    
+    # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
 def unload():
+    # Delete the repeat loop
+    if repeat.status('gungameHandicapLoop'):       
+        repeat.delete('gungameHandicapLoop')
+    
+    # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
 # ============================================================================
@@ -47,8 +61,16 @@ def unload():
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
+    # Check if player needs handicap
+    handicapCheck(userid)
+
+# ============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# ============================================================================
+def handicapCheck(userid, isupdate=False):
     # Get the level of the lowest level player other than themself
     handicapLevel = getLevelAboveUser(userid)
+    
     # Get the player
     ggPlayer = Player(userid)
 
@@ -56,12 +78,17 @@ def player_activate(event_var):
     if ggPlayer.level < handicapLevel:
         ggPlayer.level = handicapLevel
 
-        # Tell the player that their level was adjustedG
+        # Tell the player that their level was adjusted
         ggPlayer.msg('LevelLowest', {'level':handicapLevel})
+        
+        # Play sound if its an update check
+        if isupdate:
+            ggPlayer.playsound('handicap')    
 
-# ============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+def handicapUpdate():
+    for userid in es.getUseridList():
+        handicapCheck(userid, True)
+
 def getLowestLevelUsers():
     lowestLevel = get_leader_level()
     userList = []
@@ -96,7 +123,6 @@ def getLevelAboveLowest():
         # If the player is not on an active team, skip them
         if int(es.getplayerteam(userid)) <= 1:
             continue
-
 
         # Get the player's level
         playerLevel = Player(userid).level
