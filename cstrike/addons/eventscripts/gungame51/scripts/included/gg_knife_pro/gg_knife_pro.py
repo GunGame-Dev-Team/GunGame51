@@ -127,26 +127,30 @@ def player_death(event_var):
         
         # Send message to attacker if victim cannot level down?
         if ggVictim.preventlevel:
+            
+            # Knife rookie?
             if not int(gg_knife_pro_rookie):
                 msg(attacker, 'VictimPreventLevel', prefix=True)
         
         # Level down the victim
         else:   
+            
+            # Play sound & send message
+            ggVictim.playsound('leveldown')            
             ggVictim.leveldown(1, attacker, 'steal')
     
     # Can the attacker level up ?
     if not ggAttacker.preventlevel:
+        
+        # Play sound & levelup
+        ggAttacker.playsound('levelsteal')
         ggAttacker.levelup(1, userid, 'steal')
     
     # Prevent player from leveling twice from the same knife kill
     ggAttacker.preventlevel.append('gg_knife_pro')
     gamethread.delayed(0, ggAttacker.preventlevel.remove, ('gg_knife_pro'))
-     
-    # ===================
-    # Sounds
-    # ===================
-    # ...
-
+    
+    
     # ===================
     # Fire the event
     # ===================

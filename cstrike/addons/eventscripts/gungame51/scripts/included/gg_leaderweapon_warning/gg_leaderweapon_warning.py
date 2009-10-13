@@ -15,7 +15,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.leaders.shortcuts import get_leader_level
+from gungame51.core.leaders.shortcuts import getLeaderLevel
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 
 # ============================================================================
@@ -40,32 +40,32 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def round_start(event_var):
-    leaderWeapon = getLevelWeapon(get_leader_level())
-
-    '''
-    STILL HAVE TO FIGURE OUT HOW TO IMPLEMENT SOUNDS
-
-    # Play knife sound
-    if leaderWeapon == 'knife':
-        gungamelib.playSound('#human', 'knifelevel')
-
-    # Play nade sound
-    if leaderWeapon == 'hegrenade':
-        gungamelib.playSound('#human', 'nadelevel')
-    '''
+    # Play sounds ?
+    weaponWarning()
 
 def gg_levelup(event_var):
-    # Get attacker info
-    ggPlayer = Player(event_var['attacker'])
+    # Play sounds ?
+    weaponWarning()
 
-    '''
-    STILL HAVE TO FIGURE OUT HOW TO IMPLEMENT SOUNDS
-
-    # Player on knife level?
-    if ggPlayer.weapon == 'knife':
-        gungamelib.playSound('#human', 'knifelevel')
-
-    # Player on nade level?
-    if ggPlayer.weapon == 'hegrenade':
-        gungamelib.playSound('#human', 'nadelevel')
-    '''
+# ============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# ============================================================================  
+def weaponWarning():
+    # Get leader weapon
+    leaderWeapon = getLevelWeapon(getLeaderLevel())
+    
+    # Knife level ?
+    if leaderWeapon == 'knife':
+        sound = 'knifelevel'
+    
+    # Nade level ?
+    elif leaderWeapon == 'hegrenade':
+        sound = 'nadelevel'
+    
+    # No warning ?
+    else:
+        return
+    
+    # Play sounds
+    for userid in getPlayerList('#human'):
+        Player(userid).playsound(sound)

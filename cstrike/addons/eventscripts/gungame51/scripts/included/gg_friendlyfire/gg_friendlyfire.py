@@ -11,12 +11,14 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
+from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getTotalLevels
 from gungame51.core.messaging.shortcuts import msg
+from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -76,7 +78,6 @@ def gg_levelup(event_var):
             # Send the message
             msg('#human', 'WatchYourFire', prefix=True)
 
-            '''
-            # Show message and sound
-            gungamelib.playSound('#all', 'friendlyfire')
-            '''
+            # Playing sound
+            for userid in getPlayerList('#human'):
+                Player(userid).playsound('friendlyfire')

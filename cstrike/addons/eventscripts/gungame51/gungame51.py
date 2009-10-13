@@ -16,6 +16,7 @@ import sys
 import es
 import gamethread
 from playerlib import getPlayer
+from playerlib import getPlayerList
 from weaponlib import getWeaponList
 
 # GunGame Imports
@@ -132,14 +133,16 @@ def initialize():
     #gungamelib.echo('gungame', 0, 0, 'Load_Start', {'version': __version__})
     
     # Load custom events
-    es.loadevents('declare', 'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    es.loadevents('declare', 
+        'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
     
     # Fire the gg_server.cfg
     es.server.cmd('exec gungame51/gg_server.cfg')
     
     # Get weapon order file
     # Set this as the weapon order and set the weapon order type
-    currentOrder = setWeaponOrder(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
+    currentOrder = setWeaponOrder(str(gg_weapon_order_file), 
+                                  str(gg_weapon_order_sort_type))
     
     # Set multikill override
     if int(gg_multikill_override) > 1:
@@ -155,22 +158,6 @@ def initialize():
     
     # Clear out the GunGame system
     resetPlayers()
-    
-    '''
-    gungamelib.echo('gungame', 0, 0, 'Load_Warmup')
-    '''
-
-    # We will mess with this later...
-    '''
-    # Start warmup timer
-    if inMap():
-        # Check to see if the warmup round needs to be activated
-        if int(es.ServerVar('gg_warmup_timer')) > 0:
-            es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
-        else:
-            # Fire gg_start event
-            EventManager().gg_start()
-    '''
     
     # Restart map
     msg('#human', 'Loaded')
@@ -194,7 +181,8 @@ def es_map_start(event_var):
     make_downloadable()
 
     # Load custom GunGame events
-    es.loadevents('addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    es.loadevents('addons/eventscripts/' + 
+                  'gungame51/core/events/data/es_gungame_events.res')
     
     # Execute GunGame's autoexec.cfg
     es.delayed('1', 'exec gungame51/gg_server.cfg')
@@ -208,7 +196,8 @@ def es_map_start(event_var):
     dict_variables['gungame_voting_started'] = False
     
     # Reset the "rounds remaining" variable for multi-rounds
-    dict_variables['roundsRemaining'] = gungamelib.getVariableValue('gg_multi_round')
+    dict_variables['roundsRemaining'] = \
+        gungamelib.getVariableValue('gg_multi_round')
     '''
     
     '''
@@ -335,7 +324,7 @@ def player_death(event_var):
                 # Is their weapon an hegrenade and do we allow AFK leveling?
                 if ggAttacker.weapon == 'hegrenade' and \
                     int(gg_allow_afk_levels_nade):
-                        # Pass if we are allowing AFK leveling on hegrenade level
+                        # Pass if we are allowing AFK leveling on nade level
                         pass
 
                 # Is their weapon a knife and do we allow AFK leveling?
@@ -367,7 +356,7 @@ def player_death(event_var):
         ggAttacker.levelup(1, userid, 'kill')
         
         # Play the levelup sound
-        #gungamelib.playSound(attacker, 'levelup')
+        ggAttacker.playsound('levelup')
         
         return
     
@@ -380,16 +369,17 @@ def player_death(event_var):
         ggAttacker.levelup(1, userid, 'kill')
             
         # Play the levelup sound
-        #gungamelib.playSound(attacker, 'levelup')
+        ggAttacker.playsound('levelup')
         
     # Increment their current multikill value
     else:
         # Message the attacker
         multiKill = getLevelMultiKill(ggAttacker.level)
-        ggAttacker.hudhint('MultikillNotification', {'kills': ggAttacker.multikill, 'total': multiKill})
+        ggAttacker.hudhint('MultikillNotification', 
+                           {'kills': ggAttacker.multikill, 'total': multiKill})
             
         # Play the multikill sound
-        #gungamelib.playSound(attacker, 'multikill')
+        ggAttacker.playsound('multikill')
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
@@ -406,7 +396,8 @@ def bomb_defused(event_var):
     weapon = ggPlayer.weapon
     
     # Cant skip the last level
-    if ggPlayer.level == getWeaponOrder().getTotalLevels() or weapon in ['knife', 'hegrenade']:
+    if ggPlayer.level == getWeaponOrder().getTotalLevels() or \
+                                weapon in ['knife', 'hegrenade']:
         ggPlayer.msg('CannotSkipLevel_ByDefusing', {'level':weapon})
         return
     
@@ -423,7 +414,8 @@ def bomb_exploded(event_var):
     weapon = ggPlayer.weapon
     
     # Cant skip the last level
-    if ggPlayer.level == getWeaponOrder().getTotalLevels() or weapon in ['knife', 'hegrenade']:
+    if ggPlayer.level == getWeaponOrder().getTotalLevels() or \
+                                weapon in ['knife', 'hegrenade']:
         ggPlayer.msg('CannotSkipLevel_ByPlanting', {'level':weapon})
         return
     
@@ -450,7 +442,8 @@ def gg_levelup(event_var):
     newLevel = int(event_var['new_level'])
     
     # Temporary message
-    es.msg('%s leveled up by killing %s!' %(event_var['es_attackername'], event_var['es_username']))
+    es.msg('%s leveled up by ' % event_var['es_attackername'] +
+           'killing %s!' % event_var['es_username'])
     
     # ===============
     # REGULAR LEVELUP
@@ -479,7 +472,9 @@ def gg_levelup(event_var):
     # Get leader level
     leaderLevel = gungamelib.leaders.get_leader_level()
     
-    if leaderLevel == (gungamelib.getTotalLevels() - gungamelib.getVariableValue('gg_vote_trigger')):
+    if leaderLevel == \
+    (gungamelib.getTotalLevels() - \
+    gungamelib.getVariableValue('gg_vote_trigger')):
         # Nextmap already set?
         if es.ServerVar('eventscripts_nextmapoverride') != '':
             gungamelib.echo('gungame', 0, 0, 'MapSetBefore')
@@ -524,10 +519,11 @@ def gg_win(event_var):
         # Tell the world
         saytext2('#human', index, 'PlayerWon', {'player':playerName})
         
-        '''
+
         # Play the winner sound
-        gungamelib.playSound('#human', 'winner')
-        '''
+        for userid in getPlayerList('#human'):
+            Player(userid).playsound('winner')
+
     else:
         # =====================================================================
         # ROUND WIN
@@ -545,7 +541,8 @@ def gg_win(event_var):
             '''
             gungamelib.setGlobal('isIntermission', 1)
             
-            es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
+            es.server.queuecmd('es_xload ' +
+                               'gungame/included_addons/gg_warmup_round')
             '''
         # Tell the world
         saytext2('#human', index, 'PlayerWonRound', {'player':playerName})
@@ -564,33 +561,42 @@ def gg_win(event_var):
     
     # Tell the world (center message)
     centermsg('#human', 'PlayerWon_Center', {'player': playerName})
-    gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center', {'player': playerName}))
-    gamethread.delayed(2, centermsg, ('#human', 'PlayerWon_Center', {'player': playerName}))
-    gamethread.delayed(3, centermsg, ('#human', 'PlayerWon_Center', {'player': playerName}))
+    gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center', 
+                                                    {'player': playerName}))
+    gamethread.delayed(2, centermsg, ('#human', 'PlayerWon_Center', 
+                                                    {'player': playerName}))
+    gamethread.delayed(3, centermsg, ('#human', 'PlayerWon_Center', 
+                                                    {'player': playerName}))
     
     # Toptext
     if int(event_var['es_attackerteam']) == 2:
-        toptext('#human', 10, '#red', 'PlayerWon_Center', {'player': playerName})
+        toptext('#human', 10, '#red', 'PlayerWon_Center', 
+                                                    {'player': playerName})
     else:
-        toptext('#human', 10, '#blue', 'PlayerWon_Center', {'player': playerName})
+        toptext('#human', 10, '#blue', 'PlayerWon_Center', 
+                                                    {'player': playerName})
         
 def gg_start(event_var):
     # Reset all the players
     resetPlayers()
     
 def gg_addon_loaded(event_var):
-    es.dbgmsg(0, 'gg_addon_loaded: "%s" of type "%s"' %(event_var['addon'], event_var['type']))
+    es.dbgmsg(0, 'gg_addon_loaded: "%s" ' % event_var['addon'] + 
+                 'of type "%s"' % event_var['type'])
     
 def gg_addon_unloaded(event_var):
-    es.dbgmsg(0, 'gg_addon_unloaded: "%s" of type "%s"' %(event_var['addon'], event_var['type']))
+    es.dbgmsg(0, 'gg_addon_unloaded: "%s" ' % event_var['addon'] + 
+                 'of type "%s"' % event_var['type'])
 
 def server_cvar(event_var):
     cvarName = event_var['cvarname']
 
-    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type', 'gg_multikill_override']:
+    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type', 
+                                                    'gg_multikill_override']:
         # Get weapon order file
         # Set this as the weapon order and set the weapon order type
-        currentOrder = setWeaponOrder(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
+        currentOrder = setWeaponOrder(str(gg_weapon_order_file), 
+                                      str(gg_weapon_order_sort_type))
 
         # Set multikill override
         currentOrder.setMultiKillOverride(int(gg_multikill_override))

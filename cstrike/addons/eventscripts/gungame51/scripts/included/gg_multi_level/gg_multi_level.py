@@ -37,15 +37,17 @@ info.translations = ['gg_multi_level']
 # ============================================================================
 # Get the es.ServerVar() instance of "gg_multi_level"
 gg_multi_level = es.ServerVar("gg_multi_level")
+
 # Get the es.ServerVar() instance of "gg_multi_level_gravity"
 gg_multi_level_tk_reset = es.ServerVar("gg_multi_level_tk_reset")
+
 # Get the es.ServerVar() instance of "gg_multi_level_gravity"
 gg_multi_level_gravity = es.ServerVar("gg_multi_level_gravity")
+
 # Get the es.ServerVar() instance of "eventscripts_lastgive"
 eventscripts_lastgive = es.ServerVar("eventscripts_lastgive")
 
-
-multiLevelSound = "null.wav"
+# List of players currently getting the multi-level boost
 list_currentMultiLevel = []
 
 # ============================================================================
@@ -81,17 +83,27 @@ class GravityManager(object):
             self.removeGravityChange(userid)
 
         if es.exists('userid', userid):
-            self.gravityList[userid] = {'lastairvalue': es.getplayerprop(userid, 'CBasePlayer.m_fFlags'), 'gravity': amount, 'lastmovementvalue': es.getplayerprop(userid, 'CBaseEntity.movetype')}
+            self.gravityList[userid] = {
+                'lastairvalue': es.getplayerprop(userid, 
+                                                 'CBasePlayer.m_fFlags'), 
+                'gravity': amount, 
+                'lastmovementvalue': es.getplayerprop(userid, 
+                                                      'CBaseEntity.movetype')
+            }
         else:
-            self.gravityList[userid] = {'lastairvalue': 0, 'gravity': amount, 'lastmovementvalue': 2}
+            self.gravityList[userid] = {
+                'lastairvalue': 0, 
+                'gravity': amount, 
+                'lastmovementvalue': 2
+            }
 
         self._resetGravity(userid, amount)
 
     def removeGravityChange(self, userid):
         '''
-        Check if the player is in the dictioanry. If so, reset their gravity to 1
-        and delete their instance from the dictionary. If there are no more players
-        within the gravityList, remove the tick listener.
+        Check if the player is in the dictioanry. If so, reset their gravity 
+        to 1 and delete their instance from the dictionary. If there are no 
+        more players within the gravityList, remove the tick listener.
         '''
         userid = int(userid)
 
@@ -99,7 +111,8 @@ class GravityManager(object):
             del self.gravityList[userid]
             self._resetGravity(userid, 1.0)
         else:
-            es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, 1.0))
+            es.server.queuecmd('es_xfire %s !self ' % userid + 
+                               'addoutput "gravity 1.0" 0.1 1')
 
         if not len(self.gravityList):
             for player in self.gravityList:
@@ -108,8 +121,8 @@ class GravityManager(object):
 
     def deleteGravityList(self):
         '''
-        Loop through all the players, reset their gravity to 1, delete the gravity
-        list then unregister the tick listener.
+        Loop through all the players, reset their gravity to 1, delete the 
+        gravity list then unregister the tick listener.
         '''
         for player in self.gravityList:
             _resetGravity(player, 1.0)
@@ -132,9 +145,11 @@ class GravityManager(object):
                     newaval = 0
                     newmval = 2
 
-                if self.gravityList[player]['lastairvalue'] != newaval or self.gravityList[player]['lastmovementvalue'] != newmval:
+                if self.gravityList[player]['lastairvalue'] != newaval or \
+                self.gravityList[player]['lastmovementvalue'] != newmval:
                     # Player has jumped or come off of a ladder
-                    self._resetGravity(player, self.gravityList[player]['gravity'])
+                    self._resetGravity(player, 
+                                       self.gravityList[player]['gravity'])
 
                 self.gravityList[player]['lastairvalue']      = newaval
                 self.gravityList[player]['lastmovementvalue'] = newmval
@@ -145,7 +160,8 @@ class GravityManager(object):
 
     def _resetGravity(self, userid, amount):
         # Change the players gravity to value amount.
-        es.server.queuecmd('es_xfire %s !self addoutput "gravity %s" 0.1 1'%(userid, amount))
+        es.server.queuecmd('es_xfire %s !self addoutput ' % userid + 
+                           '"gravity %s" 0.1 1' % amount)
 
 gravity = GravityManager()
 
@@ -276,8 +292,10 @@ def gg_levelup(event_var):
 
     # Is it greater than or equal to our threshold?
     if ggPlayer.multiLevels >= int(gg_multi_level):
+        
         # If they currently have the bonus
         if attacker in list_currentMultiLevel:
+            
             # Cancel the gamethread
             gamethread.cancelDelayed("%i_multilevel" % attacker)
 
@@ -294,16 +312,16 @@ def gg_levelup(event_var):
         ggPlayer.multiLevels = 0
 
         # Remove multilevel in 10
-        gamethread.delayedname(10, "%i_multilevel" % attacker, removeMultiLevel, attacker)
+        gamethread.delayedname(10, "%i_multilevel" % attacker, 
+                               removeMultiLevel, attacker)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def doMultiLevel(userid):
-    global multiLevelSound
-
     # Check userid validity
     if es.exists('userid', userid):
+        
         # Retrieve the player's name
         name = es.getplayername(userid)
 
@@ -312,7 +330,7 @@ def doMultiLevel(userid):
         saytext2('#all', Player(userid).index, 'MultiLevelled', {'name': name})
 
         # Play game sound
-        # ...
+        Player(userid).playsound('multilevel')
 
         # Create env_spark
         cmd = 'es_xgive %s env_spark; ' %userid
@@ -333,8 +351,10 @@ def doMultiLevel(userid):
         es.server.cmd(cmd)
 
         # If gg_multi_level_gravity is enabled, ajust the player's gravity
-        if int(gg_multi_level_gravity) != 100 and int(gg_multi_level_gravity) >= 0:
-            gravity.addGravityChange(userid, int(gg_multi_level_gravity) * 0.01)
+        if int(gg_multi_level_gravity) != 100 and \
+        int(gg_multi_level_gravity) >= 0:
+            gravity.addGravityChange(userid, 
+                                     int(gg_multi_level_gravity) * 0.01)
 
         # Grab it's index
         speedmod_index = int(eventscripts_lastgive)
@@ -356,7 +376,7 @@ def removeMultiLevel(userid):
     # Check validity
     if es.exists('userid', userid):
 
-        # Reset player speed and gravity (yes, I know this is the lame way but hey ;D
+        # Reset player speed and gravity (yes, I know this is the lame way)
         getPlayer(userid).set('speed', 1.0)
         gravity.removeGravityChange(userid)
 
@@ -371,7 +391,8 @@ def removeMultiLevel(userid):
             validIndexes = es.createentitylist('player_speedmod')
             validIndexes.update(es.createentitylist('env_spark'))
 
-            # If the saved index of the index given to the player still exists, remove it
+            # If the saved index of the index given to the player still exists
+            #   remove it.
             if ind in validIndexes.keys():
                 es.server.queuecmd('es_xremove %i' % ind)
 

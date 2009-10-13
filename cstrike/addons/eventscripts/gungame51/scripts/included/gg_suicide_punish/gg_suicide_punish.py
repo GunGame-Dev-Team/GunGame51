@@ -70,4 +70,4 @@ def player_death(event_var):
     ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level}, prefix='gg_suicide_punish')
 
     # Play the leveldown sound
-    #gungamelib.playSound(userid, 'leveldown')
+    ggVictim.playsound('leveldown')
