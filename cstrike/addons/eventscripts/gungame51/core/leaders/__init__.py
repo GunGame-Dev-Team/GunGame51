@@ -24,49 +24,125 @@ from gungame51.core.messaging.shortcuts import saytext2
 # >> CLASSES
 # =============================================================================
 class LeaderManager(object):
-    '''
-    Class designed to handle the GunGame leaders.
-    '''
+    """Class that automatically manages leaders."""
     # =========================================================================
     # >> LeaderManager() CLASS INITIALIZATION
     # =========================================================================
     def __init__(self):
-        self.leaderlevel = 1
-        self.current = []
         self.previous = []
+        self.useridlist = []
+        self.levellist = []
 
     # =========================================================================
-    # >> LeaderManager() CUSTOM CLASS METHODS
+    # >> LeaderManager() READ-ONLY PROPERTIES
     # =========================================================================
-    def add(self, userid):
-        '''
-        Adds a leader to the current leader list.
+    @property
+    def leaderlevel(self):
+        """Read-only property that returns the highest level from the list of
+        players.
 
-        Notes:
-            * Automatically determines which method to use:
-                - LeaderManager.addTie(userid)
-                - LeaderManager.addNew(userid)
-            * This method is recommended over the direct methods listed above.
-        '''
-        level = Player(userid).level
-        if not level >= self.leaderlevel:
-            raise ValueError('Unable to set "%s" as a current leader. '
-                %userid + 'The leader level "%s" is not greater than or '
-                %self.leaderlevel + 'equal to the player\'s level "%s".'
-                %level)
+        """
+        # Make sure there are levels in the level list
+        if self.levellist:
+            # Return the highest level in the list
+            return max(self.levellist)
 
-        # Determine if this is a tied leader or new leader
-        if level == self.leaderlevel:
-            if userid not in self.current:
-                self.addTie(userid)
-            else:
-                self.setNew(userid, False)
+        # Return 1 as the highest level if no levels are in the level list
+        return 1
+
+    @property
+    def current(self):
+        """Read-only property that returns a list of current leaders' userids.
+
+        """
+        return [x for x in self.useridlist \
+            if self.levellist[self.useridlist.index(x)] == self.leaderlevel]
+
+    # =========================================================================
+    # >> LeaderManager() BASE METHODS
+    # =========================================================================
+    def check(self, ggPlayer):
+        """Checks to see if the leader manager needs to update the leader
+        status.
+
+        """
+        
+        userid = ggPlayer.userid
+        level = ggPlayer.level
+
+        # Is this a current leader?
+        if self.is_leader(userid):
+            # Same leader
+            if level > self.leaderlevel:
+                self.new_or_same_leader(ggPlayer, True)
+
+            # Lost leader
+            elif level < self.leaderlevel:
+                self.lost_leader(ggPlayer)
+
+        # Not a current leader
         else:
-            self.setNew(userid)
+            # Tied leader
+            # Check leader to make sure leader level is > 1
+            if level == self.leaderlevel and self.leaderlevel != 1:
+                self.tied_leader(ggPlayer)
 
-    def addTie(self, userid, event=True):
-        '''
-        Adds a leader to the current leader list.
+            # New leader
+            elif level > self.leaderlevel:
+                self.new_or_same_leader(ggPlayer)
+
+            # NO LEADER-RELATION
+            else:
+                self.__update_level(userid, int(level))
+
+    def __update_level(self, userid, level):
+        """Adds userids and levels to the appropriate lists."""
+
+        # Do not update the level if leader level and player level are both 1
+        if self.leaderlevel == 1 and level == 1:
+            return
+
+        # Retrieve the index of the userid
+        index = self.__find_index(userid)
+
+        # Does the userid exist in the userid list?
+        # DEV NOTE: "if index" will not work due to returning an index of 0
+        if index != None:
+            # Update the userid with the appropriate level
+            self.levellist[index] = level
+
+        # The userid does not exist
+        else:
+            # Append the userid and level
+            self.useridlist.append(userid)
+            self.levellist.append(level)
+
+    def __find_index(self, userid):
+        """Finds the index of the userid in both the useridlist and the
+        levellist.
+
+        """
+
+        # Does the userid exist in the userid list?
+        if userid in self.useridlist:
+            # Return the index
+            return self.useridlist.index(userid)
+
+        return None
+
+    def reset(self):
+        """Resets the LeaderManager for a clean start of GunGame."""
+        # Call the __init__ to reset the LeaderManager instance
+        self.__init__()
+    
+    def is_leader(self, userid):
+        return (userid in self.current)
+
+    # =========================================================================
+    # LeaderManager() STATUS UPDATE METHODS
+    # =========================================================================
+    def tied_leader(self, ggPlayer, event=True):
+        """Adds a leader to the current leader list.
 
         Notes:
             * This should only be used when there is a tie for the leader.
@@ -74,40 +150,57 @@ class LeaderManager(object):
             * Updates the current leaders list.
             * Sends all players a message about the newly tied leader.
             * Fires the GunGame event "gg_tied_leader".
-        '''
-        # Make sure that the player's level is equal to the leader level
-        if not Player(userid).level == self.leaderlevel:
-            raise ValueError('Unable to set "%s" as a current leader. '
-                %userid + 'The leader level "%s" is not equal to '
-                %self.leaderlevel + 'the player\'s level "%s".'
-                %Player(userid).level)
 
-        # Make sure the player is not a leader
-        if self.isLeader(userid):
-            raise ValueError('Unable to set "%s" as a current leader. '
-                %userid + 'The userid "%s" is already a current leader.'
-                %userid)
+        """
+        # Set the previous leaders list
+        self.previous = self.current[:]
 
-        # Add the userid to the current leaders list
-        self.current.append(userid)
+        # Update the current userid
+        self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
 
         # Tied leader messaging
         leaderCount = len(self.current)
-        gungamePlayer = Player(userid)
 
         if leaderCount == 2:
-            saytext2('#all', gungamePlayer.index, 'TiedLeader_Singular', {'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
+            saytext2('#human', ggPlayer.index, 'TiedLeader_Singular',
+                {'player': es.getplayername(ggPlayer.userid),
+                'level': self.leaderlevel}, False)
         else:
-            saytext2('#all', gungamePlayer.index, 'TiedLeader_Plural', {'count': leaderCount, 'player': es.getplayername(gungamePlayer.userid), 'level': self.leaderlevel}, False)
+            saytext2('#human', ggPlayer.index, 'TiedLeader_Plural',
+                {'count': leaderCount,
+                'player': es.getplayername(ggPlayer.userid),
+                'level': self.leaderlevel}, False)
 
         if event:
             # Fire gg_tied_leader
-            EventManager().gg_tied_leader(userid)
+            EventManager().gg_tied_leader(ggPlayer.userid)
+    
+    def lost_leader(self, ggPlayer, event=True):
+        """Removes a player from the current leaders list.
 
+        Notes:
+            * Copies the contents of the "current" leaders list to the
+              "previous" leaders list.
+            * Fires the GunGame event "gg_leader_lostlevel".
 
-    def setNew(self, userid, event=True):
-        '''
-        Sets the current leader list as the new leader's userid.
+        """
+        # Make sure the player is a leader
+        if not self.is_leader(ggPlayer.userid):
+            raise ValueError('Unable to remove "%s" from the current leaders. '
+                %userid + 'The userid "%s" is not a current leader.' %userid)
+
+        # Set previous leaders
+        self.previous = self.current[:]
+
+        # Update the current userid
+        self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
+
+        if event:
+            # Fire gg_leader_lostlevel
+            EventManager().gg_leader_lostlevel(ggPlayer.userid)
+
+    def new_or_same_leader(self, ggPlayer, event=True):
+        """Sets the current leader list as the new leader's userid.
 
         Notes:
             * Copies the contents of the "current" leaders list to the
@@ -116,137 +209,71 @@ class LeaderManager(object):
             * Updates the leader level attribute.
             * Sends all players a message about the new leader.
             * Fires the GunGame event "gg_new_leader".
-        '''
-        # Make sure that the player's level is higher than the leader level
-        if not Player(userid).level >= self.leaderlevel:
-            raise ValueError('Unable to set "%s" as a new leader. '
-                %userid + 'The leader level "%s" is higher than '
-                %self.leaderlevel + 'the player\'s level "%s".'
-                %Player(userid).level)
 
-        # Set previous leaders list
+        """
+        # Set the previous leaders list
         self.previous = self.current[:]
 
-        # Set current leaders list
-        self.current = [userid]
-
-        # Set leader level
-        self.leaderlevel = Player(userid).level
+        # Update the current userid
+        self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
 
         # Message about new leader
-        gungamePlayer = Player(userid)
-        saytext2('#all', gungamePlayer.index, 'NewLeader', {'player': es.getplayername(userid), 'level': self.leaderlevel}, False)
+        saytext2('#human', ggPlayer.index, 'NewLeader',
+            {'player': es.getplayername(ggPlayer.userid),
+            'level': self.leaderlevel}, False)
 
-        if event:
-            # Fire gg_new_leader
-            EventManager().gg_new_leader(userid)
+        if not event:
+            return
 
-    def remove(self, userid, event=True):
-        '''
-        Removes a player from the current leaders list.
+        # Fire the "gg_new_leader" event
+        EventManager().gg_new_leader(ggPlayer.userid)
 
-        Notes:
-            * Copies the contents of the "current" leaders list to the
-              "previous" leaders list.
-            * Updates the current leaders list.
-            * Fires the GunGame event "gg_leader_lostlevel".
-        '''
-        # Make sure the player is a leader
-        if not self.isLeader(userid):
-            raise ValueError('Unable to remove "%s" from the current leaders. '
-                %userid + 'The userid "%s" is not a current leader.' %userid)
+    def disconnected_leader(self, userid):
+        """Handles the disconnection of players."""
+        userid = int(userid)
 
-        # Set previous leaders
-        self.previous = self.current[:]
+        # Make sure the userid no longer exists on the server
+        if es.exists(userid):
+            return
 
-        # Remove the userid from the current leaders list
-        self.current.remove(userid)
+        # Make sure this player is a leader
+        if not self.is_leader(userid):
+            # Remove the userid
+            self.__remove_userid(userid)
 
-        # Check to see if we need to find new leaders
-        if not len(self.current):
-            self.refresh()
+            return
 
-        if event:
-            # Fire gg_leader_lostlevel
-            EventManager().gg_leader_lostlevel(userid)
+        # Set up a variable for triggering a new leader message
+        newLeader = False
 
-    def reset(self):
-        '''
-        Resets the LeaderManager for a clean start of GunGame.
-        '''
-        # Call the __init__ to reset the LeaderManager instance
-        self.__init__()
-
-    def cleanup(self, listname):
-        '''
-        Removes disconnected userids from the list.
-        '''
-        if not listname in ['current', 'previous']:
-            raise AttributeError('LevelManager has no attribute: "%s".'
-                %listname)
-
-        leaderList = getattr(self, listname)
-        for userid in leaderList[:]:
-            if not es.exists('userid', userid):
-                leaderList.remove(userid)
-
-        return leaderList[:]
-
-    def isLeader(self, userid):
-        '''
-        Returns True/False if the userid is a current leader.
-        '''
-        return (userid in self.current)
-
-    def refresh(self):
-        '''
-        Repopulates the current leaders list from the players available.
-
-        Notes:
-            * This method is intended to be used when the current leaders list
-              becomes empty and needs to be repopulated while in the middle of
-              a GunGame round.
-              - This will typically be called during the GunGame event
-                "gg_leveldown".
-        '''
-        # Reset the leader level
-        self.leaderlevel = 1
-
-        # Reset the current leaders list
-        self.current = []
-
-        # Loop through the players
-        for userid in players:
-            # Is the player on the server?
-            if not es.exists('userid', userid):
-                continue
-
-            # Get player info
-            level = Player(userid).level
-
-            # Create new leader variable and set new level
-            if level > self.leaderlevel:
-                self.current = [userid]
-                self.leaderlevel = level
-
-            # Another leader
-            elif level == self.leaderlevel:
-                self.current.append(userid)
-
-        # Set old leaders, if they have changed
-        if self.current[:] != self.previous[:]:
-            self.previous = self.current[:]
-
-        # 1 new leader
+        # See if we need to message a new leader
         if len(self.current) == 1:
-            # Message about new leader
-            saytext2('#all', Player(self.current[0]).index, 'NewLeader', {'player': es.getplayername(self.current[0]), 'level': self.leaderlevel}, False)
-            
-            # Fire gg_new_leader
-            EventManager().gg_new_leader(userid)
+            newLeader = True
 
-    # =========================================================================
-    # LeaderManager() STATIC CLASS METHODS
-    # =========================================================================
+        # Remove the userid
+        self.__remove_userid(userid)
+        
+        # Trigger new leader messaging if a single leader is found
+        if newLeader and len(self.current) == 1:
+            # Message about new leader 
+            saytext2('#human', Player(userid).index, 'NewLeader',
+                {'player': es.getplayername(userid),
+                'level': self.leaderlevel}, False)
+
+    def __remove_userid(self, userid):
+        """Removes all relations of the userid from the LeaderManager."""
+        # Retrieve the index of the userid
+        index = self.__find_index(userid)
+
+        # Make sure that the index exists
+        if index != None:
+            # Remove the index from the "useridlist" and "levellist"
+            del self.useridlist[index]
+            del self.levellist[index]
+
+        # See if the userid is in the previous leaders list
+        if userid in self.previous:
+            # Remove the userid from the previous leader list
+            del self.previous[self.previous.index(userid)]
 
 leaders = LeaderManager()

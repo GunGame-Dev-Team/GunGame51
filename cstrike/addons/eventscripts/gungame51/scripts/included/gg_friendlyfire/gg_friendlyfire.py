@@ -14,7 +14,7 @@ import es
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getTotalLevels
 from gungame51.core.messaging.shortcuts import msg
 
@@ -67,7 +67,7 @@ def gg_levelup(event_var):
     activateLevel = (getTotalLevels() + 1) - int(gg_friendlyfire)
 
     # If the Leader is on the friendlyfire level?
-    if getLeaderLevel() >= activateLevel:
+    if get_leader_level() >= activateLevel:
         # Check whether mp_friendlyfire is enabled
         if int(mp_friendlyfire) == 0:
             # Set mp_friendlyfire to 1

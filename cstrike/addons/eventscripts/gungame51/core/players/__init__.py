@@ -141,8 +141,19 @@ class BasePlayer(object):
         if name in setHooks:
             setHooks[name][0](name, value)
 
-        # Set the attribute value
-        object.__setattr__(self, name, value)
+        # Are they setting the "level" attribute?
+        if name == 'level':
+            # Return if preventlevel is set
+            if self.preventlevel:
+                return
+            else:
+                # Set the attribute value
+                object.__setattr__(self, name, value)
+                from gungame51.core.leaders import leaders
+                leaders.check(self)
+        else:
+            # Set the attribute value
+            object.__setattr__(self, name, value)
 
     def __getattr__(self, name):
         # Return the attribute value

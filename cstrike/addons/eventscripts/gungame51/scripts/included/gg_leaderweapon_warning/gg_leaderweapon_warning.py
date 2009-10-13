@@ -15,7 +15,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 
 # ============================================================================
@@ -40,7 +40,7 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def round_start(event_var):
-    leaderWeapon = getLevelWeapon(getLeaderLevel())
+    leaderWeapon = getLevelWeapon(get_leader_level())
 
     '''
     STILL HAVE TO FIGURE OUT HOW TO IMPLEMENT SOUNDS

@@ -19,37 +19,27 @@ from gungame51.core.leaders import leaders
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def isLeader(userid):
-    userid = int(userid)
-    return (userid in leaders.current)
+def is_leader(userid):
+    return leaders.is_leader(userid)
     
-def resetLeaders():
-    leaders.reset()
-    
-def getLeaderCount():
-    '''
-    Returns the amount of leaders.
-    '''
+def get_leader_count():
+    """Returns the amount of leaders."""
     return len(leaders.current)
     
-def getOldLeaderList():
-    '''
-    Returns the userids of the old/previous leader(s).
-    '''
+def get_old_leader_list():
+    """Returns the userids of the old/previous leader(s)."""
     # Remove disconnected userids from the previous leaders and return the list
-    return leaders.cleanup('previous')
+    return leaders.previous
     
-def getLeaderList():
-    '''
-    Returns the userids of the current leader(s).
-    '''
+def get_leader_list():
+    """Returns the userids of the current leader(s)."""
     # Remove disconnected userids from the current leaders and return the list
-    return leaders.cleanup('current')
+    return leaders.current
     
-def getLeaderNames():
-    '''Returns the names of the current leader(s).'''
-    return [removeReturnChars(es.getplayername(x)) for x in getLeaderList()]
+def get_leader_names():
+    """Returns the names of the current leader(s)."""
+    return [removeReturnChars(es.getplayername(x)) for x in get_leader_list()]
     
-def getLeaderLevel():
-    '''Returns the current leader level.'''
+def get_leader_level():
+    """Returns the current leader level."""
     return leaders.leaderlevel

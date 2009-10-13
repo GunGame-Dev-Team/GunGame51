@@ -24,7 +24,7 @@ from gungame51.core import getGameDir
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.events.shortcuts import EventManager
-from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getTotalLevels
 
 # ============================================================================
@@ -124,7 +124,7 @@ def es_map_start(event_var):
         print getMapList()
 
 def gg_levelup(event_var):
-    if getLeaderLevel() == (getTotalLevels() - int(gg_map_vote_trigger)):
+    if get_leader_level() == (getTotalLevels() - int(gg_map_vote_trigger)):
         # Nextmap already set?
         if es.ServerVar('eventscripts_nextmapoverride') != '':
             gungamelib.echo('gungame', 0, 0, 'MapSetBefore')

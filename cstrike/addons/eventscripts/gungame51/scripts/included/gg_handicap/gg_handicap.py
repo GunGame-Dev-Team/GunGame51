@@ -15,7 +15,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.leaders.shortcuts import get_leader_level
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -63,7 +63,7 @@ def player_activate(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def getLowestLevelUsers():
-    lowestLevel = getLeaderLevel()
+    lowestLevel = get_leader_level()
     userList = []
 
     # Loop through the users

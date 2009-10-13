@@ -40,8 +40,7 @@ from core.players.shortcuts import resetPlayers
 
 #    Leaders Function Imports
 from core.leaders.shortcuts import leaders
-from core.leaders.shortcuts import resetLeaders
-from core.leaders.shortcuts import isLeader
+from core.leaders.shortcuts import is_leader
 
 #    Core Function Imports
 from core import inMap
@@ -191,6 +190,7 @@ def es_map_start(event_var):
     if priority_addons:
         del priority_addons[:]
 
+    # Make the sounds downloadable
     make_downloadable()
 
     # Load custom GunGame events
@@ -224,7 +224,7 @@ def es_map_start(event_var):
     resetPlayers()
     
     # Reset the GunGame leaders
-    resetLeaders()
+    leaders.reset()
     
     '''
     # Make sounds downloadbale
@@ -390,12 +390,11 @@ def player_death(event_var):
             
         # Play the multikill sound
         #gungamelib.playSound(attacker, 'multikill')
-        
+
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
-    # Is leader?
-    if isLeader(userid):
-        leaders.remove(userid, False)
+    
+    leaders.disconnected_leader(userid)
 
 def bomb_defused(event_var):
     # Check for priority addons
@@ -478,7 +477,7 @@ def gg_levelup(event_var):
     # ==================
     
     # Get leader level
-    leaderLevel = gungamelib.leaders.getLeaderLevel()
+    leaderLevel = gungamelib.leaders.get_leader_level()
     
     if leaderLevel == (gungamelib.getTotalLevels() - gungamelib.getVariableValue('gg_vote_trigger')):
         # Nextmap already set?
