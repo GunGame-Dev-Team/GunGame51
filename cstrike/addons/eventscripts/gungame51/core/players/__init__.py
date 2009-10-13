@@ -491,8 +491,11 @@ class BasePlayer(object):
         '''
         Plays the declared sound to the player.
         '''
+        # Format the sound
+        sound = self._format_sound(sound):
+        
         # Make sure the sound exists
-        if self._format_sound(sound):
+        if sound:
             # Play the sound
             es.playsound(self.userid, sound, volume)
 
@@ -500,8 +503,11 @@ class BasePlayer(object):
         '''
         Emits the declared sound from the player.
         '''
+        # Format the sound
+        sound = self._format_sound(sound):
+        
         # Make sure the sound exists
-        if self._format_sound(sound):
+        if sound:
             # Play the sound
             es.emitsound('player', self.userid, sound, volume, attenuation)
     
@@ -509,8 +515,11 @@ class BasePlayer(object):
         '''
         Plays the declared sound to the player.
         '''
+        # Format the sound
+        sound = self._format_sound(sound):
+        
         # Make sure the sound exists
-        if self._format_sound(sound):
+        if sound:
             # Play the sound
             es.stopsound(self.userid, sound)
 

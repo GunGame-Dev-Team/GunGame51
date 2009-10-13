@@ -49,7 +49,7 @@ class SoundPack(object):
 
 def make_downloadable():
     # Make sure we are in a map
-    if str(eventscripts_currentmap) == ''):
+    if str(eventscripts_currentmap) == '':
         return
 
     # Loop through all files in the sound_pack directory
