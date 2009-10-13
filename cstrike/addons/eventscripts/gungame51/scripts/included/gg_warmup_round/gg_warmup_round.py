@@ -14,6 +14,7 @@ import es
 import repeat
 import gamethread
 from playerlib import getPlayer
+from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -43,7 +44,7 @@ gg_warmup_deathmatch = es.ServerVar('gg_warmup_deathmatch')
 gg_warmup_elimination = es.ServerVar('gg_warmup_elimination')
 gg_deathmatch = es.ServerVar('gg_deathmatch')
 gg_elimination = es.ServerVar('gg_elimination')
-
+priority_addons_added = []
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
@@ -143,8 +144,7 @@ def doWarmup():
     gg_elimination_backup = int(gg_elimination)
         
     # Added priority addons list
-    for addon in priority_addons_added:
-        priority_addons_added.remove(addon)
+    del priority_addons_added[:]
     
     # Checking for warmup in the priority addons list
     addPriorityAddon('gg_warmup_round')      
@@ -175,7 +175,7 @@ def doWarmup():
         
         # Enable gg_elimination
         if not int(gg_elimination):
-        es.server.queuecmd('gg_elimination 1')
+            es.server.queuecmd('gg_elimination 1')
 
         # Checking for elimination in the priority addons list
         addPriorityAddon('gg_elimination')        
@@ -211,8 +211,9 @@ def countDown():
         
         # Countdown 5 or less?
         if warmupCountDown['remaining'] <= 5:
-            # need to add beep sound
-            pass
+            
+            # Play beep
+            playBeep()
         
         # mp_restartgame and trigger round_end
         if warmupCountDown['remaining'] == 1:
@@ -224,7 +225,7 @@ def countDown():
         hudhint('#human', 'Timer_Ended')
         
         # Play beep
-        # NEED TO ADD SOUND
+        playBeep()
         
         # Delete the timer
         repeat.delete('gungameWarmupTimer')
@@ -249,4 +250,8 @@ def countDown():
         
         # Fire gg_start event
         EventManager().gg_start()
+
+def playBeep():
+    for userid in getPlayerList('#human'):
+        Player(userid).playsound('countDownBeep')
             
