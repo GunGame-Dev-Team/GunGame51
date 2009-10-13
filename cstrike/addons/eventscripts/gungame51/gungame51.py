@@ -576,7 +576,7 @@ def gg_win(event_var):
         toptext('#human', 10, '#blue', 'PlayerWon_Center', 
                                                     {'player': playerName})
         
-def gg_start(event_var):
+def gg_start():
     # Reset all the players
     resetPlayers()
     

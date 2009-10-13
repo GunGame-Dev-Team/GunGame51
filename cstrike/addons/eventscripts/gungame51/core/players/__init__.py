@@ -441,12 +441,12 @@ class BasePlayer(object):
         Weapons given by this method will not be stripped by gg_dead_strip.
         '''
         # Check if the weapon is valid
-        weapon = str(weapon).replace('weapon_', '')
-
-        if weapon not in list_pWeapons + list_sWeapons + \
-            ['hegrenade', 'flashbang', 'smokegrenade']:
-                raise ValueError('Unable to give (%s): is not a valid weapon'
-                    %weapon)
+        weapon = weapon.replace('weapon_', '')
+        
+        if 'weapon_%s' % weapon not in list_pWeapons + list_sWeapons + \
+        ['weapon_hegrenade', 'weapon_flashbang', 'weapon_smokegrenade']:
+            raise ValueError('Unable to give (%s): ' % weapon +
+                             'is not a valid weapon')
 
         # Add weapon to strip exceptions so gg_dead_strip will not 
         #   strip the weapon
