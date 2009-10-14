@@ -40,10 +40,6 @@ def load():
     # Creating repeat loop
     repeat.create('gungameHandicapLoop', handicapUpdate)
     
-    # Start repeat loop?
-    if int(gg_handicap_update):
-        repeat.start('gungameHandicapLoop', int(gg_handicap_update), 0)
-    
     # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
@@ -58,15 +54,43 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
+def gg_start(event_var):
+    # Start loop
+    loopStartStop(True)    
+
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
     # Check if player needs handicap
     handicapCheck(userid)
 
+def gg_win(event_var):
+    # Stop loop
+    loopStartStop(False)
+
+def gg_map_end():    
+    # Stop loop
+    loopStartStop(False)
+
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def loopStartStop(start):        
+    # Loop running ?
+    if repeat.status('gungameHandicapLoop') > 1:
+        es.dbgmsg(0, 'Stopping update loop')
+        # Stop loop
+        repeat.stop('gungameHandicapLoop')
+    
+    # Update enabled?
+    if not int(gg_handicap_update):
+        return 
+    
+    # Start loop ?
+    if start:
+        es.dbgmsg(0, 'Starting update loop')
+        repeat.start('gungameHandicapLoop', int(gg_handicap_update), 0)
+
 def handicapCheck(userid, isupdate=False):
     # Get the level of the lowest level player other than themself
     handicapLevel = getLevelAboveUser(userid)
@@ -86,8 +110,20 @@ def handicapCheck(userid, isupdate=False):
             ggPlayer.playsound('handicap')    
 
 def handicapUpdate():
+    # Checking if repeat loop needs to be canceled
+    if not int(gg_handicap_update):
+        repeat.stop('gungameHandicapLoop')
+        return
+    
+    # Updating players    
     for userid in es.getUseridList():
         handicapCheck(userid, True)
+    
+    # Checking if update interval has changed
+    interval = repeat.find('gungameHandicapLoop')['interval']
+    if interval != int(gg_handicap_update):
+        loopStartStop(True)
+        
 
 def getLowestLevelUsers():
     lowestLevel = get_leader_level()

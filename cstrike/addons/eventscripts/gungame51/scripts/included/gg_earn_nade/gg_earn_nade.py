@@ -63,9 +63,6 @@ def player_death(event_var):
         if event_var['weapon'] == 'hegrenade':
             return 
 
-        # Are we in warmup?
-        # ------------- ADD WARMUP CODE HERE! --------------
-
         # Give them another grenade
         gamethread.delayed(0.08, giveGrenade, (attacker))
 

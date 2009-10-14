@@ -463,18 +463,22 @@ class BasePlayer(object):
 
         es.server.queuecmd(cmd)
 
-    def strip(self, fullStrip=False):
+    def strip(self, levelStrip=False, exceptions=[]):
         '''
-        Strips/removes all weapons from the player minus the knife and their
-        current levels weapon. Unless True is specified, and their level weapon
-        is also stripped.
+            * Strips/removes all weapons from the player minus the knife and 
+              their current levels weapon. 
+        
+            * If True is specified, then their level weapon is also stripped.
+        
+            * Exceptions can be entered in list format, and anything in the
+              exceptions will not be stripped.                       
         '''
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
 
         for weapon in pPlayer.getWeaponList():
-            if ('weapon_%s' %self.weapon == weapon and not fullStrip) or \
-            weapon == 'weapon_knife':
+            if ('weapon_%s' %self.weapon == weapon and not levelStrip) or \
+            weapon == 'weapon_knife' or weapon in exceptions:
                 continue
 
             # Remove the weapon

@@ -561,10 +561,9 @@ def gg_win(event_var):
         # Tell the world
         saytext2('#human', index, 'PlayerWonRound', {'player':playerName})
         
-        '''
         # Play the winner sound
-        gungamelib.playSound('#human', 'roundwinner')
-        '''
+        for userid in getPlayerList('#human'):
+            Player(userid).playsound('winner')
     
     # =========================================================================
     # ALL WINS

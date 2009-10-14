@@ -45,6 +45,7 @@ gg_warmup_elimination = es.ServerVar('gg_warmup_elimination')
 gg_deathmatch = es.ServerVar('gg_deathmatch')
 gg_elimination = es.ServerVar('gg_elimination')
 priority_addons_added = []
+
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
@@ -108,7 +109,7 @@ def player_spawn(event_var):
     ggPlayer = Player(userid)
     
     # Check if the warmup weapon is the level 1 weapon
-    if str(gg_warmup_weapon) == '0':
+    if str(gg_warmup_weapon) in ['0', '', '0.0']:
         ggPlayer.giveWeapon()
         return
     
@@ -154,7 +155,8 @@ def doWarmup():
     
     # Checking for warmup deathmatch
     if (int(gg_warmup_deathmatch) or int(gg_deathmatch)) and \
-    not int(gg_warmup_elimination):
+        not int(gg_warmup_elimination):
+        
         # Making sure elimination is off
         if int(gg_elimination):
             es.server.queuecmd('gg_elimination 0')            
@@ -168,7 +170,8 @@ def doWarmup():
     
     # Checking for warmup elimination
     elif (int(gg_warmup_elimination) or int(gg_elimination)) and \
-    not int(gg_warmup_deathmatch):
+        not int(gg_warmup_deathmatch):
+        
         # Making sure deathmatch is off
         if int(gg_deathmatch):
             es.server.queuecmd('gg_deathmatch 0')   
@@ -176,7 +179,7 @@ def doWarmup():
         # Enable gg_elimination
         if not int(gg_elimination):
             es.server.queuecmd('gg_elimination 1')
-
+    
         # Checking for elimination in the priority addons list
         addPriorityAddon('gg_elimination')        
     
@@ -202,6 +205,7 @@ def countDown():
         
     # If the remaining time is greater than 1
     if warmupCountDown['remaining'] >= 1:
+        
         # Send hint
         if warmupCountDown['remaining'] > 1:
             hudhint('#human', 'Timer_Plural', 

@@ -150,7 +150,7 @@ class ConfigManager(object):
     @staticmethod
     def server_cvar(event_var):
         '''
-        Handles CVARs that are loaded via GunGame's ConfigManager.
+        Handles CVARs that are loaded via GunGame/'s ConfigManager.
         '''
         cvarName = event_var['cvarname']
         cvarValue = event_var['cvarvalue']
@@ -158,8 +158,10 @@ class ConfigManager(object):
         if cvarName not in getValidAddons():
             return
 
-        # Load addons if the value is greater than 0
-        if int(cvarValue) > 0:
+        # Load addons if the value is not 0, '', or a float equal to 0 
+        if bool(str(cvarValue)) and False in \
+        [x == '0' for x in str(cvarValue).split('.')]:
+        
             # Make sure the addon is not already loaded
             if cvarName in __addons__.__loaded__:
                 return
@@ -167,13 +169,15 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in conflicts.keys():
-                if int(__configs__.__cvardefaults__[cvarName]) == int(cvarValue):
+                if str(__configs__.__cvardefaults__[cvarName]) == \
+                    str(cvarValue):
+                    
                     return
 
             gamethread.delayed(0, load, (cvarName))
             
-        # Unload addons with the value of 0
-        elif int(cvarValue) == 0:
+        # Unload addons with the value of 0 (including floats) or ''
+        else:
             # Make sure that the addon is loaded
             if cvarName not in __addons__.__loaded__:
                 return
@@ -181,7 +185,7 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in dependencies.keys():
-                if int(__configs__.__cvardefaults__[cvarName]) == int(cvarValue):
+                if str(__configs__.__cvardefaults__[cvarName]) == str(cvarValue):
                     return
 
             gamethread.delayed(0, unload, (cvarName))
