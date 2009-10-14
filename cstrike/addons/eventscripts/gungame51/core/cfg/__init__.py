@@ -241,7 +241,8 @@ def getConfigList(type=None):
         * custom (custom addon configs)a
         
     Note:
-        If no argument is provided, all possible configs will be returned in the list.
+        If no argument is provided, all possible configs will be returned 
+        in the list.
     '''
     dict_types = {'main':getGameDir('addons/eventscripts/gungame51/core/cfg/' +
                   'files'),

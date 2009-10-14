@@ -170,7 +170,8 @@ def getNextWeapon(userid):
         return (str(gg_nade_bonus), False)
     
     # Getting weapon from list
-    return (getLevelWeapon(Player(userid).nadeBonusLevel, str(gg_nade_bonus)), True)
+    return (getLevelWeapon(Player(userid).nadeBonusLevel, 
+                                        str(gg_nade_bonus)), True)
     
 
 def giveBonus(userid, spawn=True):

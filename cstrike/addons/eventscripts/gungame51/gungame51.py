@@ -134,7 +134,8 @@ def unload():
     from core.addons import conflicts
     from core.cfg import __configs__
     es.dbgmsg(0, '__configs__.__loaded__ = %s' %__configs__.__loaded__)
-    es.dbgmsg(0, '__configs__.__cvardefaults__ = %s' %__configs__.__cvardefaults__)
+    es.dbgmsg(0, 
+             '__configs__.__cvardefaults__ = %s' %__configs__.__cvardefaults__)
     es.dbgmsg(0, '__addons__.__order__ = %s' %__addons__.__order__)
     es.dbgmsg(0, '__addons__.__loaded__ = %s '%__addons__.__loaded__)
     es.dbgmsg(0, 'dependencies = %s' %dependencies)
