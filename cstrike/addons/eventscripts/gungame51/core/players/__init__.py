@@ -477,8 +477,9 @@ class BasePlayer(object):
         pPlayer = getPlayer(self.userid)
 
         for weapon in pPlayer.getWeaponList():
-            if ('weapon_%s' %self.weapon == weapon and not levelStrip) or \
-            weapon == 'weapon_knife' or weapon in exceptions:
+            if (self.weapon == weapon[7:] and not levelStrip) or \
+            weapon == 'weapon_knife' or weapon[7:] in exceptions:
+            
                 continue
 
             # Remove the weapon
