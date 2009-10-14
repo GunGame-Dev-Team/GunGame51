@@ -14,6 +14,7 @@ import os.path
 
 # Eventscripts Imports
 import es
+import gamethread
 
 # GunGame Imports
 from gungame51.core import getGameDir
@@ -134,14 +135,12 @@ class AddonLoadedByDependency(dict):
         configs or that were previously determined as being loaded due to
         being a dependency.
         '''
-        # Make sure the dependency's server var is 0, or already registered
-        if int(es.ServerVar(dependency)) == 0 or dependency in self:
-            # Create a new dependency list
-            if dependency not in self:
-                self[dependency] = []
+        # Create a new dependency list
+        if dependency not in self:
+            self[dependency] = []
 
-            # Add the addon to the dependency list
-            self[dependency].append(addon_name)
+        # Add the addon to the dependency list
+        self[dependency].append(addon_name)
 
     def remove(self, addon_name):
         '''
@@ -438,9 +437,8 @@ class AddonManager(object):
             # Loop through all addons that are not loaded and load them
             for subaddon in conflicting:
                 # Add the subaddon to the "loadedByDependency" dictionary
-                self.addLoadedByDependency(subaddon, name)
-                es.set(subaddon, 1)
-                load(subaddon)
+                gamethread.delayed(0, self.addLoadedByDependency, (subaddon, name))
+                
 
         # Add this sub-addon's dependencies and conflicts
         dependencies.add(name, addon_depend)
@@ -483,6 +481,10 @@ class AddonManager(object):
         Adds dependencies to be unloaded later that were loaded as a result of
         as sub-addon.
         '''
+        if addon_name in self.__loaded__:
+            return
+        es.set(depe, 1)
+        load(subaddon)
         loadedByDependency.add(dependency, addon_name)
 
     def removeLoadedByDependency(self, name):

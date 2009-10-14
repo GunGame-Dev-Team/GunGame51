@@ -99,32 +99,46 @@ def unload():
     # Unload translations
     unloadTranslation('gungame', 'gungame')
 
-    # Create a copy of the list of addons
-    list_addons = __addons__.__order__[:]
-    
-    # We need to unload in reverse due to DependencyErrors
-    list_addons.reverse()
-    
-    for name in list_addons:
-        if name not in __addons__.__order__:
-            continue
-        __addons__.unload(name)
+    from core.addons import dependencies
+    # Create a copy of the dependencies dictionary
+    dict_dependencies = dependencies.copy()
+
+    # Loop through addons that have required dependencies
+    for addon in list(set(map((lambda (x, y): y), [(x, y) for x in \
+        dict_dependencies for y in dict_dependencies[x]]))):
+
+        # Unload the addons that have required dependencies
+        __addons__.unload(addon)
+
+    # Unload any remaining addons now that dependencies are handled
+    for addon in __addons__.__order__[:]:
+        __addons__.unload(addon)
 
     # Unload configs (removes flags from CVARs)
     unloadConfig(getConfigList())
-    
+
     # Grab a random userid for the below commands
     userid = es.getuserid()
-    
+
     # Enable Buyzones
     es.server.queuecmd('es_xfire %d func_buyzone Enable' %userid)
-    
+
     # Fire gg_unload event
     EventManager().gg_unload
-    
+
     '''
     gungamelib.clearGunGame()
     '''
+
+    # Temporary Cleanup Debug Messages
+    from core.addons import conflicts
+    from core.cfg import __configs__
+    es.dbgmsg(0, '__configs__.__loaded__ = %s' %__configs__.__loaded__)
+    es.dbgmsg(0, '__configs__.__cvardefaults__ = %s' %__configs__.__cvardefaults__)
+    es.dbgmsg(0, '__addons__.__order__ = %s' %__addons__.__order__)
+    es.dbgmsg(0, '__addons__.__loaded__ = %s '%__addons__.__loaded__)
+    es.dbgmsg(0, 'dependencies = %s' %dependencies)
+    es.dbgmsg(0, 'conflicts = %s' %conflicts)
 
 def initialize():
     loadConfig(getConfigList())
