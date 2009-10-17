@@ -163,7 +163,7 @@ class BasePlayer(object):
         # Make sure we don't try to delete required GunGame attributes
         if name in ['userid', 'level', 'preventlevel', 'steamid', 'multikill']:
             raise AttributeError('Unable to delete attribute "%s". '
-                % attribute + 'This is a required attribute for GunGame.')
+                % name + 'This is a required attribute for GunGame.')
 
         # Remove this attribute from the custom attribute callbacks, if any
         if name in setHooks:
