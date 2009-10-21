@@ -14,7 +14,7 @@ import es
 import repeat
 
 # GunGame Imports
-from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.addons.shortcuts import AddonInfo, 
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
 
@@ -56,26 +56,35 @@ def unload():
 # ============================================================================
 def gg_start(event_var):
     # Start loop
-    loopStartStop(True)    
+    loopStartStop(True)
 
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
-    # Check if player needs handicap
-    handicapCheck(userid)
+    # Get the level of the lowest level player other than themself
+    handicapLevel = getLevelAboveUser(userid)
+    # Get the player
+    ggPlayer = Player(userid)
+
+    # If their level is below the handicap level, set them to it
+    if ggPlayer.level < handicapLevel:
+        ggPlayer.level = handicapLevel
+
+        # Tell the player that their level was adjustedG
+        ggPlayer.msg('LevelLowest', {'level':handicapLevel})
 
 def gg_win(event_var):
     # Stop loop
     loopStartStop(False)
 
-def gg_map_end():    
+def gg_map_end():
     # Stop loop
     loopStartStop(False)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def loopStartStop(start):        
+def loopStartStop(start):    
     # Loop running ?
     if repeat.status('gungameHandicapLoop') > 1:
         es.dbgmsg(0, 'Stopping update loop')
@@ -89,25 +98,10 @@ def loopStartStop(start):
     # Start loop ?
     if start:
         es.dbgmsg(0, 'Starting update loop')
-        repeat.start('gungameHandicapLoop', int(gg_handicap_update), 0)
+        repeat.start('gungameHandicapLoop', int(gg_handicap_update), 0)  
 
-def handicapCheck(userid, isupdate=False):
-    # Get the level of the lowest level player other than themself
-    handicapLevel = getLevelAboveUser(userid)
-    
-    # Get the player
-    ggPlayer = Player(userid)
-
-    # If their level is below the handicap level, set them to it
-    if ggPlayer.level < handicapLevel:
-        ggPlayer.level = handicapLevel
-
-        # Tell the player that their level was adjusted
-        ggPlayer.msg('LevelLowest', {'level':handicapLevel})
-        
-        # Play sound if its an update check
-        if isupdate:
-            ggPlayer.playsound('handicap')    
+def player_jump(event_var):
+    loopStartStop(True)
 
 def handicapUpdate():
     # Checking if repeat loop needs to be canceled
@@ -115,9 +109,21 @@ def handicapUpdate():
         repeat.stop('gungameHandicapLoop')
         return
     
+    handicapLevel = getLevelAboveLowest()
+    
     # Updating players    
-    for userid in es.getUseridList():
-        handicapCheck(userid, True)
+    for userid in getLowestLevelUsers():
+        # Get the player
+        ggPlayer = Player(userid)
+        
+        if ggPlayer.level < handicapLevel:
+            ggPlayer.level = handicapLevel
+            
+            # Tell the player that their level was adjusted
+            ggPlayer.msg('LevelLowest', {'level':handicapLevel})
+            
+            # Play the update sound
+            ggPlayer.playsound('handicap') 
     
     # Checking if update interval has changed
     interval = repeat.find('gungameHandicapLoop')['interval']

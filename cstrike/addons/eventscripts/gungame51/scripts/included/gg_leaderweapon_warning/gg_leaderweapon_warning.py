@@ -15,7 +15,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.leaders.shortcuts import getLeaderLevel
+from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 
 # ============================================================================
@@ -52,7 +52,7 @@ def gg_levelup(event_var):
 # ============================================================================  
 def weaponWarning():
     # Get leader weapon
-    leaderWeapon = getLevelWeapon(getLeaderLevel())
+    leaderWeapon = getLevelWeapon(get_leader_level())
     
     # Knife level ?
     if leaderWeapon == 'knife':
