@@ -14,7 +14,7 @@ import es
 from weaponlib import getWeaponList
 
 # GunGame Imports
-from gungame51.core.weapons import weaponorders
+from gungame51.core.weapons import WeaponManager
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -27,10 +27,10 @@ def getWeaponOrder(name=None):
     GunGame and no argument has been provided, "None" is returned.
     '''
     if name:
-        return weaponorders.load(name)
+        return WeaponManager().load(name)
     else:
-        if weaponorders.gungameorder:
-            return weaponorders.__weaponorders__[weaponorders.gungameorder]
+        if WeaponManager().gungameorder:
+            return WeaponManager().__weaponorders__[WeaponManager().gungameorder]
         return None
 
 def setWeaponOrder(name, type='#default'):
@@ -64,9 +64,9 @@ def setWeaponOrder(name, type='#default'):
         # Use the default weapon order, but reverse the order
         setWeaponOrder('default_weapon_order', '#reversed')
     '''
-    weaponorders.load(name)
-    weaponorders.setOrder(name)
-    weaponorders.type = type
+    WeaponManager().load(name)
+    WeaponManager().setOrder(name)
+    WeaponManager().type = type
     return getWeaponOrder()
     
 def getLevelWeapon(level, weaponOrderName=None):

@@ -19,13 +19,16 @@ from cfglib import AddonCFG
 
 # GunGame Imports
 from gungame51.core.addons import getValidAddons
-from gungame51.core.addons import __addons__
+from gungame51.core.addons import AddonManager
 from gungame51.core.addons import load
 from gungame51.core.addons import unload
 from gungame51.core.addons import dependencies
 from gungame51.core.addons import conflicts
 from gungame51.core import getGameDir
 
+# =============================================================================
+# >> GLOBAL VARIABLES
+# =============================================================================
 configExecuting = False
 
 # =============================================================================
@@ -36,12 +39,13 @@ class ConfigManager(object):
     Class designed to handle the loading, unloading, and executing of python
     configs coded using cfglib.AddonCFG().
     '''
-    # =========================================================================
-    # >> ConfigManager() CLASS INITIALIZATION
-    # =========================================================================
-    def __init__(self):
-        self.__loaded__ = {}
-        self.__cvardefaults__ = {}
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Initialize the class instance variables
+            cls._the_instance.__loaded__ = {}
+            cls._the_instance.__cvardefaults__ = {}
+        return cls._the_instance
 
     # =========================================================================
     # >> ConfigManager() CUSTOM CLASS METHODS
@@ -163,13 +167,13 @@ class ConfigManager(object):
         [x == '0' for x in str(cvarValue).split('.')]:
         
             # Make sure the addon is not already loaded
-            if cvarName in __addons__.__loaded__:
+            if cvarName in AddonManager().__loaded__:
                 return
 
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in conflicts.keys():
-                if str(__configs__.__cvardefaults__[cvarName]) == \
+                if str(ConfigManager().__cvardefaults__[cvarName]) == \
                     str(cvarValue):
                     
                     return
@@ -179,13 +183,13 @@ class ConfigManager(object):
         # Unload addons with the value of 0 (including floats) or ''
         else:
             # Make sure that the addon is loaded
-            if cvarName not in __addons__.__loaded__:
+            if cvarName not in AddonManager().__loaded__:
                 return
 
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in dependencies.keys():
-                if str(__configs__.__cvardefaults__[cvarName]) == str(cvarValue):
+                if str(ConfigManager().__cvardefaults__[cvarName]) == str(cvarValue):
                     return
 
             gamethread.delayed(0, unload, (cvarName))
@@ -226,9 +230,9 @@ class ConfigManager(object):
             'scripts/cfg/custom/%s.py' %name)):
             return 'custom'
 
-__configs__ = ConfigManager()
+#ConfigManager() = ConfigManager()
 # Register the ConfigManager instance for the "server_cvar" event
-es.addons.registerForEvent(__configs__, 'server_cvar', __configs__.server_cvar)
+es.addons.registerForEvent(ConfigManager(), 'server_cvar', ConfigManager().server_cvar)
 
 # ============================================================================
 # >> FUNCTIONS

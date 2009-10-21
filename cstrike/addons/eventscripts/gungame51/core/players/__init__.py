@@ -21,9 +21,10 @@ from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
-from gungame51.core.messaging import __messages__
+from gungame51.core.messaging import MessageManager
 from gungame51.core.sound import SoundPack
 from afk import AFK
+from gungame51.core.leaders.shortcuts import LeaderManager
 
 # ============================================================================
 # >> GLOBALS
@@ -41,6 +42,11 @@ class CustomAttributeCallbacks(dict):
     This class is designed to store callback functions for custom attributes
     added to GunGame via a subaddon.
     '''
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = dict.__new__(cls)
+        return cls._the_instance
+
     def add(self, attribute, function, addon):
         '''
         Adds a callback to execute when a previously created attribute is set
@@ -82,9 +88,6 @@ class CustomAttributeCallbacks(dict):
 
         # Delete the attribtue callback
         del self[attribute]
-
-
-setHooks = CustomAttributeCallbacks()
 
 
 class PreventLevel(list):
@@ -138,8 +141,8 @@ class BasePlayer(object):
         
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
-        if name in setHooks:
-            setHooks[name][0](name, value)
+        if name in CustomAttributeCallbacks():
+            CustomAttributeCallbacks()[name][0](name, value)
 
         # Are they setting the "level" attribute?
         if name == 'level':
@@ -149,8 +152,7 @@ class BasePlayer(object):
             else:
                 # Set the attribute value
                 object.__setattr__(self, name, value)
-                from gungame51.core.leaders import leaders
-                leaders.check(self)
+                LeaderManager().check(self)
         else:
             # Set the attribute value
             object.__setattr__(self, name, value)
@@ -166,8 +168,8 @@ class BasePlayer(object):
                 % name + 'This is a required attribute for GunGame.')
 
         # Remove this attribute from the custom attribute callbacks, if any
-        if name in setHooks:
-            del setHooks[name]
+        if name in CustomAttributeCallbacks():
+            del CustomAttributeCallbacks()[name]
 
         # Delete the attribute only if it exists 
         #   (we don't want to raise errors)
@@ -239,25 +241,25 @@ class BasePlayer(object):
     # >> BasePlayer() MESSAGING CLASS METHODS
     # =========================================================================
     def msg(self, string, tokens={}, prefix=False):
-        __messages__.msg(self.userid, string, tokens, prefix)
+        MessageManager().msg(self.userid, string, tokens, prefix)
 
     def saytext2(self, index, string, tokens={}, prefix=False):
-        __messages__.saytext2(self.userid, index, string, tokens, prefix)
+        MessageManager().saytext2(self.userid, index, string, tokens, prefix)
 
     def centermsg(self, string, tokens={}):
-        __messages__.centermsg(self.userid, string, tokens)
+        MessageManager().centermsg(self.userid, string, tokens)
 
     def hudhint(self, string, tokens={}):
-        __messages__.hudhint(self.userid, string, tokens)
+        MessageManager().hudhint(self.userid, string, tokens)
 
     def toptext(self, duration, color, string, tokens={}):
-        __messages__.toptext(self.userid, duration, color, string, tokens)
+        MessageManager().toptext(self.userid, duration, color, string, tokens)
 
     def echo(self, level, string, tokens={}, prefix=False):
-        __messages__.echo(self.userid, level, string, tokens, prefix)
+        MessageManager().echo(self.userid, level, string, tokens, prefix)
 
     def langstring(self, string, tokens={}, prefix=False):
-        return __messages__.langstring(self.userid, string, tokens, prefix)
+        return MessageManager().langstring(self.userid, string, tokens, prefix)
 
     # =========================================================================
     # >> BasePlayer() WEAPON CLASS METHODS
@@ -552,6 +554,12 @@ class PlayerDict(dict):
     Note:
         This class is meant for private use.
     '''
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = dict.__new__(cls)
+            #es.addons.registerForEvent(cls, 'player_activate', cls._the_instance.player_activate)
+        return cls._the_instance
+
     # =========================================================================
     # >> PlayerDict() CLASS ATTRIBUTE METHODS
     # =========================================================================
@@ -595,9 +603,6 @@ class PlayerDict(dict):
         super(PlayerDict, self).clear()
 
 
-players = PlayerDict()
-
-
 class Player(object):
     '''
     This class is intended to be used as the class container for interaction
@@ -631,11 +636,11 @@ class Player(object):
     # =========================================================================
     def __getitem__(self, item):
         # We only directly allow the attribute "userid" to be set
-        return players[self.userid][item]
+        return PlayerDict()[self.userid][item]
 
     def __setitem__(self, item, value):
         # We only directly allow the attribute "userid" to be set
-        players[self.userid][item] = value
+        PlayerDict()[self.userid][item] = value
 
     def __getattr__(self, name):
         if name == 'userid':
@@ -643,7 +648,7 @@ class Player(object):
             object.__getattr__(self, name)
         else:
             # Redirect to the PlayerDict instance
-            return players[self.userid][name]
+            return PlayerDict()[self.userid][name]
 
     def __setattr__(self, name, value):
         if name == 'userid':
@@ -651,15 +656,15 @@ class Player(object):
             object.__setattr__(self, name, value)
         else:
             # Redirect to the PlayerDict instance
-            players[self.userid][name] = value
+            PlayerDict()[self.userid][name] = value
 
     def __delitem__(self, name):
         # Redirect to the PlayerDict instance
-        del players[self.userid][name]
+        del PlayerDict()[self.userid][name]
 
     def __delattr__(self, name):
         # Redirect to the PlayerDict instance
-        del players[self.userid][name]
+        del PlayerDict()[self.userid][name]
 
     # ========================================================================
     # Player() STATIC CLASS METHODS
@@ -694,7 +699,7 @@ class Player(object):
                         raise ValueError('Value must be between 1 and 10!')
         '''
         # Add the attribute callback to the CustomAttributeCallbacks instance
-        setHooks.add(attribute, function, addon)
+        CustomAttributeCallbacks().add(attribute, function, addon)
 
     @staticmethod
     def removeAttributeCallBack(attribute):
@@ -710,7 +715,7 @@ class Player(object):
             Player.removeAttributeCallBack('attributeName')
         '''
         # Remove the callback from the CustomAttributeCallbacks instance
-        setHooks.remove(attribute)
+        CustomAttributeCallbacks().remove(attribute)
 
     @staticmethod
     def removeCallBacksForAddon(addon):
@@ -728,13 +733,13 @@ class Player(object):
             not raise an exception.
         '''
         # Loop through each attribute in the CustomAttributeCallBacks instance
-        for attribute in list(setHooks):
+        for attribute in list(CustomAttributeCallbacks()):
             # Continue to the next attribute if the addon name is not found
-            if not addon in setHooks[attribute]:
+            if not addon in CustomAttributeCallbacks()[attribute]:
                 continue
 
             # Remove the custom attribute callback
-            setHooks.remove(attribute)
+            CustomAttributeCallbacks().remove(attribute)
 
     
 from gungame51.core.events.shortcuts import EventManager

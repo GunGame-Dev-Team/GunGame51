@@ -86,12 +86,13 @@ class AddonStrings(object):
 
 
 class MessageManager(object):
-    # =========================================================================
-    # >> MessageManager() CLASS INITIALIZATION
-    # =========================================================================
-    def __init__(self):
-        self.__loaded__ = {}
-        self.__addontranslations__ = {}
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Create the class instance variables
+            cls._the_instance.__loaded__ = {}
+            cls._the_instance.__addontranslations__ = {}
+        return cls._the_instance
 
     # =========================================================================
     # >> MessageManager() CUSTOM CLASS METHODS
@@ -186,7 +187,7 @@ class MessageManager(object):
 
     def __formatPrefix(self, prefix, string):
         if prefix:
-            from gungame51.core.addons import __addons__
+            from gungame51.core.addons import AddonManager
             from gungame51.core.addons.shortcuts import getAddonInfo
             if prefix == True:
                 # Retrieve the addon title that contains the message string
@@ -194,14 +195,14 @@ class MessageManager(object):
                     if not string in self.__loaded__[addon].strings:
                         continue
 
-                    if not addon in __addons__.__loaded__:
+                    if not addon in AddonManager().__loaded__:
                         continue
 
                     return '\4[%s]\1 ' %getAddonInfo(addon).title
 
                 return ''
             else:
-                if not prefix in __addons__.__loaded__:
+                if not prefix in AddonManager().__loaded__:
                     return ''
 
                 # Get the addon title that we were given
@@ -391,6 +392,3 @@ class MessageManager(object):
         # Return the formatted language string
         return '%s%s' %(prefix, self.__cleanString(self.__formatString(string,
             tokens, userid)))
-
-
-__messages__ = MessageManager()

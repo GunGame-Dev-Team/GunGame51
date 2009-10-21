@@ -14,27 +14,27 @@ import es
 
 # GunGame Imports
 from gungame51.core import removeReturnChars
-from gungame51.core.leaders import leaders
+from gungame51.core.leaders import LeaderManager
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def is_leader(userid):
-    return leaders.is_leader(userid)
+    return LeaderManager().is_leader(userid)
     
 def get_leader_count():
     """Returns the amount of leaders."""
-    return len(leaders.current)
+    return len(LeaderManager().current)
     
 def get_old_leader_list():
     """Returns the userids of the old/previous leader(s)."""
     # Remove disconnected userids from the previous leaders and return the list
-    return leaders.previous
+    return LeaderManager().previous
     
 def get_leader_list():
     """Returns the userids of the current leader(s)."""
     # Remove disconnected userids from the current leaders and return the list
-    return leaders.current
+    return LeaderManager().current
     
 def get_leader_names():
     """Returns the names of the current leader(s)."""
@@ -42,4 +42,4 @@ def get_leader_names():
     
 def get_leader_level():
     """Returns the current leader level."""
-    return leaders.leaderlevel
+    return LeaderManager().leaderlevel

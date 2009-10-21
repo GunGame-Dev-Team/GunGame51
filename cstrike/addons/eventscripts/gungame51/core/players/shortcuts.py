@@ -17,7 +17,7 @@ from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.players import Player
-from gungame51.core.players import players
+from gungame51.core.players import PlayerDict
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -95,7 +95,7 @@ def resetPlayers():
           the scripter uses event gg_start to re-initialize custom
           player attributes.
     '''
-    players.clear()
+    PlayerDict().clear()
     
 # ============================================================================
 # >> DOCTSTRING REDIRECTS

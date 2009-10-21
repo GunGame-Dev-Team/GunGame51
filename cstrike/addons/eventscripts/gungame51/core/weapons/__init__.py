@@ -247,7 +247,7 @@ class BaseWeaponOrders(object):
         delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
 
     def restartRound(self):
-        if not self.file == weaponorders.gungameorder:
+        if not self.file == WeaponManager().gungameorder:
             return
 
         es.server.cmd('mp_restartgame 2')
@@ -292,6 +292,11 @@ class WeaponOrdersDict(dict):
     Note:
         This class is meant for private use.
     '''
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = dict.__new__(cls)
+        return cls._the_instance
+
     # =========================================================================
     # >> WeaponOrdersDict() CLASS ATTRIBUTE METHODS
     # =========================================================================
@@ -325,17 +330,15 @@ class WeaponOrdersDict(dict):
         super(WeaponOrdersDict, self).clear()
 
 
-orders = WeaponOrdersDict()
-
-
 class WeaponManager(object):
-    # =========================================================================
-    # >> WeaponManager() CLASS INITIALIZATION
-    # =========================================================================
-    def __init__(self):
-        self.__weaponorders__ = {}
-        self.gungameorder = 'default_weapon_order'
-        self.currentorder = None
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Set up the instance variables
+            cls._the_instance.__weaponorders__ = {}
+            cls._the_instance.gungameorder = 'default_weapon_order'
+            cls._the_instance.currentorder = None
+        return cls._the_instance
 
     # =========================================================================
     # >> WeaponManager() CLASS ATTRIBUTE METHODS
@@ -348,7 +351,7 @@ class WeaponManager(object):
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
 
             # Return the item from the WeaponOrdersDict instance
-            return orders[self.currentorder][item]
+            return WeaponOrdersDict()[self.currentorder][item]
 
     def __setitem__(self, item, value):
         if item in ['currentorder', '__weaponorders__', 'gungameorder']:
@@ -358,7 +361,7 @@ class WeaponManager(object):
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
 
             # We only directly allow the attribute "userid" to be set
-            orders[self.currentorder][item] = value
+            WeaponOrdersDict()[self.currentorder][item] = value
 
     def __getattr__(self, name):
         if name in ['currentorder', '__weaponorders__', 'gungameorder']:
@@ -368,7 +371,7 @@ class WeaponManager(object):
             if not self.currentorder:
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
             # Redirect to the PlayerDict instance
-            return orders[self.currentorder][name]
+            return WeaponOrdersDict()[self.currentorder][name]
 
     def __setattr__(self, name, value):
         if name in ['currentorder', '__weaponorders__', 'gungameorder']:
@@ -379,7 +382,7 @@ class WeaponManager(object):
                 raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
 
             # Redirect to the PlayerDict instance
-            orders[self.currentorder][name] = value
+            WeaponOrdersDict()[self.currentorder][name] = value
 
     # =========================================================================
     # >> WeaponManager() CUSTOM CLASS METHODS
@@ -392,7 +395,7 @@ class WeaponManager(object):
             This does not set the weapon order to be used by GunGame, it only
             loads and parses the weapon order.
         '''
-        self.__weaponorders__[name] = orders[name]
+        self.__weaponorders__[name] = WeaponOrdersDict()[name]
         self.currentorder = name
         return self.__weaponorders__[name]
 
@@ -425,9 +428,6 @@ class WeaponManager(object):
         cancelDelayed('gg_mp_restartgame')
         delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
 
-
-weaponorders = WeaponManager()
-
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
@@ -443,6 +443,6 @@ def loadWeaponOrders():
         if os.path.isdir(os.path.join(weaponOrderPath, item)):
             continue
 
-        weaponorders.load(item)
+        WeaponManager().load(item)
 
 loadWeaponOrders()

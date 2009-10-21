@@ -19,7 +19,7 @@ import gamethread
 # GunGame Imports
 from gungame51.core import getGameDir
 from gungame51.core.events.shortcuts import EventManager
-from gungame51.core.messaging import __messages__
+from gungame51.core.messaging import MessageManager
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -126,6 +126,11 @@ class AddonLoadedByDependency(dict):
     This class is designed to store subaddons that were loaded as a result of
     being a dependency to another subaddon.
     '''
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = dict.__new__(cls)
+        return cls._the_instance
+
     # =========================================================================
     # >> AddonLoadedByDependency() CUSTOM CLASS METHODS
     # =========================================================================
@@ -161,9 +166,6 @@ class AddonLoadedByDependency(dict):
                 es.set(dependency, 0)
                 unload(dependency)
                 del self[dependency]
-
-
-loadedByDependency = AddonLoadedByDependency()
 
 
 class DependencyError(Exception):
@@ -217,6 +219,11 @@ class PriorityAddon(list):
     entries of addons in the PriorityAddon list, as well as preventing errors
     when scripters attempt to remove an entry that does not exist.
     '''
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = list.__new__(cls)
+        return cls._the_instance
+
     # =========================================================================
     # >> PriorityAddon() CUSTOM CLASS METHODS
     # =========================================================================
@@ -238,17 +245,16 @@ class PriorityAddon(list):
     def clear(self):
         del self[:]
 
-priority_addons = PriorityAddon()
-
 
 class AddonManager(object):
-    # =========================================================================
-    # >> AddonManager() CLASS INITIALIZATION
-    # =========================================================================
-    def __init__(self):
-        self.__loaded__ = {}
-        self.__events__ = {}
-        self.__order__ = []
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Create instance variables
+            cls._the_instance.__loaded__ = {}
+            cls._the_instance.__events__ = {}
+            cls._the_instance.__order__ = []
+        return cls._the_instance
 
     # =========================================================================
     # >> AddonManager() CUSTOM CLASS METHODS
@@ -390,9 +396,9 @@ class AddonManager(object):
         # Loop through each addon in the __order__ list
         for name in self.__order__:
             # Check to see if there is an addon taking priority
-            if priority_addons:
+            if PriorityAddon():
                 # The addon's event does not fire if it is not a priority addon
-                if name not in priority_addons:
+                if name not in PriorityAddon():
                     continue
                 
             # If the addon name is in the current event, call the function
@@ -436,7 +442,7 @@ class AddonManager(object):
         if conflicting:
             # Loop through all addons that are not loaded and load them
             for subaddon in conflicting:
-                # Add the subaddon to the "loadedByDependency" dictionary
+                # Add the subaddon to the "AddonLoadedByDependency()" dictionary
                 gamethread.delayed(0, self.addLoadedByDependency, (subaddon, name))
                 
 
@@ -485,14 +491,14 @@ class AddonManager(object):
             return
         es.set(depe, 1)
         load(subaddon)
-        loadedByDependency.add(dependency, addon_name)
+        AddonLoadedByDependency().add(dependency, addon_name)
 
     def removeLoadedByDependency(self, name):
         '''
         Removes and unloads dependencies that were loaded as a result of a
         sub-addon.
         '''
-        loadedByDependency.remove(name)
+        AddonLoadedByDependency().remove(name)
 
     def getAddonByName(self, name):
         '''
@@ -503,7 +509,7 @@ class AddonManager(object):
             return self.__loaded__[name]
 
         # If the addon is not loaded we need to import it
-        addonType = AddonManager().getAddonType(name)
+        addonType = self.getAddonType(name)
         modulePath = 'gungame51.scripts.%s.%s.%s' %(addonType, name, name)
         mod = __import__(modulePath, globals(), locals(), [''])
 
@@ -514,11 +520,11 @@ class AddonManager(object):
 
     def loadTranslations(self, addon):
         for translation in self.getAddonInfo(addon).translations:
-            __messages__.load(translation, addon.__name__.split('.')[-1])
+            MessageManager().load(translation, addon.__name__.split('.')[-1])
 
     def unloadTranslations(self, addon):
         for translation in self.getAddonInfo(addon).translations:
-            __messages__.unload(translation, addon.__name__.split('.')[-1])
+            MessageManager().unload(translation, addon.__name__.split('.')[-1])
 
     def getAddonInfo(self, addon=None):
         '''
@@ -527,7 +533,7 @@ class AddonManager(object):
         if not addon:
             # Return a dictionary of all addons
             dict_addon = {}
-            for name in __addons__.__loaded__:
+            for name in self.__loaded__:
                 addon = self.getAddonByName(name)
                 addon_globals = addon.__dict__
                 for item in addon_globals:
@@ -590,21 +596,18 @@ class AddonManager(object):
             addon_globals[blockname](*a, **kw)
 
 
-__addons__ = AddonManager()
-
-
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
 # These wrappers make it possible to use key addon functions
 # without interacting with the AddonManager directly
 def load(*a, **kw):
-   __addons__.load(*a, **kw)
+   AddonManager().load(*a, **kw)
 load.__doc__ = AddonManager.load.__doc__
 
 
 def unload(*a, **kw):
-   __addons__.unload(*a, **kw)
+   AddonManager().unload(*a, **kw)
 unload.__doc__ = AddonManager.unload.__doc__
 
 def getValidAddons():

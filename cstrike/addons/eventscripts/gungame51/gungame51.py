@@ -32,15 +32,15 @@ from core.cfg.shortcuts import unloadConfig
 from core.cfg.shortcuts import getConfigList
 
 #    Addon Function Imports
-from core.addons import __addons__
-from core.addons import priority_addons
+from core.addons import AddonManager
+from core.addons import PriorityAddon
 
 #    Player Function Imports
 from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
 
 #    Leaders Function Imports
-from core.leaders.shortcuts import leaders
+from core.leaders.shortcuts import LeaderManager
 from core.leaders.shortcuts import is_leader
 
 #    Core Function Imports
@@ -94,7 +94,7 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
         es.unload('gungame')
-    
+
 def unload():
     # Unload translations
     unloadTranslation('gungame', 'gungame')
@@ -108,11 +108,11 @@ def unload():
         dict_dependencies for y in dict_dependencies[x]]))):
 
         # Unload the addons that have required dependencies
-        __addons__.unload(addon)
+        AddonManager().unload(addon)
 
     # Unload any remaining addons now that dependencies are handled
-    for addon in __addons__.__order__[:]:
-        __addons__.unload(addon)
+    for addon in AddonManager().__order__[:]:
+        AddonManager().unload(addon)
 
     # Unload configs (removes flags from CVARs)
     unloadConfig(getConfigList())
@@ -132,12 +132,12 @@ def unload():
 
     # Temporary Cleanup Debug Messages
     from core.addons import conflicts
-    from core.cfg import __configs__
-    es.dbgmsg(0, '__configs__.__loaded__ = %s' %__configs__.__loaded__)
+    from core.cfg import ConfigManager
+    es.dbgmsg(0, 'ConfigManager().__loaded__ = %s' %ConfigManager().__loaded__)
     es.dbgmsg(0, 
-             '__configs__.__cvardefaults__ = %s' %__configs__.__cvardefaults__)
-    es.dbgmsg(0, '__addons__.__order__ = %s' %__addons__.__order__)
-    es.dbgmsg(0, '__addons__.__loaded__ = %s '%__addons__.__loaded__)
+             'ConfigManager().__cvardefaults__ = %s' %ConfigManager().__cvardefaults__)
+    es.dbgmsg(0, 'AddonManager().__order__ = %s' %AddonManager().__order__)
+    es.dbgmsg(0, 'AddonManager().__loaded__ = %s '%AddonManager().__loaded__)
     es.dbgmsg(0, 'dependencies = %s' %dependencies)
     es.dbgmsg(0, 'conflicts = %s' %conflicts)
 
@@ -189,8 +189,8 @@ def initialize():
 # ============================================================================
 def es_map_start(event_var):
     # Check for priority addons
-    if priority_addons:
-        del priority_addons[:]
+    if PriorityAddon():
+        del PriorityAddon()[:]
 
     # Make the sounds downloadable
     make_downloadable()
@@ -228,7 +228,7 @@ def es_map_start(event_var):
     resetPlayers()
     
     # Reset the GunGame leaders
-    leaders.reset()
+    LeaderManager().reset()
     
     '''
     # Make sounds downloadbale
@@ -294,7 +294,7 @@ def player_spawn(event_var):
 
 def player_death(event_var):
     # Check for priority addons
-    if priority_addons:
+    if PriorityAddon():
         return
 
     # Set player ids
@@ -399,11 +399,11 @@ def player_death(event_var):
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
     
-    leaders.disconnected_leader(userid)
+    LeaderManager().disconnected_leader(userid)
 
 def bomb_defused(event_var):
     # Check for priority addons
-    if priority_addons:
+    if PriorityAddon():
         return
 
     # Set vars
@@ -421,7 +421,7 @@ def bomb_defused(event_var):
 
 def bomb_exploded(event_var):
     # Check for priority addons
-    if priority_addons:
+    if PriorityAddon():
         return
 
     # Set vars
@@ -450,7 +450,7 @@ def player_team(event_var):
     
 def gg_levelup(event_var):
     # Check for priority addons
-    if priority_addons:
+    if PriorityAddon():
         return
 
     # Cache new level for later use
@@ -485,7 +485,7 @@ def gg_levelup(event_var):
     # ==================
     
     # Get leader level
-    leaderLevel = gungamelib.leaders.get_leader_level()
+    leaderLevel = gungamelib.LeaderManager().get_leader_level()
     
     if leaderLevel == \
     (gungamelib.getTotalLevels() - \

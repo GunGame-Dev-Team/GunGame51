@@ -11,7 +11,6 @@ $LastChangedDate$
 # ============================================================================
 # GunGame Imports
 from gungame51.core.cfg import ConfigManager
-from gungame51.core.cfg import __configs__
 from gungame51.core.cfg import getConfigList
 
 def loadConfig(names=[]):
@@ -19,17 +18,17 @@ def loadConfig(names=[]):
         names = [names,]
 
     for config in names:
-        __configs__.load(config)
+        ConfigManager().load(config)
 
 def unloadConfig(names=[]):
     if not isinstance(names, list):
         names = [names,]
 
     for config in names:
-        __configs__.unload(config)
+        ConfigManager().unload(config)
 
 def getConfig(name):
-    return __configs__.getConfigByName(name)
+    return ConfigManager().getConfigByName(name)
 
 def configExists(name):
     return ConfigManager.configExists(name)
@@ -41,13 +40,13 @@ def getConfigType(name):
 # >> DOCTSTRING REDIRECTS
 # ============================================================================
 # Declare the docstring for loadConfig
-loadConfig.__doc__ = __configs__.load.__doc__
+loadConfig.__doc__ = ConfigManager().load.__doc__
 
 # Declare the docstring for unloadConfig
-unloadConfig.__doc__ = __configs__.unload.__doc__
+unloadConfig.__doc__ = ConfigManager().unload.__doc__
 
 # Declare the docstring for getConfig
-getConfig.__doc__ = __configs__.getConfigByName.__doc__
+getConfig.__doc__ = ConfigManager().getConfigByName.__doc__
 
 # Declare the docstring for configExists
 configExists.__doc__ = ConfigManager.configExists.__doc__

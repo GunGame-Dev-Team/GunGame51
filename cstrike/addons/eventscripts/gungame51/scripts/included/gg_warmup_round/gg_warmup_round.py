@@ -21,7 +21,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.events.shortcuts import EventManager
-from gungame51.core.addons import priority_addons
+from gungame51.core.addons import PriorityAddon
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -129,9 +129,9 @@ def player_spawn(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def addPriorityAddon(name):
-    if name not in priority_addons:
+    if name not in PriorityAddon():
         priority_addons_added.append(name)
-        priority_addons.append(name)            
+        PriorityAddon().append(name)            
 
 def doWarmup():
     # Setting globals for backup variables
@@ -236,7 +236,7 @@ def countDown():
         
         # Removing addons added to priority_addons
         for addedAddon in priority_addons_added:
-            priority_addons.remove(addedAddon)                   
+            PriorityAddon().remove(addedAddon)                   
                 
         # Changing back to deathmatch from elimination?
         if int(gg_warmup_elimination) and int(gg_deathmatch_backup):

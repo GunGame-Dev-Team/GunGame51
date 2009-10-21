@@ -12,8 +12,7 @@ $LastChangedDate$
 # GunGame Imports
 from gungame51.core.addons import AddonInfo
 from gungame51.core.addons import AddonManager
-from gungame51.core.addons import __addons__
-from gungame51.core.addons import priority_addons
+from gungame51.core.addons import PriorityAddon
 
 # ============================================================================
 # >> FUNCTIONS
@@ -48,7 +47,7 @@ def getAddonInfo(name=None):
     if name:
         name = str(name).lower()
     
-    return __addons__.getAddonInfo(name)
+    return AddonManager().getAddonInfo(name)
     
 def getAddonType(name):
     '''
@@ -80,4 +79,4 @@ def addonExists(name):
     return AddonManager.addonExists(name)
 
 def getLoadedAddonList():
-    return __addons__.getAddonInfo().keys()
+    return AddonManager().getAddonInfo().keys()

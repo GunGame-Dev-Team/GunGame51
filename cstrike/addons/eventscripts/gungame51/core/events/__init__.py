@@ -134,39 +134,42 @@ class EventManager(object):
     # >> LEADER EVENTS
     # =========================================================================
     def gg_new_leader(self, userid):
+        from gungame51.core.leaders.shortcuts import LeaderManager
         es.event('initialize', 'gg_new_leader')
         es.event('setint', 'gg_new_leader', 'userid', userid)
         es.event('setint', 'gg_new_leader', 'leveler', userid)
         es.event('setstring', 'gg_new_leader', 'leaders',
-                 ','.join([str(x) for x in leaders.current[:]]))
+                 ','.join([str(x) for x in LeaderManager().current[:]]))
         es.event('setstring', 'gg_new_leader', 'old_leaders',
-                 ','.join([str(x) for x in leaders.previous[:]]))
+                 ','.join([str(x) for x in LeaderManager().previous[:]]))
         es.event('setint', 'gg_new_leader', 'leader_level',
-                 leaders.leaderlevel)
+                 LeaderManager().leaderlevel)
         es.event('fire', 'gg_new_leader')
         
     def gg_tied_leader(self, userid):
+        from gungame51.core.leaders.shortcuts import LeaderManager
         es.event('initialize', 'gg_tied_leader')
         es.event('setint', 'gg_tied_leader', 'userid', userid)
         es.event('setint', 'gg_tied_leader', 'leveler', userid)
         es.event('setstring', 'gg_tied_leader', 'leaders',
-                 ','.join([str(x) for x in leaders.current[:]]))
+                 ','.join([str(x) for x in LeaderManager().current[:]]))
         es.event('setstring', 'gg_tied_leader', 'old_leaders',
-                 ','.join([str(x) for x in leaders.previous[:]]))
+                 ','.join([str(x) for x in LeaderManager().previous[:]]))
         es.event('setint', 'gg_tied_leader', 'leader_level',
-                 leaders.leaderlevel)
+                 LeaderManager().leaderlevel)
         es.event('fire', 'gg_tied_leader')
         
     def gg_leader_lostlevel(self, userid):
+        from gungame51.core.leaders.shortcuts import LeaderManager
         es.event('initialize', 'gg_leader_lostlevel')
         es.event('setint', 'gg_leader_lostlevel', 'userid', userid)
         es.event('setint', 'gg_leader_lostlevel', 'leveler', userid)
         es.event('setstring', 'gg_leader_lostlevel', 'leaders',
-                 ','.join([str(x) for x in leaders.current[:]]))
+                 ','.join([str(x) for x in LeaderManager().current[:]]))
         es.event('setstring', 'gg_leader_lostlevel', 'old_leaders',
-                 ','.join([str(x) for x in leaders.previous[:]]))
+                 ','.join([str(x) for x in LeaderManager().previous[:]]))
         es.event('setint', 'gg_leader_lostlevel', 'leader_level',
-                 leaders.leaderlevel)
+                 LeaderManager().leaderlevel)
         es.event('fire', 'gg_leader_lostlevel')
         
     # =========================================================================
@@ -271,6 +274,3 @@ class EventManager(object):
         es.event('setint', 'gg_multi_level', 'userid', attacker)
         es.event('setint', 'gg_multi_level', 'leveler', attacker)
         es.event('fire', 'gg_multi_level')
-
-
-from gungame51.core.leaders.shortcuts import leaders

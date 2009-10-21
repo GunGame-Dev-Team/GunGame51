@@ -15,8 +15,6 @@ $LastChangedDate$
 import es
 
 # GunGame Imports
-from gungame51.core.players.shortcuts import Player
-from gungame51.core.players.shortcuts import players
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging.shortcuts import saytext2
 
@@ -25,13 +23,14 @@ from gungame51.core.messaging.shortcuts import saytext2
 # =============================================================================
 class LeaderManager(object):
     """Class that automatically manages leaders."""
-    # =========================================================================
-    # >> LeaderManager() CLASS INITIALIZATION
-    # =========================================================================
-    def __init__(self):
-        self.previous = []
-        self.useridlist = []
-        self.levellist = []
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Create the instance variables
+            cls._the_instance.previous = []
+            cls._the_instance.useridlist = []
+            cls._the_instance.levellist = []
+        return cls._the_instance
 
     # =========================================================================
     # >> LeaderManager() READ-ONLY PROPERTIES
@@ -255,6 +254,7 @@ class LeaderManager(object):
         
         # Trigger new leader messaging if a single leader is found
         if newLeader and len(self.current) == 1:
+            from gungame51.core.players.shortcuts import Player
             # Message about new leader 
             saytext2('#human', Player(userid).index, 'NewLeader',
                 {'player': es.getplayername(userid),
@@ -275,5 +275,3 @@ class LeaderManager(object):
         if userid in self.previous:
             # Remove the userid from the previous leader list
             del self.previous[self.previous.index(userid)]
-
-leaders = LeaderManager()
