@@ -252,7 +252,8 @@ def round_start(event_var):
     # =========================================================================
     # Remove weapons from the map
     # =========================================================================
-    list_noStrip = [x.strip() for x in str(gg_map_strip_exceptions).split(',')]
+    list_noStrip = ['weapon_%s' % x.strip() for x in \
+                                    str(gg_map_strip_exceptions).split(',')]
 
     if list_noStrip:
         for weapon in getWeaponList('#all'):
@@ -261,7 +262,7 @@ def round_start(event_var):
                 continue
 
             # Remove the weapon from the map
-            es.server.queuecmd('es_xfire %d weapon_%s kill' % (userid, weapon))
+            es.server.queuecmd('es_xfire %d %s kill' % (userid, weapon))
     else:
         es.server.queuecmd('es_xfire %d weapon_* kill' %userid)
 
