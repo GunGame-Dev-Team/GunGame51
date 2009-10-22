@@ -14,7 +14,7 @@ import es
 import repeat
 
 # GunGame Imports
-from gungame51.core.addons.shortcuts import AddonInfo, 
+from gungame51.core.addons.shortcuts import AddonInfo 
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
 
