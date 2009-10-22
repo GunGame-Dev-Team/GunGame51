@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
+from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo

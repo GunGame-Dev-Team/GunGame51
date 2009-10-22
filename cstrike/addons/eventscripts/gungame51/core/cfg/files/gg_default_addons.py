@@ -593,7 +593,8 @@ def load():
                 'them up".')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap_update.')
-    config.text('   1 = (Enabled) Load gg_handicap_update.')
+    config.text('   180 = (Enabled) Update the lowest level players every ' +
+                '180 seconds (3 minutes).')
     config.text('Default Value: 0')
     config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
                 'players\' levels using handicap.')

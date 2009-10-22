@@ -11,10 +11,11 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
+import gamethread
 import repeat
 
 # GunGame Imports
-from gungame51.core.addons.shortcuts import AddonInfo 
+from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
 
@@ -38,7 +39,7 @@ gg_handicap_update = es.ServerVar('gg_handicap_update')
 # ============================================================================
 def load():
     # Creating repeat loop
-    repeat.create('gungameHandicapLoop', handicapUpdate)
+    loopStart()
     
     # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -54,10 +55,6 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-def gg_start(event_var):
-    # Start loop
-    loopStartStop(True)
-
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
@@ -73,42 +70,52 @@ def player_activate(event_var):
         # Tell the player that their level was adjustedG
         ggPlayer.msg('LevelLowest', {'level':handicapLevel})
 
+def round_start(event_var):
+    # Start loop
+    loopStart()
+
 def gg_win(event_var):
     # Stop loop
-    loopStartStop(False)
-
-def gg_map_end():
-    # Stop loop
-    loopStartStop(False)
+    loopStop()
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def loopStartStop(start):    
+def loopStart():
+    myRepeat = repeat.find('gungameHandicapLoop')
+    status = repeat.status('gungameHandicapLoop')
+
     # Loop running ?
-    if repeat.status('gungameHandicapLoop') > 1:
-        es.dbgmsg(0, 'Stopping update loop')
-        # Stop loop
-        repeat.stop('gungameHandicapLoop')
-    
-    # Update enabled?
-    if not int(gg_handicap_update):
-        return 
-    
-    # Start loop ?
-    if start:
-        es.dbgmsg(0, 'Starting update loop')
-        repeat.start('gungameHandicapLoop', int(gg_handicap_update), 0)  
+    if status == 0:
+        # Create loop
+        myRepeat = repeat.create('gungameHandicapLoop', handicapUpdate)
+        myRepeat.start(int(gg_handicap_update), 0)
+        return
 
-def player_jump(event_var):
-    loopStartStop(True)
-
-def handicapUpdate():
-    # Checking if repeat loop needs to be canceled
-    if not int(gg_handicap_update):
-        repeat.stop('gungameHandicapLoop')
+    # If the gg_handicap_update was changed, re-create the loop
+    if int(myRepeat['interval']) != float(gg_handicap_update):
+        loopStop()
+        gamethread.delayed(0.1, loopStart)
         return
     
+    # If the gg_handicap_update was removed, delete the loop
+    if int(gg_handicap_update) == 0:
+        myRepeat.delete()
+        return
+
+    # Is the loop stopped?
+    if status == 2:
+        # Start loop
+        myRepeat.start(int(gg_handicap_update), 0)
+
+def loopStop():
+    # Loop running ?
+    if repeat.status('gungameHandicapLoop'):
+        # Stop loop
+        repeat.stop('gungameHandicapLoop')
+
+def handicapUpdate():
+    # Get the handicap level
     handicapLevel = getLevelAboveLowest()
     
     # Updating players    
@@ -116,7 +123,9 @@ def handicapUpdate():
         # Get the player
         ggPlayer = Player(userid)
         
+        # If the lowest level players are below the handicap level, continue
         if ggPlayer.level < handicapLevel:
+            # Set player level
             ggPlayer.level = handicapLevel
             
             # Tell the player that their level was adjusted
@@ -124,12 +133,6 @@ def handicapUpdate():
             
             # Play the update sound
             ggPlayer.playsound('handicap') 
-    
-    # Checking if update interval has changed
-    interval = repeat.find('gungameHandicapLoop')['interval']
-    if interval != int(gg_handicap_update):
-        loopStartStop(True)
-        
 
 def getLowestLevelUsers():
     lowestLevel = get_leader_level()
