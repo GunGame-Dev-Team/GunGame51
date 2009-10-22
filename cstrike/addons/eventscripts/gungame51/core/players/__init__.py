@@ -50,30 +50,22 @@ class CustomAttributeCallbacks(dict):
     def add(self, attribute, function, addon):
         '''
         Adds a callback to execute when a previously created attribute is set
-        via the BasePlayer class' __setitem__ or __setattr__ methods.
+        via the BasePlayer class __setitem__ or __setattr__ methods.
 
         Note:
-            You can not add callbacks for primary GunGame attributes:
-                * userid
-                * steamid
-                * level
-                * preventlevel
-                * multikill
+            Do not raise errors for GunGame attributes.
         '''
-        # Do not let them add callbacks to GunGame's attributes
-        if attribute in ['userid', 'level', 'preventlevel',
-                         'steamid', 'multikill']:
-            raise AttributeError('No callbacks are allowed to be set for "%s".'
-                %attribute)
-
         # Make sure that the function is callable
         if not callable(function):
             raise AttributeError('Callback "%s" is not callable.' %function)
 
-        # Create the attribute callback
-        self[attribute] = (function, addon)
+        if not self.has_key(attribute):
+            self[attribute] = {}
 
-    def remove(self, attribute):
+        # Add or update the attribute callback
+        self[attribute].update({addon:function})
+
+    def remove(self, attribute, addon):
         '''
         Removes a callback to execute when a previously created attribute is
         set via the BasePlayer class' __getitem__ or __getattr__ methods.
@@ -86,8 +78,16 @@ class CustomAttributeCallbacks(dict):
         if not attribute in self:
             return
 
+        # Make sure that the addon exists in the attribute
+        if not self[attribute].has_key(addon):
+            return
+
         # Delete the attribtue callback
-        del self[attribute]
+        del self[attribute][addon]
+        
+        # See if the attribute is now empty
+        if not self[attribute]:
+            del self[attribute]
 
 
 class PreventLevel(list):
@@ -141,8 +141,9 @@ class BasePlayer(object):
         
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
-        if name in CustomAttributeCallbacks():
-            CustomAttributeCallbacks()[name][0](name, value)
+        if CustomAttributeCallbacks().has_key(name):
+            for function in CustomAttributeCallbacks()[name].values():
+                function(name, value, self)
 
         # Are they setting the "level" attribute?
         if name == 'level':
@@ -557,7 +558,6 @@ class PlayerDict(dict):
     def __new__(cls, *p, **k):
         if not '_the_instance' in cls.__dict__:
             cls._the_instance = dict.__new__(cls)
-            #es.addons.registerForEvent(cls, 'player_activate', cls._the_instance.player_activate)
         return cls._the_instance
 
     # =========================================================================
@@ -733,13 +733,13 @@ class Player(object):
             not raise an exception.
         '''
         # Loop through each attribute in the CustomAttributeCallBacks instance
-        for attribute in list(CustomAttributeCallbacks()):
+        for attribute in CustomAttributeCallbacks().keys():
             # Continue to the next attribute if the addon name is not found
             if not addon in CustomAttributeCallbacks()[attribute]:
                 continue
 
             # Remove the custom attribute callback
-            CustomAttributeCallbacks().remove(attribute)
+            CustomAttributeCallbacks().remove(attribute, addon)
 
     
 from gungame51.core.events.shortcuts import EventManager
