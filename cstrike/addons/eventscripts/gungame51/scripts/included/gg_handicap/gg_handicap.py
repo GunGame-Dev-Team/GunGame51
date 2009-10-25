@@ -40,18 +40,18 @@ gg_handicap_update = es.ServerVar('gg_handicap_update')
 def load():
     # Creating repeat loop
     loopStart()
-    
+
     # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
 def unload():
     # Delete the repeat loop
     if repeat.status('gungameHandicapLoop'):       
         repeat.delete('gungameHandicapLoop')
-    
+
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-    
+
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
@@ -82,13 +82,18 @@ def gg_win(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def loopStart():
-    # If the gg_handicap_update is removed, delete the loop
-    if int(gg_handicap_update) == 0:
-        repeat.find('gungameHandicapLoop')
-        return
-
     myRepeat = repeat.find('gungameHandicapLoop')
     status = repeat.status('gungameHandicapLoop')
+
+    # If the gg_handicap_update is removed
+    if int(gg_handicap_update) == 0:
+
+        # If the repeat exists, delete it
+        if status > 0:
+            myRepeat.delete()
+
+        # Stop here
+        return
 
     # Loop running ?
     if status == 0:
@@ -117,20 +122,20 @@ def loopStop():
 def handicapUpdate():
     # Get the handicap level
     handicapLevel = getLevelAboveLowest()
-    
+
     # Updating players    
     for userid in getLowestLevelUsers():
         # Get the player
         ggPlayer = Player(userid)
-        
+
         # If the lowest level players are below the handicap level, continue
         if ggPlayer.level < handicapLevel:
             # Set player level
             ggPlayer.level = handicapLevel
-            
+
             # Tell the player that their level was adjusted
             ggPlayer.msg('LevelLowest', {'level':handicapLevel})
-            
+
             # Play the update sound
             ggPlayer.playsound('handicap') 
 
