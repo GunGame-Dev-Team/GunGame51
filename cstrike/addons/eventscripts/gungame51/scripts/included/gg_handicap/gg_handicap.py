@@ -82,6 +82,11 @@ def gg_win(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def loopStart():
+    # If the gg_handicap_update is removed, delete the loop
+    if int(gg_handicap_update) == 0:
+        repeat.find('gungameHandicapLoop')
+        return
+
     myRepeat = repeat.find('gungameHandicapLoop')
     status = repeat.status('gungameHandicapLoop')
 
@@ -96,11 +101,6 @@ def loopStart():
     if int(myRepeat['interval']) != float(gg_handicap_update):
         loopStop()
         gamethread.delayed(0.1, loopStart)
-        return
-    
-    # If the gg_handicap_update was removed, delete the loop
-    if int(gg_handicap_update) == 0:
-        myRepeat.delete()
         return
 
     # Is the loop stopped?
