@@ -9,6 +9,9 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+# SPE Imports
+from spe.games import cstrike
+
 # Python imports
 import sys
 
@@ -77,7 +80,8 @@ gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 
 # ============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# ============================================================================    
+
 def load():
     # Load translations
     loadTranslation('gungame', 'gungame')
@@ -241,30 +245,30 @@ def es_map_start(event_var):
     equipPlayer()    
     
 def round_start(event_var):
+
     # Retrieve a random userid
     userid = es.getuserid()
 
     # =========================================================================
     # Disable Buyzones
     # =========================================================================
-    es.server.queuecmd('es_xfire %d func_buyzone Disable' %userid)
+    es.server.queuecmd('es_xfire %d func_buyzone Disable' % userid)
 
     # =========================================================================
     # Remove weapons from the map
     # =========================================================================
-    list_noStrip = ['weapon_%s' % x.strip() for x in \
-                                    str(gg_map_strip_exceptions).split(',')]
+    list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
+                    'weapon_%s' % x.strip()) for x in \
+                    str(gg_map_strip_exceptions).split(',') if x.strip() != \
+                    ''] + ['weapon_knife']
 
-    if list_noStrip:
-        for weapon in getWeaponList('#all'):
-            # Make sure that the admin doesn't want the weapon left on the map
-            if weapon in list_noStrip:
-                continue
+    for weapon in getWeaponList('#all'):
+        # Make sure that the admin doesn't want the weapon left on the map
+        if weapon in list_noStrip:
+            continue
 
-            # Remove the weapon from the map
-            es.server.queuecmd('es_xfire %d %s kill' % (userid, weapon))
-    else:
-        es.server.queuecmd('es_xfire %d weapon_* kill' %userid)
+        # Remove the weapon from the map
+        es.server.queuecmd('es_xfire %i %s kill' % (userid, weapon))
 
     # =========================================================================
     # Equip players with a knife and possibly item_kevalr or item_assaultsuit
@@ -272,6 +276,11 @@ def round_start(event_var):
     equipPlayer()
 
 def player_spawn(event_var):
+    
+    # Check for priority addons
+    if PriorityAddon():
+        return
+
     userid = event_var['userid']
     
     if getPlayer(userid).isobserver:
@@ -280,11 +289,8 @@ def player_spawn(event_var):
     if getPlayer(userid).isdead:
         return
     
-    # Warmup Round Check Would Go Here
-    # ....
-    
     # Give the player their weapon
-    Player(userid).giveWeapon()
+    gamethread.delayed(0.05, Player(userid).giveWeapon, ())
     
     # Reset the player's AFK calculation
     if not es.isbot(userid):
@@ -504,16 +510,6 @@ def gg_levelup(event_var):
             EventManager().gg_vote()
     '''
     
-'''
-AGAIN, I FEEL THIS IS SOMETHING THAT DOES NOT BELONG IN THE CORE OF GUNGAME
-
-def gg_vote(event_var):
-    dict_variables['gungame_voting_started'] = True
-    
-    if gungamelib.getVariableValue('gg_map_vote') == 2:
-        es.server.queuecmd(gungamelib.getVariableValue('gg_map_vote_command'))
-'''
-    
 def gg_win(event_var):
     # Get player info
     userid = int(event_var['winner'])
@@ -623,8 +619,8 @@ def server_cvar(event_var):
 def equipPlayer():
     userid = es.getuserid()
     cmd = 'es_xremove game_player_equip;' + \
-          'es_xgive %s game_player_equip;' %userid + \
-          'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' %userid
+          'es_xgive %s game_player_equip;' % userid + \
+          'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' % userid
 
     # Retrieve the armor type
     armorType = int(gg_player_armor)
