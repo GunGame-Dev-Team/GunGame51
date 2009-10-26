@@ -407,42 +407,6 @@ def player_disconnect(event_var):
     userid = int(event_var['userid'])
     
     LeaderManager().disconnected_leader(userid)
-
-def bomb_defused(event_var):
-    # Check for priority addons
-    if PriorityAddon():
-        return
-
-    # Set vars
-    ggPlayer = Player(event_var['userid'])
-    weapon = ggPlayer.weapon
-    
-    # Cant skip the last level
-    if ggPlayer.level == getWeaponOrder().getTotalLevels() or \
-                                weapon in ['knife', 'hegrenade']:
-        ggPlayer.msg('CannotSkipLevel_ByDefusing', {'level':weapon})
-        return
-    
-    # Level them up
-    ggPlayer.levelup(1, 0, 'bomb_defused')
-
-def bomb_exploded(event_var):
-    # Check for priority addons
-    if PriorityAddon():
-        return
-
-    # Set vars
-    ggPlayer = Player(event_var['userid'])
-    weapon = ggPlayer.weapon
-    
-    # Cant skip the last level
-    if ggPlayer.level == getWeaponOrder().getTotalLevels() or \
-                                weapon in ['knife', 'hegrenade']:
-        ggPlayer.msg('CannotSkipLevel_ByPlanting', {'level':weapon})
-        return
-    
-    # Level them up
-    ggPlayer.levelup(1, 0, 'bomb_exploded')
     
 '''
 def player_team(event_var):
