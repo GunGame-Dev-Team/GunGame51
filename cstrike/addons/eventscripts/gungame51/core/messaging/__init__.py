@@ -306,7 +306,7 @@ class MessageManager(object):
                 return usermsg.hudhint(filter, string)
 
             # Send message to the userids from the playerlib filter
-            for userid in getUseridList(self.filter):
+            for userid in getUseridList(filter):
                 usermsg.hudhint(userid, string)
         else:
             # Send message to the userid
