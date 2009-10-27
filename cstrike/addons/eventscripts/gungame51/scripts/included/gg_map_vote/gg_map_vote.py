@@ -6,33 +6,36 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
+from __future__ import with_statement
 import random
 from os import listdir
 from os.path import splitext
+from os.path import exists
 
 # Eventscripts Imports
 import es
-import votelib
 import repeat
+import popuplib
 from playerlib import getUseridList
-from popuplib import easymenu
 
 # GunGame Imports
 from gungame51.core import getGameDir
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import saytext2
+from gungame51.core.messaging.shortcuts import msg
+from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getTotalLevels
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_map_vote'
 info.title = 'GG Map Vote' 
@@ -50,7 +53,7 @@ gg_map_vote_size = es.ServerVar('gg_map_vote_size')
 gg_map_vote_trigger = es.ServerVar('gg_map_vote_trigger')
 gg_map_vote_time = es.ServerVar('gg_map_vote_time')
 gg_map_vote_dont_show_last_maps = es.ServerVar(
-                                             'gg_map_vote_dont_show_last_maps')
+                                    'gg_map_vote_dont_show_last_maps')
 gg_map_vote_show_player_vote = es.ServerVar('gg_map_vote_show_player_vote')
 gg_map_vote_file = es.ServerVar('gg_map_vote_file')
 gg_map_vote_list_source = es.ServerVar('gg_map_vote_list_source')
@@ -59,18 +62,36 @@ gg_map_vote_after_death = es.ServerVar('gg_map_vote_after_death')
 eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 
 # Player command backup var
-player_command_backup = '%s' % gg_map_vote_command  
+player_command_backup = '%s' % gg_map_vote_player_command 
 
 # Dictionary to store the location of the source of the map files
 dict_mapListSource = {1:getGameDir('mapcycle.txt'),
                       2:getGameDir('maplist.txt'),
-                      3:getGameDir('%s.txt' %str(gg_map_vote_file) if not \
+                      3:getGameDir('%s.txt' % str(gg_map_vote_file) if not \
                                    '.txt' in str(gg_map_vote_file) else \
                                    str(gg_map_vote_file)),
                       4:getGameDir('maps')}
 
 # List to store the maps previously voted for "gg_map_vote_dont_show_last_maps"
 list_lastMaps = []
+
+# Holds options and the userids that voted for them
+mapVoteOptions = {}
+
+# Holds a list of userid's that have been sent the vote (for dead players)
+voteSentUserids = []
+
+# Holds userids that have recenty used the !vote command
+voteCmdUserids = []
+
+# Instance of popuplib
+ggVote = None
+
+# Holds a list of userids at the time the vote was started
+voteUserids = []
+
+# True/False if vote has allready been ran this map
+voteHasStarted = None
                     
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -86,6 +107,9 @@ def load():
         if int(gg_map_vote_dont_show_last_maps):
             list_lastMaps.append(eventscripts_currentmap)
     
+        # Check file location if using list_source = 3
+        mapFileClean(True)
+    
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
@@ -94,60 +118,10 @@ def unload():
     if int(es.exists('saycommand', '%s' % gg_map_vote_player_command)):        
         es.unregsaycmd('%s' % gg_map_vote_player_command)    
    
-    # Did we create a vote ?
-    if not votelib.exists('gg_map_vote'):
-        return  
-    
-    # Cancel vote ?
-    if votelib.isrunning('gg_map_vote'):
-        ggVotelib('gg_map_vote').stop(True)      
-    
-    votelib.delete('gg_map_vote')
+    cleanVote()
     
     # Unloaded message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
-# =============================================================================
-#  CLASS
-# =============================================================================
-'''
-    Note to developers:
-        This is a child of votelib and was created so we could use a player
-        filter with start().  This start() also uses repeat to stop the vote
-        instead of the votelib method.
-'''
-class ggVotelib(votelib.Vote_vote):
-    def start(self, time=0, filter='#human'):
-        if filter != '#human':
-            filter += ', #human'        
-        if not self.running:
-            self.time = time
-            self.running = True
-            self.votes = 0
-            self.popup = easymenu("vote_"+str(self.name), 
-                                  "_vote_choice", _submit)
-            self.popup.settitle(self.question)
-            self.popup.vguititle = self.question.replace('\\n', ' - ')
-            for option in self.options:
-                self.popup.addoption(option, self.options[option].text)
-            if self.showmenu:
-                self.send(getUseridList(filter), True, False)
-            if self.time > 0:
-                self.doRepeat(self.name, self.time)
-            else:
-                self.endtime = False
-        else:
-            es.dbgmsg(0,"Votelib: Cannot start vote '%s', " % self.name +
-                        "it is already running")
-    
-    def doRepeat(self, name, time):
-        self.repeat = repeat.find(name)
-        if not self.repeat:
-            self.repeat = repeat.create(name, self.repeat_cmd)
-        self.repeat.stop()
-        self.repeat.start(1, time)
-  
-    pass
 
 # =============================================================================
 #  GAME EVENTS
@@ -168,20 +142,26 @@ def es_map_start(event_var):
         if len(list_lastMaps) > int(gg_map_vote_dont_show_last_maps):
             del list_lastMaps[0]
 
+    cleanVote()
+    mapFileClean()    
+
+    global voteHasStarted
+    voteHasStarted = False
+    
 def gg_levelup(event_var):
+    # Vote has allready been started?
+    if voteHasStarted:
+        return
+    
     # Start vote ? 
-    es.msg('level up!')
-    if get_leader_level() != (getTotalLevels() - int(gg_map_vote_trigger)):
-        es.msg('not right level!')
+    if get_leader_level() <= (getTotalLevels() - int(gg_map_vote_trigger)):
         return
     
     # Use 3rd party voting system ?  
     if int(gg_map_vote) > 1:
-        es.msg('3rd party!')
         es.server.queuecmd('%s' % gg_map_vote_command)
         return
-
-    es.msg('start vote!')
+        
     voteStart()    
 
 def player_death(event_var):
@@ -196,131 +176,302 @@ def player_death(event_var):
     userid = int(event_var['userid'])
       
     # Is map vote running ?
-    if votelib.isrunning('gg_map_vote'):
-        ggVotelib('gg_map_vote').send(userid)
-        
+    if popuplib.exists('gg_map_vote'):
+        ggVote.send(userid)
+
+def player_disconnect(event_var):
+    userid = int(event_var['userid'])
     
+    # Player had voting ability ?
+    if userid not in voteUserids:
+        return
+        
+    # Player did vote ?
+    if userid in reduce(lambda a, b: a + b, mapVoteOptions.values()):
+        return
+    
+    # Remove userid from list
+    voteUserids.remove(userid)
+
+    # Everyone voted ?
+    if isVoteDone():
+        voteEnd()
+            
 # =============================================================================
 #  HELPER FUNCTIONS
 # =============================================================================
-def voteSubmit(userid, voteName, choice, choiceName):
+def mapFileClean(fromLoad=False):    
+    # Using a custom list ?
+    if int(gg_map_vote_list_source) != 3:
+        return
+        
+    # Skip this part on initial load
+    if not fromLoad:
+        # Current source file
+        current_file =  getGameDir('%s.txt' % str(gg_map_vote_file) if not \
+                    '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
+        
+        # Did it change ?                            
+        if dict_mapListSource[3] != current_file:
+            dict_mapListSource[3] = current_file
+    
+    # Look for it in /cstrike
+    if exists(dict_mapListSource[3]):
+        return
+        
+    # Look for file in other common folders
+    for folder in ('cfg/', 'cfg/gungame/', 'cfg/gungame51/'):
+        possible_path = getGameDir(folder + '%s.txt' % str(gg_map_vote_file) \
+             if not '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
+        
+        # File exists in the other location ?
+        if exists(possible_path):                   
+            dict_mapListSource[3] = possible_path
+            es.dbgmsg(0,'>>>> GunGame has found "%s" ' % gg_map_vote_file +
+                        'in (%s) Please change your config file to ' % folder + 
+                        'reflect the location! (I.E. cfg/gungame/myfile.txt)')
+            return
+    
+    # File couldn't be found, raising error
+    raise IOError('The file (%s) ' % gg_map_vote_file +
+                  'could not be found!  GunGame attempted to find the ' + 
+                  'file in other locations and was unsuccessful.  The ' +
+                  'server will default to the mapcycle.txt')
+
+def isVoteDone():
+    # Less votes than voters ?
+    total_votes = len(reduce(lambda a, b: a + b, mapVoteOptions.values())) 
+    if len(voteUserids) > total_votes: 
+        return False
+    return True
+
+def cleanVote():
+    # Clear options
+    mapVoteOptions.clear()
+    
+    # Delete popup ?
+    if popuplib.exists('gg_map_vote'):
+        popuplib.delete('gg_map_vote')    
+    
+    # Delete repeat ?
+    if repeat.find('gg_map_vote'):
+        repeat.delete('gg_map_vote')  
+    
+    # Clear userid lists
+    del voteSentUserids[:]
+    del voteCmdUserids[:]
+    del voteUserids[:]
+    
+    global ggVote
+    ggVote = None
+
+def voteSubmit(userid, choice, popupname):      
+    # Is a revote ?
+    for option in mapVoteOptions.keys():
+        if userid in mapVoteOptions[option]:
+            
+            # Is not the same choice ?
+            if choice != option:
+                mapVoteOptions[option].remove(userid)
+                mapVoteOptions[choice].append(userid)           
+                break
+            
+            # Same choice, stop here
+            else:
+                return
+    
+    # Is a new vote
+    else:
+        mapVoteOptions[choice].append(userid)     
+            
     # Announce players choice if enabled
     if int(gg_map_vote_show_player_vote):
         saytext2('#human', Player(userid).index, 'VotedFor', 
-            {'name':es.getplayername(userid), 'map':choiceName})
-
-def voteEnd(voteName, win, winName, winVotes, winPercent, total, tie, 
-                                                                    cancelled):
-    if cancelled:
-        es.msg("The vote "+votename+" was cancelled.")
-        return
+            {'name':es.getplayername(userid), 'map':choice.lower()})
     
+    # Everyone voted ?
+    if isVoteDone():
+        voteEnd()             
+        
+def voteEnd():   
+    # Stop repeat ?
+    ggRepeat = repeat.find('gg_map_vote')
+    if ggRepeat:
+        ggRepeat.stop()
+
+    # Unsend all menus
+    ggVote.unsend(voteUserids)
+
+    winner = []
+    total_votes = len(reduce(lambda a, b: a + b, mapVoteOptions.values()))
+    
+    if not total_votes:
+        msg('#human', 'NotEnoughVotes', {}, True)
+        cleanVote()
+        return    
+    
+    # Find winner
+    for option in mapVoteOptions:
+        votes = len(mapVoteOptions[option])
+        # No votes ?
+        if not votes:
+            continue
+        
+        # First option with any votes ?
+        if not winner:
+            winner.append(option)
+            continue
+        
+        win_votes = len(mapVoteOptions[winner[0]])            
+        
+        # Loser ?
+        if votes < win_votes:
+            continue
+        
+        # Winner ?
+        if votes > win_votes:
+            del winner[:]
+            winner.append(option)
+            continue
+        
+        # Tie
+        winner.append(option)
+
+    # Random winner
+    winner = random.choice(winner)
+
     # Win message    
-    es.msg("The option "+winname+" ["+str(win)+"] has won the vote with "
-            +str(winvotes)+" ("+str(winpercent)+"%) votes.")
+    msg('#human', 'WinningMap', {'map': winner.lower(), 
+        'totalVotes': total_votes}, True) 
     
     # Set eventscripts_nextmapoverride to the winning map
-    es.ServerVar('eventscripts_nextmapoverride').set(winName)
+    es.ServerVar('eventscripts_nextmapoverride').set(winner)
     
     # Set Mani 'nextmap' if Mani is loaded
     if str(es.ServerVar('mani_admin_plugin_version')) != '0':
-        es.server.queuecmd('ma_setnextmap %s' % winName)
+        es.server.queuecmd('ma_setnextmap %s' % winner)
     
     # Set SourceMods 'nextmap' if SourceMod is loaded
     if str(es.ServerVar('sourcemod_version')) != '0':
-        es.server.queuecmd('sm_nextmap %s' % winName)
+        es.server.queuecmd('sm_nextmap %s' % winner)
     
     # Play sound
     for userid in getUseridList('#human'):
         Player(userid).playsound('endofvote')
+
+    cleanVote()
         
 def voteSendcmd():
     # Is map vote running ?
-    if not votelib.isrunning('gg_map_vote'):
+    if not popuplib.exists('gg_map_vote'):
         return
     
     userid = es.getcmduserid()
     
-    ggVotelib('gg_map_vote').send(userid, True)
-
-def voteStart():
-    if votelib.find('gg_map_vote'):
-        votelib.delete('gg_map_vote')
-        
-    # Create a new vote
-    ggVote = votelib.create('gg_map_vote', voteEnd, voteSubmit)
+    if userid not in voteUserids:
+        return
     
-    # Function to use for countdown
-    ggVote.repeat_cmd = voteCountDown
+    if userid in voteCmdUserids:
+        return
+    
+    voteCmdUserids.append(userid)
+    gamethread.delayed(3, voteCmdUserids.remove, userid)
+    ggVote.send(userid)
+
+def voteStart():        
+    # Create a new vote
+    global ggVote
+    ggVote = popuplib.easymenu('gg_map_vote', None, voteSubmit)
+    
+    msg('#human', 'PlaceYourVotes', {}, True)
     
     # Set question and add some options
-    ggVote.setquestion('Please vote for the next map:')
+    ggVote.settitle('Please vote for the next map:')
     
     # Add maps as options
     for map_name in getMapList():
-        ggVote.addoption(map_name)
+        ggVote.addoption(map_name, map_name.lower())
+        mapVoteOptions[map_name] = []
+    
+    # Users eligable to vote
+    voteUserids.extend(getUseridList('#human'))
     
     # Only send to dead players ?
     if int(gg_map_vote_after_death):
-        ggVote.start(int(gg_map_vote_time), '#dead')
-        return    
+        voteSentUserids.extend(getUseridList('#human, #dead'))
+        ggVote.send(voteSentUserids)    
     
-    # Start the vote
-    ggVote.start(int(gg_map_vote_time))
+    # Send it to everyone
+    else:
+        ggVote.send(voteUserids)      
+   
+    # Start the repeat
+    voteRepeat = repeat.create('gg_map_vote', voteCountDown)
+    voteRepeat.start(1, int(gg_map_vote_time))
     
     # Fire event
     EventManager().gg_vote()
-        
+
+    # Set var so we know the vote has started    
+    global voteHasStarted
+    voteHasStarted = True
+            
 def voteCountDown():
     ggRepeat = repeat.find('gg_map_vote')
     if not ggRepeat:
         return
-    
+
+    timeleft = ggRepeat['remaining']
+
     # Stop the vote ?    
-    if ggRepeat['remaining'] == 0:
-        ggVotelib('gg_map_vote').stop(False, True)  
+    if timeleft == 0:
+        voteEnd()
+        return
+    
+    votes = len(reduce(lambda a, b: a + b, mapVoteOptions.values()))
+    
+    if timeleft == 1:
+        hudhint('#human', 'Countdown_Singular', {'time': int(gg_map_vote_time), 
+            'voteInfo': None, 'votes': votes, 
+            'totalVotes': len(voteUserids)})
+        return     
+    
+    if timeleft <= 5:
+        hudhint('#human', 'Countdown_Plural', {'time': int(gg_map_vote_time), 
+            'voteInfo': None, 'votes': votes, 
+            'totalVotes': len(voteUserids)})
 
 def getMapList():
     # Check to make sure the value of "gg_map_vote" is 1-4
-    if not int(gg_map_vote_list_source) in range(1, 5):
-        raise ValueError('"gg_map_vote_list_source" must be 1-4: current ' + \
-            'value "%s"' %int(gg_map_vote))
+    if int(gg_map_vote_list_source) not in range(1, 5):
+        raise ValueError('"gg_map_vote_list_source" must be 1-4: current ' +
+            'value "%s"' % int(gg_map_vote))
         
     # Check the maps directory for a list of all maps (option 4)
     if int(gg_map_vote_list_source) == 4:
         files = listdir(dict_mapListSource[4])
         maps = [x.strip('.bsp') for x in files if splitext(x)[1] == '.bsp']
-    
+
     else:
         # Check a specific file for a list of all maps (options 1-3)
-        file = open(dict_mapListSource[int(gg_map_vote)], 'r')
-        maps = [x.strip() for x in file.readlines()]
-        file.close()
-    
-    # Checking for specified file restrictions
-    if int(gg_map_vote_list_source) == 3:
-        for name in maps:
-            # Cleanup and create list
-            name = name.replace('\t','').replace(' '*(name.count(' ')-1), '')
-            name = name.split(' ')
+        with open(dict_mapListSource[int(gg_map_vote_list_source)], 'r') as f:
+            # Normal list ?
+            if int(gg_map_vote_list_source) != 3:
+                maps = [x.strip() for x in f.readlines() if x.strip() != '']
             
-            # No restriction/filter ?
-            if len(name) == 1:
-                continue
-            
-            maps.remove(name)
-            
-            # Exclude map ? (restricted/filtered)
-            if name[1] > len(es.getUseridList()):
-                continue
-            
-            maps.append(name[0])
-
+            # Restriction list ?
+            else:
+            	maps = [z[0] for z in [y.replace(' ' * (y.count(' ') - 1), 
+                        '').split(' ') for y in [x.strip().replace('\t', ' ') 
+                        for x in f.readlines() if x != '' or not 
+                        x.startswith('/')]] if len(z) == 1 or (int(z[1]) if 
+                        z[1].isdigit() else 0) <= len(getUseridList('#all'))]
+                        
     # Remove any maps from the list that were voted for previously
     if int(gg_map_vote_dont_show_last_maps):
-        for map in list_lastMaps:
-            if map in maps:
-                maps.remove(map)  
+        for map_name in list_lastMaps:
+            if map_name in maps:
+                maps.remove(map_name)  
           
     # Make sure that the maps list is not empty
     if not maps:
@@ -329,13 +480,14 @@ def getMapList():
         # Could it be do to the restrictions ?
         if int(gg_map_vote_list_source) == 3:
             error += (' **You should add more maps or reduce your ' +
-                     'min player restrictions (%s).' % dict_mapListSource[3])            
+                     'min player restrictions ' +
+                     '(Currently: %s).' % dict_mapListSource[3])            
 
         # Could it be do to too many last maps ?
         if int(gg_map_vote_dont_show_last_maps):
             error += (' **You should reduce ' + 
                       'gg_map_vote_dont_show_last_maps ' +
-                      '(%s) ' % gg_map_vote_dont_show_last_maps +
+                      '(File: %s) ' % gg_map_vote_dont_show_last_maps +
                       'or add more maps.')
         
         raise ValueError(error)          

@@ -1,0 +1,48 @@
+//-----------------------------------------------------------------------------
+//  GunGame 5.1                                        GunGame Development Team
+//                              gg_vote_list.txt    
+//
+//     >> Information:
+//    =========================================================================
+//        You can use this file, or another of this format, to filter 
+//    maps for map voting (gg_map_vote) based on player count.  You can 
+//    specify a minimum amount of players that must be currently logged 
+//    in on the server before the map will display in the vote list.
+//        
+//    Format: <map name>  [minimum players]
+//
+//     >> Example:
+//    =========================================================================
+//        For bigger maps such as knas_speedcastle_css or de_dust2 you might 
+//        not want to include that map in your rotation unless there were at 
+//        least 10 players on the server.  However, you may always want to
+//        include shotty, since its a relatively small map.
+//        
+//        So you would add:
+//            
+//            knas_speedcastle_css 10
+//            de_dust2 10
+//            aim_shotty
+//
+//           
+//    >> FAQ:
+//   ==========================================================================
+//        * It is not necessary to include a minimum player filter for every 
+//          map. If the number is blank, 0 is assumed and the map will always 
+//          be available. 
+//    
+//        * You CANNOT get this functionality from "maplist.txt" or 
+//          "mapcycle.txt"! You must copy that list into this file.
+//          
+//        * You will see errors from GunGame if none of the maps meet
+//          the player requirements. Its recommended to leave several 
+//          maps without a filter for this reason. 
+//        
+//-----------------------------------------------------------------------------
+
+de_dust2    10
+cs_office   6
+de_train
+cs_italy
+cs_militia
+cs_havana   6
