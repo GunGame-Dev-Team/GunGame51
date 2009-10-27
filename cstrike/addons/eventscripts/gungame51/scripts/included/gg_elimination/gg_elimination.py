@@ -100,7 +100,7 @@ def player_disconnect(event_var):
 
     # Respawn eliminated players if needed
     if ggPlayer.eliminated:
-        respawnEliminated(userid, currentRound)
+        respawnEliminated(userid, roundInfo.round)
 
     # Delete the "eliminated" attribute from the disconnecting player
     del ggPlayer.eliminated
