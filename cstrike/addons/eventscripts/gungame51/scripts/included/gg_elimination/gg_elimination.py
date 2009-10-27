@@ -101,9 +101,9 @@ def player_disconnect(event_var):
     # Respawn eliminated players if needed
     if ggPlayer.eliminated:
         respawnEliminated(userid, roundInfo.round)
-
-    # Delete the "eliminated" attribute from the disconnecting player
-    del ggPlayer.eliminated
+    else:
+        # Delete the "eliminated" attribute from the disconnecting player
+        del ggPlayer.eliminated
 
 def player_death(event_var):
     
@@ -152,7 +152,11 @@ def respawnPlayer(userid, respawnRound):
     # Check if respawn was issued in the current round
     if roundInfo.round != respawnRound:
         return
-    
+
+    # See if the player suicided due to disconnect
+    if not es.exists(userid):
+        return
+
     # Retrieve the playerlib player object
     plPlayer = getPlayer(userid)
 
@@ -192,6 +196,10 @@ def respawnEliminated(userid, respawnRound):
 
     # Respawn all victims eliminated players
     for playerid in ggPlayer.eliminated:
+        # Make sure the player exists
+        if not es.exists(playerid):
+            continue
+
         # Make sure the player is respawnable
         if not getPlayer(playerid).isdead or es.getplayerteam(playerid) < 2:
             continue
@@ -210,5 +218,10 @@ def respawnEliminated(userid, respawnRound):
     saytext2('#human', index, 'RespawningPlayer', 
     {'player': ', '.join(players)}, True)
 
-    # Clear victims eliminated player list
-    ggPlayer.eliminated = []
+    # Is the player that was killed still on the server (suicide disconnect)?
+    if es.exists(userid):
+        # Clear victims eliminated player list
+        ggPlayer.eliminated = []
+    else:
+        # Delete the "eliminated" attribute from the disconnected player
+        del ggPlayer.eliminated
