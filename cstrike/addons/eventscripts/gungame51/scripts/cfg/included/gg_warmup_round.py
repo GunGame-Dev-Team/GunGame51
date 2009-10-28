@@ -1,9 +1,9 @@
 # ../addons/eventscripts/gungame/scripts/cfg/included/gg_warmup_round.py
 
 '''
-$Rev: $
-$LastChangedBy: $
-$LastChangedDate: $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================
