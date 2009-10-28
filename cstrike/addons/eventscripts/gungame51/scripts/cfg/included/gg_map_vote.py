@@ -250,7 +250,7 @@ def load():
     
     # Write
     config.write()
-    es.dbgmsg(0, '\tgg_knife_pro.cfg')
+    es.dbgmsg(0, '\tgg_map_vote.cfg')
        
 def unload():
     global config
