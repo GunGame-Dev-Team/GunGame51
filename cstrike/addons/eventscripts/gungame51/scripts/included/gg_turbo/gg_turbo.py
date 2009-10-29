@@ -51,14 +51,12 @@ def unload():
 # >> GUNGAME EVENTS
 # ============================================================================
 def gg_levelup(event_var):
-
     userid = int(event_var['leveler'])
 
     # Strip and give weapon
     giveWeapon(userid, int(event_var['old_level']))
 
 def gg_leveldown(event_var):
-
     userid = int(event_var['leveler'])
 
     # Strip and give weapon
@@ -68,49 +66,47 @@ def gg_leveldown(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def giveWeapon(userid, previousLevel):
-
     # Do player checks first
     if not playerChecks(userid):
         return
 
     # Get player
-    player = Player(userid)
+    ggPlayer = Player(userid)
 
     # Give them their next weapon
-    player.giveWeapon()
-    
-    # Get the names of the previous and current level weapons
-    previousWeapon = "weapon_%s" % getLevelWeapon(previousLevel)
-    currentWeapon = "weapon_%s" % player.weapon
-    
-    # Retrieve a playerlib.Player() instance
-    pPlayer = getPlayer(userid)
-    
-    if previousWeapon:
-        # Set strip to 1 if previousWeapon and currentWeapon are primary and secondary or visa-versa
-        if ((previousWeapon in list_sWeapons and currentWeapon in list_pWeapons) or \
-            (previousWeapon in list_pWeapons and currentWeapon in list_sWeapons)):
-            strip = 1
-        else:
-            strip = 0
-        
-        # If a weapon will be stripped, get the name of the weapon that is being held
-        if strip:
-            if previousWeapon in list_pWeapons:
-                pWeapon = pPlayer.getPrimary()
-            elif previousWeapon in list_sWeapons:
-                pWeapon = pPlayer.getSecondary()
-            
-            # If they are they holding the previous level's weapon, remove it
-            if pWeapon == previousWeapon:
-                es.remove(pPlayer.getWeaponIndex(pWeapon))
+    ggPlayer.giveWeapon()
 
-    # Make them use it
-    es.sexec(userid, "use weapon_%s" % player.weapon)
+    # Retrieve a playerlib.Player() instances
+    pPlayer = getPlayer(userid)
+    pWeapon = pPlayer.getPrimary()
+    sWeapon = pPlayer.getSecondary()
+
+    # Get the player's current weapons
+    currentWeapon = "weapon_%s" % ggPlayer.weapon
+    previousWeapon = "weapon_%s" % getLevelWeapon(previousLevel)
+
+    strip = None
+
+    # Strip secondary weapon ? (Move to primary)
+    if previousWeapon == sWeapon and currentWeapon in list_pWeapons:
+        strip = sWeapon
+
+    # Strip primary weapon ? (Move to seconary)
+    elif previousWeapon == pWeapon and currentWeapon in list_sWeapons:
+        strip = pWeapon
+
+    # Did we find a weapon to strip ?
+    if strip:
+        es.server.queuecmd('es_xremove %s' % (
+                                            pPlayer.getWeaponIndex(strip)))
+
+    # Make them use it ?
+    if pPlayer.weapon != currentWeapon:
+        es.server.queuecmd('es_xsexec %s "use %s"' % (userid, currentWeapon))
 
 def playerChecks(userid):
-    # Get player
-    player = Player(userid)
+    # Get ggPlayer
+    ggPlayer = Player(userid)
 
     # Is player dead?
     if getPlayer(userid).isdead:

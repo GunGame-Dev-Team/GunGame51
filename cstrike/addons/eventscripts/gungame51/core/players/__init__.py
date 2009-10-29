@@ -341,8 +341,8 @@ class BasePlayer(object):
                 es.server.queuecmd('es_xremove %s' % (
                                                 pPlayer.getWeaponIndex(strip)))
                 
-                # Check for no weapon in 0.05 seconds
-                gamethread.delayedname(0.05, 'gg_noweap_%i' % self.userid, 
+                # Check for no weapon in 0.08 seconds
+                gamethread.delayedname(0.08, 'gg_noweap_%i' % self.userid,
                                         Player(self.userid).noWeaponCheck, ())
             
             # Give new gun                           
@@ -363,7 +363,6 @@ class BasePlayer(object):
     def noWeaponCheck(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
-        
         # Store the weapon you are holding in the weapon slot which your 
         #  level's weapon
         # should be in
@@ -375,19 +374,18 @@ class BasePlayer(object):
             return
 
         # If you have a weapon, return
-        if weapon:
-            return
+        if not weapon:
+
+            # Using give() ?
+            if newWeapon:
+                self.give(weapon)
+
+            # Repeat giveWeapon to re-strip the slot and give your weapon
+            else:
+                self.giveWeapon()
 
         # Get the index of the last given entity
         int_lastgive = int(eventscripts_lastgive)
-
-        # Using give() ?
-        if newWeapon:
-            self.give(weapon)
-        
-        # Repeat giveWeapon to re-strip the slot and give your weapon          
-        else:     
-            self.giveWeapon()
 
         # If there was no lastgive, return
         if not int_lastgive:
@@ -395,12 +393,11 @@ class BasePlayer(object):
 
         # If the last given entity is held by someone other than you
         owner = es.getindexprop(int_lastgive, 'CBaseEntity.m_hOwnerEntity')
+
         if owner != es.getplayerhandle(self.userid):
-            
             # Owner is a person ?
             if owner > -1:
                 owner_userid = es.getuserid(owner)
-                
                 # Make the wrong owner use their own weapon ?
                 if getPlayer(owner_userid).weapon != \
                     'weapon_%s' % Player(owner_userid).weapon: 
@@ -413,6 +410,8 @@ class BasePlayer(object):
                 
                 # Remove the weapon
                 es.remove(int_lastgive)
+
+        es.msg('DONE!')
 
     def give(self, weapon, useWeapon=0):
         '''
@@ -717,6 +716,13 @@ class Player(object):
             # Remove the custom attribute callback
             CustomAttributeCallbacks().remove(attribute, addon)
 
+'''>> Note to Devs:
+        This actually does not seem to be working, but then again, it also
+        does not seem to be needed...  I will look into this soon.
+            (item_pickup)
+        
+                        - Monday
+'''
 def item_pickup(event_var):
     userid = int(event_var['userid'])
     ggPlayer = Player(userid)
@@ -736,12 +742,11 @@ def item_pickup(event_var):
         
     # Player got what they needed ?
     if ggPlayer.weapon == event_var['item']:
-        
+
         # Use it ?
         if getPlayer(userid).weapon != 'weapon_%s' % ggPlayer.weapon:
             es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, 
                                                             ggPlayer.weapon))            
-        
         # Remove from list and stop
         recent_give_userids.remove(userid)
         return    
