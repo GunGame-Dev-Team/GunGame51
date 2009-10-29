@@ -427,10 +427,6 @@ def gg_levelup(event_var):
     # Cache new level for later use
     newLevel = int(event_var['new_level'])
     
-    # Temporary message
-    es.msg('%s leveled up by ' % event_var['es_attackername'] +
-           'killing %s!' % event_var['es_username'])
-    
     # ===============
     # REGULAR LEVELUP
     # ===============

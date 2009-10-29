@@ -411,8 +411,6 @@ class BasePlayer(object):
                 # Remove the weapon
                 es.remove(int_lastgive)
 
-        es.msg('DONE!')
-
     def give(self, weapon, useWeapon=0):
         '''
         Gives a player the specified weapon.
