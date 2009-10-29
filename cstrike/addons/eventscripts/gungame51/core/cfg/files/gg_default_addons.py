@@ -18,7 +18,7 @@ import cfglib
 # ============================================================================
 config = cfglib.AddonCFG('%s/cfg/gungame51/gg_default_addons.cfg'
     %es.ServerVar('eventscripts_gamedir'))
-        
+
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
@@ -36,7 +36,7 @@ def load():
     config.text('*'*76)
     config.text('')
     config.text('')
-    
+
     # Error Logging
     config.text('='*76)
     config.text('>> ERROR LOGGING')
@@ -56,7 +56,7 @@ def load():
     config.text('Default Value: 1')
     config.cvar('gg_error_logging', 1, 'Logs all GunGame-related ' +
                 'errors.')
-    
+
     # Multi-Level
     config.text('')
     config.text('='*76)
@@ -88,17 +88,17 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   The percentage of gravity that players receieving the ' +
-                'multi-level bonus') 
+                'multi-level bonus')
     config.text('   will have.')
     config.text('Options:')
     config.text('   100 = (Disabled) Keep the player\'s gravity unchanged.')
     config.text('   # = (Enabled) The percentage of normal gravity the ' +
-                'player') 
+                'player')
     config.text('                 will have.')
     config.text('Default Value: 100')
-    config.cvar('gg_multi_level_gravity', 100, 'The percentage of gravity ' + 
+    config.cvar('gg_multi_level_gravity', 100, 'The percentage of gravity ' +
                 'included with the multi-level bonus.')
-    
+
     # Multi-Level TK Victim Reset
     config.text('')
     config.text('='*76)
@@ -109,15 +109,15 @@ def load():
                 'count reset.')
     config.text('Options:')
     config.text('   0 = (Disabled) All players will have their level-up ' +
-                'count reset') 
+                'count reset')
     config.text('                  when they die.')
     config.text('   1 = (Enabled) Team kill victims not have their level-up ' +
-                'count reset') 
+                'count reset')
     config.text('when they die.')
     config.text('Default Value: 0')
     config.cvar('gg_multi_level_tk_reset', 0, 'Continue multi level count ' +
                 'for TK victims.')
-                
+
     # Turbo Mode
     config.text('')
     config.text('='*76)
@@ -131,7 +131,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_turbo.')
     config.text('Default Value: 0')
     config.cvar('gg_turbo', 0, 'Enables/Disables gg_turbo.')
-    
+
     # No Block
     config.text('')
     config.text('='*76)
@@ -145,7 +145,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_noblock', 0, 'Enables/Disables ' +
                 'gg_noblock.')
-    
+
     # Dead Strip
     config.text('')
     config.text('='*76)
@@ -161,7 +161,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_dead_strip', 0, 'Enables/Disables ' +
                 'gg_dead_strip.')
-    
+
     # =========================================================================
     # KNIFE-RELATED CVARS
     # =========================================================================
@@ -183,7 +183,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_knife_elite', 0, 'Enables/Disables ' +
                 'gg_knife_elite.')
-    
+
     # =========================================================================
     # GRENADE-RELATED CVARS
     # =========================================================================
@@ -204,7 +204,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_earn_nade', 0, 'Enables/Disables ' +
                 'gg_earn_nade.')
-    
+
     # Unlimited Grenades
     config.text('')
     config.text('='*76)
@@ -222,37 +222,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_unl_grenade', 0, 'Enables/Disables ' +
                 'gg_unl_grenade.')
-    
-    # Grenade Bonus
-    config.text('')
-    config.text('='*76)
-    config.text('>> GRENADE BONUS')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   Players on grenade level will receive this weapon along ' +
-                'with the')
-    config.text('   hegrenade.')
-    config.text('Notes:')
-    config.text('   * You can have multiple weapons by seperating them ' +
-                'with commas.')
-    config.text('   * If you choose to have multiple weapons, you can only ' +
-                'have one primary')
-    config.text('     weapon, one secondary weapon, and one grenade (not an ' +
-                'hegrenade).')
-    config.text('Examples:')
-    config.text('   * gg_nade_bonus aug')
-    config.text('   * gg_nade_bonus glock,aug')
-    config.text('Options:')
-    config.text('\tawp   \tscout\taug   \tmac10\ttmp   \tmp5navy\tump45\tp90')
-    config.text('\tgalil\tfamas\tak47\tsg552\tsg550\tg3sg1\tm249\tm3')
-    config.text('\txm1014\tm4a1\tglock\tusp   \tp228\tdeagle\telite\t' +
-                'fiveseven')
-    config.text('\tflashbang   \tsmokegrenade')
-    config.text('\t0 = (Disabled) Do not load gg_nade_bonus.')
-    config.text('Default Value: 0')
-    config.cvar('gg_nade_bonus', 0, 'The weapon(s) to be given as a grenade ' +
-                'level bonus weapon.')
-    
+
     # Reload
     config.text('')
     config.text('='*76)
@@ -267,7 +237,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_reload', 0, 'Enables/Disables ' +
                 'gg_reload.')
-    
+
     # Friendly Fire
     config.text('')
     config.text('='*76)
@@ -294,7 +264,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_friendlyfire', 0, 'The number (+1) of levels below the ' +
                 'last level to enable friendly fire.')
-    
+
     # =========================================================================
     # STATS-RELATED CVARS
     # =========================================================================
@@ -317,7 +287,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_stats', 0, 'Enables/Disables ' +
                 'gg_stats.')
-    
+
     # Stats Database Prune
     config.text('')
     config.text('='*76)
@@ -337,7 +307,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_prune_database', 0, 'The number inactive days before ' +
                 'a winner is removed from the database.')
-                
+
     # Stats Logging
     config.text('')
     config.text('='*76)
@@ -357,10 +327,11 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_stats_logging', 0, 'Enables/Disables ' +
                 'stats logging for third-party programs.')
-    
+
     # =========================================================================
     # SPAWN-RELATED CVARS
     # =========================================================================
+
     # Random Spawnpoints
     config.text('')
     config.text('='*76)
@@ -375,7 +346,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_random_spawn.')
     config.text('Default Value: 0')
     config.cvar('gg_random_spawn', 0, 'Enables/Disables random spawn points')
-    
+
     # Spawnpoint Manager
     config.text('')
     config.text('='*76)
@@ -389,89 +360,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_spawnpoints.')
     config.text('Default Value: 0')
     config.cvar('gg_spawnpoints', 0, 'Spawn point management.')
-    
-    # Spawn Protection
-    config.text('')
-    config.text('='*76)
-    config.text('>> SPAWN PROTECTION')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   The number of seconds to allow spawn protection, in ' +
-                'which they will be')
-    config.text('   immune to other players fire but cannot levelup if they ' +
-                'kill a player.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_spawn_protect.')
-    config.text('   # = Time (in seconds) for players to be spawn protected.')
-    config.text('Default Value: 0')
-    config.cvar('gg_spawn_protect', 0, 'Enables/Disables spawn ' +
-                'protection.')
-                
-    # Spawn Protection Colors
-    config.text('')
-    config.text('='*76)
-    config.text('>> SPAWN PROTECTION COLORS')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   The player\'s color while under spawn protection.')
-    config.text('Notes:')
-    config.text('   * Colors are set via the RGB (red/green/blue) model. ' +
-                'For more information ')
-    config.text('     on how to get the color you want, visit:')
-    config.text('        http://www.tayloredmktg.com/rgb/')
-    config.text('   * Alpha is the transparency of the player. The lower ' +
-                'the number, the more')
-    config.text('     transparent the player becomes.')
-    config.text('Options:')
-    config.text('   0-255')
-    config.text('Default Values:')
-    config.text('   * Red: 255')
-    config.text('   * Green: 255')
-    config.text('   * Blue: 255')
-    config.text('   * Alpha: 150')
-    config.cvar('gg_spawn_protect_red', 255, 'The red shade of the spawn ' +
-                'protected player.')
-    config.cvar('gg_spawn_protect_green', 255, 'The green shade of the spawn' +
-                ' protected player.')
-    config.cvar('gg_spawn_protect_blue', 255, 'The blue shade of the spawn ' +
-                'protected player.')
-    config.cvar('gg_spawn_protect_alpha', 150, 'The alpha of the spawn ' +
-                'protected player.')
-                
-    # Spawn Protection "Cancel On Fire"
-    config.text('')
-    config.text('='*76)
-    config.text('>> SPAWN PROTECTION "CANCEL-ON-FIRE"')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   Cancels the spawn protection timer when the player ' +
-                'fires their weapon and')
-    config.text('   allows the player to level up.')
-    config.text('Note:')
-    config.text('   * Uses "eventscripts_noisy", which "may" cause lag.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_spawn_protect_cancelonfire.')
-    config.text('   1 = (Enabled) Load gg_spawn_protect_cancelonfire.')
-    config.text('Default Value: 0')
-    config.cvar('gg_spawn_protect_cancelonfire', 0, 'Cancels spawn ' +
-                'protection when the weapon is fired.')
-                
-    # Allow Leveling Whilst Protected
-    config.text('')
-    config.text('='*76)
-    config.text('>> ALLOW LEVELING WHILST PROTECTED')
-    config.text('='*76)
-    config.text('Description:')
-    config.text('   Players can level up while spawn protected.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not allow players to level up while ' +
-                'spawn protected.')
-    config.text('   1 = (Enabled) Allow players to level up while spawn ' + 
-                'protected.')
-    config.text('Default Value: 0')
-    config.cvar('gg_spawn_protect_can_level_up', 1, 'Allow players ' +
-                'to level up while spawn protected')
-    
+
     # Deathmatch
     config.text('')
     config.text('='*76)
@@ -499,7 +388,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_deathmatch', 0, 'Enables/Disables ' +
                 'gg_deathmatch.')
-    
+
     # Deathmatch Respawn Delay
     config.text('')
     config.text('='*76)
@@ -518,7 +407,7 @@ def load():
     config.text('Default Value: 2')
     config.cvar('gg_dm_respawn_delay', 2, 'Seconds to wait before respawning' +
                 ' a player after death.')
-    
+
     # Elimination
     config.text('')
     config.text('='*76)
@@ -545,7 +434,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_elimination', 0, 'Enables/Disables ' +
                 'gg_elimination.')
-    
+
     # Dissolver
     config.text('')
     config.text('='*76)
@@ -564,7 +453,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_dissolver', 0, 'Enables/Disables ' +
                 'gg_dissolver.')
-    
+
     # Handicap
     config.text('')
     config.text('='*76)
@@ -575,12 +464,12 @@ def load():
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap.')
     config.text('   1 = Set player to the level of the lowest level of all ' +
-                'the other players.') 
+                'the other players.')
     config.text('       Basically "catching them up".')
     config.text('Default Value: 0')
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
                 'adjusting their level.')
-    
+
     # Handicap Update
     config.text('')
     config.text('='*76)
@@ -588,7 +477,7 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   A timer (in seconds) that updates players with the ' +
-                'lowest level to the') 
+                'lowest level to the')
     config.text('   lowest level of the other players. Basically "catching ' +
                 'them up".')
     config.text('Options:')
@@ -598,7 +487,7 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
                 'players\' levels using handicap.')
-    
+
     # Thanks
     config.text('')
     config.text('='*76)
@@ -606,15 +495,15 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   Allows players to type !thanks to display a list of ' +
-                'those involved with') 
+                'those involved with')
     config.text('   development and testing of GunGame.')
     config.text('Options:')
     config.text('   0 = Disabled')
     config.text('   1 = Enabled')
     config.text('Default Value: 1')
-    config.cvar('gg_thanks', 1, 'Displays a list of those involved with ' + 
+    config.cvar('gg_thanks', 1, 'Displays a list of those involved with ' +
                 'development and testing of GunGame.')
-    
+
     config.write()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
 '''
@@ -656,10 +545,10 @@ gg_convert 0
 
 def unload():
     global config
-    
+
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config
