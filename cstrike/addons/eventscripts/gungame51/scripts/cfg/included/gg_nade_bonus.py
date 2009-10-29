@@ -1,8 +1,8 @@
 # ../addons/eventscripts/gungame/scripts/cfg/included/gg_nade_bonus.py
 
 '''
-$Rev: $
-$LastChangedBy: $
+$Rev$
+$LastChangedBy$
 $LastChangedDate: $
 '''
 
