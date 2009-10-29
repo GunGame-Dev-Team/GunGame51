@@ -3,7 +3,7 @@
 '''
 $Rev$
 $LastChangedBy$
-$LastChangedDate: $
+$LastChangedDate$
 '''
 
 # ============================================================================
