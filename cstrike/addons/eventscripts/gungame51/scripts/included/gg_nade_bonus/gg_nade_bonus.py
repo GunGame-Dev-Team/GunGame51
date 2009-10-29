@@ -38,13 +38,13 @@ info.version = '0.1'
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
+# Server Vars
 gg_nade_bonus = es.ServerVar('gg_nade_bonus')
+gg_nade_bonus_mode = es.ServerVar('gg_nade_bonus_allow_mode')
+gg_nade_bonus_reset = es.ServerVar('gg_nade_bonus_reset')
+
+# Weapon list
 list_Weapons = getWeaponNameList('#all')
-
-# ============================================================================
-# >> CLASSES
-# ============================================================================
-
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -67,7 +67,12 @@ def player_spawn(event_var):
     # Checking if player needs a nade bonus
     if not checkBonus(userid):
         return
-
+    
+    # Reset the player's bonus level ?
+    if int(gg_nade_bonus_reset) and usingWeaponList():
+        Player(userid).nadeBonusMulti = 0
+        Player(userid).nadeBonusLevel = 1
+    
     # Giving bonus (delayed)
     gamethread.delayed(0.15, giveBonus, userid)
 
@@ -77,9 +82,35 @@ def gg_levelup(event_var):
     # Checking if player needs a nade bonus
     if not checkBonus(userid):
         return
-
+    
+    # Using a weapon list ?
+    if usingWeaponList():
+        Player(userid).nadeBonusMulti = 0
+        Player(userid).nadeBonusLevel = 1        
+    
     # Giving bonus
     giveBonus(userid)
+
+def gg_leveldown(event_var):       
+    userid = int(event_var['userid'])
+    
+    # Player leveled down to nade ?
+    if checkBonus(userid):
+        giveBonus(userid)  
+        return    
+    
+    # Using weapon list ?
+    if not usingWeaponList():
+        return
+
+    oldlevel = int(event_var['old_level'])
+    
+    # Was Player on nade ?
+    if getLevelWeapon(oldlevel) == 'hegrenade':
+        
+        # Reset bonus levels
+        Player(userid).nadeBonusMulti = 0
+        Player(userid).nadeBonusLevel = 1        
     
 def player_activate(event_var):
     userid = int(event_var['userid'])
@@ -87,7 +118,7 @@ def player_activate(event_var):
     # Adding attributes
     createAttributes(userid)
 
-def gg_start(event_var):
+def gg_start():
     # Adding attributes
     createAttributes('#all')
 
@@ -102,15 +133,20 @@ def player_death(event_var):
     if not usingWeaponList():
         return
         
-    # Getting weapon
     weapon = getWeapon(attacker)    
     
     # Was the kill with the bonus gun ?
     if event_var['weapon'] != weapon[0]:
         return
     
-    # Fetch GG player
     ggPlayer = Player(attacker)
+    
+    # Stop Player at last level ?
+    if not int(gg_nade_bonus_mode):
+        
+        # Player on last level ?
+        if getTotalLevels(str(gg_nade_bonus)) == ggPlayer.nadeBonusLevel:
+            return
     
     # Multikil check
     multiKill = getLevelMultiKill(ggPlayer.nadeBonusLevel, str(gg_nade_bonus))
@@ -131,7 +167,7 @@ def player_death(event_var):
             ggPlayer.nadeBonusLevel += 1
             
             # Give new weapon
-            giveBonus(attacker, True)
+            giveBonus(attacker, True, True)
         
         # Add multiKill
         else:
@@ -146,7 +182,7 @@ def player_death(event_var):
         ggPlayer.nadeBonusLevel += 1
         
         # Give new weapon
-        giveBonus(attacker, True)
+        giveBonus(attacker, True, True)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -157,8 +193,8 @@ def createAttributes(filter):
 
 def usingWeaponList():
     # Does gg_nade_bonus contain a regular weapon?
-    _format = str(gg_nade_bonus).split(',')[0].replace(' ', '')
-    if 'weapon_' + _format in list_Weapons:
+    nade_bonus = str(gg_nade_bonus).split(',')[0].replace(' ', '')
+    if 'weapon_' + nade_bonus in list_Weapons:
         return False
     
     # Assuming weaponlist
@@ -167,13 +203,18 @@ def usingWeaponList():
 def getWeapon(userid):
     # Using a weapon list ?
     if usingWeaponList():
-        return [getLevelWeapon(Player(userid).nadeBonusLevel, str(gg_nade_bonus))]
-        
+        return [getLevelWeapon(Player(userid).nadeBonusLevel, 
+                                                str(gg_nade_bonus))]
+     
     # Getting regular weapon(s)
     weap = str(gg_nade_bonus).split(',')
     
     # Cleaning up list
     for index in range(len(weap)):
+    
+        # We know the first one is clean
+        if index == 0:
+            continue
         
         # Removing spaces
         weap[index] = str(weap[index]).replace(' ', '')
@@ -182,41 +223,55 @@ def getWeapon(userid):
         if ('weapon_' + weap[index]) not in list_Weapons:
             
             # Send error
-            es.dbgmsg(0, 'GunGame5.1 ERROR :: (%s) ' % weap[index] + 
-                         'is not a valid weapon!')    
-            
-            # Remove invalid weapon
-            del weap[index]   
+            raise ValueError('gg_nade_bonus (%s) contains ' % gg_nade_bonus +
+                'the invalid weapon "%s"' % weap[index])
     
     # Sending weapon(s)        
     return weap
 
-def giveBonus(userid, sound=False):
+def giveBonus(userid, sound=False, turboCheck=False):
     ggPlayer = Player(userid)
 
     # Using weapon list?
     if usingWeaponList():
+        
         # Player needs a real levelup?
-        if getTotalLevels(str(gg_nade_bonus)) < ggPlayer.nadeBonusLevel:
+        totalLevels = getTotalLevels(str(gg_nade_bonus))
+        if totalLevels < ggPlayer.nadeBonusLevel:
+            
+            # Reset bonus multi kills
+            ggPlayer.nadeBonusMulti = 0                
+            
+            # Player stuck on last gun ?
+            if not int(gg_nade_bonus_mode):
+                ggPlayer.nadeBonusLevel = totalLevels
+                return
+            
+            # Resetting player's bonus level
+            ggPlayer.nadeBonusLevel = 1
+                
+            # Put the player back on level 1 ?
+            if int(gg_nade_bonus_mode) == 1:               
+            
+                # Recall the function to give level 1 weapon
+                giveBonus(userid, sound, turboCheck)
+                return
             
             # Level them up
             ggPlayer.levelup(1, userid, 'kill')
                 
             # Play the levelup sound
             ggPlayer.playsound('levelup')
-            
-            # Resetting player's attributes
-            ggPlayer.nadeBonusLevel = 1
-            ggPlayer.nadeBonusMulti = 0    
-            
-            es.tell(userid, 'LEVEL UP!!!')
-            
+
             return
             
     # Play sound ?
-    ''' Change this with a sound pack? '''
     if sound:
-        ggPlayer.playsound('common/stuck2.wav')
+        ggPlayer.playsound('nadebonuslevel')
+
+    # gg_turbo is loaded ?
+    if turboCheck and not int(gg_turbo):
+        return
   
     # Get weapon
     weapons = getWeapon(userid)

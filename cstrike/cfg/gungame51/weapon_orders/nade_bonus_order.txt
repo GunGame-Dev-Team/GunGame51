@@ -1,0 +1,34 @@
+//-----------------------------------------------------------------------------
+//  GunGame 5.1                                        GunGame Development Team
+//                            nade_bonus_order.txt                               
+//
+//     >> Information:
+//    =========================================================================
+//              
+//           This is a normal weapon order file except it contains
+//      information and examples for use with gg_nade_bonus.  Using a 
+//      weapon order with gg_nade_bonus allows players to change weapons 
+//      as they receive kills, yet they will remain on nade level.  Think of
+//      it as a GunGame inside of nade level.  We will use this weapon order
+//        as an example.
+//
+//           A player gets to nade level and is given a glock.  The player's
+//      nade kills nobody, but they did manage to kill 2 other players with
+//      the glock before being killed.  Once the player respawns they will
+//      have a usp with their nade.  If gg_turbo is loaded, grenade bonus
+//      level ups will preform just like a normal turbo levelup.
+//
+//            (Check the config file for options and settings.)
+//
+//           You can still use the multikill format just like any other
+//      weapon file. (See default_weapon_order.txt for information on 
+//      weapon orders.)  
+//
+//-----------------------------------------------------------------------------
+
+=> Nade Bonus Order
+
+glock 2
+usp 2
+p228 2
+deagle 2
