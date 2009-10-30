@@ -240,7 +240,7 @@ def es_map_start(event_var):
     '''
     
     # =========================================================================
-    # Equip players with a knife and possibly item_kevalr or item_assaultsuit
+    # Equip players with a knife and possibly item_kevlar or item_assaultsuit
     # =========================================================================
     equipPlayer()    
     
