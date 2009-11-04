@@ -28,6 +28,7 @@ from weaponlib import getWeaponList
 from core.weapons.shortcuts import getWeaponOrder
 from core.weapons.shortcuts import setWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
+from core.weapons.shortcuts import getTotalLevels
 
 #    Config Function Imports
 from core.cfg.shortcuts import loadConfig
@@ -130,10 +131,6 @@ def unload():
     # Fire gg_unload event
     EventManager().gg_unload
 
-    '''
-    gungamelib.clearGunGame()
-    '''
-
     # Temporary Cleanup Debug Messages
     from core.addons import conflicts
     from core.cfg import ConfigManager
@@ -171,9 +168,6 @@ def initialize():
     es.dbgmsg(0, '[GunGame]')
     currentOrder.echo()
     es.dbgmsg(0, '[GunGame]')
-    '''
-    gungamelib.echo('gungame', 0, 0, 'Load_Commands')
-    '''
     
     # Clear out the GunGame system
     resetPlayers()
@@ -206,42 +200,13 @@ def es_map_start(event_var):
     # Execute GunGame's autoexec.cfg
     es.delayed('1', 'exec gungame51/gg_server.cfg')
     
-    '''
-    =====================================================
-    THERE HAS TO BE A BETTER WAY TO HANDLE THE FOLLOWING:
-    =====================================================
-    
-    # Reset the "gungame_voting_started" variable
-    dict_variables['gungame_voting_started'] = False
-    
-    # Reset the "rounds remaining" variable for multi-rounds
-    dict_variables['roundsRemaining'] = \
-        gungamelib.getVariableValue('gg_multi_round')
-    '''
-    
-    '''
-    # Check to see if the warmup round needs to be activated
-    if int(es.ServerVar('gg_warmup_timer')):
-        es.server.queuecmd('es_xload gungame/included_addons/gg_warmup_round')
-    else:
-        # Fire gg_start event
-        EventManager().gg_start()
-    '''
-    
     # Reset the GunGame players
     resetPlayers()
     
     # Reset the GunGame leaders
     LeaderManager().reset()
     
-    '''
-    # Make sounds downloadbale
-    gungamelib.addDownloadableSounds()
-    '''
-    
-    # =========================================================================
     # Equip players with a knife and possibly item_kevlar or item_assaultsuit
-    # =========================================================================
     equipPlayer()    
     
 def round_start(event_var):
@@ -249,14 +214,10 @@ def round_start(event_var):
     # Retrieve a random userid
     userid = es.getuserid()
 
-    # =========================================================================
     # Disable Buyzones
-    # =========================================================================
     es.server.queuecmd('es_xfire %d func_buyzone Disable' % userid)
 
-    # =========================================================================
     # Remove weapons from the map
-    # =========================================================================
     list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
                     'weapon_%s' % x.strip()) for x in \
                     str(gg_map_strip_exceptions).split(',') if x.strip() != \
@@ -270,22 +231,21 @@ def round_start(event_var):
         # Remove the weapon from the map
         es.server.queuecmd('es_xfire %i %s kill' % (userid, weapon))
 
-    # =========================================================================
-    # Equip players with a knife and possibly item_kevalr or item_assaultsuit
-    # =========================================================================
+    # Equip players with a knife and possibly item_kevlar or item_assaultsuit
     equipPlayer()
 
 def player_spawn(event_var):
-    
     # Check for priority addons
     if PriorityAddon():
         return
 
     userid = event_var['userid']
     
+    # Is a spectator ?
     if getPlayer(userid).isobserver:
         return
     
+    # Is dead ?
     if getPlayer(userid).isdead:
         return
     
@@ -296,8 +256,11 @@ def player_spawn(event_var):
     if not es.isbot(userid):
         gamethread.delayed(0.6, Player(userid).afk.reset, ())
 
+    ggPlayer = Player(userid)
+    
     # Send the level information hudhint
-    # ....
+    ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level, 
+                                                    'total': getTotalLevels()})
 
 def player_death(event_var):
     # Check for priority addons
@@ -312,40 +275,41 @@ def player_death(event_var):
     if not es.exists('userid', attacker):
         return
 
-    # Get victim object
-    ggVictim = Player(userid)
-
     # Suicide check
     if (attacker == 0 or attacker == userid):
         return
-    
-    # Get attacker object
-    ggAttacker = Player(attacker)
 
-    # =========================================================================
     # TEAM-KILL CHECK
-    # =========================================================================
     if (event_var['es_userteam'] == event_var['es_attackerteam']):
         return
 
-    # =========================================================================
-    # >> NORMAL KILL
-    # =========================================================================
-    # Check the weapon was correct
+    # Check the weapon was correct (Normal Kill)
     if event_var['weapon'] != ggAttacker.weapon:
         return
 
     # =========================================================================
     # AFK CHECK
     # =========================================================================
+    
+    # Get victim object
+    ggVictim = Player(userid)
+    
+    # Get attacker object
+    ggAttacker = Player(attacker)           
+    
     # Don't continue if the victim is AFK
     if not int(gg_allow_afk_levels):
+        
         # Make sure the victim is not a bot
         if not es.isbot(userid):
+            
+            # Is AFK ?
             if ggVictim.afk():
+                
                 # Is their weapon an hegrenade and do we allow AFK leveling?
                 if ggAttacker.weapon == 'hegrenade' and \
                     int(gg_allow_afk_levels_nade):
+                        
                         # Pass if we are allowing AFK leveling on nade level
                         pass
 
@@ -369,6 +333,7 @@ def player_death(event_var):
     # =========================================================================
     # MULTIKILL CHECK
     # =========================================================================
+    
     # Get the current level's multikill value
     multiKill = getLevelMultiKill(ggAttacker.level)
     
@@ -406,69 +371,25 @@ def player_death(event_var):
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
     
+    # Check to see if player was the leader
     LeaderManager().disconnected_leader(userid)
-    
-'''
-def player_team(event_var):
-    # Was a disconnect?
-    if int(event_var['disconnect']) == 1:
-        return
-        
-    # Play welcome sound
-    if int(event_var['oldteam']) < 2 and team > 1:
-        gungamelib.playSound(userid, 'welcome')
-'''
     
 def gg_levelup(event_var):
     # Check for priority addons
     if PriorityAddon():
         return
+    
+    userid = int(event_var['userid'])
+    
+    # Is a bot?
+    if es.isbot(userid):
+        return
 
-    # Cache new level for later use
-    newLevel = int(event_var['new_level'])
-    
-    # ===============
-    # REGULAR LEVELUP
-    # ===============
-    # Get attacker info
-    ggPlayer = Player(event_var['attacker'])
-    
-    '''
-    WILL ADD THIS A LITTLE LATER -- I HAVE TO FIGURE OUT THE DEAL WITH THE
-    "canShowHudHints()" FUNCTION. I BELIEVE THIS IS ONLY IF A MAP VOTE IS
-    ACTIVE.
-    
-    # Show level info HUDHint
-    if gungamelib.canShowHints():
-        levelInfoHint(attacker)
-    '''
-    
-    '''
-    I BELIEVE THIS SHOULD BE HANDLED BY A GG_MAP_VOTE ADDON OF SOME SORT BASED
-    ON WHATEVER VARIABLE TRIGGERS IT --- "gg_vote_trigger"?
-    
-    # ==================
-    # VOTE TRIGGER CHECK
-    # ==================
-    
-    # Get leader level
-    leaderLevel = gungamelib.LeaderManager().get_leader_level()
-    
-    if leaderLevel == \
-    (gungamelib.getTotalLevels() - \
-    gungamelib.getVariableValue('gg_vote_trigger')):
-        # Nextmap already set?
-        if es.ServerVar('eventscripts_nextmapoverride') != '':
-            gungamelib.echo('gungame', 0, 0, 'MapSetBefore')
-            return
+    ggPlayer = Player(userid)
         
-        # Vote already started?
-        if dict_variables['gungame_voting_started']:
-            return
-        
-        if dict_variables['roundsRemaining'] < 2:
-            EventManager().gg_vote()
-    '''
+    # Send hudhint (level information)
+    ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level, 
+                                                    'total': getTotalLevels()})
     
 def gg_win(event_var):
     # Get player info
@@ -517,7 +438,7 @@ def gg_win(event_var):
                                'gungame/included_addons/gg_warmup_round')
             '''
         # Tell the world
-        saytext2('#human', index, 'PlayerWonRound', {'player':playerName})
+        saytext2('#human', index, 'PlayerWonRound', {'player': playerName})
         
         # Play the winner sound
         for userid in getPlayerList('#human'):
@@ -526,6 +447,7 @@ def gg_win(event_var):
     # =========================================================================
     # ALL WINS
     # =========================================================================
+    
     # Enable alltalk
     if not int(sv_alltalk) and int(gg_win_alltalk):
         es.server.queuecmd('sv_alltalk 1')
@@ -572,7 +494,6 @@ def server_cvar(event_var):
         # Set multikill override
         currentOrder.setMultiKillOverride(int(gg_multikill_override))
 
-
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
@@ -589,11 +510,11 @@ def equipPlayer():
     if armorType == 2:
         cmd = cmd + \
             'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";' \
-                %userid
+                % userid
 
     # Give the player kevlar only
     elif armorType == 1:
         cmd = cmd + \
-            'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' %userid
+            'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' % userid
 
     es.server.queuecmd(cmd)
