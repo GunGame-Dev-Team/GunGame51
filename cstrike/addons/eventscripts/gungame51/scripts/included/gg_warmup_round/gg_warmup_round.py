@@ -51,7 +51,12 @@ priority_addons_added = []
 # ============================================================================
 def load():
     # Start warmup timer
-    doWarmup()
+    if es.exists('variable', 'gg_deathmatch') and \
+      es.exists('variable', 'gg_elimination'):
+        doWarmup()
+
+    else:
+        gamethread.delayed(1, doWarmup, ())
     
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -109,7 +114,7 @@ def player_spawn(event_var):
     ggPlayer = Player(userid)
     
     # Check if the warmup weapon is the level 1 weapon
-    if str(gg_warmup_weapon) in ['0', '', '0.0']:
+    if str(gg_warmup_weapon) in ('0', '', '0.0'):
         ggPlayer.giveWeapon()
         return
     
@@ -123,7 +128,7 @@ def player_spawn(event_var):
     
     # Delay giving the weapon by a split second, because the code in round 
     #   start removes all weapons
-    gamethread.delayed(0.10, ggPlayer.give, '%s' % gg_warmup_weapon)
+    gamethread.delayed(0.11, ggPlayer.give, '%s' % gg_warmup_weapon)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -238,15 +243,30 @@ def countDown():
         for addedAddon in priority_addons_added:
             PriorityAddon().remove(addedAddon)                   
                 
-        # Changing back to deathmatch from elimination?
-        if int(gg_warmup_elimination) and int(gg_deathmatch_backup):
-            es.server.queuecmd('gg_elimination 0')
-            es.server.queuecmd('gg_deathmatch 1')
+        # Warmup elimination ?
+        if int(gg_warmup_elimination):
+
+            # Back to DM ?
+            if gg_deathmatch_backup:
+                es.server.queuecmd('gg_elimination 0')
+                es.server.queuecmd('gg_deathmatch 1')
+
+            # Back to normal ?
+            elif not gg_elimination_backup:
+                es.server.queuecmd('gg_elimination 0')
+
         
-        # Changing back to elimination from deathmatch?
-        elif int(gg_warmup_deathmatch) and int(gg_elimination_backup):
-            es.server.queuecmd('gg_deathmatch 0')
-            es.server.queuecmd('gg_elimination 1')
+        # Warmup DM ?
+        elif int(gg_warmup_deathmatch):
+
+            # Back to elimination ?
+            if gg_elimination_backup:
+                es.server.queuecmd('gg_deathmatch 0')
+                es.server.queuecmd('gg_elimination 1')
+
+            # Back to normal ?
+            elif not gg_deathmatch_backup:
+                es.server.queuecmd('gg_deathmatch 0')
         
         # Changing mp_freezetime back
         if int(mp_freezetime) != mp_freezetime_backup:

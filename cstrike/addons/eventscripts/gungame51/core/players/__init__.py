@@ -342,7 +342,7 @@ class BasePlayer(object):
                                                 pPlayer.getWeaponIndex(strip)))
                 
                 # Check for no weapon in 0.08 seconds
-                gamethread.delayedname(0.08, 'gg_noweap_%i' % self.userid,
+                gamethread.delayedname(0.05, 'gg_noweap_%i' % self.userid,
                                         Player(self.userid).noWeaponCheck, ())
             
             # Give new gun                           
@@ -416,9 +416,10 @@ class BasePlayer(object):
         Gives a player the specified weapon.
         Weapons given by this method will not be stripped by gg_dead_strip.
         '''
-        # Check if the weapon is valid
-        weapon = weapon.replace('weapon_', '')
+        # Format weapon
+        weapon = str(weapon).replace('weapon_', '')
         
+        # Check if weapon is valid
         if 'weapon_%s' % weapon not in list_pWeapons + list_sWeapons + \
         ['weapon_hegrenade', 'weapon_flashbang', 'weapon_smokegrenade']:
             raise ValueError('Unable to give (%s): ' % weapon +
@@ -426,16 +427,17 @@ class BasePlayer(object):
 
         # Add weapon to strip exceptions so gg_dead_strip will not 
         #   strip the weapon
-        self.stripexceptions.append(weapon)
+        if int(es.ServerVar('gg_dead_strip')):
+            self.stripexceptions.append(weapon)
 
-        # Delay removing the weapon long enough for gg_dead_strip to fire
-        gamethread.delayed(0.1, self.stripexceptions.remove, (weapon))
+            # Delay removing the weapon long enough for gg_dead_strip to fire
+            gamethread.delayed(0.1, self.stripexceptions.remove, (weapon))
 
         # Give the player the weapon
-        cmd = 'es_xgive %s weapon_%s;' %(self.userid, weapon)
+        cmd = 'es_xgive %s weapon_%s;' % (self.userid, weapon)
 
         if useWeapon:
-            cmd += 'es_xsexec %s "use weapon_%s"' %(self.userid, weapon)
+            cmd += 'es_xsexec %s "use weapon_%s"' % (self.userid, weapon)
 
         es.server.queuecmd(cmd)
 
@@ -454,7 +456,7 @@ class BasePlayer(object):
 
         for weapon in pPlayer.getWeaponList():
             if (self.weapon == weapon[7:] and not levelStrip) or \
-            weapon == 'weapon_knife' or weapon[7:] in exceptions:
+              weapon == 'weapon_knife' or weapon[7:] in exceptions:
             
                 continue
 
