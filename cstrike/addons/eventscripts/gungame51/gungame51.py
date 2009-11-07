@@ -282,20 +282,16 @@ def player_death(event_var):
     # TEAM-KILL CHECK
     if (event_var['es_userteam'] == event_var['es_attackerteam']):
         return
-
-    # Check the weapon was correct (Normal Kill)
-    if event_var['weapon'] != ggAttacker.weapon:
-        return
-
-    # =========================================================================
-    # AFK CHECK
-    # =========================================================================
     
     # Get victim object
     ggVictim = Player(userid)
     
     # Get attacker object
     ggAttacker = Player(attacker)           
+
+    # Check the weapon was correct (Normal Kill)
+    if event_var['weapon'] != ggAttacker.weapon:
+        return
     
     # Don't continue if the victim is AFK
     if not int(gg_allow_afk_levels):
