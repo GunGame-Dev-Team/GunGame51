@@ -182,8 +182,8 @@ def load():
     config.text('   2 = maplist.txt')
     config.text('   3 = "gg_map_list_file" variable')
     config.text('   4 = All maps in the "maps" folder')    
-    config.text('Default Value: 0')
-    config.cvar('gg_map_vote_list_source', 0, 
+    config.text('Default Value: 1')
+    config.cvar('gg_map_vote_list_source', 1,
                                 'Source of maps for GunGame\'s map voting.')
     config.text('')
     config.text('')
@@ -232,12 +232,12 @@ def load():
     config.text('>> DEAD FILTER')
     config.text('='*76)
     config.text('Description:')
-    config.text('   This will only send the vote menu to dead players. ') 
-    config.text('   Players will receive the menu once they die.')
+    config.text('   * This will only send the vote menu to dead players. ')
+    config.text('   * Players will receive the menu once they die.')
     config.text('Notes:')
     config.text('   * Players can use the player vote command to load the ' +
                         'menu if they') 
-    config.text('      wish to vote while alive.')
+    config.text('     wish to vote while alive.')
     config.text('Options:')
     config.text('   0 = (Disabled) Send the vote menu to everyone.')
     config.text('   1 = (Enabled) Only send the vote menu to dead players.')

@@ -37,13 +37,14 @@ def load():
     config.text('')
     config.text('')
     
-    # Elimination
+    # Deathmatch
     config.text('')
     config.text('='*76)
-    config.text('>> ELIMINATION')
+    config.text('>> DEATHMATCH')
     config.text('='*76)
     config.text('Description:')
-    config.text('   Respawn when your killer is killed.')
+    config.text('   Emulates a team-deathmatch mode, and players will ' +
+                'respawn when they die.')
     config.text('Notes:')
     config.text('   * "gg_dead_strip" will automatically be enabled.')
     config.text('   * Will not load if "gg_dead_strip" can not be enabled.')
@@ -51,18 +52,37 @@ def load():
     config.text('   * Will not load if "gg_turbo" can not be enabled.')
     config.text('   * "gg_dissolver" will automatically be enabled.')
     config.text('   * Will not load if "gg_dissolver" can not be enabled.')
-    config.text('   * Will not load with "gg_deathmatch" enabled.')
-    config.text('   * Will not load with "gg_knife_elite" enabled.')
     config.text('   * Will not load with "gg_map_obj" enabled.')
+    config.text('   * Will not load with "gg_knife_elite" enabled.')
+    config.text('   * Will not load with "gg_elimination" enabled.')
     config.text('   * This addon requires usage of the "gg_respawn_cmd" ' +
                 'found in the')
     config.text('     gg_en_config.cfg')
     config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_elimination.')
-    config.text('   1 = (Enabled) Load gg_elimination.')
+    config.text('   0 = (Disabled) Do not load gg_deathmatch.')
+    config.text('   1 = (Enabled) Load gg_deathmatch.')
     config.text('Default Value: 0')
-    config.cvar('gg_elimination', 0, 'Enables/Disables ' +
-                'gg_elimination.')
+    config.cvar('gg_deathmatch', 0, 'Enables/Disables ' +
+                'gg_deathmatch.')
+
+    # Deathmatch Respawn Delay
+    config.text('')
+    config.text('='*76)
+    config.text('>> DEATHMATCH RESPAWN DELAY')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The amount of time (in seconds) to wait before ' +
+                'respawning a player after')
+    config.text('   they die.')
+    config.text('Notes:')
+    config.text('   * The respawn delay must be greater than 0.')
+    config.text('   * You can use 0.1 for a nearly immediate respawn time.')
+    config.text('   * If set to 0 or less, the delay will be set to 0.1.')
+    config.text('Options:')
+    config.text('   # = Time (in seconds) to wait before respawning a player.')
+    config.text('Default Value: 2')
+    config.cvar('gg_dm_respawn_delay', 2, 'Seconds to wait before respawning' +
+                ' a player after death.')
 
     config.write()
     es.dbgmsg(0, '\tgg_deathmatch.cfg')

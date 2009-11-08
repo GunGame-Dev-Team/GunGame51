@@ -129,7 +129,7 @@ def levelCallback(name, value, ggPlayer):
         previousLevel = 1
 
     # Delay the check to see if they have the correct turbo weapon
-    gamethread.delayed(0.05, checkCallBackWeapon, (ggPlayer, previousLevel))
+    gamethread.delayed(0.10, checkCallBackWeapon, (ggPlayer, previousLevel))
 
 def checkCallBackWeapon(ggPlayer, previousLevel):
     weapon = 'weapon_%s' % ggPlayer.weapon

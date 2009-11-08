@@ -303,6 +303,7 @@ def voteEnd():
     ggVote.unsend(voteUserids)
 
     winner = []
+    win_votes = None
     total_votes = len(reduce(lambda a, b: a + b, mapVoteOptions.values()))
     
     if not total_votes:
@@ -337,12 +338,16 @@ def voteEnd():
         # Tie
         winner.append(option)
 
+    # Make sure we have a winning vote count
+    if not win_votes:
+        win_votes = len(mapVoteOptions[winner[0]])
+
     # Random winner
     winner = random.choice(winner)
 
     # Win message    
-    msg('#human', 'WinningMap', {'map': winner.lower(), 
-        'totalVotes': total_votes}, True) 
+    msg('#human', 'WinningMap', {'map': winner.lower(),
+     'totalVotes': total_votes, 'votes': win_votes}, True)
     
     # Set eventscripts_nextmapoverride to the winning map
     es.ServerVar('eventscripts_nextmapoverride').set(winner)
@@ -351,7 +356,7 @@ def voteEnd():
     if str(es.ServerVar('mani_admin_plugin_version')) != '0':
         es.server.queuecmd('ma_setnextmap %s' % winner)
     
-    # Set SourceMods 'nextmap' if SourceMod is loaded
+    # Set SourceMod 'nextmap' if SourceMod is loaded
     if str(es.ServerVar('sourcemod_version')) != '0':
         es.server.queuecmd('sm_nextmap %s' % winner)
     
@@ -463,8 +468,8 @@ def getMapList():
             else:
             	maps = [z[0] for z in [y.replace(' ' * (y.count(' ') - 1), 
                         '').split(' ') for y in [x.strip().replace('\t', ' ') 
-                        for x in f.readlines() if x != '' or not 
-                        x.startswith('/')]] if len(z) == 1 or (int(z[1]) if 
+                        for x in f.readlines()] if not (y == '' or
+                        y.startswith('/'))] if len(z) == 1 or (int(z[1]) if
                         z[1].isdigit() else 0) <= len(getUseridList('#all'))]
                         
     # Remove any maps from the list that were voted for previously
