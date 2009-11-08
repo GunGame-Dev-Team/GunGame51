@@ -171,9 +171,9 @@ class BasePlayer(object):
 
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
-        if name in ['userid', 'level', 'preventlevel', 'steamid', 'multikill']:
-            raise AttributeError('Unable to delete attribute "%s". '
-                % name + 'This is a required attribute for GunGame.')
+        if name in ('userid', 'level', 'preventlevel', 'steamid', 'multikill'):
+            raise AttributeError('Unable to delete attribute "%s". ' % name +
+                    'This is a required attribute for GunGame.')
 
         # Remove this attribute from the custom attribute callbacks, if any
         if name in CustomAttributeCallbacks():
@@ -293,8 +293,8 @@ class BasePlayer(object):
         # Error ?
         if error:
             # Was the player looping ?
-            if self.userid in recent_give_userids:
-                recent_give_userids.remove(userid)    
+            #if self.userid in recent_give_userids:
+            #    recent_give_userids.remove(self.userid)
             
             raise GunGameError(error)
         
@@ -357,8 +357,8 @@ class BasePlayer(object):
                                                     self.userid, self.weapon))                
             
             # Add the userid to the list ?
-            if self.userid not in recent_give_userids:
-                recent_give_userids.append(self.userid)
+            #if self.userid not in recent_give_userids:
+            #    recent_give_userids.append(self.userid)
     
     def noWeaponCheck(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
