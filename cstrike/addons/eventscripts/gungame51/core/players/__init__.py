@@ -363,9 +363,14 @@ class BasePlayer(object):
     def noWeaponCheck(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
-        # Store the weapon you are holding in the weapon slot which your 
-        #  level's weapon
-        # should be in
+
+        # Player dead or in spec ?
+        if pPlayer.isdead or pPlayer.teamid < 2:
+            return
+
+        # Store the weapon you are holding in the weapon slot which your
+        #  level's weapon should be in
+        
         if "weapon_%s" % self.weapon in list_pWeapons:
             weapon = pPlayer.getPrimary()
         elif "weapon_%s" % self.weapon in list_sWeapons:

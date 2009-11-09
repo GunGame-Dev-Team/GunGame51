@@ -82,10 +82,12 @@ class getTeam(object):
             self.levels.append(Player(player).level)       
         
     # Returns the amount of players in the average
+    @property
     def count(self):
         return len(self.levels)
         
     # Returns the sum of all levels for the team
+    @property
     def sum(self):
         return sum(self.levels)
     
@@ -176,11 +178,8 @@ class getTeam(object):
                 # Notify ?
                 if int(gg_auto_balance_notify):
                     notify.append(userid)
-
-                es.msg('Player (%s) is dead, moving now.' % userid)
                 continue
         
-            es.msg('Player (%s) is being moved when they die' % userid)
             # Set attributes for alive players
             player.newTeam = newTeamid
             player.changeTeam = True
@@ -231,8 +230,7 @@ def player_death(event_var):
     if ggPlayer.changeTeam:
         
         # Changing teams
-        es.msg('Moving dead player (%s)' % userid)
-        es.changeteam(userid, ggPlayer.newTeamid)
+        es.changeteam(userid, ggPlayer.newTeam)
         
         # Sending notification
         notify.append(userid)
@@ -269,13 +267,12 @@ def round_end(event_var):
             
             # Dead ?
             if pPlayer.isdead:
-                es.changeteam(userid, ggPlayer.newTeamid)
+                es.changeteam(userid, ggPlayer.newTeam)
                 ggPlayer.changeTeam = False
                 continue
 
             else:
-                es.msg('change on fly (%s)' % userid)
-                ggPlayer.teamid = ggPlayer.newTeamid
+                ggPlayer.teamid = ggPlayer.newTeam
 
     if balance:
         autoBalance()
@@ -325,28 +322,28 @@ def sendNotify(userid):
 
 def autoBalance():
     ''' This function starts the automatic team balancing sequence. '''
-    es.msg('Starting balance...')
+
     '''Setting the high and low objects'''
     
     # Grabbing CT avg
-    count, sum = 0, 0
+    count = 0
+    ssum = 0
     list = getUseridList('#ct')
     for player in list:
-        sum += Player(player).level
+       ssum += Player(player).level
     count = len(list)
-    CTavg =  sum/count
+    CTavg = ssum/count
     
     # Grabbing T avg
-    count, sum = 0, 0
+    count = 0
+    ssum = 0
     list = getUseridList('#t')
     for player in list:
-        sum += Player(player).level
+        ssum += Player(player).level
     count = len(list)
-    Tavg =  sum/count
-    es.msg('Difference: %s' % abs(CTavg - Tavg))
+    Tavg =  ssum/count
     # Checking to see if the average level difference exceeds the config range
     if abs(CTavg - Tavg) < int(gg_auto_balance_threshold):
-        es.msg('Balance not needed...')
         return False
     
     # Creating high/low
@@ -372,26 +369,25 @@ def autoBalance():
     ''' Calculating a value '''
 
     # Finding our team population difference
-    offset = float(float(high.count() - low.count())/2)
+    offset = float(float(high.count - low.count)/2)
     
     # Calculating the server average level
-    average = float(low.sum() + high.sum()) 
-    average /= (low.count() + high.count())
+    average = float(low.sum + high.sum)
+    average /= (low.count + high.count)
     
     # Calculating the amount of levels to be moved
-    value = average * float(low.count() + offset) - low.sum()
+    value = average * float(low.count + offset) - low.sum
     
     # Rounding and removing floats
     value = int(round(value))
     offset = int(round(offset))
-    es.msg('value: %s    offset: %s' % (value, offset))
     # Starting a closest solution (starting high)
     close_solution = 100
 	
     ''' Finding a solution '''
     
     # Starting loop to find balancing solution
-    for n in range((high.count() - offset)):
+    for n in range((high.count - offset)):
         
         # Setting iterator objects
         high.makeGenerator(max(0, (n + offset)))
@@ -415,7 +411,6 @@ def autoBalance():
                     # Solution found
                     high.startSwap()
                     low.startSwap()
-                    es.msg('Perfect solution found!')
                     return True
                 
                 # Checking for best solution thus far
@@ -442,7 +437,7 @@ def autoBalance():
     # Use the best solution                
     low.startSwap(bestChoice[1])
     high.startSwap(bestChoice[0])
-    es.msg('Best choice is being used...')
+
     return True
 
 def addImmunity(userid):
