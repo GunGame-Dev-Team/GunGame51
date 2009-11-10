@@ -219,10 +219,16 @@ class PriorityAddon(list):
     entries of addons in the PriorityAddon list, as well as preventing errors
     when scripters attempt to remove an entry that does not exist.
     '''
-    def __new__(cls, *p, **k):
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = list.__new__(cls)
+
+    _the_instance = None
+
+    def __new__(cls, *elems):
+        if cls._the_instance is None:
+            cls._the_instance = t = list.__new__(cls)
         return cls._the_instance
+
+    def __init__(self, *elems):
+        self.extend(elems)
 
     # =========================================================================
     # >> PriorityAddon() CUSTOM CLASS METHODS

@@ -124,11 +124,12 @@ def player_spawn(event_var):
         return
     
     # Strip the player's weapons (split second delay)
-    gamethread.delayed(0.10, ggPlayer.strip, True)
-    
-    # Delay giving the weapon by a split second, because the code in round 
+    gamethread.delayed(0.10, ggPlayer.strip, (True, [gg_warmup_weapon]))
+
+    # Delay giving the weapon by a split second, because the code in round
     #   start removes all weapons
-    gamethread.delayed(0.11, ggPlayer.give, '%s' % gg_warmup_weapon)
+    gamethread.delayed(0.115, ggPlayer.give, (str(gg_warmup_weapon),
+                                                            True, True, True))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
