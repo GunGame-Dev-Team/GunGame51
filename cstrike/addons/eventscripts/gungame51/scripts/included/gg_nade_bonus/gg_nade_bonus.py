@@ -40,7 +40,7 @@ info.version = '0.1'
 # ============================================================================
 # Server Vars
 gg_nade_bonus = es.ServerVar('gg_nade_bonus')
-gg_nade_bonus_mode = es.ServerVar('gg_nade_bonus_allow_mode')
+gg_nade_bonus_mode = es.ServerVar('gg_nade_bonus_mode')
 gg_nade_bonus_reset = es.ServerVar('gg_nade_bonus_reset')
 
 # Weapon list
@@ -74,7 +74,7 @@ def player_spawn(event_var):
         Player(userid).nadeBonusLevel = 1
     
     # Giving bonus (delayed)
-    gamethread.delayed(0.15, giveBonus, userid)
+    gamethread.delayed(0.10, giveBonus, userid)
 
 def gg_levelup(event_var):
     userid = int(event_var['attacker'])
@@ -88,8 +88,8 @@ def gg_levelup(event_var):
         Player(userid).nadeBonusMulti = 0
         Player(userid).nadeBonusLevel = 1        
     
-    # Giving bonus
-    giveBonus(userid)
+    # Giving bonus (delayed)
+    gamethread.delayed(0.10, giveBonus, userid)
 
 def gg_leveldown(event_var):       
     userid = int(event_var['userid'])
@@ -112,7 +112,7 @@ def gg_leveldown(event_var):
         Player(userid).nadeBonusLevel = 1        
 
     # Give bonus weapon(s)
-    giveBonus(userid)
+    gamethread.delayed(0.10, giveBonus, userid)
     
 def player_activate(event_var):
     userid = int(event_var['userid'])
@@ -136,7 +136,7 @@ def player_death(event_var):
         return
         
     weapon = getWeapon(attacker)    
-    es.msg(weapon)
+
     # Was the kill with the bonus gun ?
     if event_var['weapon'] != weapon[0]:
         return
@@ -144,11 +144,10 @@ def player_death(event_var):
     ggPlayer = Player(attacker)
     
     # Stop Player at last level ?
-    if not int(gg_nade_bonus_mode):
+    if int(gg_nade_bonus_mode) == 0:
         
         # Player on last level ?
         if getTotalLevels(str(gg_nade_bonus)) == ggPlayer.nadeBonusLevel:
-            es.msg('Player on last level! (mode 0)')
             return
     
     # Multikil check
@@ -246,8 +245,7 @@ def giveBonus(userid, sound=False, turboCheck=False):
             ggPlayer.nadeBonusMulti = 0                
             
             # Player stuck on last gun ?
-            if not int(gg_nade_bonus_mode):
-                es.msg('Player on last level! (mode 0)')
+            if int(gg_nade_bonus_mode) == 0:
                 ggPlayer.nadeBonusLevel = totalLevels
                 return
             
@@ -258,7 +256,6 @@ def giveBonus(userid, sound=False, turboCheck=False):
             if int(gg_nade_bonus_mode) == 1:               
             
                 # Recall the function to give level 1 weapon
-                es.msg('Player going back to level 1! (mode 1)')
                 giveBonus(userid, sound, turboCheck)
                 return
             
