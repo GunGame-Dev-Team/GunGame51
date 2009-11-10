@@ -95,8 +95,7 @@ def gg_leveldown(event_var):
     userid = int(event_var['userid'])
     
     # Player leveled down to nade ?
-    if checkBonus(userid):
-        giveBonus(userid)  
+    if not checkBonus(userid):
         return    
     
     # Using weapon list ?
@@ -111,6 +110,9 @@ def gg_leveldown(event_var):
         # Reset bonus levels
         Player(userid).nadeBonusMulti = 0
         Player(userid).nadeBonusLevel = 1        
+
+    # Give bonus weapon(s)
+    giveBonus(userid)
     
 def player_activate(event_var):
     userid = int(event_var['userid'])
@@ -134,7 +136,7 @@ def player_death(event_var):
         return
         
     weapon = getWeapon(attacker)    
-    
+    es.msg(weapon)
     # Was the kill with the bonus gun ?
     if event_var['weapon'] != weapon[0]:
         return
@@ -146,6 +148,7 @@ def player_death(event_var):
         
         # Player on last level ?
         if getTotalLevels(str(gg_nade_bonus)) == ggPlayer.nadeBonusLevel:
+            es.msg('Player on last level! (mode 0)')
             return
     
     # Multikil check
@@ -244,6 +247,7 @@ def giveBonus(userid, sound=False, turboCheck=False):
             
             # Player stuck on last gun ?
             if not int(gg_nade_bonus_mode):
+                es.msg('Player on last level! (mode 0)')
                 ggPlayer.nadeBonusLevel = totalLevels
                 return
             
@@ -254,6 +258,7 @@ def giveBonus(userid, sound=False, turboCheck=False):
             if int(gg_nade_bonus_mode) == 1:               
             
                 # Recall the function to give level 1 weapon
+                es.msg('Player going back to level 1! (mode 1)')
                 giveBonus(userid, sound, turboCheck)
                 return
             
@@ -270,14 +275,11 @@ def giveBonus(userid, sound=False, turboCheck=False):
         ggPlayer.playsound('nadebonuslevel')
 
     # gg_turbo is loaded ?
-    if turboCheck and not int(gg_turbo):
+    if turboCheck and not int(es.ServerVar('gg_turbo')):
         return
   
     # Get weapon
     weapons = getWeapon(userid)
-    
-    # Strip player
-    ggPlayer.strip(False, weapons)
     
     # All you get is a knife?
     if len(weapons) == 1 and weapons[0] == 'knife':
@@ -292,11 +294,11 @@ def giveBonus(userid, sound=False, turboCheck=False):
     
     # Give weapons
     for weapon in weapons:
-        gamethread.delayed(0, ggPlayer.give, weapon)
+        ggPlayer.give(weapon, False, True, True)
 
 def checkBonus(userid):
     # Valid team?
-    if userid < 2:
+    if getPlayer(userid).teamid < 2:
         return False
     
     # Dead?

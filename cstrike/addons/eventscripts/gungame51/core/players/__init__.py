@@ -416,35 +416,63 @@ class BasePlayer(object):
                 # Remove the weapon
                 es.remove(int_lastgive)
 
-    def give(self, weapon, useWeapon=0):
+    def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
         '''
         Gives a player the specified weapon.
         Weapons given by this method will not be stripped by gg_dead_strip.
         '''
         # Format weapon
-        weapon = str(weapon).replace('weapon_', '')
+        weapon = 'weapon_%s' % str(weapon).replace('weapon_', '')
         
         # Check if weapon is valid
-        if 'weapon_%s' % weapon not in list_pWeapons + list_sWeapons + \
+        if weapon not in list_pWeapons + list_sWeapons + \
         ['weapon_hegrenade', 'weapon_flashbang', 'weapon_smokegrenade']:
-            raise ValueError('Unable to give (%s): ' % weapon +
+            raise ValueError('Unable to give "%s": ' % weapon[7:] +
                              'is not a valid weapon')
 
         # Add weapon to strip exceptions so gg_dead_strip will not 
         #   strip the weapon
         if int(es.ServerVar('gg_dead_strip')):
-            self.stripexceptions.append(weapon)
+            self.stripexceptions.append(weapon[7:])
 
             # Delay removing the weapon long enough for gg_dead_strip to fire
-            gamethread.delayed(0.1, self.stripexceptions.remove, (weapon))
+            gamethread.delayed(0.1, self.stripexceptions.remove, (weapon[7:]))
+
+        pPlayer = getPlayer(self.userid)
+        sWeapon = pPlayer.secondary
+        pWeapon = pPlayer.primary
+        
+        # Player allready has weapon ?
+        if weapon in [sWeapon, pWeapon]:
+            return
+
+        # Strip the weapon ?
+        if strip:
+
+            # Holding a primary weapon ?
+            if weapon in list_pWeapons and pWeapon:
+                w = pWeapon
+
+            # Holding a secondary weapon ?
+            elif weapon in list_sWeapons and sWeapon:
+                w = sWeapon
+
+            # Strip the weapon
+            if 'w' in locals().keys():
+                es.server.queuecmd('es_xremove %s' % (
+                                                pPlayer.getWeaponIndex(w)))
 
         # Give the player the weapon
-        cmd = 'es_xgive %s weapon_%s;' % (self.userid, weapon)
+        cmd = 'es_xgive %s %s;' % (self.userid, weapon)
 
         if useWeapon:
-            cmd += 'es_xsexec %s "use weapon_%s"' % (self.userid, weapon)
+            cmd += 'es_xsexec %s "use %s"' % (self.userid, weapon)
 
         es.server.queuecmd(cmd)
+        
+        # No weapon check
+        if noWeaponCheck:
+            gamethread.delayed(0.05, Player(self.userid).noWeaponCheck, weapon)
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
