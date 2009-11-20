@@ -10,10 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python Imports
-import random
-
-# SPE Imports
-from spe.games import cstrike
+from random import choice
 
 # EventScripts Imports
 import es
@@ -29,8 +26,9 @@ from gungame51.core import getOS
 from gungame51.core import GunGameError
 from gungame51.core.messaging import MessageManager
 from gungame51.core.sound import SoundPack
-from afk import AFK
 from gungame51.core.leaders.shortcuts import LeaderManager
+from gungame51.core.sql import Database
+from afk import AFK
 
 # ============================================================================
 # >> GLOBALS
@@ -39,7 +37,6 @@ list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
 gg_respawn_cmd = es.ServerVar('gg_respawn_cmd')
-recent_give_userids = []
 
 # ============================================================================
 # >> CLASSES
@@ -91,7 +88,7 @@ class CustomAttributeCallbacks(dict):
 
         # Delete the attribtue callback
         del self[attribute][addon]
-        
+
         # See if the attribute is now empty
         if not self[attribute]:
             del self[attribute]
@@ -127,8 +124,8 @@ class BasePlayer(object):
     # =========================================================================
     # >> BasePlayer() CLASS INITIALIZATION
     # =========================================================================
-    def __init__(self, userid): 
-        self.userid = userid 
+    def __init__(self, userid):
+        self.userid = userid
         self.preventlevel = PreventLevel()
         self.level = 1
         self.afk = AFK(self.userid)
@@ -145,7 +142,7 @@ class BasePlayer(object):
     def weapon(self):
         """Return the weapon name"""
         return self.getWeapon()
-        
+
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
         if CustomAttributeCallbacks().has_key(name):
@@ -155,23 +152,142 @@ class BasePlayer(object):
         # Are they setting the "level" attribute?
         if name == 'level':
             # Return if preventlevel is set
-            if self.preventlevel:
-                return
-            else:
+            if not self.preventlevel:
                 # Set the attribute value
                 object.__setattr__(self, name, value)
                 LeaderManager().check(self)
-        else:
-            # Set the attribute value
-            object.__setattr__(self, name, value)
+            return
+
+        '''
+        Player(userid).team is just the same as es.getplayerteam(userid)
+        Player(userid).team = 1 move player to spec
+        Player(userid).team = 2 move player to terrorist
+        Player(userid).team = 3 move player to counter-terrorist
+
+        * Dead players will be moved using es.changeteam()
+        * Alive players will be moved using SPE
+        '''
+
+        # Team change
+        if name == 'team':
+            # Is the value a int ?
+            if not str(value).isdigit():
+
+                # Other CT values
+                if value in ('ct', '#ct'):
+                    value = 3
+
+                # Other T values
+                elif value in ('t', '#t'):
+                    value = 2
+
+                # Raise error
+                else:
+                    raise ValueError('"%s" is an invalid team' % value)
+
+            # Is the value in range ?
+            elif int(value) not in range(1,4):
+                raise ValueError('"%s" is an invalid teamid' % value)
+
+            pPlayer = getPlayer(self.userid)
+            value = int(value)
+
+            # Make sure we are not moving the player to the same team
+            if pPlayer.teamid == value:
+                return
+
+            # If the player is dead, use es.changeteam()
+            if pPlayer.isdead:
+                es.changeteam(self.userid, value)
+                return
+
+            # Import SPE
+            from spe.games import cstrike
+
+            # Change the team
+            cstrike.switchTeam(self.userid, value)
+
+            # Change the model
+            if value > 1:
+
+                # Terrorist Models
+                if int(value) == 2:
+                    pPlayer.model = 'player/%s' \
+                        % random.choice(('t_arctic', 't_guerilla', 't_leet',
+                                 't_phoenix'))
+
+                # Counter-Terrorist Models
+                else:
+                    pPlayer.model = 'player/%s' \
+                        % random.choice(('ct_gign', 'ct_gsg9', 'ct_sas',
+                                 'ct_urban'))
+            return
+
+        '''
+        Player(userid).wins returns the amount of wins a player has
+            * If they are not in the DB it will return 0
+
+        Player(userid).wins += 1 The prefered method of adding a win
+
+        Player(userid).wins = # You may also change the wins setting to a
+          value of your choice, although this method should only be used for
+          internal ussage.
+        '''
+
+        # From winner's DB ?
+        if name == 'wins':
+            # We using a int?
+            if not str(value).isdigit():
+                raise ValueError('wins has to be a int value, you passed ' +
+                                '"%s"' % value)
+
+            # Bots can't win
+            if es.isbot(self.userid):
+                return
+
+            value = int(value)
+            ggDB = Database()
+
+            # Has won before
+            if self.wins:
+                ggDB.query("UPDATE gg_wins SET wins=%i " % value +
+                           "WHERE uniqueid = '%s'" % self.uniqueid)
+                return
+
+            # new entry
+            ggDB.query("INSERT INTO gg_wins " +
+                "(name, uniqueid, wins, timestamp)" +
+                "VALUES (%s, %s, %s, %s)" % (es.getplayername(self.userid),
+                    self.uniqueid, value, time()))
+
+            return
+
+        # Set the attribute value
+        object.__setattr__(self, name, value)
 
     def __getattr__(self, name):
+
+        # Team ?
+        if name == 'team':
+            return es.getplayerteam(self.userid)
+
+        # From winners DB?
+        if name == 'wins':
+            _query = Database().select('gg_wins', 'wins',
+                                    "where uniqueid = '%s'" % self.uniqueid)
+
+            if _query:
+                return int(_query)
+
+            return 0
+
         # Return the attribute value
         return object.__getattribute__(self, name)
 
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
-        if name in ('userid', 'level', 'preventlevel', 'steamid', 'multikill'):
+        if name in ('userid',
+          'level', 'preventlevel', 'steamid', 'multikill', 'wins', 'team'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
 
@@ -179,7 +295,7 @@ class BasePlayer(object):
         if name in CustomAttributeCallbacks():
             del CustomAttributeCallbacks()[name]
 
-        # Delete the attribute only if it exists 
+        # Delete the attribute only if it exists
         #   (we don't want to raise errors)
         if hasattr(self, name):
             object.__delattr__(self, name)
@@ -214,7 +330,7 @@ class BasePlayer(object):
         # Return false if we can't level up
         if len(self.preventlevel):
             return False
-            
+
         # Get the victim's Player() instance
         if victim:
             victim = Player(victim)
@@ -282,84 +398,73 @@ class BasePlayer(object):
         error = None
         # Make sure player is on a team
         if es.getplayerteam(self.userid) < 2:
-            error = ('Unable to give player weapon (%s):' 
+            error = ('Unable to give player weapon (%s):'
                 % self.userid + ' is not on a team.')
 
         # Make sure player is alive
         elif getPlayer(self.userid).isdead:
-            error = ('Unable to give player weapon (%s):' 
+            error = ('Unable to give player weapon (%s):'
                 % self.userid + ' is not alive.')
-        
+
         # Error ?
         if error:
-            # Was the player looping ?
-            #if self.userid in recent_give_userids:
-            #    recent_give_userids.remove(self.userid)
-            
             raise GunGameError(error)
-        
+
         # Knife ?
         elif self.weapon == 'knife':
             es.server.queuecmd('es_xsexec %i "use weapon_knife"' % (
                                                                 self.userid))
-            self.strip()                
-        
+            self.strip()
+
         # Nade ?
         elif self.weapon == 'hegrenade':
             es.server.queuecmd('es_xgive %i weapon_hegrenade;' % (
-                                                                self.userid))                                                        
+                                                                self.userid))
             self.strip()
-        
-        # All other weapons 
+
+        # All other weapons
         else:
             # Get player's weapons
             pPlayer = getPlayer(self.userid)
             pWeapon = pPlayer.getPrimary()
             sWeapon = pPlayer.getSecondary()
             strip = None
-            
-            # Already have the current weapon ?            
+
+            # Already have the current weapon ?
             if 'weapon_%s' % self.weapon == pWeapon or \
                 'weapon_%s' % self.weapon == sWeapon:
-                
+
                 # Use it ?
                 if pPlayer.weapon != self.weapon:
                     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
-                return            
-            
+                return
+
             # Strip secondary weapon ?
-            if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon: 
+            if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
                 strip = sWeapon
-            
+
             # Strip primary weapon ?
             elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
                 strip = pWeapon
-            
+
             if strip:
-                # cstrike.removeEntityByIndex(pPlayer.getWeaponIndex(strip))
                 es.server.queuecmd('es_xremove %s' % (
                                                 pPlayer.getWeaponIndex(strip)))
-                
+
                 # Check for no weapon in 0.08 seconds
                 gamethread.delayedname(0.05, 'gg_noweap_%i' % self.userid,
                                         Player(self.userid).noWeaponCheck, ())
-            
-            # Give new gun                           
-            #cstrike.call("GiveItem", 
-            #    cstrike.getPlayer(self.userid), 'weapon_%s' % self.weapon, 0)                       
-            es.server.queuecmd('es_xgive %i weapon_%s' % (self.userid, 
+
+            # Give new gun
+            es.server.queuecmd('es_xgive %i weapon_%s' % (self.userid,
                                                                 self.weapon))
-        
+
             # Make bots use it ? (Bots sometimes don't equip the new gun.)
             if es.isbot(self.userid):
                     es.delayed(0, 'es_xsexec %s "use weapon_%s"' % (
-                                                    self.userid, self.weapon))                
-            
-            # Add the userid to the list ?
-            #if self.userid not in recent_give_userids:
-            #    recent_give_userids.append(self.userid)
-    
+                                                    self.userid, self.weapon))
+
     def noWeaponCheck(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
@@ -370,7 +475,7 @@ class BasePlayer(object):
 
         # Store the weapon you are holding in the weapon slot which your
         #  level's weapon should be in
-        
+
         if "weapon_%s" % self.weapon in list_pWeapons:
             weapon = pPlayer.getPrimary()
         elif "weapon_%s" % self.weapon in list_sWeapons:
@@ -383,7 +488,7 @@ class BasePlayer(object):
 
             # Using give() ?
             if newWeapon:
-                self.give(weapon)
+                self.give(newWeapon)
 
             # Repeat giveWeapon to re-strip the slot and give your weapon
             else:
@@ -405,32 +510,41 @@ class BasePlayer(object):
                 owner_userid = es.getuserid(owner)
                 # Make the wrong owner use their own weapon ?
                 if getPlayer(owner_userid).weapon != \
-                    'weapon_%s' % Player(owner_userid).weapon: 
+                    'weapon_%s' % Player(owner_userid).weapon:
                     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (
                         owner_userid, Player(owner_userid).weapon))
-            
+
             # If the weapon is the same as the weapon that was dropped
             if es.createentitylist()[int_lastgive]['classname'] == \
                                                     'weapon_' + self.weapon:
-                
+
                 # Remove the weapon
                 es.remove(int_lastgive)
 
     def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
+
         '''
         Gives a player the specified weapon.
         Weapons given by this method will not be stripped by gg_dead_strip.
+
+        Setting strip to True will make it strip the weapon currently
+        held in the slot you are trying to give to.
+
+        Setting noWeaponCheck to True will make give() preform alot like
+        giveWeapon() It will verify the weapon was not delivered to the wrong
+        player, and that the correct player ends up with the weapon you give.
         '''
+
         # Format weapon
         weapon = 'weapon_%s' % str(weapon).replace('weapon_', '')
-        
+
         # Check if weapon is valid
         if weapon not in list_pWeapons + list_sWeapons + \
         ['weapon_hegrenade', 'weapon_flashbang', 'weapon_smokegrenade']:
             raise ValueError('Unable to give "%s": ' % weapon[7:] +
                              'is not a valid weapon')
 
-        # Add weapon to strip exceptions so gg_dead_strip will not 
+        # Add weapon to strip exceptions so gg_dead_strip will not
         #   strip the weapon
         if int(es.ServerVar('gg_dead_strip')):
             self.stripexceptions.append(weapon[7:])
@@ -441,7 +555,7 @@ class BasePlayer(object):
         pPlayer = getPlayer(self.userid)
         sWeapon = pPlayer.secondary
         pWeapon = pPlayer.primary
-        
+
         # Player allready has weapon ?
         if weapon in [sWeapon, pWeapon]:
             return
@@ -469,20 +583,20 @@ class BasePlayer(object):
             cmd += 'es_xsexec %s "use %s"' % (self.userid, weapon)
 
         es.server.queuecmd(cmd)
-        
+
         # No weapon check
         if noWeaponCheck:
-            gamethread.delayed(0.05, Player(self.userid).noWeaponCheck, weapon)
+            gamethread.delayed(0.065, Player(self.userid).noWeaponCheck, weapon)
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
-            * Strips/removes all weapons from the player minus the knife and 
-              their current levels weapon. 
-        
+            * Strips/removes all weapons from the player minus the knife and
+              their current levels weapon.
+
             * If True is specified, then their level weapon is also stripped.
-        
+
             * Exceptions can be entered in list format, and anything in the
-              exceptions will not be stripped.                       
+              exceptions will not be stripped.
         '''
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
@@ -490,7 +604,7 @@ class BasePlayer(object):
         for weapon in pPlayer.getWeaponList():
             if (self.weapon == weapon[7:] and not levelStrip) or \
               weapon == 'weapon_knife' or weapon[7:] in exceptions:
-            
+
                 continue
 
             # Remove the weapon
@@ -520,7 +634,7 @@ class BasePlayer(object):
         '''
         # Format the sound
         sound = self._format_sound(sound)
-        
+
         # Make sure the sound exists
         if sound:
             # Play the sound
@@ -532,19 +646,19 @@ class BasePlayer(object):
         '''
         # Format the sound
         sound = self._format_sound(sound)
-        
+
         # Make sure the sound exists
         if sound:
             # Play the sound
             es.emitsound('player', self.userid, sound, volume, attenuation)
-    
+
     def stopsound(self, sound):
         '''
         Plays the declared sound to the player.
         '''
         # Format the sound
         sound = self._format_sound(sound)
-        
+
         # Make sure the sound exists
         if sound:
             # Play the sound
@@ -555,6 +669,16 @@ class BasePlayer(object):
             return sound
         return self.soundpack[sound]
 
+    # =========================================================================
+    # >> Winner's Database methods
+    # =========================================================================
+    def databaseUpdate(self):
+        '''
+        Updates the time and the player's name in the database
+        '''
+        if self.wins:
+            Database().query("UPDATE gg_wins SET wins=%i " % value +
+                       "WHERE uniqueid = '%s'" % self.uniqueid)
 
 class PlayerDict(dict):
     '''
@@ -580,7 +704,7 @@ class PlayerDict(dict):
         if userid not in self:
             # Get the uniqueid
             steamid = uniqueid(str(userid), 1)
-            
+
             # Search for the player's uniqueid to see if they played previously
             if not steamid in [self[playerid].steamid for playerid in self]:
                 self[userid] = BasePlayer(userid)
@@ -604,7 +728,7 @@ class PlayerDict(dict):
         # We don't want to call our __getitem__ again
         return super(PlayerDict, self).__getitem__(userid)
 
-    def clear(self): 
+    def clear(self):
         '''
         Clear the player dictionary to start fresh with a clean slate.
         '''
@@ -617,19 +741,19 @@ class Player(object):
     with all GunGame-based player attributes. This class forwards to the stored
     PlayerDict instance of the player's userid, which in return forwards to the
     BasePlayer class.
-    
+
     Usage:
         # Setting attributes
         Player(userid).customattribute = value
         Player(userid)['customattribute'] = value
-        
+
         # Getting attributes
         level = Player(userid).level
         level = Player(userid)['level']
-        
+
         # Deleting custom attributes
         del Player(userid).customattribute
-        
+
     Note:
         For class methods, see the gungame.core.players.BasePlayer class.
     '''
@@ -749,49 +873,4 @@ class Player(object):
             # Remove the custom attribute callback
             CustomAttributeCallbacks().remove(attribute, addon)
 
-'''>> Note to Devs:
-        This actually does not seem to be working, but then again, it also
-        does not seem to be needed...  I will look into this soon.
-            (item_pickup)
-        
-                        - Monday
-'''
-def item_pickup(event_var):
-    userid = int(event_var['userid'])
-    ggPlayer = Player(userid)
-    # lastgive = int(eventscripts_lastgive)
-    
-    # Stop noWeapon() check?
-    if 'gg_noweap_%i' % userid in gamethread.listDelayed():
-        gamethread.cancelDelayed('gg_noweap_%i' % userid)    
-    
-    # Was a knife ?
-    if 'knife' == event_var['item']:
-        return
-            
-    # We checking this player ?
-    if userid not in recent_give_userids:
-        return
-        
-    # Player got what they needed ?
-    if ggPlayer.weapon == event_var['item']:
-
-        # Use it ?
-        if getPlayer(userid).weapon != 'weapon_%s' % ggPlayer.weapon:
-            es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, 
-                                                            ggPlayer.weapon))            
-        # Remove from list and stop
-        recent_give_userids.remove(userid)
-        return    
-    
-    # Weapon iterator
-    witr = ['weapon_%s' % ggPlayer.weapon, 'weapon_%s' % event_var['item']]
-    
-    #   Did the player pick up a weapon that takes up the gungame weapon  
-    #   slot? Is so, the player is given another weapon, and the one that 
-    #   was picked up is striped in giveWeapon()      
-    if all([(x in list_sWeapons) for x in wpn_iter]) or \
-                all([(x in list_pWeapons) for x in wpn_iter]):
-        ggPlayer.giveWeapon()
-    
 from gungame51.core.events.shortcuts import EventManager

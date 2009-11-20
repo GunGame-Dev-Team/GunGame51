@@ -9,9 +9,6 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# SPE Imports
-from spe.games import cstrike
-
 # Python imports
 import sys
 
@@ -19,7 +16,7 @@ import sys
 import es
 import gamethread
 from playerlib import getPlayer
-from playerlib import getPlayerList
+from playerlib import getUseridList
 from weaponlib import getWeaponList
 
 # GunGame Imports
@@ -64,6 +61,12 @@ from core.events.shortcuts import EventManager
 
 #   Sound Function Imports
 from core.sound import make_downloadable
+
+#   Database
+from core.sql.shortcuts import pruneWinnersDB
+from core.sql.shortcuts import Database
+from core.sql.shortcuts import commit
+from core.sql.shortcuts import unloadGunGameDB
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -130,23 +133,14 @@ def unload():
 
     # Fire gg_unload event
     EventManager().gg_unload
-
-    # Temporary Cleanup Debug Messages
-    from core.addons import conflicts
-    from core.cfg import ConfigManager
-    es.dbgmsg(0, 'ConfigManager().__loaded__ = %s' %ConfigManager().__loaded__)
-    es.dbgmsg(0, 
-             'ConfigManager().__cvardefaults__ = %s' %ConfigManager().__cvardefaults__)
-    es.dbgmsg(0, 'AddonManager().__order__ = %s' %AddonManager().__order__)
-    es.dbgmsg(0, 'AddonManager().__loaded__ = %s '%AddonManager().__loaded__)
-    es.dbgmsg(0, 'dependencies = %s' %dependencies)
-    es.dbgmsg(0, 'conflicts = %s' %conflicts)
-
+    
+    # Close the database
+    unloadGunGameDB()
+    
 def initialize():
     loadConfig(getConfigList())
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
-    #gungamelib.echo('gungame', 0, 0, 'Load_Start', {'version': __version__})
     
     # Load custom events
     es.loadevents('declare', 
@@ -181,7 +175,10 @@ def initialize():
     # Print load completed
     #gungamelib.echo('gungame', 0, 0, 'Load_Completed')
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
-    
+
+    # Prune the DB
+    pruneWinnersDB()
+
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
@@ -205,9 +202,9 @@ def es_map_start(event_var):
     
     # Reset the GunGame leaders
     LeaderManager().reset()
-    
-    # Equip players with a knife and possibly item_kevlar or item_assaultsuit
-    equipPlayer()    
+
+    # Prune the DB
+    pruneWinnersDB()
     
 def round_start(event_var):
 
@@ -370,6 +367,10 @@ def player_disconnect(event_var):
     # Check to see if player was the leader
     LeaderManager().disconnected_leader(userid)
     
+    # Update the player in the winner's Database
+    if not es.isbot(userid):
+        Player(userid).databaseUpdate()
+    
 def gg_levelup(event_var):
     # Check for priority addons
     if PriorityAddon():
@@ -392,11 +393,14 @@ def gg_win(event_var):
     userid = int(event_var['winner'])
     index = getPlayer(userid).index
     playerName = es.getplayername(userid)
-    
+    if not es.isbot(userid):
+        Player(userid).wins += 1
+
     '''
     CURRENTLY, EVENT_VAR['ROUND'] WILL ALWAYS RETURN 0. I HAVE TO FIGURE OUT A
     GOOD WAY TO IMPLEMENT THIS.
     '''
+
     if event_var['round'] == '0':
         # ====================================================
         # MAP WIN
@@ -410,7 +414,7 @@ def gg_win(event_var):
         
 
         # Play the winner sound
-        for userid in getPlayerList('#human'):
+        for userid in getUseridList('#human'):
             Player(userid).playsound('winner')
 
     else:
@@ -437,7 +441,7 @@ def gg_win(event_var):
         saytext2('#human', index, 'PlayerWonRound', {'player': playerName})
         
         # Play the winner sound
-        for userid in getPlayerList('#human'):
+        for userid in getUseridList('#human'):
             Player(userid).playsound('winner')
     
     # =========================================================================
@@ -464,6 +468,9 @@ def gg_win(event_var):
     else:
         toptext('#human', 10, '#blue', 'PlayerWon_Center', 
                                                     {'player': playerName})
+
+    # Update DB
+    gamethread.delayed(1.5, commit, ())
         
 def gg_start():
     # Reset all the players

@@ -51,12 +51,11 @@ priority_addons_added = []
 # ============================================================================
 def load():
     # Start warmup timer
-    if es.exists('variable', 'gg_deathmatch') and \
-      es.exists('variable', 'gg_elimination'):
+    if all([es.exists('variable', x) for x in ('gg_deathmatch',
+                    'gg_elimination', 'gg_warmup_weapon', 'gg_warmup_timer')]):
         doWarmup()
-
     else:
-        gamethread.delayed(1, doWarmup, ())
+        gamethread.delayed(0.75, doWarmup, ())
     
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -123,12 +122,22 @@ def player_spawn(event_var):
         es.sexec(userid, 'use weapon_knife')
         return
     
+    '''>> Note to Developers:
+            This delay arrangement was needed because it was crashing
+            the server when bots spawned during a warmup round.
+    '''
+
+    delay = 0.07
+    
+    if es.isbot(userid):
+        delay += 1.0
+    
     # Strip the player's weapons (split second delay)
-    gamethread.delayed(0.10, ggPlayer.strip, (True, [gg_warmup_weapon]))
+    gamethread.delayed(delay, ggPlayer.strip, (True, [gg_warmup_weapon]))
 
     # Delay giving the weapon by a split second, because the code in round
     #   start removes all weapons
-    gamethread.delayed(0.115, ggPlayer.give, (str(gg_warmup_weapon),
+    gamethread.delayed((delay + 0.05), ggPlayer.give, (str(gg_warmup_weapon),
                                                             True, True, True))
 
 # ============================================================================
