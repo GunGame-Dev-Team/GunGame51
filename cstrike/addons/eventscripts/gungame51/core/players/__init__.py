@@ -213,14 +213,13 @@ class BasePlayer(object):
                 # Terrorist Models
                 if int(value) == 2:
                     pPlayer.model = 'player/%s' \
-                        % random.choice(('t_arctic', 't_guerilla', 't_leet',
-                                 't_phoenix'))
+                        % choice(('t_arctic', 't_guerilla', 't_leet',
+                                    't_phoenix'))
 
                 # Counter-Terrorist Models
                 else:
                     pPlayer.model = 'player/%s' \
-                        % random.choice(('ct_gign', 'ct_gsg9', 'ct_sas',
-                                 'ct_urban'))
+                        % choice(('ct_gign', 'ct_gsg9', 'ct_sas', 'ct_urban'))
             return
 
         '''
