@@ -677,7 +677,8 @@ class BasePlayer(object):
         Updates the time and the player's name in the database
         '''
         if self.wins:
-            Database().query("UPDATE gg_wins SET wins=%i " % value +
+            Database().query("UPDATE gg_wins SET " +
+                       "timestamp=strftime('%s','now') " +
                        "WHERE uniqueid = '%s'" % self.uniqueid)
 
 class PlayerDict(dict):

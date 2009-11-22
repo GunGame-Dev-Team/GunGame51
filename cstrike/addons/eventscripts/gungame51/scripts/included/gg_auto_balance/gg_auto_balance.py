@@ -204,12 +204,10 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-def gg_start():
-    userid = event_var['userid']
-    
+def gg_start(event_var):
     # Setting attributes
-    setAttribute(userid, 'changeTeam', False)
-    setAttribute(userid, 'newTeam', None)
+    setAttribute('#all', 'changeTeam', False)
+    setAttribute('#all', 'newTeam', None)
 
 def es_map_start(event_var):
     # Flushing immunity list every map

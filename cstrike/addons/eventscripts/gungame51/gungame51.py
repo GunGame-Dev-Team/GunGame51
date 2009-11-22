@@ -472,7 +472,7 @@ def gg_win(event_var):
     # Update DB
     gamethread.delayed(1.5, commit, ())
         
-def gg_start():
+def gg_start(event_var):
     # Reset all the players
     resetPlayers()
     

@@ -114,3 +114,4 @@ if 'DbBuild' not in globals().keys():
     ggDB.query("PRAGMA auto_vacuum = 1")
     _ggSQL.commit()
     DbBuild = 1
+    del ggDB

@@ -120,7 +120,7 @@ def player_activate(event_var):
     # Adding attributes
     createAttributes(userid)
 
-def gg_start():
+def gg_start(event_var):
     # Adding attributes
     createAttributes('#all')
 
