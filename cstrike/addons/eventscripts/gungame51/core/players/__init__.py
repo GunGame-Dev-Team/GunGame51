@@ -257,9 +257,11 @@ class BasePlayer(object):
             # new entry
             ggDB.query("INSERT INTO gg_wins " +
                 "(name, uniqueid, wins, timestamp)" +
-                "VALUES (%s, %s, %s, %s)" % (es.getplayername(self.userid),
-                    self.uniqueid, value, time()))
+                "VALUES (%s, %s, %s, 0)" % (es.getplayername(self.userid),
+                    self.uniqueid, value))
 
+            ggDB.query("UPDATE gg_wins SET timestamp=strftime('%s','now') " +
+                       "WHERE uniqueid = '%s'" % self.uniqueid)
             return
 
         # Set the attribute value
