@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Python Imports
 from random import choice
+from random import randint
 
 # EventScripts Imports
 import es
@@ -18,6 +19,7 @@ import gamethread
 from playerlib import uniqueid
 from playerlib import getPlayer
 from weaponlib import getWeaponNameList
+from usermsg import showVGUIPanel
 
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import getLevelWeapon
@@ -170,6 +172,9 @@ class BasePlayer(object):
 
         # Team change
         if name == 'team':
+            if not es.exists('userid', self.userid):
+                raise ValueError('userid (%s) doesn\'t exist.' % self.userid)
+
             # Is the value a int ?
             if not str(value).isdigit():
 
@@ -199,6 +204,25 @@ class BasePlayer(object):
             # If the player is dead, use es.changeteam()
             if pPlayer.isdead:
                 es.changeteam(self.userid, value)
+
+                # going to spectator ?
+                if value == 1:
+                    return
+
+                classId = randint(1,4)
+
+                # CT ?
+                if value == 3:
+                    classId += 4
+
+                # Set prop & hide vgui
+                es.setplayerprop(self.userid, 'CCSPlayer.m_iClass', classId)
+                usermsg.showVGUIPanel(self.userid, 'class_ter', False, {})
+
+                # If player is a bot, kill him
+                if es.isbot(self.userid):
+                    es.server.queuecmd('es_xsexec %s kill' % self.userid)
+
                 return
 
             # Import SPE
@@ -250,17 +274,17 @@ class BasePlayer(object):
             # Has won before
             if self.wins:
                 ggDB.query("UPDATE gg_wins SET wins=%i " % value +
-                           "WHERE uniqueid = '%s'" % self.uniqueid)
+                           "WHERE uniqueid = '%s'" % self.steamid)
                 return
 
             # new entry
             ggDB.query("INSERT INTO gg_wins " +
                 "(name, uniqueid, wins, timestamp)" +
-                "VALUES (%s, %s, %s, 0)" % (es.getplayername(self.userid),
-                    self.uniqueid, value))
+                "VALUES (%s, %s, %s, 0)" % (getPlayer(self.userid).name,
+                    self.steamid, value))
 
             ggDB.query("UPDATE gg_wins SET timestamp=strftime('%s','now') " +
-                       "WHERE uniqueid = '%s'" % self.uniqueid)
+                       "WHERE uniqueid = '%s'" % self.steamid)
             return
 
         # Set the attribute value
@@ -275,7 +299,7 @@ class BasePlayer(object):
         # From winners DB?
         if name == 'wins':
             _query = Database().select('gg_wins', 'wins',
-                                    "where uniqueid = '%s'" % self.uniqueid)
+                                    "where uniqueid = '%s'" % self.steamid)
 
             if _query:
                 return int(_query)
@@ -520,7 +544,7 @@ class BasePlayer(object):
                                                     'weapon_' + self.weapon:
 
                 # Remove the weapon
-                es.remove(int_lastgive)
+                es.server.queuecmd('es_xremove %s' % int_lastgive)
 
     def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
 
@@ -680,7 +704,7 @@ class BasePlayer(object):
         if self.wins:
             Database().query("UPDATE gg_wins SET " +
                        "timestamp=strftime('%s','now') " +
-                       "WHERE uniqueid = '%s'" % self.uniqueid)
+                       "WHERE uniqueid = '%s'" % self.steamid)
 
 class PlayerDict(dict):
     '''
