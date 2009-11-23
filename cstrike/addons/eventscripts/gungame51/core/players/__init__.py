@@ -202,48 +202,63 @@ class BasePlayer(object):
                 return
 
             # If the player is dead, use es.changeteam()
-            if pPlayer.isdead:
+            elif pPlayer.isdead:
                 es.changeteam(self.userid, value)
 
                 # going to spectator ?
                 if value == 1:
                     return
 
-                classId = randint(1,4)
+                # Terrorist ?
+                if value == 2:
+                    iClass = randint(1,4)
+                    menuname = 'class_ter'
 
-                # CT ?
-                if value == 3:
-                    classId += 4
+                # Counter-Terrorist ?
+                else:
+                    iClass = randint(4,8)
+                    menuname = 'class_ct'
 
                 # Set prop & hide vgui
-                es.setplayerprop(self.userid, 'CCSPlayer.m_iClass', classId)
-                usermsg.showVGUIPanel(self.userid, 'class_ter', False, {})
+                es.setplayerprop(self.userid, 'CCSPlayer.m_iClass', iClass)
+                usermsg.showVGUIPanel(self.userid, menuname, False, {})
 
                 # If player is a bot, kill him
                 if es.isbot(self.userid):
                     es.server.queuecmd('es_xsexec %s kill' % self.userid)
-
                 return
 
-            # Import SPE
-            from spe.games import cstrike
+            # Import SPE if installed
+            try:
+                from spe.games import cstrike
+
+            # No SPE ?
+            except ImportError:
+
+                # Move the player in a very basic manner
+                es.changeteam(self.userid, value)
+
+                # Raise error, and request for SPE to be installed.
+                raise ImportError('SPE Is not installed on this server! ' +
+                        'Please visit http://forums.eventscripts.com/viewtop' +
+                        'ic.php?t=29657 and download the latest version!')
 
             # Change the team
             cstrike.switchTeam(self.userid, value)
 
             # Change the model
-            if value > 1:
+            if value == 1:
+                return
 
-                # Terrorist Models
-                if int(value) == 2:
-                    pPlayer.model = 'player/%s' \
-                        % choice(('t_arctic', 't_guerilla', 't_leet',
-                                    't_phoenix'))
+            # Terrorist Models
+            if int(value) == 2:
+                pPlayer.model = 'player/%s' \
+                    % choice(('t_arctic', 't_guerilla', 't_leet', 't_phoenix'))
 
-                # Counter-Terrorist Models
-                else:
-                    pPlayer.model = 'player/%s' \
-                        % choice(('ct_gign', 'ct_gsg9', 'ct_sas', 'ct_urban'))
+            # Counter-Terrorist Models
+            else:
+                pPlayer.model = 'player/%s' \
+                    % choice(('ct_gign', 'ct_gsg9', 'ct_sas', 'ct_urban'))
             return
 
         '''
