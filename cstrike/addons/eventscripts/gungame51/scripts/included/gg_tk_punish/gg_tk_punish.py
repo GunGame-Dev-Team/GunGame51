@@ -28,8 +28,6 @@ info.version = '0.1'
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-# Get the es.ServerVar() instance of "gg_warmup_round"
-gg_warmup_round = es.ServerVar('gg_warmup_round')
 # Get the es.ServerVar() instance of "gg_tk_punish"
 gg_tk_punish = es.ServerVar('gg_tk_punish')
 
@@ -46,10 +44,6 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def player_death(event_var):
-    # Warmup Round Check
-    if int(gg_warmup_round):
-        return
-
     # Set player ids
     userid = int(event_var['userid'])
     attacker = int(event_var['attacker'])
@@ -76,4 +70,4 @@ def player_death(event_var):
         ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level})
 
         # Play the leveldown sound
-        #gungamelib.playSound(attacker, 'leveldown')
+        ggAttacker.playsound('leveldown')
