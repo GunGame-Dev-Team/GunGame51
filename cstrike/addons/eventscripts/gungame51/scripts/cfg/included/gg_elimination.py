@@ -13,6 +13,9 @@ $LastChangedDate$
 import es
 import cfglib
 
+# GunGame Imports
+from gungame51.core.cfg import generate_header
+
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
@@ -23,20 +26,25 @@ config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    generate_header(config)
+    '''
     config.text('*'*76)
-    config.text('*' + ' '*13 + 'gg_elimination.cfg -- Elimination ' +
-                'Configuration' + ' '*14 + '*')
+    config.text('*' +
+                'gg_elimination.cfg -- Elimination Configuration'.center(74) +
+                '*')
     config.text('*' + ' '*74 + '*')
-    config.text('*' + ' '*17 + 'This file defines GunGame Addon settings.' +
-                ' '*16 + '*')
+    config.text('*' + 'This file defines GunGame Addon settings.'.center(74) +
+                '*')
     config.text('*' + ' '*74 + '*')
-    config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' '*8 + '*')
-    config.text('*' + ' '*11 + 'reload of GunGame.' + ' '*45 + '*')
+    config.text('*' +
+                'Note: Any alteration of this file requires a'.center(74) +
+                '*')
+    config.text('*' + 'server restart or a reload of GunGame.'.center(74) +
+                '*')
     config.text('*'*76)
     config.text('')
     config.text('')
-    
+    '''
     # Elimination
     config.text('')
     config.text('='*76)

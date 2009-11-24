@@ -230,9 +230,10 @@ class ConfigManager(object):
             'scripts/cfg/custom/%s.py' %name)):
             return 'custom'
 
-#ConfigManager() = ConfigManager()
+
 # Register the ConfigManager instance for the "server_cvar" event
 es.addons.registerForEvent(ConfigManager(), 'server_cvar', ConfigManager().server_cvar)
+
 
 # ============================================================================
 # >> FUNCTIONS
@@ -288,3 +289,38 @@ def getConfigList(type=None):
             list_configs.append(filename)
 
     return list_configs
+    
+def generate_header(config):
+    '''
+    Generates a generic header based off of the addon name.
+    '''
+    config.text('*'*76)
+
+    # Retrieve the config path
+    cfgPath = config.cfgpath
+
+    # Get the addon name from the config path
+    addon = cfgPath.split('/')[len(cfgPath.split('/'))-1].replace('.cfg', '')
+
+    # Split the name via underscores
+    list_title = str(addon).split('_')
+
+    # Format the addon title
+    addonTitle = '%s.cfg --' %str(addon)
+    for index in range(1, len(list_title)):
+        addonTitle += ' %s' %list_title[index].title()
+    addonTitle +=' Configuration'
+
+    config.text('*' + addonTitle.center(74) + '*')
+    config.text('*' + ' '*74 + '*')
+    config.text('*' + 'This file defines GunGame Addon settings.'.center(74) +
+                '*')
+    config.text('*' + ' '*74 + '*')
+    config.text('*' +
+                'Note: Any alteration of this file requires a'.center(74) +
+                '*')
+    config.text('*' + 'server restart or a reload of GunGame.'.center(74) +
+                '*')
+    config.text('*'*76)
+    config.text('')
+    config.text('')

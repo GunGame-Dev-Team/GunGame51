@@ -13,6 +13,9 @@ $LastChangedDate$
 import es
 import cfglib
 
+# GunGame Imports
+from gungame51.core.cfg import generate_header
+
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
@@ -24,19 +27,7 @@ config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
 # ============================================================================
 
 def load():
-    config.text('*'*76)
-    config.text('*' + ' '*15 + 'gg_map_vote.cfg -- Map Vote ' +
-                'Configuration' + ' '*18 + '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*' + ' '*17 + 'This file defines GunGame Addon settings.' +
-                ' '*16 + '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' '*8 + '*')
-    config.text('*' + ' '*11 + 'reload of GunGame.' + ' '*45 + '*')
-    config.text('*'*76)
-    config.text('')
-    config.text('')
+    generate_header(config)
     
     # gg_map_vote
     config.text('='*76)
