@@ -1,6 +1,0 @@
-'''
-$Rev$
-$LastChangedBy$
-$LastChangedDate$
-$HEAD: $
-'''
