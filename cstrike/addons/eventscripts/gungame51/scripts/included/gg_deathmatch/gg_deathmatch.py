@@ -9,9 +9,6 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
 from playerlib import getPlayer
@@ -38,28 +35,22 @@ info.translations = ['gg_deathmatch']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
-respawnDelay = es.ServerVar('gg_dm_respawn_delay')
-respawnAllowed = 0
-
+# Server Vars
+gg_dm_respawn_delay = es.ServerVar('gg_dm_respawn_delay')
 mp_freezetime = es.ServerVar('mp_freezetime')
 mp_roundtime = es.ServerVar('mp_roundtime')
+
+# Misc
 mpFreezetimeBackup = int(mp_freezetime)
 mpRoundtimeBackup = int(mp_roundtime)
-
-# ============================================================================
-# >> CLASSES
-# ============================================================================
-
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    
     # Don't allow respawn
     global respawnAllowed
-    respawnAllowed = 0
+    respawnAllowed = False
     
     # Set freezetime and roundtime to avoid gameplay interuptions
     mp_freezetime.set('0')
@@ -70,16 +61,18 @@ def load():
         respawnPlayer = repeat.find('gungameRespawnPlayer%s' % userid)
         
         if not respawnPlayer:
-            repeat.create('gungameRespawnPlayer%s' % userid, respawnCountDown, (userid))
+            repeat.create('gungameRespawnPlayer%s' % userid, respawnCountDown,
+                                                                      (userid))
     
     # Respawn all dead players
     for userid in getUseridList('#dead'):
-        repeat.start('gungameRespawnPlayer%s' % userid, 1, respawnDelay)
+        repeat.start('gungameRespawnPlayer%s' % userid, 1,
+                                                      int(gg_dm_respawn_delay))
     
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
-    # Set freezetime and roundtime back to their value before deathmatch was loaded
+    # Set freezetime and roundtime back to their original values
     mp_freezetime.set(mpFreezetimeBackup)
     mp_roundtime.set(mpRoundtimeBackup)
     
@@ -91,55 +84,50 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-
 def es_map_start(event_var):
-    
     # Don't allow respawn
     global respawnAllowed
-    respawnAllowed = 0
+    respawnAllowed = False
 
 def round_start(event_var):
-    
     # Allow respawn
     global respawnAllowed
-    respawnAllowed = 1
+    respawnAllowed = True
 
 def round_end(event_var):
-    
     # Don't allow respawn
     global respawnAllowed
-    respawnAllowed = 0
+    respawnAllowed = False
 
 def gg_win(event_var):
-    
     #Cancel pending respawns
     for userid in es.getUseridList():
         if repeat.find('gungameRespawnPlayer%s' % userid):
             repeat.delete('gungameRespawnPlayer%s' % userid)
 
 def player_team(event_var):
-    
-    if event_var['disconnect'] != '0':
+    if int(event_var['disconnect']):
         return
     
     # Get the userid
-    userid = event_var['userid']
+    userid = int(event_var['userid'])
     
     # If the player does not have a respawn repeat, create one
     respawnPlayer = repeat.find('gungameRespawnPlayer%s' % userid)
     if not respawnPlayer:
-        repeat.create('gungameRespawnPlayer%s' % userid, respawnCountDown, (userid))
+        repeat.create('gungameRespawnPlayer%s' % userid,
+                                                respawnCountDown, (userid))
     
     # Don't allow spectators or players that are unassigned to respawn
     if int(event_var['team']) < 2:
         if repeat.status('gungameRespawnPlayer%s' % userid) != 1:
             repeat.stop('gungameRespawnPlayer%s' % userid)
             hudhint(userid, 'RespawnCountdown_CancelTeam')
-        
         return
     
     # Respawn the player
-    repeat.start('gungameRespawnPlayer%s' % userid, 1, respawnDelay)
+    repeat.start('gungameRespawnPlayer%s' % userid, 1,
+                                                      int(gg_dm_respawn_delay))
 
 def player_disconnect(event_var):
     # Get userid
@@ -150,22 +138,31 @@ def player_disconnect(event_var):
         repeat.delete('gungameRespawnPlayer%s' % userid)
 
 def player_death(event_var):
-    
     # Get the userid
     userid = event_var['userid']
     
     # Respawn the player if the round hasn't ended
     if respawnAllowed:
-        repeat.start('gungameRespawnPlayer%s' % userid, 1, respawnDelay)
+        # No respawn delay ?
+        if int(gg_dm_respawn_delay) == 0:
+            gamethead.delayed(0.50, Player(userid).respawn)
+        else:
+            repeat.start('gungameRespawnPlayer%s' % userid, 1,
+                                                      int(gg_dm_respawn_delay))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-
 def respawnCountDown(userid):
     # Make sure that the repeat exists
-    respawnRepeat = repeat.find('gungameRespawnPlayer%s' %userid)
+    respawnRepeat = repeat.find('gungameRespawnPlayer%s' % userid)
     if not respawnRepeat:
+        return
+
+    # Player on server ?
+    if not es.exists('userid', userid):
+        respawnRepeat.stop()
+        respawnRepeat.delete()
         return
     
     # Not dead?
@@ -182,7 +179,8 @@ def respawnCountDown(userid):
     
     # More than 1 remaining?
     if respawnRepeat['remaining'] > 1:
-        hudhint(userid, 'RespawnCountdown_Plural', {'time': respawnRepeat['remaining']})
+        hudhint(userid, 'RespawnCountdown_Plural',
+            {'time': respawnRepeat['remaining']})
     
     # Is the counter 1?
     elif respawnRepeat['remaining'] == 1:
@@ -190,4 +188,8 @@ def respawnCountDown(userid):
     
     # Respawn the player
     elif respawnRepeat['remaining'] == 0:
-        Player(userid).respawn()
+        if float(gg_dm_respawn_delay) % 1 == 0:
+            Player(userid).respawn()
+        else:
+            gamethead.delayed((float(gg_dm_respawn_delay) % 1),
+                                                        Player(userid).respawn)

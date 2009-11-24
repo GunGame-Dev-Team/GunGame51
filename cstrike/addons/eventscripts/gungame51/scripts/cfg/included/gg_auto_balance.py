@@ -13,6 +13,9 @@ $LastChangedDate$
 import es
 import cfglib
 
+# GunGame Imports
+from gungame51.core.cfg import generate_header
+
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
@@ -23,19 +26,8 @@ config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    config.text('*'*76)
-    config.text('*' + ' '*12 + 'gg_auto_balance.cfg -- Auto Balancer ' +
-                'Configuration' + ' '*12 + '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*' + ' '*17 + 'This file defines GunGame Addon settings.' +
-                ' '*16 + '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' '*8 + '*')
-    config.text('*' + ' '*11 + 'reload of GunGame.' + ' '*45 + '*')
-    config.text('*'*76)
-    config.text('')
-    config.text('')
+    # Generate header
+    generate_header(config)
     
     # gg_auto_balance
     config.text('')
@@ -71,8 +63,8 @@ def load():
     config.text('   * Setting this low will cause frequent balancing.')
     config.text('Options:')
     config.text('   # = Threshold')
-    config.text('Default Value: 2')
-    config.cvar('gg_auto_balance_threshold', 2, 'Threshold for gg_auto_' +
+    config.text('Default Value: 1.75')
+    config.cvar('gg_auto_balance_threshold', 1.75, 'Threshold for gg_auto_' +
                 'balance')
     config.text('')
     
@@ -181,8 +173,8 @@ def load():
     config.text('   * Required for gg_deathmatch.')
     config.text('Options:')
     config.text('# = Time in minutes')
-    config.text('Default Value: 5')
-    config.cvar('gg_auto_balance_timer', 5, 'Timer for gg_auto_' +
+    config.text('Default Value: 3')
+    config.cvar('gg_auto_balance_timer', 3, 'Timer for gg_auto_' +
                 'balance')
 
     # gg_auto_balance_knife

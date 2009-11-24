@@ -73,7 +73,6 @@ class AddonInfo(dict):
         self.name = ''
         self.title = ''
         self.author = ''
-        self.version = '0.0'
         self.requires = []
         self.conflicts = []
         self.translations = []
@@ -85,18 +84,28 @@ class AddonInfo(dict):
         '''
         Setting an attribute is equivalent to setting an item
         '''
+        if name == 'version':
+            if AddonManager().getAddonType('%s' % self.name) == 'included':
+                dict.__setattr__(self, 'version', '5.1.%s' % AddonManager(
+                ).getAddonByName('%s' % self.name).__doc__.split(
+                '$Rev: ')[1].split()[0])
+                return
+
         self[name] = value
 
     def __getattr__(self, name):
         '''
         Getting an attribute is equivalent to getting an item
         '''
+        if name == 'version':
+            if name not in self._getKeyList():
+                return '0.0'
         return self[name]
 
     def __setitem__(self, name, value):
         if name not in self._getKeyList():
             raise KeyError('AddonInfo instance has no key: "%s". \
-                            Use only "%s".' 
+                            Use only "%s".'
                                 %(name, '", "'.join(self._getKeyList())))
 
         dict.__setitem__(self, name, value)
@@ -104,7 +113,7 @@ class AddonInfo(dict):
     def __getitem__(self, name):
         if name not in self._getKeyList():
             raise KeyError('AddonInfo instance has no key: "%s". \
-                            Use only "%s".' 
+                            Use only "%s".'
                                 %(name, '", "'.join(self._getKeyList())))
 
         return dict.__getitem__(self, name)
@@ -171,7 +180,7 @@ class AddonLoadedByDependency(dict):
 class DependencyError(Exception):
     """
     We want a nice, descriptive error for dependency problems
-    Due to the fact this error is unique it will need to be referenced by 
+    Due to the fact this error is unique it will need to be referenced by
     module.  If we want this error excepted we must except:
     gungame.DependencyError
     """
@@ -352,7 +361,7 @@ class AddonManager(object):
                 type(addon_globals[item]).__name__ != 'function':
                 continue
 
-            # See if this is an event that we have not previously registered  
+            # See if this is an event that we have not previously registered
             if item not in self.__events__.keys():
                 # Add the event to our __events__ dictionary
                 self.__events__[item] = {}
@@ -361,7 +370,7 @@ class AddonManager(object):
                 #   self.callEvent() to handle ALL events
                 es.addons.registerForEvent(self, item, self.callEvent)
 
-            # Add the addon to the list of addons to call when the event 
+            # Add the addon to the list of addons to call when the event
             #   triggers
             self.__events__[item][name] = addon_globals[item]
 
@@ -406,7 +415,7 @@ class AddonManager(object):
                 # The addon's event does not fire if it is not a priority addon
                 if name not in PriorityAddon():
                     continue
-                
+
             # If the addon name is in the current event, call the function
             if name in current_event:
                 current_event[name](event_var)
@@ -430,7 +439,7 @@ class AddonManager(object):
         # Ensure this addon does not conflict with a loaded addon
         if name in conflicts:
             es.set(name, 0)
-            raise DependencyError('Loaded sub-addon(s) "%s" conflict with ' 
+            raise DependencyError('Loaded sub-addon(s) "%s" conflict with '
                     %('", "'.join(conflicts[name])) +
                     'sub-addon "%s"' %(name))
 
@@ -450,7 +459,7 @@ class AddonManager(object):
             for subaddon in conflicting:
                 # Add the subaddon to the "AddonLoadedByDependency()" dictionary
                 gamethread.delayed(0, self.addLoadedByDependency, (subaddon, name))
-                
+
 
         # Add this sub-addon's dependencies and conflicts
         dependencies.add(name, addon_depend)

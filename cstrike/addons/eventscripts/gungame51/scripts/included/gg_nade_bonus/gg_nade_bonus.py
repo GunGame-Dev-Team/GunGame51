@@ -294,6 +294,10 @@ def giveBonus(userid, sound=False, turboCheck=False):
         ggPlayer.give(weapon, False, True, True)
 
 def checkBonus(userid):
+    # Valid userid?
+    if userid < 1:
+        return False
+
     # Valid team?
     if getPlayer(userid).teamid < 2:
         return False

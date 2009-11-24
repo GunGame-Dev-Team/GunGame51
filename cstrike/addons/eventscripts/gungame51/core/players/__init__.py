@@ -38,7 +38,7 @@ from afk import AFK
 list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
-gg_respawn_cmd = es.ServerVar('gg_respawn_cmd')
+gg_respawn_cmd_override = es.ServerVar('gg_respawn_cmd_override')
 
 # ============================================================================
 # >> CLASSES
@@ -221,7 +221,7 @@ class BasePlayer(object):
 
                 # Set prop & hide vgui
                 es.setplayerprop(self.userid, 'CCSPlayer.m_iClass', iClass)
-                usermsg.showVGUIPanel(self.userid, menuname, False, {})
+                showVGUIPanel(self.userid, menuname, False, {})
 
                 # If player is a bot, kill him
                 if es.isbot(self.userid):
@@ -546,13 +546,17 @@ class BasePlayer(object):
 
         if owner != es.getplayerhandle(self.userid):
             # Owner is a person ?
-            if owner > -1:
+            if owner > 0:
                 owner_userid = es.getuserid(owner)
                 # Make the wrong owner use their own weapon ?
                 if getPlayer(owner_userid).weapon != \
                     'weapon_%s' % Player(owner_userid).weapon:
                     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (
                         owner_userid, Player(owner_userid).weapon))
+
+            # Make sure index is still existing
+            if not es.createentitylist().has_key(int_lastgive):
+                return
 
             # If the weapon is the same as the weapon that was dropped
             if es.createentitylist()[int_lastgive]['classname'] == \
@@ -626,7 +630,8 @@ class BasePlayer(object):
 
         # No weapon check
         if noWeaponCheck:
-            gamethread.delayed(0.065, Player(self.userid).noWeaponCheck, weapon)
+            gamethread.delayed(0.065, Player(self.userid).noWeaponCheck,
+                                                                        weapon)
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
@@ -653,17 +658,42 @@ class BasePlayer(object):
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS
     # =========================================================================
-    def respawn(self):
+    def respawn(self, force=False):
         '''
         Respawns the player.
         '''
+        if str(gg_respawn_cmd_override) in ('', '0'):
+            # Import SPE if installed
+            try:
+                from spe.games import cstrike
+
+            except ImportError:
+                raise ImportError('SPE Is not installed on this server! ' +
+                        'Please visit http://forums.eventscripts.com/viewtop' +
+                        'ic.php?t=29657 and download the latest version!')
+
+            # Player on server ?
+            if not es.exists('userid', self.userid):
+                return
+
+            # Player in spec ?
+            if self.team == 1:
+                return
+
+            # Player alive? (require force)
+            if not getPlayer(self.userid).isdead and not force:
+                return
+                
+            cstrike.respawn(self.userid)
+
         # Check if the respawn command requires the "#" symbol
-        if '#' not in str(gg_respawn_cmd):
+        elif '#' not in str(gg_respawn_cmd_override):
             # Userids not requiring the "#" symbol
-            es.server.queuecmd('%s %s' % (gg_respawn_cmd, self.userid))
+            es.server.queuecmd('%s %s' % (gg_respawn_cmd_override,
+                                                                  self.userid))
         else:
             # SourceMod Workaround
-            es.server.queuecmd('%s%s' % (gg_respawn_cmd, self.userid))
+            es.server.queuecmd('%s%s' % (gg_respawn_cmd_override, self.userid))
 
     # =========================================================================
     # >> BasePlayer() SOUND CLASS METHODS
