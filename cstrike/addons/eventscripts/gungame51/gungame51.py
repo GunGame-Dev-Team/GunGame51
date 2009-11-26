@@ -35,6 +35,7 @@ from core.cfg.shortcuts import getConfigList
 #    Addon Function Imports
 from core.addons import AddonManager
 from core.addons import PriorityAddon
+from core.addons import GunGameInfo
 
 #    Player Function Imports
 from core.players.shortcuts import Player
@@ -83,9 +84,23 @@ gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 
 # ============================================================================
+# >> ADDON REGISTRATION
+# ============================================================================
+info = es.AddonInfo()
+del info['keylist'][:]
+info.About = ('\n' +
+             ' '*25 + '\tGunGame 5.1 (%s)\n\n' % GunGameInfo('version') +
+             ' '*25 + 'Authors:\n' +
+             ' '*25 + '\tMichael Barr (XE_ManUp)\n' +
+             ' '*25 + '\tLuke Robinson (Monday)\n' +
+             ' '*25 + '\tWarren Alpert\n' +
+             ' '*25 + '\tPaul Smith (RideGuy)\n' +
+             ' '*25 + '\tDeniz Sezen (your-name-here)\n\n' +
+             ' '*25 + 'Website: http://www.gungame5.com/\n')
+
+# ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================    
-
 def load():
     # Load translations
     loadTranslation('gungame', 'gungame')
@@ -97,10 +112,9 @@ def load():
     try:
         initialize()
     except:
-        #gungamelib.echo('gungame', 0, 0, 'Load_Exception')
-        es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+        es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
         es.excepter(*sys.exc_info())
-        es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+        es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
         es.unload('gungame')
 
 def unload():
@@ -116,20 +130,17 @@ def unload():
         dict_dependencies for y in dict_dependencies[x]]))):
 
         # Unload the addons that have required dependencies
-        AddonManager().unload(addon)
+        AddonManager().unload(addon, True)
 
     # Unload any remaining addons now that dependencies are handled
     for addon in AddonManager().__order__[:]:
-        AddonManager().unload(addon)
+        AddonManager().unload(addon, True)
 
     # Unload configs (removes flags from CVARs)
     unloadConfig(getConfigList())
 
-    # Grab a random userid for the below commands
-    userid = es.getuserid()
-
     # Enable Buyzones
-    es.server.queuecmd('es_xfire %d func_buyzone Enable' %userid)
+    es.server.queuecmd('es_xfire %d func_buyzone Enable' % es.getuserid())
 
     # Fire gg_unload event
     EventManager().gg_unload
@@ -140,7 +151,7 @@ def unload():
 def initialize():
     loadConfig(getConfigList())
     # Print load started
-    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+    es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
     
     # Load custom events
     es.loadevents('declare', 
@@ -173,11 +184,13 @@ def initialize():
     EventManager().gg_load()
     
     # Print load completed
-    #gungamelib.echo('gungame', 0, 0, 'Load_Completed')
-    es.dbgmsg(0, '[GunGame] %s' % ('=' * 80))
+    es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
 
     # Prune the DB
     pruneWinnersDB()
+    
+    # Set es.AddonInfo()
+    GunGameInfo('addoninfo', info)
 
 # ============================================================================
 # >> GAME EVENTS
@@ -470,7 +483,7 @@ def gg_win(event_var):
                                                     {'player': playerName})
 
     # Update DB
-    gamethread.delayed(1.5, commit, ())
+    gamethread.delayed(1.5, commit)
         
 def gg_start(event_var):
     # Reset all the players

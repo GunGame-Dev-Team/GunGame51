@@ -10,7 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python Imports
-import os.path
+import os
 
 # Eventscripts Imports
 import es
@@ -18,6 +18,7 @@ import gamethread
 
 # GunGame Imports
 from gungame51.core import getGameDir
+from gungame51.core import getFileList
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging import MessageManager
 
@@ -260,7 +261,6 @@ class PriorityAddon(list):
     def clear(self):
         del self[:]
 
-
 class AddonManager(object):
     def __new__(cls, *p, **k):
         if not '_the_instance' in cls.__dict__:
@@ -305,10 +305,13 @@ class AddonManager(object):
         # stop loading the sub-addon
         self.callBlock(addon, 'load')
 
+        # Updating es.AddonInfo
+        GunGameInfo('update')
+
         # Fire the event "gg_addon_loaded"
         EventManager().gg_addon_loaded(name, self.getAddonType(name))
 
-    def unload(self, name):
+    def unload(self, name, unloading_gg=False):
         '''
         Unloads a GunGame sub-addon by name
         '''
@@ -343,6 +346,10 @@ class AddonManager(object):
         # Call the unload block as is normally done by ES
         # Again, we do this last so it doesn't matter if the block errors
         self.callBlock(addon, 'unload')
+
+        # Updating es.AddonInfo
+        if not unloading_gg:
+            GunGameInfo('update')
 
         # Fire the event "gg_addon_unloaded"
         EventManager().gg_addon_unloaded(name, self.getAddonType(name))
@@ -457,9 +464,9 @@ class AddonManager(object):
         if conflicting:
             # Loop through all addons that are not loaded and load them
             for subaddon in conflicting:
-                # Add the subaddon to the "AddonLoadedByDependency()" dictionary
-                gamethread.delayed(0, self.addLoadedByDependency, (subaddon, name))
-
+                # Add the subaddon to the "AddonLoadedByDependency()" dict
+                gamethread.delayed(0, self.addLoadedByDependency,
+                                                            (subaddon, name))
 
         # Add this sub-addon's dependencies and conflicts
         dependencies.add(name, addon_depend)
@@ -614,8 +621,103 @@ class AddonManager(object):
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
-# These wrappers make it possible to use key addon functions
-# without interacting with the AddonManager directly
+def GunGameInfo(info, _info=None):
+    '''
+    Fetches the head revision number from all of gungame's files
+    '''
+    if info == 'version':
+        if globals().has_key('GG51version'):
+            return GG51version
+        rev = int(__doc__.split('$Rev: ')[1].split()[0])
+        gen = getFileList()
+        while True:
+            try:
+                files = gen.next()
+            except:
+                del doc_string
+                global GG51version
+                GG51version = '5.1.%s' % rev
+                return GG51version
+            base_name = files[0].split('/')
+            base_name = '.'.join(base_name[base_name.index('gungame51'):])
+            if base_name.startswith('gungame51.scripts.custom'):
+                continue
+            if base_name.startswith('gungame51.core.events.data'):
+                continue
+            if base_name.startswith('gungame51.scripts.included'):
+                mod_name = base_name.split('.')[-1]
+                AM = AddonManager()
+                if mod_name in AM.getAddonInfo().keys():
+                    ver = AM.getAddonInfo()[mod_name].version[4:]
+                    if ver > rev:
+                        rev = ver
+                    continue
+            modules = [c.split('.py')[0] for c in files[1]
+                                                        if c.endswith('.py')]
+            for module in modules:
+                try:
+                    if module == '__init__':
+                        doc_string = __import__(base_name, globals(), locals(),
+                                                                 ['']).__doc__
+                    else:
+                        doc_string = __import__('%s.%s' % (base_name, module),
+                                            globals(), locals(), ['']).__doc__
+                    ver = int(doc_string.split('$Rev: ')[1].split()[0])
+                    if ver > rev:
+                        rev = ver
+                except:
+                    continue
+
+    '''
+    Fetches a list of addons and it's version number in str format for
+    es.AddonInfo()
+    '''
+    if info in ('included', 'custom'):
+        if _gg_info_quiet:
+            return
+        AM = AddonManager()
+        addonlist = [AM.getAddonInfo()[addon] for addon in
+                    AM.getAddonInfo().keys() if AM.getAddonType(addon) == info]
+        if not addonlist:
+            return 'None\n'
+
+        i = 0
+        for addon in addonlist:
+            addonlist[i] = ' '*25 + '%s (v%s)\n' % (addon.name, addon.version)
+            i += 1
+
+        addonlist.insert(0, '\n')
+        return ' '.join(addonlist)
+
+    '''
+    Lets gungame51.py pass it's instance of es.AddonInfo into this file
+    so we can update it. (stored as _gg_info global)
+    '''
+    if info == 'addoninfo':
+        global _gg_info
+        global _gg_info_quiet
+        _gg_info = _info
+        _gg_info_quiet = True
+        gamethread.delayed(0.25, GunGameInfo, 'listen')
+        
+    '''
+    Updates es.AddonInfo instance for gungame51
+    '''
+    if info == 'update':
+        if _gg_info_quiet:
+            return
+        _gg_info.Included_Addons = GunGameInfo('included')
+        _gg_info.Custom_Addons = GunGameInfo('custom')
+        
+    if info == 'listen':
+        global _gg_info_reset
+        _gg_info_quiet = False
+        GunGameInfo('update')
+        
+'''
+This wrapper makes it possible to use key addon functions
+without interacting with the AddonManager directly
+'''
 def load(*a, **kw):
    AddonManager().load(*a, **kw)
 load.__doc__ = AddonManager.load.__doc__
