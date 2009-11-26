@@ -115,11 +115,6 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
         es.unload('gungame')
-        
-    es.regcmd('top10', 'gungame51/top10', 'gets top 10')
-
-def top10():
-    es.msg(getWinnersList())
 
 def unload():
     # Unload translations
