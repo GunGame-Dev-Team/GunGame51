@@ -9,17 +9,16 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# EventScripts Imports
-import es
+# Eventscripts Imports
+from es import ServerVar
 
 # GunGame Imports
 from gungame51.core.sql import Database
-from gungame51.core.sql import _ggSQL
 
 # ============================================================================
 # >> GLOBALS
 # ============================================================================
-gg_prune_database = es.ServerVar('gg_prune_database')
+gg_prune_database = ServerVar('gg_prune_database')
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -50,19 +49,4 @@ def pruneWinnersDB(days=None):
     ggDB = Database()
     ggDB.query("DELETE FROM gg_wins WHERE " +
                 "timestamp < strftime('%s','now', '-%s days')" % ('%s', days))
-    commit()
-
-def commit():
-    '''
-    Commits the database to file (for internal use)
-    '''
-    _ggSQL.commit()
-    
-def unloadGunGameDB():
-    '''
-    Closes the connection to the GG Database.
-    INTERNAL USE ONLY
-    '''
-    commit()
-    _ggSQL.close()
-    
+    ggDB.commit()

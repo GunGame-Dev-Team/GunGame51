@@ -66,8 +66,7 @@ from core.sound import make_downloadable
 #   Database
 from core.sql.shortcuts import pruneWinnersDB
 from core.sql.shortcuts import Database
-from core.sql.shortcuts import commit
-from core.sql.shortcuts import unloadGunGameDB
+from core.sql.shortcuts import getWinnersList
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -116,6 +115,11 @@ def load():
         es.excepter(*sys.exc_info())
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
         es.unload('gungame')
+        
+    es.regcmd('top10', 'gungame51/top10', 'gets top 10')
+
+def top10():
+    es.msg(getWinnersList())
 
 def unload():
     # Unload translations
@@ -136,6 +140,9 @@ def unload():
     for addon in AddonManager().__order__[:]:
         AddonManager().unload(addon, True)
 
+    # Close the database
+    Database().close()
+
     # Unload configs (removes flags from CVARs)
     unloadConfig(getConfigList())
 
@@ -144,9 +151,6 @@ def unload():
 
     # Fire gg_unload event
     EventManager().gg_unload
-    
-    # Close the database
-    unloadGunGameDB()
     
 def initialize():
     loadConfig(getConfigList())
@@ -188,7 +192,7 @@ def initialize():
 
     # Prune the DB
     pruneWinnersDB()
-    
+
     # Set es.AddonInfo()
     GunGameInfo('addoninfo', info)
 
@@ -483,7 +487,7 @@ def gg_win(event_var):
                                                     {'player': playerName})
 
     # Update DB
-    gamethread.delayed(1.5, commit)
+    gamethread.delayed(1.5, Database().commit)
         
 def gg_start(event_var):
     # Reset all the players
