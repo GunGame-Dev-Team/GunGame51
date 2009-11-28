@@ -17,14 +17,14 @@ from gungame51.core.addons import PriorityAddon
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
-def getAddonInfo(name=None):
+def get_addon_info(name=None):
     '''
     Returns the stored AddonInfo() instance of the named addon from the
     AddonStorage() container class (returns a dictionary of the named addon's
     attributes).
     
     USAGE:
-        from core.addons.shortcuts import getAddonInfo
+        from core.addons.shortcuts import get_addon_info
         
         myAddon = getAddon('example_addon')
         
@@ -47,17 +47,17 @@ def getAddonInfo(name=None):
     if name:
         name = str(name).lower()
     
-    return AddonManager().getAddonInfo(name)
+    return AddonManager().get_addon_info(name)
     
-def getAddonType(name):
+def get_addon_type(name):
     '''
     Returns a string value of the addon type:
         "custom"
         "included"
     '''
-    return AddonManager.getAddonType(name)
+    return AddonManager.get_addon_type(name)
 
-def addonExists(name):
+def addon_exists(name):
     '''
     Returns an int (bool) value depending on a GunGame addon's existance.
         0 = False (addon does not exist)
@@ -74,9 +74,9 @@ def addonExists(name):
         returned.
         
     USAGE:
-        from core.addons.shortcuts import addonExists
+        from core.addons.shortcuts import addon_exists
     '''
-    return AddonManager.addonExists(name)
+    return AddonManager.addon_exists(name)
 
 def getLoadedAddonList():
-    return AddonManager().getAddonInfo().keys()
+    return AddonManager().get_addon_info().keys()

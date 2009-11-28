@@ -17,8 +17,8 @@ import es
 import gamethread
 
 # GunGame Imports
-from gungame51.core import getGameDir
-from gungame51.core import getFileList
+from gungame51.core import get_game_dir
+from gungame51.core import get_file_list
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging import MessageManager
 
@@ -86,9 +86,9 @@ class AddonInfo(dict):
         Setting an attribute is equivalent to setting an item
         '''
         if name == 'version':
-            if AddonManager().getAddonType('%s' % self.name) == 'included':
+            if AddonManager().get_addon_type('%s' % self.name) == 'included':
                 dict.__setattr__(self, 'version', '5.1.%s' % AddonManager(
-                ).getAddonByName('%s' % self.name).__doc__.split(
+                ).get_addon_by_name('%s' % self.name).__doc__.split(
                 '$Rev: ')[1].split()[0])
                 return
 
@@ -283,16 +283,16 @@ class AddonManager(object):
             raise NameError, 'GunGame sub-addon "%s" is already loaded' % name
 
         # Retrieve the addon
-        addon = self.getAddonByName(name)
+        addon = self.get_addon_by_name(name)
 
         # Add dependencies or conflicts of the sub-addon being unloaded
-        self.addDependenciesConflicts(addon, name)
+        self.add_dependencies_conflicts(addon, name)
 
         # Load the translation files
-        self.loadTranslations(addon)
+        self.load_translations(addon)
 
         # Register the events in the addon
-        self.registerEvents(addon, name)
+        self.register_events(addon, name)
 
         # Save the module by name so we know it is loaded
         self.__loaded__[name] = addon
@@ -303,13 +303,13 @@ class AddonManager(object):
         # Call the load block as is normally done by ES
         # We do this last because if there is a load error we don't want to
         # stop loading the sub-addon
-        self.callBlock(addon, 'load')
+        self.call_block(addon, 'load')
 
         # Updating es.AddonInfo
         GunGameInfo('update')
 
         # Fire the event "gg_addon_loaded"
-        EventManager().gg_addon_loaded(name, self.getAddonType(name))
+        EventManager().gg_addon_loaded(name, self.get_addon_type(name))
 
     def unload(self, name, unloading_gg=False):
         '''
@@ -320,19 +320,19 @@ class AddonManager(object):
             raise NameError, "GunGame sub-addon '%s' is not loaded" % name
 
         # Retrieve the addon
-        addon = self.getAddonByName(name)
+        addon = self.get_addon_by_name(name)
 
         # Remove dependencies or conflicts of the sub-addon being unloaded
-        self.removeDependenciesConflicts(name)
+        self.remove_dependencies_conflicts(name)
 
         # Unload the translation files
-        self.unloadTranslations(addon)
+        self.unload_translations(addon)
 
         # Unload any subaddons that were loaded as dependencies
-        self.removeLoadedByDependency(name)
+        self.remove_loaded_by_dependency(name)
 
         # Unregister the events in the addon
-        self.unregisterEvents(addon, name)
+        self.unregister_events(addon, name)
 
         # Remove the module from the loaded module dictionary
         del self.__loaded__[name]
@@ -345,16 +345,16 @@ class AddonManager(object):
 
         # Call the unload block as is normally done by ES
         # Again, we do this last so it doesn't matter if the block errors
-        self.callBlock(addon, 'unload')
+        self.call_block(addon, 'unload')
 
         # Updating es.AddonInfo
         if not unloading_gg:
             GunGameInfo('update')
 
         # Fire the event "gg_addon_unloaded"
-        EventManager().gg_addon_unloaded(name, self.getAddonType(name))
+        EventManager().gg_addon_unloaded(name, self.get_addon_type(name))
 
-    def registerEvents(self, addon, name):
+    def register_events(self, addon, name):
         '''
         Register all functions in the module as events to ES
         '''
@@ -374,14 +374,14 @@ class AddonManager(object):
                 self.__events__[item] = {}
 
                 # We only register the specific event once, and use
-                #   self.callEvent() to handle ALL events
-                es.addons.registerForEvent(self, item, self.callEvent)
+                #   self.call_event() to handle ALL events
+                es.addons.registerForEvent(self, item, self.call_event)
 
             # Add the addon to the list of addons to call when the event
             #   triggers
             self.__events__[item][name] = addon_globals[item]
 
-    def unregisterEvents(self, addon, name):
+    def unregister_events(self, addon, name):
         '''
         Unregister all functions in the module from being called by ES as
         events
@@ -408,7 +408,7 @@ class AddonManager(object):
                     # Remove the event from our __events__ dictionary
                     del self.__events__[item]
 
-    def callEvent(self, event_var):
+    def call_event(self, event_var):
         '''
         Calls the events in sub-addons in the order dictated by __order__
         '''
@@ -427,13 +427,13 @@ class AddonManager(object):
             if name in current_event:
                 current_event[name](event_var)
 
-    def addDependenciesConflicts(self, addon, name):
+    def add_dependencies_conflicts(self, addon, name):
         '''
         Raises an error if there is a dependency or conflict problem or adds
         the addon's dependencies and conflicts to the existing dictionaries
         '''
         # Gather a list of dependencies and conflicts
-        addon_depend, addon_conflict = self.getDependenciesConflicts(name)
+        addon_depend, addon_conflict = self.get_dependencies_conflicts(name)
 
         # If an addon is depended on and also conflicts, wth?
         conflicting = set(addon_depend).intersection(addon_conflict)
@@ -465,14 +465,14 @@ class AddonManager(object):
             # Loop through all addons that are not loaded and load them
             for subaddon in conflicting:
                 # Add the subaddon to the "AddonLoadedByDependency()" dict
-                gamethread.delayed(0, self.addLoadedByDependency,
+                gamethread.delayed(0, self.add_loaded_by_dependency,
                                                             (subaddon, name))
 
         # Add this sub-addon's dependencies and conflicts
         dependencies.add(name, addon_depend)
         conflicts.add(name, addon_conflict)
 
-    def removeDependenciesConflicts(self, name):
+    def remove_dependencies_conflicts(self, name):
         '''
         Removes the dependencies or conflicts associated with a sub-addon
         '''
@@ -486,15 +486,15 @@ class AddonManager(object):
         dependencies.remove(name)
         conflicts.remove(name)
 
-    def getDependenciesConflicts(self, addon):
+    def get_dependencies_conflicts(self, addon):
         '''
         Returns the dependencies and conflicts of an addon
         '''
         # Retrieve the addon's module
-        mod = self.getAddonByName(addon)
+        mod = self.get_addon_by_name(addon)
 
         # Grab the addon info
-        info = self.getAddonInfo(mod.__name__.split('.')[-1])
+        info = self.get_addon_info(mod.__name__.split('.')[-1])
 
         # Gather a list of dependencies
         addon_depend = info.requires if 'requires' in info else []
@@ -504,7 +504,7 @@ class AddonManager(object):
 
         return addon_depend, addon_conflict
 
-    def addLoadedByDependency(self, dependency, addon_name):
+    def add_loaded_by_dependency(self, dependency, addon_name):
         '''
         Adds dependencies to be unloaded later that were loaded as a result of
         as sub-addon.
@@ -515,14 +515,14 @@ class AddonManager(object):
         load(subaddon)
         AddonLoadedByDependency().add(dependency, addon_name)
 
-    def removeLoadedByDependency(self, name):
+    def remove_loaded_by_dependency(self, name):
         '''
         Removes and unloads dependencies that were loaded as a result of a
         sub-addon.
         '''
         AddonLoadedByDependency().remove(name)
 
-    def getAddonByName(self, name):
+    def get_addon_by_name(self, name):
         '''
         Returns the module of an addon by name
         '''
@@ -531,7 +531,7 @@ class AddonManager(object):
             return self.__loaded__[name]
 
         # If the addon is not loaded we need to import it
-        addonType = self.getAddonType(name)
+        addonType = self.get_addon_type(name)
         modulePath = 'gungame51.scripts.%s.%s.%s' %(addonType, name, name)
         mod = __import__(modulePath, globals(), locals(), [''])
 
@@ -540,15 +540,15 @@ class AddonManager(object):
 
         return mod
 
-    def loadTranslations(self, addon):
-        for translation in self.getAddonInfo(addon).translations:
+    def load_translations(self, addon):
+        for translation in self.get_addon_info(addon).translations:
             MessageManager().load(translation, addon.__name__.split('.')[-1])
 
-    def unloadTranslations(self, addon):
-        for translation in self.getAddonInfo(addon).translations:
+    def unload_translations(self, addon):
+        for translation in self.get_addon_info(addon).translations:
             MessageManager().unload(translation, addon.__name__.split('.')[-1])
 
-    def getAddonInfo(self, addon=None):
+    def get_addon_info(self, addon=None):
         '''
         Returns the AddonInfo instance in the module if present
         '''
@@ -556,7 +556,7 @@ class AddonManager(object):
             # Return a dictionary of all addons
             dict_addon = {}
             for name in self.__loaded__:
-                addon = self.getAddonByName(name)
+                addon = self.get_addon_by_name(name)
                 addon_globals = addon.__dict__
                 for item in addon_globals:
                     if isinstance(addon_globals[item], AddonInfo):
@@ -566,7 +566,7 @@ class AddonManager(object):
             return dict_addon
 
         if type(addon).__name__ == 'str':
-            addon = self.getAddonByName(addon)
+            addon = self.get_addon_by_name(addon)
 
         # If the addon info exists we return it
         addon_globals = addon.__dict__
@@ -581,37 +581,37 @@ class AddonManager(object):
     # AddonManager() STATIC CLASS METHODS
     # ========================================================================
     @staticmethod
-    def getAddonType(name):
+    def get_addon_type(name):
         '''
         Returns a string value of the addon type:
             "custom"
             "included"
         '''
         # Check addon exists
-        if not AddonManager().addonExists(name):
+        if not AddonManager().addon_exists(name):
             raise ValueError('Cannot get addon type (%s): doesn\'t exist.'
                 % name)
 
         # Get addon type
-        if os.path.isfile(getGameDir('addons/eventscripts/gungame51/scripts/' +
+        if os.path.isfile(get_game_dir('addons/eventscripts/gungame51/scripts/' +
             'included/%s/%s.py' %(name, name))):
             return 'included'
-        elif os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+        elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/custom/%s/%s.py' %(name, name))):
             return 'custom'
 
     @staticmethod
-    def addonExists(name):
+    def addon_exists(name):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
-        return int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+        return int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/included/%s/%s.py' %(name, name)))) or \
-            int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+            int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/custom/%s/%s.py' %(name, name))))
 
     @staticmethod
-    def callBlock(addon, blockname, *a, **kw):
+    def call_block(addon, blockname, *a, **kw):
         """ Calls a block in a loaded sub-addon """
         addon_globals = addon.__dict__
         if blockname in addon_globals and callable(addon_globals[blockname]):
@@ -629,7 +629,7 @@ def GunGameInfo(info, _info=None):
         if globals().has_key('GG51version'):
             return GG51version
         rev = int(__doc__.split('$Rev: ')[1].split()[0])
-        gen = getFileList()
+        gen = get_file_list()
         while True:
             try:
                 files = gen.next()
@@ -647,8 +647,8 @@ def GunGameInfo(info, _info=None):
             if base_name.startswith('gungame51.scripts.included'):
                 mod_name = base_name.split('.')[-1]
                 AM = AddonManager()
-                if mod_name in AM.getAddonInfo().keys():
-                    ver = AM.getAddonInfo()[mod_name].version[4:]
+                if mod_name in AM.get_addon_info().keys():
+                    ver = AM.get_addon_info()[mod_name].version[4:]
                     if ver > rev:
                         rev = ver
                     continue
@@ -676,8 +676,8 @@ def GunGameInfo(info, _info=None):
         if _gg_info_quiet:
             return
         AM = AddonManager()
-        addonlist = [AM.getAddonInfo()[addon] for addon in
-                    AM.getAddonInfo().keys() if AM.getAddonType(addon) == info]
+        addonlist = [AM.get_addon_info()[addon] for addon in
+                    AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
         if not addonlist:
             return 'None\n'
 
@@ -727,13 +727,13 @@ def unload(*a, **kw):
    AddonManager().unload(*a, **kw)
 unload.__doc__ = AddonManager.unload.__doc__
 
-def getValidAddons():
+def get_valid_addons():
     '''
     Returns a list of valid addon names from the included and custom addons
     directory.
     '''
-    included = getGameDir('addons/eventscripts/gungame51/scripts/included')
-    custom = getGameDir('addons/eventscripts/gungame51/scripts/custom')
+    included = get_game_dir('addons/eventscripts/gungame51/scripts/included')
+    custom = get_game_dir('addons/eventscripts/gungame51/scripts/custom')
 
     list_addons = []
 

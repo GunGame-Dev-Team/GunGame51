@@ -17,7 +17,7 @@ import es
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -42,7 +42,7 @@ def load():
     this = __import__(__name__)
 
     # Get the file
-    with open(getGameDir('cfg/gungame51/included_addon_configs/' + \
+    with open(get_game_dir('cfg/gungame51/included_addon_configs/' + \
         'gg_stats_logging.txt'), 'r') as f:
 
         # Create a list of lines in the file

@@ -47,7 +47,7 @@ from core.leaders.shortcuts import is_leader
 
 #    Core Function Imports
 from core import inMap
-from core import getGameDir
+from core import get_game_dir
 
 #   Messaging Function Imports
 from core.messaging.shortcuts import loadTranslation

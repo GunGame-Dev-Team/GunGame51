@@ -13,7 +13,7 @@ $LastChangedDate$
 from sqlite3 import connect
 
 # GunGame Imports
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 
 # ============================================================================
 # >> GLOBALS
@@ -126,6 +126,6 @@ class Database(object):
             pass
 
     def connect(self):
-        self._ggSQL = connect(getGameDir(
+        self._ggSQL = connect(get_game_dir(
                     'addons/eventscripts/gungame51/core/sql/gg_database.db'))
         self.curs = self._ggSQL.cursor()

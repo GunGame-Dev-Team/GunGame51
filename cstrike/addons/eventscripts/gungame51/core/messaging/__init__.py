@@ -21,7 +21,7 @@ from playerlib import getUseridList
 import usermsg
 
 # GunGame Imports
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 
 
 # =============================================================================
@@ -66,12 +66,12 @@ class AddonStrings(object):
         self.__denied__ = []
 
         # Load the addon's translations via langlib.Strings() if they exist
-        if not os.path.isfile(getGameDir('cfg/gungame51/translations/%s.ini'
+        if not os.path.isfile(get_game_dir('cfg/gungame51/translations/%s.ini'
             %self.addon)):
             return
 
         # Retrieve the langlib Strings()
-        self.strings = Strings(getGameDir('cfg/gungame51/translations/%s.ini'
+        self.strings = Strings(get_game_dir('cfg/gungame51/translations/%s.ini'
             %self.addon))
 
         # Loop through all strings
@@ -188,7 +188,7 @@ class MessageManager(object):
     def __formatPrefix(self, prefix, string):
         if prefix:
             from gungame51.core.addons import AddonManager
-            from gungame51.core.addons.shortcuts import getAddonInfo
+            from gungame51.core.addons.shortcuts import get_addon_info
             if prefix == True:
                 # Retrieve the addon title that contains the message string
                 for addon in self.__loaded__:
@@ -198,7 +198,7 @@ class MessageManager(object):
                     if not addon in AddonManager().__loaded__:
                         continue
 
-                    return '\4[%s]\1 ' %getAddonInfo(addon).title
+                    return '\4[%s]\1 ' %get_addon_info(addon).title
 
                 return ''
             else:
@@ -206,7 +206,7 @@ class MessageManager(object):
                     return ''
 
                 # Get the addon title that we were given
-                return '\4[%s]\1 ' %getAddonInfo(prefix).title
+                return '\4[%s]\1 ' %get_addon_info(prefix).title
         else:
             return ''
 

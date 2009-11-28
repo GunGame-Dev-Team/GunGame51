@@ -23,7 +23,7 @@ import popuplib
 from playerlib import getUseridList
 
 # GunGame Imports
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import saytext2
@@ -65,12 +65,12 @@ eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 player_command_backup = '%s' % gg_map_vote_player_command 
 
 # Dictionary to store the location of the source of the map files
-dict_mapListSource = {1:getGameDir('mapcycle.txt'),
-                      2:getGameDir('maplist.txt'),
-                      3:getGameDir('%s.txt' % str(gg_map_vote_file) if not \
+dict_mapListSource = {1:get_game_dir('mapcycle.txt'),
+                      2:get_game_dir('maplist.txt'),
+                      3:get_game_dir('%s.txt' % str(gg_map_vote_file) if not \
                                    '.txt' in str(gg_map_vote_file) else \
                                    str(gg_map_vote_file)),
-                      4:getGameDir('maps')}
+                      4:get_game_dir('maps')}
 
 # List to store the maps previously voted for "gg_map_vote_dont_show_last_maps"
 list_lastMaps = []
@@ -208,7 +208,7 @@ def mapFileClean(fromLoad=False):
     # Skip this part on initial load
     if not fromLoad:
         # Current source file
-        current_file =  getGameDir('%s.txt' % str(gg_map_vote_file) if not \
+        current_file =  get_game_dir('%s.txt' % str(gg_map_vote_file) if not \
                     '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
         
         # Did it change ?                            
@@ -221,7 +221,7 @@ def mapFileClean(fromLoad=False):
         
     # Look for file in other common folders
     for folder in ('cfg/', 'cfg/gungame/', 'cfg/gungame51/'):
-        possible_path = getGameDir(folder + '%s.txt' % str(gg_map_vote_file) \
+        possible_path = get_game_dir(folder + '%s.txt' % str(gg_map_vote_file) \
              if not '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
         
         # File exists in the other location ?

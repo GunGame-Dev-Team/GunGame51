@@ -52,10 +52,10 @@ from hashlib import md5
 from sys import exc_info
 from traceback import format_exception
 from inspect import getargspec, ismethod, isclass, isfunction
-from gungame51.core import getGameDir, platform
+from gungame51.core import get_game_dir, platform
 
 def _write_to_log(message):
-    #TODO: add a file to write to! Awaiting decision on using path over getGameDir
+    #TODO: add a file to write to! Awaiting decision on using path over get_game_dir
     pass
 
 def _write_to_console(message, level=0):

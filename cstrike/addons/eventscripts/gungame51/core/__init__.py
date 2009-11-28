@@ -33,7 +33,7 @@ class GunGameError(Exception):
 # ============================================================================
 # >> FILES, DIRECTORIES, & OS FUNCTIONS
 # ============================================================================
-def getGameDir(folder=None):
+def get_game_dir(folder=None):
     '''!Gets an absolute path to a game directory.
 
     @remark Implicitly replaces \\ with / (linux support)
@@ -77,7 +77,7 @@ def cleanString(text, exceptions=[]):
         text = text.replace(escape_char[0], escape_char[1])
     return text
 
-def getFileList(top=getGameDir('addons/eventscripts/gungame51')):
+def get_file_list(top=get_game_dir('addons/eventscripts/gungame51')):
     '''
     Generator that returns a list of files from within the gungame51 directory
     recursively.
@@ -99,5 +99,5 @@ def getFileList(top=getGameDir('addons/eventscripts/gungame51')):
             continue
         if not S_ISDIR(st.st_mode):
             continue
-        for (newtop, children) in getFileList('%s/%s' % (top, name)):
+        for (newtop, children) in get_file_list('%s/%s' % (top, name)):
             yield [newtop, [c for c in children if c != '.svn']]

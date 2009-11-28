@@ -18,13 +18,13 @@ import gamethread
 from cfglib import AddonCFG
 
 # GunGame Imports
-from gungame51.core.addons import getValidAddons
+from gungame51.core.addons import get_valid_addons
 from gungame51.core.addons import AddonManager
 from gungame51.core.addons import load
 from gungame51.core.addons import unload
 from gungame51.core.addons import dependencies
 from gungame51.core.addons import conflicts
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -159,7 +159,7 @@ class ConfigManager(object):
         cvarName = event_var['cvarname']
         cvarValue = event_var['cvarvalue']
 
-        if cvarName not in getValidAddons():
+        if cvarName not in get_valid_addons():
             return
 
         # Load addons if the value is not 0, '', or a float equal to 0 
@@ -199,11 +199,11 @@ class ConfigManager(object):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
-        return int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+        return int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'core/cfg/files/%s.py' %name))) or \
-            int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+            int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/cfg/included/%s.py' %name))) or \
-            int(os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+            int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/cfg/custom/%s.py' %name)))
 
     @staticmethod
@@ -220,13 +220,13 @@ class ConfigManager(object):
                 % name)
 
         # Get config type
-        if os.path.isfile(getGameDir('addons/eventscripts/gungame51/core/cfg' +
+        if os.path.isfile(get_game_dir('addons/eventscripts/gungame51/core/cfg' +
             '/files/%s.py' %name)):
             return 'main'
-        elif os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+        elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/cfg/included/%s.py' %name)):
             return 'included'
-        elif os.path.isfile(getGameDir('addons/eventscripts/gungame51/' +
+        elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/cfg/custom/%s.py' %name)):
             return 'custom'
 
@@ -249,11 +249,11 @@ def getConfigList(type=None):
         If no argument is provided, all possible configs will be returned 
         in the list.
     '''
-    dict_types = {'main':getGameDir('addons/eventscripts/gungame51/core/cfg/' +
+    dict_types = {'main':get_game_dir('addons/eventscripts/gungame51/core/cfg/' +
                   'files'),
-                  'included':getGameDir('addons/eventscripts/gungame51/' +
+                  'included':get_game_dir('addons/eventscripts/gungame51/' +
                   'scripts/cfg/included'),
-                  'custom':getGameDir('addons/eventscripts/gungame51/scripts' +
+                  'custom':get_game_dir('addons/eventscripts/gungame51/scripts' +
                   '/cfg/custom')}
 
     list_configs = []

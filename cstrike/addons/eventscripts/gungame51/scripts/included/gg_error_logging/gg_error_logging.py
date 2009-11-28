@@ -21,7 +21,7 @@ import traceback
 import es
 
 # GunGame Imports
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 from gungame51.core import cleanString
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import GunGameInfo
@@ -49,7 +49,7 @@ sourcemod_version = es.ServerVar('sourcemod_version')
 mani_admin_plugin_version = es.ServerVar('mani_admin_plugin_version')
 est_version = es.ServerVar('est_version')
 
-file_name = (getGameDir('addons/eventscripts/gungame51/logs') +
+file_name = (get_game_dir('addons/eventscripts/gungame51/logs') +
                     '/GunGame_Error_Log.txt')
 
 # ============================================================================
@@ -190,7 +190,7 @@ def makeLogFile():
         n = 0
         while True:
             n += 1
-            new_file_name = (getGameDir('addons/eventscripts/gungame51/logs') +
+            new_file_name = (get_game_dir('addons/eventscripts/gungame51/logs') +
                                     '/GunGame_Error_Log[%01i].txt' % n)
             if not path.isfile(new_file_name):
                 break

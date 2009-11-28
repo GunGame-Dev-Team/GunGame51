@@ -18,7 +18,7 @@ import es
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 from gungame51.core.weapons.shortcuts import getWeaponOrder
 from gungame51.core.weapons.shortcuts import setWeaponOrder
 
@@ -39,7 +39,7 @@ gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 
 def es_map_start(event_var):
     # Get the weapon_orders directory
-    baseDir = getGameDir('cfg/gungame5/weapon_orders/')
+    baseDir = get_game_dir('cfg/gungame5/weapon_orders/')
 
     # Get a list of files in the weapon_orders directory
     files = filter(lambda x: os.path.splitext(x)[1] == '.txt',

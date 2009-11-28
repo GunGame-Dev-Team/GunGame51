@@ -20,7 +20,7 @@ from gamethread import delayedname
 from gamethread import cancelDelayed
 
 # GunGame Imports
-from gungame51.core import getGameDir
+from gungame51.core import get_game_dir
 
 # ============================================================================
 # >> CLASSES
@@ -34,7 +34,7 @@ class BaseWeaponOrders(object):
     # =========================================================================
     def __init__(self, name):
         self.file = name
-        self.filepath = getGameDir('cfg/gungame51/weapon_orders/%s.txt' %self.file)
+        self.filepath = get_game_dir('cfg/gungame51/weapon_orders/%s.txt' %self.file)
         self.title = 'Untitled Weapon Order'
         self.type = '#default'
         self.order = {}
@@ -436,7 +436,7 @@ def loadWeaponOrders():
     Loads all weapon orders in the "../<MOD>/cfg/gungame/weapon_orders"
     directory.
     '''
-    weaponOrderPath = getGameDir('cfg/gungame51/weapon_orders')
+    weaponOrderPath = get_game_dir('cfg/gungame51/weapon_orders')
 
     for item in os.listdir(weaponOrderPath):
         # Ignore subfolders
