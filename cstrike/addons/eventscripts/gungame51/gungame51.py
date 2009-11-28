@@ -35,7 +35,7 @@ from core.cfg.shortcuts import getConfigList
 #    Addon Function Imports
 from core.addons import AddonManager
 from core.addons import PriorityAddon
-from core.addons import GunGameInfo
+from core.addons import gungame_info
 
 #    Player Function Imports
 from core.players.shortcuts import Player
@@ -88,7 +88,7 @@ gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 info = es.AddonInfo()
 del info['keylist'][:]
 info.About = ('\n' +
-             ' '*25 + '\tGunGame 5.1 (%s)\n\n' % GunGameInfo('version') +
+             ' '*25 + '\tGunGame 5.1 (v%s)\n\n' % gungame_info('version') +
              ' '*25 + 'Authors:\n' +
              ' '*25 + '\tMichael Barr (XE_ManUp)\n' +
              ' '*25 + '\tLuke Robinson (Monday)\n' +
@@ -189,7 +189,7 @@ def initialize():
     pruneWinnersDB()
 
     # Set es.AddonInfo()
-    GunGameInfo('addoninfo', info)
+    gungame_info('addoninfo', info)
 
 # ============================================================================
 # >> GAME EVENTS

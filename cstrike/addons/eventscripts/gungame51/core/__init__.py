@@ -60,23 +60,6 @@ def removeReturnChars(text):
     text = text.replace('\\r', '')
     return text.replace('\\n', '')
 
-def cleanString(text, exceptions=[]):
-    '''
-    Removes escape characters from a string and replaces them with their
-    original text.
-    
-    i.e. c:\addons becomes 'c:\x07ddons' and this function turns it back into
-    c:\\addons
-    '''
-    bad_chars = (('\x07', '\\a'), ('\x08', '\\b'), ('\x0c', '\\f'),
-        ('\n', '\\n'), ('\\N', '\\N'), ('\r', '\\r'), ('\t', '\\t'),
-        ('\x0b', '\\v'))
-    for escape_char in bad_chars:
-        if escape_char[0] in exceptions or escape_char[0] not in text:
-            continue
-        text = text.replace(escape_char[0], escape_char[1])
-    return text
-
 def get_file_list(top=get_game_dir('addons/eventscripts/gungame51')):
     '''
     Generator that returns a list of files from within the gungame51 directory

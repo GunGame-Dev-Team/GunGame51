@@ -22,9 +22,8 @@ import es
 
 # GunGame Imports
 from gungame51.core import get_game_dir
-from gungame51.core import cleanString
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.addons import GunGameInfo
+from gungame51.core.addons import gungame_info
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -57,10 +56,10 @@ file_name = (get_game_dir('addons/eventscripts/gungame51/logs') +
 # ============================================================================
 def load():
     # Checking error log
-    makeLogFile()
+    make_log_file()
 
     # Trackback hook
-    sys.excepthook = gungameExceptHook
+    sys.excepthook = gungame_except_hook
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
@@ -70,7 +69,7 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-def gungameExceptHook(type, value, tb):
+def gungame_except_hook(type, value, tb):
     tb = traceback.format_exception(type, value, tb)
 
     # Format the traceback
@@ -142,14 +141,14 @@ def gungameExceptHook(type, value, tb):
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def makeLogFile():
+def make_log_file():
     # Log file header
     header = ['*'*79 + '\n', '*' + ' '*68 + 'v%s ' % info.version + '*\n',
               '*' + 'GUNGAME v5.1 ERROR LOGGING'.center(77) + '*' + '\n',
               '*' + 'HTTP://WWW.GUNGAME5.COM/'.center(77) + '*\n',
               '*' + ' '*77 + '*\n',
               ('*' + 'GG VERSION: '.rjust(19) +
-               GunGameInfo('version').ljust(19) +
+               gungame_info('version').ljust(19) +
                 'IP: '.rjust(19) + str(ip).upper().ljust(15) + ' '*5 + '*\n'),
               ('*' + 'SPE VERSION: '.rjust(19) +
                str(spe_version_var).ljust(19) +

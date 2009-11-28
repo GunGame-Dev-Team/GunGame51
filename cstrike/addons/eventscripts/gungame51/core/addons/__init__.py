@@ -25,7 +25,7 @@ from gungame51.core.messaging import MessageManager
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
+GG51version = None
 
 # ============================================================================
 # >> CLASSES
@@ -62,6 +62,8 @@ class AddonInfo(dict):
 
             # The version number
             info.version = '1.0'
+                * This number will be overrided if you have the SVN keyword
+                  Rev in the doc string
 
             # GunGame scripts that are required for your addon to run properly
             # This MUST be a list
@@ -306,7 +308,7 @@ class AddonManager(object):
         self.call_block(addon, 'load')
 
         # Updating es.AddonInfo
-        GunGameInfo('update')
+        gungame_info('update')
 
         # Fire the event "gg_addon_loaded"
         EventManager().gg_addon_loaded(name, self.get_addon_type(name))
@@ -349,7 +351,7 @@ class AddonManager(object):
 
         # Updating es.AddonInfo
         if not unloading_gg:
-            GunGameInfo('update')
+            gungame_info('update')
 
         # Fire the event "gg_addon_unloaded"
         EventManager().gg_addon_unloaded(name, self.get_addon_type(name))
@@ -621,12 +623,12 @@ class AddonManager(object):
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
-def GunGameInfo(info, _info=None):
+def gungame_info(info, _info=None):
     '''
     Fetches the head revision number from all of gungame's files
     '''
     if info == 'version':
-        if globals().has_key('GG51version'):
+        if GG51version:
             return GG51version
         rev = int(__doc__.split('$Rev: ')[1].split()[0])
         gen = get_file_list()
@@ -698,7 +700,7 @@ def GunGameInfo(info, _info=None):
         global _gg_info_quiet
         _gg_info = _info
         _gg_info_quiet = True
-        gamethread.delayed(0.25, GunGameInfo, 'listen')
+        gamethread.delayed(0.25, gungame_info, 'listen')
         
     '''
     Updates es.AddonInfo instance for gungame51
@@ -706,13 +708,13 @@ def GunGameInfo(info, _info=None):
     if info == 'update':
         if _gg_info_quiet:
             return
-        _gg_info.Included_Addons = GunGameInfo('included')
-        _gg_info.Custom_Addons = GunGameInfo('custom')
+        _gg_info.Included_Addons = gungame_info('included')
+        _gg_info.Custom_Addons = gungame_info('custom')
         
     if info == 'listen':
         global _gg_info_reset
         _gg_info_quiet = False
-        GunGameInfo('update')
+        gungame_info('update')
         
 '''
 This wrapper makes it possible to use key addon functions

@@ -62,7 +62,7 @@ info.translations = ['gg_auto_balance']
 # ============================================================================
 # >> CLASSES
 # ============================================================================
-class getTeam(object):
+class GetTeam(object):
     # Initializing
     def __init__(self):
         self.levels = [] # levels
@@ -73,7 +73,7 @@ class getTeam(object):
         self.set = [] # holder for iterator from generator
 
     # Gets the gungame levels for the team
-    def getLevels(self):
+    def get_levels(self):
         ''' Populates the class with player levels and userids '''
         for player in getUseridList('#%s' % self.team):
             self.players.append(player)
@@ -102,7 +102,7 @@ class getTeam(object):
         return sum(self.levels)
 
     # Returns a userid for the gungame level
-    def getPlayer(self, level):
+    def get_player(self, level):
         '''
         Returns the first available player who is not immune and of the right
         level requested by the balancer
@@ -143,7 +143,7 @@ class getTeam(object):
             for level in next:
 
                 # Checking for immunity
-                if self.getPlayer(level) == False:
+                if self.get_player(level) == False:
                     break
 
             # No immunity found
@@ -151,11 +151,11 @@ class getTeam(object):
                 return next
 
     # Generator creation function
-    def makeGenerator(self, r):
+    def make_generator(self, r):
         self.generator = combinations(self.levels, r)
 
     # Change the attributes of players to change teams
-    def startSwap(self, level_set=None):
+    def start_swap(self, level_set=None):
         '''
         Initiates the moving of players after a balance has completed
         successfully.
@@ -177,7 +177,7 @@ class getTeam(object):
 
         # Moving through solution set
         for level in level_set:
-            userid = self.getPlayer(level)
+            userid = self.get_player(level)
             ggPlayer = Player(userid)
 
             # Set attributes for alive players
@@ -187,14 +187,14 @@ class getTeam(object):
             # Force swap ?
             if float(gg_auto_balance_force):
                 gamethread.delayedname(float(gg_auto_balance_force),
-                          'gg_autobal_%s' % userid, forceSwap, ggPlayer)
+                          'gg_autobal_%s' % userid, force_swap, ggPlayer)
 
             # Notify to chat enabled ?
             if int(gg_auto_balance_notify_all):
                 moving.append('\3%s\1' % getPlayer(userid).name)
 
             # Add player to immunity list
-            addImmunity(userid)
+            add_immunity(userid)
 
         # Notify Everyone ?
         if moving == []:
@@ -230,16 +230,16 @@ def load():
 
     # Checking for DeathMatch
     if es.exists('variable', 'gg_deathmatch'):
-        checkForDM(True)
+        check_for_dm(True)
     else:
-        gamethread.delayed(1, checkForDM, (False))
+        gamethread.delayed(1, check_for_dm, (False))
 
     # Adding attributes
     setAttribute('#all', 'changeTeam', False)
     setAttribute('#all', 'newTeam', None)
 
     # Make immune list
-    makeImmuneList()
+    make_immune_list()
 
     if int(mp_autoteambalance):
         mp_autoteambalance.set(0)
@@ -275,7 +275,7 @@ def gg_start(event_var):
     setAttribute('#all', 'newTeam', None)
 
     # Check for DM timer
-    checkForDM(True)
+    check_for_dm(True)
 
 def es_map_start(event_var):
     # Flushing immunity list every map
@@ -285,7 +285,7 @@ def es_map_start(event_var):
     del notify[:]
 
     # Make immune list
-    makeImmuneList()
+    make_immune_list()
 
 def player_death(event_var):
     if not int(gg_deathmatch):
@@ -324,37 +324,46 @@ def round_end(event_var):
 
     newBalance = True
 
-    # Move the remaining players
-    for userid in getUseridList('#all'):
+    '''
+    This try/exception needs to be done because sometimes bots join and end
+    the round before they can be assigned attritbutes to the Player class
+    '''
+    try:
+        # Move the remaining players
+        for userid in getUseridList('#all'):
 
-        ggPlayer = Player(userid)
+            ggPlayer = Player(userid)
 
-        # Player needs to move ?
-        if ggPlayer.changeTeam:
-            # Cancel any delays
-            gamethread.cancelDelayed('gg_autobal_%s' % userid)
+            # Player needs to move ?
+            if ggPlayer.changeTeam:
+                # Cancel any delays
+                gamethread.cancelDelayed('gg_autobal_%s' % userid)
 
-            # Player allready moved or in spec?
-            if ggPlayer.team in [1, ggPlayer.newTeam]:
-                ggPlayer.changeTeam = False
+                # Player allready moved or in spec?
+                if ggPlayer.team in [1, ggPlayer.newTeam]:
+                    ggPlayer.changeTeam = False
 
-            else:
-                # Move player & Notify
-                ggPlayer.team = ggPlayer.newTeam
-                notify.append(userid)
+                else:
+                    # Move player & Notify
+                    ggPlayer.team = ggPlayer.newTeam
+                    notify.append(userid)
 
-                # Don't balance this round
-                if newBalance:
-                    newBalance = False
+                    # Don't balance this round
+                    if newBalance:
+                        newBalance = False
 
-        # Set player health/armor if alive
-        pPlayer = getPlayer(userid)
-        if not pPlayer.isdead:
-            pPlayer.health += 1500
-            pPlayer.armor += 1000
+            # Set player health/armor if alive
+            pPlayer = getPlayer(userid)
+            if not pPlayer.isdead:
+                pPlayer.health += 1500
+                pPlayer.armor += 1000
+
+    # Bots caused an error while joining an empty server
+    except AttributeError:
+        return
 
     if newBalance:
-        autoBalanceExec()
+        auto_balance_exec()
 
 def player_activate(event_var):
     userid = int(event_var['userid'])
@@ -371,7 +380,7 @@ def player_spawn(event_var):
     # Looking for userid in notify list
     userid = int(event_var['userid'])
     if userid in notify:
-        sendNotify(userid)
+        send_notify(userid)
 
 def gg_win(event_var):
     # Stop the timer if it is running
@@ -387,7 +396,7 @@ def server_cvar(event_var):
     # gg_deathmatch changed ?
     if cvar_name == 'gg_deathmatch':
         if int(cvar_value):
-            checkForDM(True)
+            check_for_dm(True)
         else:
             autoBalanceTimer = repeat.find('gg_auto_balance')
             if autoBalanceTimer:
@@ -414,12 +423,12 @@ def server_cvar(event_var):
         autoBalanceTimer = repeat.find('gg_auto_balance')
         if autoBalanceTimer:
             autoBalanceTimer.delete()
-        checkForDM(False)
+        check_for_dm(False)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def checkForDM(ok):
+def check_for_dm(ok):
     '''
     Check to see if deathmatch is loaded, and if the balancer needs to start
     a repeat timer.
@@ -447,21 +456,21 @@ def checkForDM(ok):
         return
 
     # Start a new timer
-    autoBalanceTimer = repeat.create('gg_auto_balance', autoBalanceExec)
+    autoBalanceTimer = repeat.create('gg_auto_balance', auto_balance_exec)
     autoBalanceTimer.start((float(gg_auto_balance_timer) * 60), 0)
 
-def autoBalanceExec():
+def auto_balance_exec():
     es.dbgmsg(0, '    %s ::: Running Balancer... [ver: %s]' % (info.title,
                                                                 info.version))
     _time = time()
-    if autoBalance():
+    if auto_balance():
         es.dbgmsg(0, '    %s ::: Balance Preformed!' % info.title)
     else:
         es.dbgmsg(0, '    %s ::: No Balance Needed!' % info.title)
     es.dbgmsg(0, '    %s ::: Executed in %s seconds' % (info.title,
                                                              (time() - _time)))
 
-def autoBalance():
+def auto_balance():
     ''' This function starts the automatic team balancing sequence. '''
 
     ''' Setting the high and low objects '''
@@ -484,8 +493,8 @@ def autoBalance():
     # Grabbing averages
     CTavg = (sum([Player(uid).level for uid in ct_list]) / float(len(ct_list)))
     Tavg = (sum([Player(uid).level for uid in t_list]) / float(len(t_list)))
-    es.dbgmsg(0, '    %s ::: T AVG: %s  CT AVG: %s  Difference: %s' % (
-                                   info.title, Tavg, CTavg, abs(CTavg - Tavg)))
+    es.dbgmsg(0, '    %s ::: T AVG: %0.02f  ' % (info.title, Tavg) +
+             'CT AVG: %0.02f  Difference: %0.02f' % (CTavg, abs(CTavg - Tavg)))
 
     es.dbgmsg(0, '    %s ::: Threshold: %s' % (info.title,
                                             float(gg_auto_balance_threshold)))
@@ -495,8 +504,8 @@ def autoBalance():
         return False
 
     # Creating high/low
-    high = getTeam()
-    low = getTeam()
+    high = GetTeam()
+    low = GetTeam()
 
     # Assigning teams to high/low
     if CTavg > Tavg:
@@ -515,8 +524,8 @@ def autoBalance():
         return False
 
     # Populating level information
-    high.getLevels()
-    low.getLevels()
+    high.get_levels()
+    low.get_levels()
 
     # Making sure there is more than 1 player with a level above 1
     level_check = 0
@@ -551,8 +560,8 @@ def autoBalance():
     for n in range((high.count - offset)):
 
         # Setting iterator objects
-        high.makeGenerator(max(0, (n + offset)))
-        low.makeGenerator(n)
+        high.make_generator(max(0, (n + offset)))
+        low.make_generator(n)
 
         # Getting first high team combo
         high.set = high.combo()
@@ -574,8 +583,8 @@ def autoBalance():
                 if solution == 0:
 
                     # Solution found
-                    high.startSwap()
-                    low.startSwap()
+                    high.start_swap()
+                    low.start_swap()
                     return True
 
                 # Checking for best solution thus far
@@ -595,7 +604,7 @@ def autoBalance():
                     high.set = high.combo()
 
                     # Generating another low team list
-                    low.makeGenerator(n)
+                    low.make_generator(n)
 
                     # Check again
                     continue
@@ -604,11 +613,11 @@ def autoBalance():
                 except StopIteration:
                     break
 
-    low.startSwap(bestChoice[1])
-    high.startSwap(bestChoice[0])
+    low.start_swap(bestChoice[1])
+    high.start_swap(bestChoice[0])
     return True
 
-def forceSwap(ggPlayer):
+def force_swap(ggPlayer):
     ''' Forces a player to change teams in the middle of a round. '''
     # Is player okay to move ?
     if not es.exists('userid', ggPlayer.userid) or ggPlayer.team == 1:
@@ -628,9 +637,9 @@ def forceSwap(ggPlayer):
 
     ggPlayer.changeTeam = False
     ggPlayer.team = ggPlayer.newTeam
-    sendNotify(ggPlayer.userid)
+    send_notify(ggPlayer.userid)
 
-def sendNotify(userid):
+def send_notify(userid):
     ''' Notifty a player he has changed teams. '''
     if userid in notify:
         notify.remove(userid)
@@ -665,7 +674,7 @@ def sendNotify(userid):
     if int(gg_auto_balance_notify) > 1:
         ggPlayer.playsound('notify')
 
-def addImmunity(userid):
+def add_immunity(userid):
     ''' Adds a player to the team change immunity list '''
     # Making sure gg_auto_balance_useimmune isn't disabled
     if not int(gg_auto_balance_useimmune):
@@ -678,7 +687,7 @@ def addImmunity(userid):
 
     immune[userid] = 1
 
-def makeImmuneList():
+def make_immune_list():
     ''' Makes steamid immunity list '''
     del immunity_list[:]
 
