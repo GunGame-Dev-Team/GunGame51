@@ -21,8 +21,6 @@ from gungame51.core.players import Player
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-# Get the es.ServerVar() instance of "gg_warmup_round"
-gg_warmup_round = es.ServerVar('gg_warmup_round')
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -56,23 +54,28 @@ def player_death(event_var):
     if event_var['es_attackerteam'] == event_var['es_userteam']:
         return
 
-    # Is this player on nade level?
+    # Make sure the player didn't kill with an hegrenade
+    if event_var['weapon'] == 'hegrenade':
+        return
+
+    # Only give a nade to a player on nade level
     if Player(attacker).weapon == 'hegrenade':
-
-        # Make sure the player didn't kill with an hegrenade
-        if event_var['weapon'] == 'hegrenade':
-            return 
-
-        # Give them another grenade
-        gamethread.delayed(0.08, giveGrenade, (attacker))
+        gamethread.delayed(0.11, give_nade, attacker)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def giveGrenade(userid):
-    # Does this player already have a grenade?
-    if int(getPlayer(userid).get('he')) != 0:
-        # Don't give them one, return
+def give_nade(userid):
+    pPlayer = getPlayer(userid)
+
+    # Is the player dead ?
+    if pPlayer.isdead:
+        return
+        
+    # Is the player on a team ?
+    if pPlayer.teamid < 2:
         return
 
-    es.server.queuecmd('es_xgive %i weapon_hegrenade' % userid)
+    # Only give a nade if this player does not have one.
+    if int(getPlayer(userid).get('he')) == 0:
+        es.server.queuecmd('es_xgive %s weapon_hegrenade' % userid)
