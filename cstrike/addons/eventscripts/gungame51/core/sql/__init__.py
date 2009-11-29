@@ -47,8 +47,9 @@ class Database(object):
         # Initilize the Database
         self._ggSQL.text_factory = str
         self.query("CREATE TABLE IF NOT EXISTS gg_wins(name " +
-                     "varchar(31), uniqueid varchar(20), wins int " +
-                     "DEFAULT 0, timestamp int, PRIMARY KEY(uniqueid DESC))")
+                     "varchar(31), uniqueid varchar(20), wins varchar(10) " +
+                     "DEFAULT 0, timestamp varchar(31), " +
+                     "PRIMARY KEY(uniqueid DESC))")
         self.query("PRAGMA auto_vacuum = 1")
         self.commit()
 

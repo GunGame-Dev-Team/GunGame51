@@ -136,6 +136,7 @@ class BasePlayer(object):
         self.index = int(getPlayer(str(self.userid)).index)
         self.stripexceptions = []
         self.soundpack = SoundPack('default')
+        self.name = getPlayer(self.userid).name
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
@@ -288,18 +289,17 @@ class BasePlayer(object):
 
             # Has won before
             if self.wins:
-                ggDB.query("UPDATE gg_wins SET wins=%i " % value +
+                ggDB.query("UPDATE gg_wins SET wins=%s " % value +
                            "WHERE uniqueid = '%s'" % self.steamid)
-                return
 
-            # new entry
-            ggDB.query("INSERT INTO gg_wins " +
-                "(name, uniqueid, wins, timestamp)" +
-                "VALUES (%s, %s, %s, 0)" % (getPlayer(self.userid).name,
-                    self.steamid, value))
+            # New entry
+            else:
+                ggDB.query("INSERT INTO gg_wins " +
+                    "(name, uniqueid, wins, timestamp) " +
+                    "VALUES ('%s', '%s', '%s', strftime('%s','now'))" %
+                    (self.name, self.steamid, value, '%s'))
 
-            ggDB.query("UPDATE gg_wins SET timestamp=strftime('%s','now') " +
-                       "WHERE uniqueid = '%s'" % self.steamid)
+            ggDB.commit()
             return
 
         # Set the attribute value
@@ -326,8 +326,8 @@ class BasePlayer(object):
 
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
-        if name in ('userid',
-          'level', 'preventlevel', 'steamid', 'multikill', 'wins', 'team'):
+        if name in ('userid', 'level', 'preventlevel', 'steamid',
+                                          'multikill', 'wins', 'team', 'name'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
 
@@ -747,9 +747,12 @@ class BasePlayer(object):
         Updates the time and the player's name in the database
         '''
         if self.wins:
-            Database().query("UPDATE gg_wins SET " +
-                       "timestamp=strftime('%s','now') " +
+            ggDB = Database()
+            ggDB.query("UPDATE gg_wins SET " +
+                       "timestamp=strftime('%s','now'), " +
+                       "name='%s' " % self.name +
                        "WHERE uniqueid = '%s'" % self.steamid)
+            ggDB.commit()
 
 class PlayerDict(dict):
     '''

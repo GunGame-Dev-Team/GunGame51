@@ -452,7 +452,7 @@ def check_for_dm(ok):
     # Allready have a timer ?
     if autoBalanceTimer:
         autoBalanceTimer.stop()
-        autoBalanceTimer.start()
+        autoBalanceTimer.start((float(gg_auto_balance_timer) * 60), 0)
         return
 
     # Start a new timer

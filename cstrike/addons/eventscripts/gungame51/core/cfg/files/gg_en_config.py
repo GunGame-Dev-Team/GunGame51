@@ -154,7 +154,7 @@ def load():
                 'intermission lasts')
     config.text('       between rounds.')
     config.text('Default Value: 20')
-    config.cvar('gg_multi_round', 20, 'The amount of time (in seconds) that ' +
+    config.cvar('gg_multi_round_intermission', 20, 'The amount of time (in seconds) that ' +
                 'the intermission lasts between rounds.')
 
     # Dynamic End of Map Chat Time

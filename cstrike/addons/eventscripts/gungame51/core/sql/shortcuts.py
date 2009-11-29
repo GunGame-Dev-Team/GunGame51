@@ -23,7 +23,7 @@ gg_prune_database = ServerVar('gg_prune_database')
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def getWinnersList(n=10):
+def get_winners_list(n=10):
     '''
     Returns an ordered list dicts of (n) player names in order from highest
     to lowest win count.
@@ -34,10 +34,13 @@ def getWinnersList(n=10):
     if n > 50:
         n = 50
     ggDB = Database()
-    return ggDB.select('gg_wins', ('name', 'wins'),
-                            'ORDER BY wins DESC', True, n)
+    winner_list = ggDB.select('gg_wins', ('name', 'wins'),
+                                            'ORDER BY wins DESC', True, n)
+    if winner_list:
+        return winner_list
+    return []
 
-def pruneWinnersDB(days=None):
+def prune_winners_db(days=None):
     '''
     Prunes the database within n amount of days, defaults to gg_prune_database
     '''

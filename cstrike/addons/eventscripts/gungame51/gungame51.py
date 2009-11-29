@@ -64,9 +64,11 @@ from core.events.shortcuts import EventManager
 from core.sound import make_downloadable
 
 #   Database
-from core.sql.shortcuts import pruneWinnersDB
+from core.sql.shortcuts import prune_winners_db
 from core.sql.shortcuts import Database
-from core.sql.shortcuts import getWinnersList
+
+#   Menus
+from core.menus import MenuManager
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -186,10 +188,13 @@ def initialize():
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
 
     # Prune the DB
-    pruneWinnersDB()
+    prune_winners_db()
 
     # Set es.AddonInfo()
     gungame_info('addoninfo', info)
+    
+    # Load menus
+    MenuManager().load('#all')
 
 # ============================================================================
 # >> GAME EVENTS
@@ -216,8 +221,12 @@ def es_map_start(event_var):
     LeaderManager().reset()
 
     # Prune the DB
-    pruneWinnersDB()
+    prune_winners_db()
     
+    # Update players in winner's database
+    for userid in getUseridList('#human'):
+        Player(userid).databaseUpdate()
+
 def round_start(event_var):
 
     # Retrieve a random userid
@@ -241,7 +250,7 @@ def round_start(event_var):
         es.server.queuecmd('es_xfire %i %s kill' % (userid, weapon))
 
     # Equip players with a knife and possibly item_kevlar or item_assaultsuit
-    equipPlayer()
+    equip_player()
 
 def player_spawn(event_var):
     # Check for priority addons
@@ -379,10 +388,6 @@ def player_disconnect(event_var):
     # Check to see if player was the leader
     LeaderManager().disconnected_leader(userid)
     
-    # Update the player in the winner's Database
-    if not es.isbot(userid):
-        Player(userid).databaseUpdate()
-    
 def gg_levelup(event_var):
     # Check for priority addons
     if PriorityAddon():
@@ -509,10 +514,20 @@ def server_cvar(event_var):
         # Set multikill override
         currentOrder.setMultiKillOverride(int(gg_multikill_override))
 
+def player_changename(event_var):
+    # Update the Player() instance's name attr (used for the db)
+    userid = int(event_var['userid'])
+    Player(userid).name = getPlayer(userid).name
+
+def player_activate(event_var):
+    # Update the player in the database
+    userid = int(event_var['userid'])
+    Player(userid).databaseUpdate()
+
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def equipPlayer():
+def equip_player():
     userid = es.getuserid()
     cmd = 'es_xremove game_player_equip;' + \
           'es_xgive %s game_player_equip;' % userid + \
