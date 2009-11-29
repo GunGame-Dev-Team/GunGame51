@@ -56,7 +56,7 @@ def score_menu_cmd(userid, args):
     # Get list of levels
     newScoreList = []
     for player in getUseridList('#all'):
-        newScoreList.append('[%s] %s' % (Player(userid).level,
+        newScoreList.append('[%s] %s' % (Player(player).level,
                                                     es.getplayername(player)))
     # Sort from highest to lowest
     newScoreList.sort(reverse=True)
