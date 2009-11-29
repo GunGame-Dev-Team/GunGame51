@@ -42,7 +42,7 @@ def get_game_dir(folder=None):
 
     @return An absolute path to the game directory plus \p dir.'''
     if folder:
-        folder = cleanString(folder).replace('\\', '/')
+        folder = str(folder).replace('\\', '/')
         return '%s/%s' % (gamePath, folder)
     return gamePath
 
