@@ -41,13 +41,13 @@ list_weaponNameList = getWeaponNameList()
 # ============================================================================
 def load():
     # Register the drop command to prevent it from being used.
-    es.addons.registerClientCommandFilter(filterDrop)
+    es.addons.registerClientCommandFilter(filter_drop)
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
 def unload():
     # Unregister the drop command
-    es.addons.unregisterClientCommandFilter(filterDrop)
+    es.addons.unregisterClientCommandFilter(filter_drop)
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
@@ -64,15 +64,15 @@ def item_pickup(event_var):
     userid = int(event_var['userid'])
 
     # Is a weapon?
-    if ("weapon_%s" %item) not in list_weaponNameList:
-        return
-
-    # Don't strip the knife
-    if item == "knife":
+    if ("weapon_%s" % item) not in list_weaponNameList:
         return
 
     # Client exists?
     if not es.exists('userid', userid):
+        return
+
+    # Don't strip the knife
+    if item == "knife":
         return
 
     # Check to see if the weapon is in the player's strip exceptions
@@ -87,15 +87,16 @@ def item_pickup(event_var):
         return
 
     # Remove player's weapon
-    removeWeapon(userid, item)
+    remove_weapon(userid, item)
 
-    # If the player did not switch to the weapon they just picked up, no need to switch them back to their previous weapon
+    # Player carrying the item ?
     if currentWeapon != item:
         return
 
     # Check if player is on nade level
     if weapon == 'hegrenade':
-        # Switch the player knife if they are on nade level but don't have a nade
+
+        # Switch the player knife ?
         if not getPlayer(userid).he:
             es.sexec(userid, "use weapon_knife")
             return
@@ -106,11 +107,11 @@ def item_pickup(event_var):
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def removeWeapon(userid, item):
+def remove_weapon(userid, item):
     # Remove weapon
     es.remove(getPlayer(userid).getWeaponIndex("weapon_%s" %item))
 
-def filterDrop(userid, args):
+def filter_drop(userid, args):
     # If command not drop, continue
     if args[0].lower() != 'drop':
         return 1

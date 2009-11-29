@@ -69,8 +69,13 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
-def gungame_except_hook(type, value, tb):
-    tb = traceback.format_exception(type, value, tb)
+def gungame_except_hook(tb_type, value, trace_back):
+    tb = traceback.format_exception(tb_type, value, trace_back)
+
+    # If not a gungame error, send to ES and return
+    if 'gungame51' not in str(tb).lower():
+        es.excepter(tb_type, value, trace_back)
+        return
 
     # Format the traceback
     for i in range(len(tb)):
@@ -83,11 +88,6 @@ def gungame_except_hook(type, value, tb):
 
     # turn tb into a string
     tb = reduce((lambda a, b: a + b), tb)
-
-    # If not a gungame error, send to ES and return
-    if 'gungame' not in str(tb).lower():
-        es.excepter(type, value, tb)
-        return
 
     # Print traceback to console
     es.dbgmsg(0, '\n')
