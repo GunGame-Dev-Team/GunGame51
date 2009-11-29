@@ -41,7 +41,7 @@ info.version = '0.1'
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    addAttributeCallBack('level', levelCallback, info.name)
+    addAttributeCallBack('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
 def unload():
@@ -54,20 +54,20 @@ def gg_levelup(event_var):
     userid = int(event_var['leveler'])
 
     # Strip and give weapon
-    giveWeapon(userid, int(event_var['old_level']))
+    give_weapon(userid, int(event_var['old_level']))
 
 def gg_leveldown(event_var):
     userid = int(event_var['leveler'])
 
     # Strip and give weapon
-    giveWeapon(userid, int(event_var['old_level']))
+    give_weapon(userid, int(event_var['old_level']))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def giveWeapon(userid, previousLevel):
+def give_weapon(userid, previousLevel):
     # Do player checks first
-    if not playerChecks(userid):
+    if not player_checks(userid):
         return
 
     # Get player
@@ -104,7 +104,7 @@ def giveWeapon(userid, previousLevel):
     if pPlayer.weapon != currentWeapon:
         es.server.queuecmd('es_xsexec %s "use %s"' % (userid, currentWeapon))
 
-def playerChecks(userid):
+def player_checks(userid):
     # Get ggPlayer
     ggPlayer = Player(userid)
 
@@ -118,7 +118,7 @@ def playerChecks(userid):
 
     return True
 
-def levelCallback(name, value, ggPlayer):
+def level_call_back(name, value, ggPlayer):
     # If the player has been assigned a level already
     if hasattr(ggPlayer, 'level'):
         # Get their previous level, before it was changed
@@ -129,9 +129,9 @@ def levelCallback(name, value, ggPlayer):
         previousLevel = 1
 
     # Delay the check to see if they have the correct turbo weapon
-    gamethread.delayed(0.10, checkCallBackWeapon, (ggPlayer, previousLevel))
+    gamethread.delayed(0.10, check_call_back_weapon, (ggPlayer, previousLevel))
 
-def checkCallBackWeapon(ggPlayer, previousLevel):
+def check_call_back_weapon(ggPlayer, previousLevel):
     weapon = 'weapon_%s' % ggPlayer.weapon
 
     # Retrieve a playerlib.Player() instance
@@ -147,4 +147,4 @@ def checkCallBackWeapon(ggPlayer, previousLevel):
 
     # If they are they holding the previous level's weapon, remove it
     if weapon != weaponHeld:
-        giveWeapon(ggPlayer.userid, previousLevel)
+        give_weapon(ggPlayer.userid, previousLevel)
