@@ -144,7 +144,7 @@ class BasePlayer(object):
     @property
     def weapon(self):
         """Return the weapon name"""
-        return self.getWeapon()
+        return self.get_weapon()
 
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
@@ -428,10 +428,10 @@ class BasePlayer(object):
     # =========================================================================
     # >> BasePlayer() WEAPON CLASS METHODS
     # =========================================================================
-    def getWeapon(self):
+    def get_weapon(self):
         return getLevelWeapon(self.level)
 
-    def giveWeapon(self):
+    def give_weapon(self):
         '''
         Gives a player their current levels weapon.
         '''
@@ -494,7 +494,7 @@ class BasePlayer(object):
 
                 # Check for no weapon in 0.08 seconds
                 gamethread.delayedname(0.05, 'gg_noweap_%i' % self.userid,
-                                        Player(self.userid).noWeaponCheck, ())
+                                        Player(self.userid).no_weapon_check, ())
 
             # Give new gun
             es.server.queuecmd('es_xgive %i weapon_%s' % (self.userid,
@@ -505,7 +505,7 @@ class BasePlayer(object):
                     es.delayed(0, 'es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
 
-    def noWeaponCheck(self, newWeapon=None):
+    def no_weapon_check(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
 
@@ -530,9 +530,9 @@ class BasePlayer(object):
             if newWeapon:
                 self.give(newWeapon)
 
-            # Repeat giveWeapon to re-strip the slot and give your weapon
+            # Repeat give_weapon to re-strip the slot and give your weapon
             else:
-                self.giveWeapon()
+                self.give_weapon()
 
         # Get the index of the last given entity
         int_lastgive = int(eventscripts_lastgive)
@@ -565,7 +565,7 @@ class BasePlayer(object):
                 # Remove the weapon
                 es.server.queuecmd('es_xremove %s' % int_lastgive)
 
-    def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
+    def give(self, weapon, useWeapon=False, strip=False, no_weapon_check=False):
 
         '''
         Gives a player the specified weapon.
@@ -574,8 +574,8 @@ class BasePlayer(object):
         Setting strip to True will make it strip the weapon currently
         held in the slot you are trying to give to.
 
-        Setting noWeaponCheck to True will make give() preform alot like
-        giveWeapon() It will verify the weapon was not delivered to the wrong
+        Setting no_weapon_check to True will make give() preform alot like
+        give_weapon() It will verify the weapon was not delivered to the wrong
         player, and that the correct player ends up with the weapon you give.
         '''
 
@@ -629,8 +629,8 @@ class BasePlayer(object):
         es.server.queuecmd(cmd)
 
         # No weapon check
-        if noWeaponCheck:
-            gamethread.delayed(0.065, Player(self.userid).noWeaponCheck,
+        if no_weapon_check:
+            gamethread.delayed(0.065, Player(self.userid).no_weapon_check,
                                                                         weapon)
 
     def strip(self, levelStrip=False, exceptions=[]):
@@ -742,7 +742,7 @@ class BasePlayer(object):
     # =========================================================================
     # >> Winner's Database methods
     # =========================================================================
-    def databaseUpdate(self):
+    def database_update(self):
         '''
         Updates the time and the player's name in the database
         '''
@@ -876,7 +876,7 @@ class Player(object):
     # Player() STATIC CLASS METHODS
     # ========================================================================
     @staticmethod
-    def addAttributeCallBack(attribute, function, addon):
+    def add_attribute_callback(attribute, function, addon):
         '''
         Adds a callback function when an attribute is set using the class-
         based dictionary CustomAttributeCallbacks. The callback function
@@ -894,7 +894,7 @@ class Player(object):
               certain ranges/specifications.
 
         Usage:
-            Player.addAttributeCallBack('attributeName', callbackFunction,
+            Player.add_attribute_callback('attributeName', callbackFunction,
                                         'gg_addon_name')
 
             def callbackFunction(name_of_the_attribute, value_to_be_checked):
@@ -908,7 +908,7 @@ class Player(object):
         CustomAttributeCallbacks().add(attribute, function, addon)
 
     @staticmethod
-    def removeAttributeCallBack(attribute):
+    def remove_attribute_callback(attribute):
         '''
         Removes a callback function that is called when a named attribute is
         set using the class-based dictionary CustomAttributeCallbacks.
@@ -918,20 +918,20 @@ class Player(object):
             raise an exception.
 
         Usage:
-            Player.removeAttributeCallBack('attributeName')
+            Player.remove_attribute_callback('attributeName')
         '''
         # Remove the callback from the CustomAttributeCallbacks instance
         CustomAttributeCallbacks().remove(attribute)
 
     @staticmethod
-    def removeCallBacksForAddon(addon):
+    def remove_callbacks_for_addon(addon):
         '''
         Removes all attribute callbacks from the class-based dictionary
         CustomAttributeCallBacks that have been associated with the named
         addon.
 
         Usage:
-            Player.removeCallBacksForAddon('gg_addon_name')
+            Player.remove_callbacks_for_addon('gg_addon_name')
 
         Note:
             Attempting to remove attributes from an addon that does not exist

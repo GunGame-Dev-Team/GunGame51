@@ -65,7 +65,7 @@ class BaseWeaponOrders(object):
             if self.type == value and value != '#random':
                 return
 
-            object.__setattr__(self, name, self.__setWeaponOrderType(value))
+            object.__setattr__(self, name, self.__set_weapon_order_type(value))
         else:
             object.__setattr__(self, name, value)
 
@@ -128,7 +128,7 @@ class BaseWeaponOrders(object):
             # Set level values as a list
             self.order[levelCounter] = [weapon, multikill]
 
-    def __setWeaponOrderType(self, type):
+    def __set_weapon_order_type(self, type):
         # =====================================================================
         # RANDOM WEAPON ORDER
         # =====================================================================
@@ -220,12 +220,12 @@ class BaseWeaponOrders(object):
         # that we do not restart the round multiple times due to one weapon
         # order change
         cancelDelayed('gg_mp_restartgame')
-        delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
+        delayedname(1, 'gg_mp_restartgame', self.restart_round, ())
 
         # Set the new order type
         return type
 
-    def setMultiKillOverride(self, value):
+    def set_multikill_override(self, value):
         '''
         Sets the multikill override.
         '''
@@ -244,9 +244,9 @@ class BaseWeaponOrders(object):
         # that we do not restart the round multiple times due to one weapon
         # order change
         cancelDelayed('gg_mp_restartgame')
-        delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
+        delayedname(1, 'gg_mp_restartgame', self.restart_round, ())
 
-    def restartRound(self):
+    def restart_round(self):
         if not self.file == WeaponManager().gungameorder:
             return
 
@@ -269,19 +269,19 @@ class BaseWeaponOrders(object):
             es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level, multikill, weapon))
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
 
-    def getWeapon(self, level):
+    def get_weapon(self, level):
         if not level in range(1, len(self.order) + 1):
             raise ValueError('Can not get weapon for level: "%s".'
                 %level + ' Level is out of range (1-%s).' %len(self.order))
         return self.order[level][0]
 
-    def getMultiKill(self, level):
+    def get_multikill(self, level):
         if not level in range(1, len(self.order) + 1):
             raise ValueError('Can not get multikill value for level: "%s".'
                 %level + ' Level is out of range (1-%s).' %len(self.order))
         return self.order[level][1]
 
-    def getTotalLevels(self):
+    def get_total_levels(self):
         return len(self.order)
 
 
@@ -348,7 +348,7 @@ class WeaponManager(object):
             return object.__getattr__(self, item)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
+                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
 
             # Return the item from the WeaponOrdersDict instance
             return WeaponOrdersDict()[self.currentorder][item]
@@ -358,7 +358,7 @@ class WeaponManager(object):
             object.__setattr__(self, item, value)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
+                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
 
             # We only directly allow the attribute "userid" to be set
             WeaponOrdersDict()[self.currentorder][item] = value
@@ -369,7 +369,7 @@ class WeaponManager(object):
             object.__getattr__(self, name)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
+                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
             # Redirect to the PlayerDict instance
             return WeaponOrdersDict()[self.currentorder][name]
 
@@ -379,7 +379,7 @@ class WeaponManager(object):
             object.__setattr__(self, name, value)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use setOrder(order_name) first!')
+                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
 
             # Redirect to the PlayerDict instance
             WeaponOrdersDict()[self.currentorder][name] = value
@@ -415,7 +415,7 @@ class WeaponManager(object):
         if name == self.gungameorder:
             self.gungameorder = None
 
-    def setOrder(self, name):
+    def set_order(self, name):
         if name not in self.__weaponorders__:
             self.load(name)
             self.gungameorder = name
@@ -426,12 +426,12 @@ class WeaponManager(object):
         # that we do not restart the round multiple times due to one weapon
         # order change
         cancelDelayed('gg_mp_restartgame')
-        delayedname(1, 'gg_mp_restartgame', self.restartRound, ())
+        delayedname(1, 'gg_mp_restartgame', self.restart_round, ())
 
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
-def loadWeaponOrders():
+def load_weapon_orders():
     '''
     Loads all weapon orders in the "../<MOD>/cfg/gungame/weapon_orders"
     directory.
@@ -445,4 +445,4 @@ def loadWeaponOrders():
 
         WeaponManager().load(item)
 
-loadWeaponOrders()
+load_weapon_orders()

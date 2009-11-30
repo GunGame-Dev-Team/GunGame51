@@ -22,10 +22,10 @@ from weaponlib import getWeaponList
 # GunGame Imports
 
 #    Weapon Function Imports
-from core.weapons.shortcuts import getWeaponOrder
+from core.weapons.shortcuts import get_weaponOrder
 from core.weapons.shortcuts import setWeaponOrder
 from core.weapons.shortcuts import getLevelMultiKill
-from core.weapons.shortcuts import getTotalLevels
+from core.weapons.shortcuts import get_total_levels
 
 #    Config Function Imports
 from core.cfg.shortcuts import loadConfig
@@ -168,7 +168,7 @@ def initialize():
     
     # Set multikill override
     if int(gg_multikill_override) > 1:
-        currentOrder.setMultiKillOverride(int(gg_multikill_override))
+        currentOrder.set_multikill_override(int(gg_multikill_override))
         
     # Echo the weapon order to console
     es.dbgmsg(0, '[GunGame]')
@@ -225,7 +225,7 @@ def es_map_start(event_var):
     
     # Update players in winner's database
     for userid in getUseridList('#human'):
-        Player(userid).databaseUpdate()
+        Player(userid).database_update()
 
 def round_start(event_var):
 
@@ -268,7 +268,7 @@ def player_spawn(event_var):
         return
     
     # Give the player their weapon
-    gamethread.delayed(0.05, Player(userid).giveWeapon, ())
+    gamethread.delayed(0.05, Player(userid).give_weapon, ())
     
     # Reset the player's AFK calculation
     if not es.isbot(userid):
@@ -278,7 +278,7 @@ def player_spawn(event_var):
     
     # Send the level information hudhint
     ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level, 
-                                                    'total': getTotalLevels()})
+                                                    'total': get_total_levels()})
 
 def player_death(event_var):
     # Check for priority addons
@@ -403,7 +403,7 @@ def gg_levelup(event_var):
         
     # Send hudhint (level information)
     ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level, 
-                                                    'total': getTotalLevels()})
+                                                    'total': get_total_levels()})
     
 def gg_win(event_var):
     # Get player info
@@ -512,7 +512,7 @@ def server_cvar(event_var):
                                       str(gg_weapon_order_sort_type))
 
         # Set multikill override
-        currentOrder.setMultiKillOverride(int(gg_multikill_override))
+        currentOrder.set_multikill_override(int(gg_multikill_override))
 
 def player_changename(event_var):
     # Update the Player() instance's name attr (used for the db)
@@ -522,7 +522,7 @@ def player_changename(event_var):
 def player_activate(event_var):
     # Update the player in the database
     userid = int(event_var['userid'])
-    Player(userid).databaseUpdate()
+    Player(userid).database_update()
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS

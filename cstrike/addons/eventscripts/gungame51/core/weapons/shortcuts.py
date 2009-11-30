@@ -19,7 +19,7 @@ from gungame51.core.weapons import WeaponManager
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def getWeaponOrder(name=None):
+def get_weaponOrder(name=None):
     '''
     Returns the named weapon order instance if a name is provided as an
     argument. If no argument is provided, it will return the current GunGame
@@ -65,21 +65,21 @@ def setWeaponOrder(name, type='#default'):
         setWeaponOrder('default_weapon_order', '#reversed')
     '''
     WeaponManager().load(name)
-    WeaponManager().setOrder(name)
+    WeaponManager().set_order(name)
     WeaponManager().type = type
-    return getWeaponOrder()
+    return get_weaponOrder()
     
 def getLevelWeapon(level, weaponOrderName=None):
     '''
     Returns the name of the level's weapon set in GunGame's weapon order.
     '''
-    return getWeaponOrder(weaponOrderName).getWeapon(level)
+    return get_weaponOrder(weaponOrderName).get_weapon(level)
     
 def getLevelMultiKill(level, weaponOrderName=None):
     '''
     Returns the multikill value of the level set in GunGame's weapon order.
     '''
-    return getWeaponOrder(weaponOrderName).getMultiKill(level)
+    return get_weaponOrder(weaponOrderName).get_multikill(level)
     
-def getTotalLevels(weaponOrderName=None):
-    return getWeaponOrder(weaponOrderName).getTotalLevels()
+def get_total_levels(weaponOrderName=None):
+    return get_weaponOrder(weaponOrderName).get_total_levels()

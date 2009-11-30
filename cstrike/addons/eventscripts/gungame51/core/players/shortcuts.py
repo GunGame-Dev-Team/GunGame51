@@ -22,14 +22,14 @@ from gungame51.core.players import PlayerDict
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def addAttributeCallBack(attribute, function, addon):
-    Player.addAttributeCallBack(attribute, function, addon)
+def add_attribute_callback(attribute, function, addon):
+    Player.add_attribute_callback(attribute, function, addon)
     
-def removeAttributeCallBack(attribute):
-    Player.removeAttributeCallBack(attribute)
+def remove_attribute_callback(attribute):
+    Player.remove_attribute_callback(attribute)
     
-def removeCallBacksForAddon(addon):
-    Player.removeCallBacksForAddon(addon)
+def remove_callbacks_for_addon(addon):
+    Player.remove_callbacks_for_addon(addon)
 
 def setAttribute(filter, attribute, value):
     '''
@@ -100,9 +100,9 @@ def resetPlayers():
 # ============================================================================
 # >> DOCTSTRING REDIRECTS
 # ============================================================================
-# Declare the docstring for addAttributeCallBack
-addAttributeCallBack.__doc__ = Player.addAttributeCallBack.__doc__
-# Declare the docstring for removeAttributeCallBack
-removeAttributeCallBack.__doc__ = Player.removeAttributeCallBack.__doc__
-# Declare the docstring for removeCallBacksForAddon
-removeCallBacksForAddon.__doc__ = Player.removeCallBacksForAddon.__doc__
+# Declare the docstring for add_attribute_callback
+add_attribute_callback.__doc__ = Player.add_attribute_callback.__doc__
+# Declare the docstring for remove_attribute_callback
+remove_attribute_callback.__doc__ = Player.remove_attribute_callback.__doc__
+# Declare the docstring for remove_callbacks_for_addon
+remove_callbacks_for_addon.__doc__ = Player.remove_callbacks_for_addon.__doc__

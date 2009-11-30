@@ -46,7 +46,7 @@ def load():
     
     for userid in es.getUseridList():
         Player(userid).assistpoints = 0
-    Player.addAttributeCallBack('assistpoints', callback, 'gg_assist')
+    Player.add_attribute_callback('assistpoints', callback, 'gg_assist')
     
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
@@ -54,7 +54,7 @@ def unload():
     for userid in es.getUseridList():
         del Player(userid).assistpoints
         
-    Player.removeAttributeCallBack('assistpoints')
+    Player.remove_attribute_callback('assistpoints')
     
 # ============================================================================
 # >> GAME EVENTS

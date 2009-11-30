@@ -13,7 +13,7 @@ $LastChangedDate$
 import es
 
 # GunGame imports
-from gungame51.core.weapons.shortcuts import getTotalLevels
+from gungame51.core.weapons.shortcuts import get_total_levels
 
 # ============================================================================
 # >> CLASSES
@@ -50,7 +50,7 @@ class EventManager(object):
         newLevel = playerInstance.level + int(levelsAwarded)
         
         # Check to see if the player just won
-        if newLevel > getTotalLevels():
+        if newLevel > get_total_levels():
             '''
             Note: fix "round"
             '''

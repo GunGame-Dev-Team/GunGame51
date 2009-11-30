@@ -127,7 +127,7 @@ def player_spawn(event_var):
     
     # Check if the warmup weapon is the level 1 weapon
     if str(gg_warmup_weapon) in ('0', '', '0.0'):
-        ggPlayer.giveWeapon()
+        ggPlayer.give_weapon()
         return
     
     # Check if the warmup weapon is a knife

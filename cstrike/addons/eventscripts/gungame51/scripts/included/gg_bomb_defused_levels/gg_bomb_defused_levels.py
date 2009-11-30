@@ -19,7 +19,7 @@ import es
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.weapons.shortcuts import getLevelWeapon
-from gungame51.core.weapons.shortcuts import getTotalLevels
+from gungame51.core.weapons.shortcuts import get_total_levels
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -87,7 +87,7 @@ def getLevelupList(currentLevel, levelupLevel):
     levelupList = []
 
     # Get the total number of levels
-    totalLevels = getTotalLevels()
+    totalLevels = get_total_levels()
     
     # If the player would exceed the total number of levels, stop at the total
     if levelupLevel > totalLevels:

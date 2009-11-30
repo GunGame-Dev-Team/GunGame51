@@ -343,7 +343,7 @@ class AddonManager(object):
         self.__order__.remove(name)
 
         # Remove custom attribute callbacks associated with this addon
-        Player.removeCallBacksForAddon(name)
+        Player.remove_callbacks_for_addon(name)
 
         # Call the unload block as is normally done by ES
         # Again, we do this last so it doesn't matter if the block errors

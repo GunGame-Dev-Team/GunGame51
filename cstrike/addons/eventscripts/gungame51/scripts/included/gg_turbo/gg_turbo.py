@@ -18,8 +18,8 @@ from weaponlib import getWeaponNameList
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.players.shortcuts import addAttributeCallBack
-from gungame51.core.players.shortcuts import removeCallBacksForAddon
+from gungame51.core.players.shortcuts import add_attribute_callback
+from gungame51.core.players.shortcuts import remove_callbacks_for_addon
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 
 # ============================================================================
@@ -41,7 +41,7 @@ info.version = '0.1'
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    addAttributeCallBack('level', level_call_back, info.name)
+    add_attribute_callback('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
 def unload():
@@ -74,7 +74,7 @@ def give_weapon(userid, previousLevel):
     ggPlayer = Player(userid)
 
     # Give them their next weapon
-    ggPlayer.giveWeapon()
+    ggPlayer.give_weapon()
 
     # Retrieve a playerlib.Player() instances
     pPlayer = getPlayer(userid)

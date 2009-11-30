@@ -11,7 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
-from weaponlib import getWeapon
+from weaponlib import get_weapon
 from playerlib import getPlayer
 
 # GunGame Imports
@@ -68,7 +68,7 @@ def player_death(event_var):
         return
 
     # Get the weapon object and the size if its clip
-    weaponObject = getWeapon(weapon)
+    weaponObject = get_weapon(weapon)
 
     # Find the attacker's weapon index to be used to reload the weapon
     playerHandle = es.getplayerhandle(attacker)

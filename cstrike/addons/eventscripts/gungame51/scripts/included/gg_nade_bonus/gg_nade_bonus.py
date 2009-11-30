@@ -23,7 +23,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.weapons.shortcuts import getLevelMultiKill
-from gungame51.core.weapons.shortcuts import getTotalLevels
+from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core.players.shortcuts import setAttribute
 
 # ============================================================================
@@ -147,7 +147,7 @@ def player_death(event_var):
     if int(gg_nade_bonus_mode) == 0:
         
         # Player on last level ?
-        if getTotalLevels(str(gg_nade_bonus)) == ggPlayer.nadeBonusLevel:
+        if get_total_levels(str(gg_nade_bonus)) == ggPlayer.nadeBonusLevel:
             return
     
     # Multikil check
@@ -238,7 +238,7 @@ def give_bonus(userid, sound=False, turboCheck=False):
     if using_weapon_list():
         
         # Player needs a real levelup?
-        totalLevels = getTotalLevels(str(gg_nade_bonus))
+        totalLevels = get_total_levels(str(gg_nade_bonus))
         if totalLevels < ggPlayer.nadeBonusLevel:
             
             # Reset bonus multi kills

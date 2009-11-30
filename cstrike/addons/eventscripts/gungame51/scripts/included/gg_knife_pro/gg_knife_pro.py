@@ -16,7 +16,7 @@ import gamethread
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.weapons.shortcuts import getTotalLevels
+from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
 
@@ -81,7 +81,7 @@ def player_death(event_var):
     # Attacker checks
     # ===================
     # Fix duplicate winning
-    if ggAttacker.level >= getTotalLevels():
+    if ggAttacker.level >= get_total_levels():
         return
         
     # Is the attacker on knife or grenade level?

@@ -19,7 +19,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core import get_game_dir
-from gungame51.core.weapons.shortcuts import getWeaponOrder
+from gungame51.core.weapons.shortcuts import get_weaponOrder
 from gungame51.core.weapons.shortcuts import setWeaponOrder
 
 # ============================================================================
@@ -46,7 +46,7 @@ def es_map_start(event_var):
                 os.listdir(baseDir))
 
     # Get the current weapon order's file name
-    currentFile = getWeaponOrder().file
+    currentFile = get_weaponOrder().file
 
     # Remove the current weapon order's file name
     files.remove('%s.txt' %currentFile)

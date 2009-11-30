@@ -31,7 +31,7 @@ from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.leaders.shortcuts import get_leader_level
-from gungame51.core.weapons.shortcuts import getTotalLevels
+from gungame51.core.weapons.shortcuts import get_total_levels
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -154,7 +154,7 @@ def gg_levelup(event_var):
         return
     
     # Start vote ? 
-    if get_leader_level() <= (getTotalLevels() - int(gg_map_vote_trigger)):
+    if get_leader_level() <= (get_total_levels() - int(gg_map_vote_trigger)):
         return
     
     # Use 3rd party voting system ?  
