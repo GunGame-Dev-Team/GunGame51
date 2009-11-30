@@ -1,1 +1,1 @@
-WILL COMMIT LATER
+Go to ../cfg/gungame51/included_addon_configs/gg_convert for instructions.
