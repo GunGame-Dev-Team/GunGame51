@@ -2,7 +2,7 @@
 
 '''
 $Rev$
-$LastChangedBy: Monday $
+$LastChangedBy$
 $LastChangedDate$
 '''
 
