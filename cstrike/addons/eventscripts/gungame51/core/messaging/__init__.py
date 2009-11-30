@@ -147,7 +147,7 @@ class MessageManager(object):
         # Remove the translation file from the loaded translations dictionary
         del self.__loaded__[name]
 
-    def __formatFilter(self, filter):
+    def __format_filter(self, filter):
         filter = str(filter)
 
         if filter.isdigit():
@@ -155,11 +155,11 @@ class MessageManager(object):
 
         return filter
 
-    def __cleanString(self, string):
+    def __clean_string(self, string):
         '''Cleans the string for output to the console.'''
         return string.replace('\3', '').replace('\4', '').replace('\1', '')
 
-    def __formatString(self, string, tokens, userid=0):
+    def __format_string(self, string, tokens, userid=0):
         '''Retrieves and formats the string.'''
         # Make the userid an int
         userid = int(userid)
@@ -185,7 +185,7 @@ class MessageManager(object):
         # Return the string
         return string
 
-    def __formatPrefix(self, prefix, string):
+    def __format_prefix(self, prefix, string):
         if prefix:
             from gungame51.core.addons import AddonManager
             from gungame51.core.addons.shortcuts import get_addon_info
@@ -212,10 +212,10 @@ class MessageManager(object):
 
     def msg(self, filter, string, tokens={}, prefix=False):
         # Format the filter
-        filter = self.__formatFilter(filter)
+        filter = self.__format_filter(filter)
 
         # Format the message with the prefix if needed
-        prefix = self.__formatPrefix(prefix, string)
+        prefix = self.__format_prefix(prefix, string)
 
         # Check if this is a normal message
         if not str(string) in __strings__:
@@ -230,19 +230,19 @@ class MessageManager(object):
             if isinstance(filter, int):
                 # Send message to the userid
                 return es.tell(filter, '#multi', '%s%s'
-                    %(prefix, self.__formatString(string, tokens, filter)))
+                    %(prefix, self.__format_string(string, tokens, filter)))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 es.tell(userid, '#multi', '%s%s'
-                    %(prefix, self.__formatString(string, tokens, userid)))
+                    %(prefix, self.__format_string(string, tokens, userid)))
 
     def saytext2(self, filter, index, string, tokens={}, prefix=False):
         # Setup filter
-        self.__formatFilter(filter)
+        self.__format_filter(filter)
 
         # Format the message with the prefix if needed
-        prefix = self.__formatPrefix(prefix, string)
+        prefix = self.__format_prefix(prefix, string)
 
         # Check if this is a normal message
         if not str(string) in __strings__:
@@ -258,12 +258,12 @@ class MessageManager(object):
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.saytext2(filter, index, '\1%s%s'
-                    %(prefix, self.__formatString(string, tokens, filter)))
+                    %(prefix, self.__format_string(string, tokens, filter)))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 usermsg.saytext2(userid, index, '\1%s%s'
-                    %(prefix, self.__formatString(string, tokens, userid)))
+                    %(prefix, self.__format_string(string, tokens, userid)))
 
         # Show in console
         '''
@@ -273,7 +273,7 @@ class MessageManager(object):
 
     def centermsg(self, filter, string, tokens={}):
         # Setup filter
-        filter = self.__formatFilter(filter)
+        filter = self.__format_filter(filter)
 
         # Check if this is a normal message
         if not str(string) in __strings__:
@@ -288,16 +288,16 @@ class MessageManager(object):
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.centermsg(filter,
-                    self.__formatString(string, tokens, filter))
+                    self.__format_string(string, tokens, filter))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 usermsg.centermsg(userid,
-                    self.__formatString(string, tokens, userid))
+                    self.__format_string(string, tokens, userid))
 
     def hudhint(self, filter, string, tokens={}):
         # Setup filter
-        filter = self.__formatFilter(filter)
+        filter = self.__format_filter(filter)
 
         # Check if this is a normal message
         if not str(string) in __strings__:
@@ -312,16 +312,16 @@ class MessageManager(object):
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.hudhint(filter,
-                    self.__formatString(string, tokens, filter))
+                    self.__format_string(string, tokens, filter))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 usermsg.hudhint(userid,
-                    self.__formatString(string, tokens, userid))
+                    self.__format_string(string, tokens, userid))
 
     def toptext(self, filter, duration, color, string, tokens={}):
         # Setup filter
-        filter = self.__formatFilter(filter)
+        filter = self.__format_filter(filter)
 
         # Check if this is a normal message
         if not str(string) in __strings__:
@@ -336,16 +336,16 @@ class MessageManager(object):
             # Send message to the userid
             if isinstance(filter, int):
                 return es.toptext(filter, duration, color,
-                    self.__formatString(string, tokens, filter))
+                    self.__format_string(string, tokens, filter))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 es.toptext(userid, duration, color,
-                    self.__formatString(string, tokens, userid))
+                    self.__format_string(string, tokens, userid))
 
     def echo(self, filter, level, string, tokens={}, prefix=False):
         # Setup filter
-        filter = self.__formatFilter(filter)
+        filter = self.__format_filter(filter)
 
         '''
         # Is the debug level high enough?
@@ -354,12 +354,12 @@ class MessageManager(object):
         '''
 
         # Format the message with the prefix if needed
-        prefix = self.__formatPrefix(prefix, string)
+        prefix = self.__format_prefix(prefix, string)
 
         # Check if this is a normal message
         if not str(string) in __strings__:
             # Get clean string
-            string = self.__cleanString(string)
+            string = self.__clean_string(string)
 
             # Console or Userid
             if isinstance(filter, int):
@@ -374,7 +374,7 @@ class MessageManager(object):
             # Console or Userid
             if isinstance(filter, int):
                 # Get clean string
-                string = self.__cleanString(self.__formatString(string, tokens, filter))
+                string = self.__clean_string(self.__format_string(string, tokens, filter))
 
                 # Send message
                 return usermsg.echo(filter, '%s%s' %(prefix, string))
@@ -383,12 +383,12 @@ class MessageManager(object):
             for userid in getUseridList(filter):
                 # Send message
                 usermsg.echo(userid, '%s%s' %(prefix,
-                    self.__cleanString(self.__formatString(string, tokens, userid))))
+                    self.__clean_string(self.__format_string(string, tokens, userid))))
 
     def langstring(self, userid=0, string='', tokens={}, prefix=False):
         # Format the message with the prefix if needed
-        prefix = self.__formatPrefix(prefix, string)
+        prefix = self.__format_prefix(prefix, string)
 
         # Return the formatted language string
-        return '%s%s' %(prefix, self.__cleanString(self.__formatString(string,
+        return '%s%s' %(prefix, self.__clean_string(self.__format_string(string,
             tokens, userid)))
