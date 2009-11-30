@@ -144,7 +144,7 @@ def unload():
     unloadConfig(get_config_list())
 
     # Enable Buyzones
-    es.server.queuecmd('es_xfire %d func_buyzone Enable' % es.getuserid())
+    es.server.queuecmd('es_xfire %s func_buyzone Enable' % es.getuserid())
 
     # Fire gg_unload event
     EventManager().gg_unload
@@ -233,7 +233,7 @@ def round_start(event_var):
     userid = es.getuserid()
 
     # Disable Buyzones
-    es.server.queuecmd('es_xfire %d func_buyzone Disable' % userid)
+    es.server.queuecmd('es_xfire %s func_buyzone Disable' % userid)
 
     # Remove weapons from the map
     list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
@@ -247,7 +247,7 @@ def round_start(event_var):
             continue
 
         # Remove the weapon from the map
-        es.server.queuecmd('es_xfire %i %s kill' % (userid, weapon))
+        es.server.queuecmd('es_xfire %s %s kill' % (userid, weapon))
 
     # Equip players with a knife and possibly item_kevlar or item_assaultsuit
     equip_player()
@@ -257,28 +257,31 @@ def player_spawn(event_var):
     if PriorityAddon():
         return
 
-    userid = event_var['userid']
-    
-    # Is a spectator ?
-    if getPlayer(userid).isobserver:
+    userid = int(event_var['userid'])
+    pPlayer = getPlayer(userid)
+
+    # Is a spectator or dead ?
+    if pPlayer.isobserver or pPlayer.isdead:
         return
-    
-    # Is dead ?
-    if getPlayer(userid).isdead:
-        return
-    
-    # Give the player their weapon
-    gamethread.delayed(0.05, Player(userid).give_weapon, ())
-    
-    # Reset the player's AFK calculation
-    if not es.isbot(userid):
-        gamethread.delayed(0.6, Player(userid).afk.reset, ())
 
     ggPlayer = Player(userid)
-    
-    # Send the level information hudhint
-    ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level, 
-                                                    'total': get_total_levels()})
+
+    # Strip bots (sometimes they keep previous weapons)
+    if es.isbot(userid):
+        gamethread.delayed(0.25, ggPlayer.give_weapon)
+        gamethread.delayed(0.35, ggPlayer.strip)
+        
+    # Player is human
+    else:
+        # Reset AFK
+        gamethread.delayed(0.60, ggPlayer.afk.reset)
+
+        # Send the level information hudhint
+        ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level,
+                                                  'total': get_total_levels()})
+
+        # Give the player their weapon
+        gamethread.delayed(0.05, ggPlayer.give_weapon)
 
 def player_death(event_var):
     # Check for priority addons
@@ -423,8 +426,8 @@ def gg_win(event_var):
         # MAP WIN
         # ====================================================
         # End game
-        es.server.cmd('es_xgive %d game_end;es_xfire %d game_end EndGame'
-            %(userid, userid))
+        es.server.cmd('es_xgive %s game_end;es_xfire %s game_end EndGame'
+            % (userid, userid))
         
         # Tell the world
         saytext2('#human', index, 'PlayerWon', {'player':playerName})

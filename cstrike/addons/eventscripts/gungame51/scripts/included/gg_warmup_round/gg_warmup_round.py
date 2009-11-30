@@ -51,7 +51,7 @@ priority_addons_added = []
 # ============================================================================
 def load():
     # Load warmup round (delayed)
-    gamethread.delayed(1, doWarmup)
+    gamethread.delayed(1, do_warmup)
     
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -64,7 +64,7 @@ def unload():
         warmupCountDown.delete()
 
     # Reset server vars
-    resetServerVars(True)
+    reset_server_vars(True)
     
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
@@ -84,11 +84,11 @@ def es_map_start(event_var):
             warmupCountDown.stop()
 
             # Start warmup without backup vars
-            doWarmup(False)
+            do_warmup(False)
             return
 
     # Start warmup timer
-    doWarmup()     
+    do_warmup()
         
 def hegrenade_detonate(event_var):
     # Making sure warmup round is running
@@ -156,12 +156,12 @@ def player_spawn(event_var):
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def addPriorityAddon(name):
+def add_priority_addon(name):
     if name not in PriorityAddon():
         priority_addons_added.append(name)
         PriorityAddon().append(name)            
 
-def doWarmup(useBackupVars=True):
+def do_warmup(useBackupVars=True):
     # Looking for warmup timer
     warmupCountDown = repeat.find('gungameWarmupTimer')
 
@@ -183,7 +183,7 @@ def doWarmup(useBackupVars=True):
     del priority_addons_added[:]
     
     # Checking for warmup in the priority addons list
-    addPriorityAddon('gg_warmup_round')      
+    add_priority_addon('gg_warmup_round')
     
     # Checking for warmup deathmatch
     if (int(gg_warmup_deathmatch) or int(gg_deathmatch)) and \
@@ -198,7 +198,7 @@ def doWarmup(useBackupVars=True):
             es.server.queuecmd('gg_deathmatch 1')
         
         # Checking for deathmatch in the priority addons list
-        addPriorityAddon('gg_deathmatch')      
+        add_priority_addon('gg_deathmatch')
     
     # Checking for warmup elimination
     elif (int(gg_warmup_elimination) or int(gg_elimination)) and \
@@ -213,7 +213,7 @@ def doWarmup(useBackupVars=True):
             es.server.queuecmd('gg_elimination 1')
     
         # Checking for elimination in the priority addons list
-        addPriorityAddon('gg_elimination')        
+        add_priority_addon('gg_elimination')
 
     # Start it up if it exists
     if warmupCountDown:
@@ -222,10 +222,10 @@ def doWarmup(useBackupVars=True):
         return
             
     # Create a timer
-    warmupCountDown = repeat.create('gungameWarmupTimer', countDown)
+    warmupCountDown = repeat.create('gungameWarmupTimer', count_down)
     warmupCountDown.start(1, int(gg_warmup_timer) + 3)
     
-def countDown():
+def count_down():
     warmupCountDown = repeat.find('gungameWarmupTimer')
     
     # Making sure the count-down is going
@@ -246,11 +246,11 @@ def countDown():
         if warmupCountDown['remaining'] <= 5:
             
             # Play beep
-            playBeep()
+            play_beep()
         
         # mp_restartgame triggered a little early to prevent someone leveling
         if warmupCountDown['remaining'] == 2:
-            gamethread.delayed(0.88, es.server.queuecmd, 'mp_restartgame 1')
+            es.delayed(0.95, 'mp_restartgame 1')
     
     # No time left
     elif warmupCountDown['remaining'] == 0:
@@ -258,7 +258,7 @@ def countDown():
         hudhint('#human', 'Timer_Ended')
         
         # Play beep
-        playBeep()
+        play_beep()
         
         # Delete the timer
         repeat.delete('gungameWarmupTimer')
@@ -268,16 +268,16 @@ def countDown():
             PriorityAddon().remove(addedAddon)                   
         
         # Reset server vars back
-        resetServerVars(False)
+        reset_server_vars(False)
         
         # Fire gg_start event
         EventManager().gg_start()
 
-def playBeep():
+def play_beep():
     for userid in getPlayerList('#human'):
         Player(userid).playsound('countDownBeep')
 
-def resetServerVars(unload):
+def reset_server_vars(unload):
     # Warmup elimination ?
     if int(gg_warmup_elimination):
 

@@ -57,12 +57,12 @@ def load():
     mp_roundtime.set('9')
     
     # Create repeats for all players on the server
-    for userid in es.getUseridList():
+    for userid in getUseridList('#all'):
         respawnPlayer = repeat.find('gungameRespawnPlayer%s' % userid)
         
         if not respawnPlayer:
-            repeat.create('gungameRespawnPlayer%s' % userid, respawnCountDown,
-                                                                      (userid))
+            repeat.create(
+                'gungameRespawnPlayer%s' % userid, respawn_count_down, userid)
     
     # Respawn all dead players
     for userid in getUseridList('#dead'):
@@ -77,7 +77,7 @@ def unload():
     mp_roundtime.set(mpRoundtimeBackup)
     
     # Delete all player respawns
-    for userid in es.getUseridList():
+    for userid in getUseridList('#all'):
         if repeat.find('gungameRespawnPlayer%s' % userid):
             repeat.delete('gungameRespawnPlayer%s' % userid)
     
@@ -101,7 +101,7 @@ def round_end(event_var):
 
 def gg_win(event_var):
     #Cancel pending respawns
-    for userid in es.getUseridList():
+    for userid in getUseridList('#all'):
         if repeat.find('gungameRespawnPlayer%s' % userid):
             repeat.delete('gungameRespawnPlayer%s' % userid)
 
@@ -116,7 +116,7 @@ def player_team(event_var):
     respawnPlayer = repeat.find('gungameRespawnPlayer%s' % userid)
     if not respawnPlayer:
         repeat.create('gungameRespawnPlayer%s' % userid,
-                                                respawnCountDown, (userid))
+                                                respawn_count_down, userid)
     
     # Don't allow spectators or players that are unassigned to respawn
     if int(event_var['team']) < 2:
@@ -153,7 +153,7 @@ def player_death(event_var):
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def respawnCountDown(userid):
+def respawn_count_down(userid):
     # Make sure that the repeat exists
     respawnRepeat = repeat.find('gungameRespawnPlayer%s' % userid)
     if not respawnRepeat:

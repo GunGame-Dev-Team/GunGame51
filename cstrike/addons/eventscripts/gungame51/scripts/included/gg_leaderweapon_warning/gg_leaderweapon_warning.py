@@ -11,13 +11,19 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
-from playerlib import getPlayerList
+from playerlib import getUseridList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import getLevelWeapon
+
+# ============================================================================
+# >> GLOBALS
+# ============================================================================
+playedKnife = False
+playedNade = False
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -40,33 +46,56 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
+def es_map_start(event_var):
+    global playedKnife
+    playedKnife = False
+    global playedNade
+    playedNade = False
+
 def round_start(event_var):
-    # Play sounds ?
-    weaponWarning()
+    # Get leader weapon
+    leaderWeapon = getLevelWeapon(get_leader_level())
+
+    # Knife level ?
+    if leaderWeapon == 'knife':
+        sound = 'knifelevel'
+
+    # Nade level ?
+    elif leaderWeapon == 'hegrenade':
+        sound = 'nadelevel'
+
+    # No warning
+    else:
+        return
+
+    # Play sounds
+    for userid in getUseridList('#human'):
+        Player(userid).playsound(sound)
 
 def gg_levelup(event_var):
-    # Play sounds ?
-    weaponWarning()
+    attacker = int(event_var['attacker'])
+    
+    # Play nade warning ? (One time during a round per map)
+    if Player(attacker).weapon == 'hegrenade' and not playedNade:
+        sound = 'nadelevel'
+        global playedNade
+        playedNade = True
+            
+    # Play knife warning ? (One time during a round per map)
+    elif Player(attacker).weapon == 'knife' and not playedKnife:
+        sound = 'knifelevel'
+        global playedKnife
+        playedKnife = True
+        
+    # Don't play any sounds
+    else:
+        return
+
+    # Play sound to all players
+    for userid in getUseridList('#human'):
+        Player(userid).playsound(sound)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================  
-def weaponWarning():
-    # Get leader weapon
-    leaderWeapon = getLevelWeapon(get_leader_level())
-    
-    # Knife level ?
-    if leaderWeapon == 'knife':
-        sound = 'knifelevel'
-    
-    # Nade level ?
-    elif leaderWeapon == 'hegrenade':
-        sound = 'nadelevel'
-    
-    # No warning ?
-    else:
-        return
-    
-    # Play sounds
-    for userid in getPlayerList('#human'):
-        Player(userid).playsound(sound)
+

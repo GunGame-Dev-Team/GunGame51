@@ -132,7 +132,6 @@ class BasePlayer(object):
         self.level = 1
         self.afk = AFK(self.userid)
         self.multikill = 0
-        self.steamid = uniqueid(str(self.userid), 1)
         self.index = int(getPlayer(str(self.userid)).index)
         self.stripexceptions = []
         self.soundpack = SoundPack('default')
@@ -143,8 +142,22 @@ class BasePlayer(object):
     # =========================================================================
     @property
     def weapon(self):
-        """Return the weapon name"""
+        '''
+        Return the weapon name
+        '''
         return self.get_weapon()
+
+    @property
+    def steamid(self):
+        '''
+        This was done because playerlib will throw an error for bots from
+        time to time
+        '''
+        try:
+            _steamid = uniqueid(str(self.userid), 1)
+        except:
+            _steamid = None
+        return _steamid
 
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
@@ -326,8 +339,9 @@ class BasePlayer(object):
 
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
-        if name in ('userid', 'level', 'preventlevel', 'steamid',
-                                          'multikill', 'wins', 'team', 'name'):
+        if name in ('userid', 'level', 'preventlevel', 'steamid', 'soundpack',
+          'stripexceptions', 'multikill', 'wins', 'team', 'name', 'index',
+                                                                        'afk'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
 
@@ -451,14 +465,14 @@ class BasePlayer(object):
             raise GunGameError(error)
 
         # Knife ?
-        elif self.weapon == 'knife':
-            es.server.queuecmd('es_xsexec %i "use weapon_knife"' % (
+        if self.weapon == 'knife':
+            es.server.queuecmd('es_xsexec %s "use weapon_knife"' % (
                                                                 self.userid))
             self.strip()
 
         # Nade ?
         elif self.weapon == 'hegrenade':
-            es.server.queuecmd('es_xgive %i weapon_hegrenade;' % (
+            es.server.queuecmd('es_xgive %s weapon_hegrenade;' % (
                                                                 self.userid))
             self.strip()
 
@@ -468,49 +482,50 @@ class BasePlayer(object):
             pPlayer = getPlayer(self.userid)
             pWeapon = pPlayer.getPrimary()
             sWeapon = pPlayer.getSecondary()
-            strip = None
+            weapToStrip = None
 
             # Already have the current weapon ?
             if 'weapon_%s' % self.weapon == pWeapon or \
                 'weapon_%s' % self.weapon == sWeapon:
 
                 # Use it ?
-                if pPlayer.weapon != self.weapon:
+                if pPlayer.weapon != 'weapon_%s' % self.weapon:
                     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
                 return
 
             # Strip secondary weapon ?
             if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
-                strip = sWeapon
+                weapToStrip = sWeapon
 
             # Strip primary weapon ?
             elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
-                strip = pWeapon
+                weapToStrip = pWeapon
 
-            if strip:
+            if weapToStrip:
+                es.dbgmsg(0, '**** GIVE WEAPON REMOVE!!')
                 es.server.queuecmd('es_xremove %s' % (
-                                                pPlayer.getWeaponIndex(strip)))
+                                          pPlayer.getWeaponIndex(weapToStrip)))
 
-                # Check for no weapon in 0.08 seconds
-                gamethread.delayedname(0.05, 'gg_noweap_%i' % self.userid,
-                                        Player(self.userid).no_weapon_check, ())
+                # Check for no weapon in 0.05 seconds
+                gamethread.delayed(0.05, Player(self.userid).no_weapon_check)
 
             # Give new gun
-            es.server.queuecmd('es_xgive %i weapon_%s' % (self.userid,
+            es.server.queuecmd('es_xgive %s weapon_%s' % (self.userid,
                                                                 self.weapon))
 
             # Make bots use it ? (Bots sometimes don't equip the new gun.)
             if es.isbot(self.userid):
-                    es.delayed(0, 'es_xsexec %s "use weapon_%s"' % (
+                    es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
 
     def no_weapon_check(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
         pPlayer = getPlayer(self.userid)
 
-        # Player dead or in spec ?
-        if pPlayer.isdead or pPlayer.teamid < 2:
+        # Stop if the player is not eligiable for a new weapon
+        if es.exists('userid', self.userid) or pPlayer.isdead or \
+          pPlayer.teamid < 2:
             return
 
         # Store the weapon you are holding in the weapon slot which your
@@ -529,10 +544,10 @@ class BasePlayer(object):
             # Using give() ?
             if newWeapon:
                 self.give(newWeapon)
+                return
 
             # Repeat give_weapon to re-strip the slot and give your weapon
-            else:
-                self.give_weapon()
+            gamethread.delayed(0.025, Player(self.userid).give_weapon)
 
         # Get the index of the last given entity
         int_lastgive = int(eventscripts_lastgive)
@@ -563,9 +578,10 @@ class BasePlayer(object):
                                                     'weapon_' + self.weapon:
 
                 # Remove the weapon
+                es.dbgmsg(0, '**** NO WEAPON CHECK REMOVE!!')
                 es.server.queuecmd('es_xremove %s' % int_lastgive)
 
-    def give(self, weapon, useWeapon=False, strip=False, no_weapon_check=False):
+    def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
 
         '''
         Gives a player the specified weapon.
@@ -594,7 +610,7 @@ class BasePlayer(object):
             self.stripexceptions.append(weapon[7:])
 
             # Delay removing the weapon long enough for gg_dead_strip to fire
-            gamethread.delayed(0.1, self.stripexceptions.remove, (weapon[7:]))
+            gamethread.delayed(0.10, self.stripexceptions.remove, (weapon[7:]))
 
         pPlayer = getPlayer(self.userid)
         sWeapon = pPlayer.secondary
@@ -606,30 +622,31 @@ class BasePlayer(object):
 
         # Strip the weapon ?
         if strip:
+            stripWeapon = None
 
             # Holding a primary weapon ?
             if weapon in list_pWeapons and pWeapon:
-                w = pWeapon
+                stripWeapon = pWeapon
 
             # Holding a secondary weapon ?
             elif weapon in list_sWeapons and sWeapon:
-                w = sWeapon
+                stripWeapon = sWeapon
 
             # Strip the weapon
-            if 'w' in locals().keys():
+            if stripWeapon:
                 es.server.queuecmd('es_xremove %s' % (
-                                                pPlayer.getWeaponIndex(w)))
+                                          pPlayer.getWeaponIndex(stripWeapon)))
 
         # Give the player the weapon
         cmd = 'es_xgive %s %s;' % (self.userid, weapon)
 
         if useWeapon:
-            cmd += 'es_xsexec %s "use %s"' % (self.userid, weapon)
+            cmd += ' es_xsexec %s "use %s"' % (self.userid, weapon)
 
         es.server.queuecmd(cmd)
 
         # No weapon check
-        if no_weapon_check:
+        if noWeaponCheck:
             gamethread.delayed(0.065, Player(self.userid).no_weapon_check,
                                                                         weapon)
 
@@ -653,6 +670,7 @@ class BasePlayer(object):
                 continue
 
             # Remove the weapon
+            es.dbgmsg(0, '**** STRIP REMOVE!!')
             es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
 
     # =========================================================================
@@ -775,6 +793,7 @@ class PlayerDict(dict):
         hasn't been already.
         '''
         userid = int(userid)
+            
         if userid not in self:
             # Get the uniqueid
             steamid = uniqueid(str(userid), 1)

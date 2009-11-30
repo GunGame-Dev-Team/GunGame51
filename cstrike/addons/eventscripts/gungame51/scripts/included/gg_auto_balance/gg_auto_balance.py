@@ -622,10 +622,15 @@ def force_swap(ggPlayer):
     # Is player okay to move ?
     if not es.exists('userid', ggPlayer.userid) or ggPlayer.team == 1:
 
-        # Player is supposed to be moved ?
-        if ggPlayer.changeTeam:
-            ggPlayer.changeTeam = False
-        return
+        try:
+            # Player is supposed to be moved ?
+            if ggPlayer.changeTeam:
+                ggPlayer.changeTeam = False
+        except:
+            pass
+            
+        finally:
+            return
 
     # Normal round ? (Don't move the last player yet.)
     if not int(gg_deathmatch):

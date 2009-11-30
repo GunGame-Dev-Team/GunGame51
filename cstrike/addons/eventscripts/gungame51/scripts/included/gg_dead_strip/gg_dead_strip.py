@@ -23,8 +23,8 @@ from gungame51.core.players.shortcuts import Player
 # ============================================================================
 info = AddonInfo()
 info.name = 'gg_dead_strip'
-info.title = 'GG Dead Strip' 
-info.author = 'GG Dev Team' 
+info.title = 'GG Dead Strip'
+info.author = 'GG Dev Team'
 info.version = '0.1'
 
 # ============================================================================
@@ -41,13 +41,13 @@ list_weaponNameList = getWeaponNameList()
 # ============================================================================
 def load():
     # Register the drop command to prevent it from being used.
-    es.addons.registerClientCommandFilter(filter_drop)
+    es.addons.registerClientCommandFilter(drop_filter)
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
 def unload():
     # Unregister the drop command
-    es.addons.unregisterClientCommandFilter(filter_drop)
+    es.addons.unregisterClientCommandFilter(drop_filter)
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
@@ -56,7 +56,8 @@ def unload():
 # ============================================================================
 def round_start(event_var):
     # Remove all idle weapons that exist on the map.
-    es.fire(es.getuserid(), 'game_weapon_manager AddOutput "maxpieces 0"')
+    es.server.queuecmd('es_xfire %s game_weapon_manager ' % es.getuserid() +
+                        'AddOutput "maxpieces 0"')
 
 def item_pickup(event_var):
     # Get variables
@@ -98,20 +99,20 @@ def item_pickup(event_var):
 
         # Switch the player knife ?
         if not getPlayer(userid).he:
-            es.sexec(userid, "use weapon_knife")
+            es.server.queuecmd('es_xsexec %s "use weapon_knife"' % userid)
             return
 
     # Switch to their gungame weapon
-    es.sexec(userid, "use weapon_%s" %weapon)
-
+    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, weapon))
+    
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def remove_weapon(userid, item):
     # Remove weapon
-    es.remove(getPlayer(userid).getWeaponIndex("weapon_%s" %item))
-
-def filter_drop(userid, args):
+    es.server.queuecmd('es_xremove %s' % getPlayer(userid).getWeaponIndex(
+                                                    "weapon_%s" % item))
+def drop_filter(userid, args):
     # If command not drop, continue
     if args[0].lower() != 'drop':
         return 1
@@ -124,26 +125,11 @@ def filter_drop(userid, args):
 
     # Check to see if their current weapon is their level weapon
     if weapon != 'hegrenade':
-        return int(curWeapon != "weapon_%s" %weapon)
+        return int(curWeapon != 'weapon_%s' % weapon)
 
-    # ================
     # NADE BONUS CHECK
-    # ================
-    nadeBonusWeapons = str(gg_nade_bonus).split(',')
-
-    # Is nade bonus enabled?
-    if nadeBonusWeapons[0] == '0':
-        return int(curWeapon != "weapon_%s" %weapon)
-
-    # Loop through the nade bonus weapons
-    for nadeWeapon in nadeBonusWeapons:
-        # Prefix weapon_
-        if not nadeWeapon.startswith('weapon_'):
-            nadeWeapon = "weapon_%s" %nadeWeapon
-
-        # Don't allow them to drop it
-        if nadeWeapon == curWeapon:
-            return 0
+    if str(gg_nade_bonus) in ('', '0'):
+        return 0
 
     # Allow them to drop it
     return 1

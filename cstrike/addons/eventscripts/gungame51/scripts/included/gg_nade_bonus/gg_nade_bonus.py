@@ -73,7 +73,11 @@ def player_spawn(event_var):
         Player(userid).nadeBonusMulti = 0
         Player(userid).nadeBonusLevel = 1
     
-    # Giving bonus (delayed)
+    # Giving bonus (delayed more for bots)
+    if es.isbot(userid):
+        gamethread.delayed(0.50, give_bonus, userid)
+        return
+        
     gamethread.delayed(0.10, give_bonus, userid)
 
 def gg_levelup(event_var):
@@ -88,7 +92,11 @@ def gg_levelup(event_var):
         Player(userid).nadeBonusMulti = 0
         Player(userid).nadeBonusLevel = 1        
     
-    # Giving bonus (delayed)
+    # Giving bonus (delayed more for bots)
+    if es.isbot(userid):
+        gamethread.delayed(0.50, give_bonus, userid)
+        return
+
     gamethread.delayed(0.10, give_bonus, userid)
 
 def gg_leveldown(event_var):       
@@ -111,7 +119,11 @@ def gg_leveldown(event_var):
         Player(userid).nadeBonusMulti = 0
         Player(userid).nadeBonusLevel = 1        
 
-    # Give bonus weapon(s)
+    # Giving bonus (delayed more for bots)
+    if es.isbot(userid):
+        gamethread.delayed(0.50, give_bonus, userid)
+        return
+
     gamethread.delayed(0.10, give_bonus, userid)
     
 def player_activate(event_var):
