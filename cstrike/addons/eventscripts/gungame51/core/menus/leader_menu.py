@@ -35,9 +35,10 @@ def load():
         popuplib.unsendname('ggLeaderMenu', getUseridList('#human'))
         popuplib.delete('ggLeaderMenu')
 
-    # Register command
+    # Register commands
     registerSayCommand('!leader', leader_menu_cmd, 'Displays a !leader menu.')
-
+    registerSayCommand('!leaders', leader_menu_cmd, 'Displays a !leader menu.')
+    
 def unload():
     # Delete the popup if it exists
     if popuplib.exists('ggLeaderMenu'):
@@ -46,7 +47,8 @@ def unload():
 
     # Unregister commands
     unregisterSayCommand('!leader')
-
+    unregisterSayCommand('!leaders')
+    
 # ============================================================================
 # >> MENU FUNCTIONS
 # ============================================================================
