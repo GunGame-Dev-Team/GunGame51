@@ -1,9 +1,9 @@
 # ../addons/eventscripts/gungame/scripts/included/gg_convert/gg_convert.py
 
 '''
-$Rev: 206 $
+$Rev$
 $LastChangedBy: Monday $
-$LastChangedDate: 2009-10-28 15:35:41 -0400 (Wed, 28 Oct 2009) $
+$LastChangedDate$
 '''
 
 # ============================================================================
