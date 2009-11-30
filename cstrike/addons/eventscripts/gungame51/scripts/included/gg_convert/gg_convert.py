@@ -281,6 +281,6 @@ def add_winner(name, uniqueid, wins, timestamp):
         else:
             totalWins = wins
 
-        # Update the number of wins for the uniqueid
+        # Update the number of wins stored for the uniqueid
         ggDB.query("UPDATE gg_wins SET wins=%s " % totalWins + "WHERE " + \
         "uniqueid = '%s'" % uniqueid)
