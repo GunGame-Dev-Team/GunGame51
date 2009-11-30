@@ -64,7 +64,7 @@ class ConfigManager(object):
               method.
         '''
         # Retrieve the config module
-        config = self.getConfigByName(name)
+        config = self.get_config_by_name(name)
 
         # Load the config if it has a load function
         if config.__dict__.has_key('load'):
@@ -83,7 +83,7 @@ class ConfigManager(object):
                     es.ServerVar(cvar).addFlag('notify')
                 global cfgExecuting
                 cfgExecuting = True
-                gamethread.delayed(0, self.resetConfigExecution, ())
+                gamethread.delayed(0, self._reset_config_execution, ())
                 cfg.execute()
 
     def unload(self, name):
@@ -97,7 +97,7 @@ class ConfigManager(object):
               python file.
         '''
         # Retrieve the config module
-        config = self.getConfigByName(name)
+        config = self.get_config_by_name(name)
 
         for item in config.__dict__:
             if isinstance(config.__dict__[item], AddonCFG):
@@ -116,7 +116,7 @@ class ConfigManager(object):
         # Remove the stored config module
         del self.__loaded__[name]
 
-    def resetConfigExecution(self):
+    def _reset_config_execution(self):
         '''
         Resets the global veriable cfgExecuting for when configs are being
         executed via cfglib.AddonCFG().execute().
@@ -124,7 +124,7 @@ class ConfigManager(object):
         global cfgExecuting
         cfgExecuting = False
 
-    def getConfigByName(self, name):
+    def get_config_by_name(self, name):
         '''
         Returns the module of a config by name.
         '''
@@ -133,7 +133,7 @@ class ConfigManager(object):
             return self.__loaded__[name]
 
         # Get the config type
-        cfgType = ConfigManager.getConfigType(name)
+        cfgType = ConfigManager.get_config_type(name)
 
         # Import the config and store the module
         if cfgType == 'main':
@@ -195,7 +195,7 @@ class ConfigManager(object):
             gamethread.delayed(0, unload, (cvarName))
 
     @staticmethod
-    def configExists(name):
+    def config_exists(name):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
@@ -207,7 +207,7 @@ class ConfigManager(object):
             'scripts/cfg/custom/%s.py' %name)))
 
     @staticmethod
-    def getConfigType(name):
+    def get_config_type(name):
         '''
         Returns a string value of the config type:
             "custom"
@@ -215,7 +215,7 @@ class ConfigManager(object):
             "main"
         '''
         # Check to see if the config exists
-        if not ConfigManager().configExists(name):
+        if not ConfigManager().config_exists(name):
             raise ValueError('Cannot get config type (%s): doesn\'t exist.'
                 % name)
 
@@ -238,7 +238,7 @@ es.addons.registerForEvent(ConfigManager(), 'server_cvar', ConfigManager().serve
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
-def getConfigList(type=None):
+def get_config_list(type=None):
     '''
     Retrieves a list of configlib configs of the following types:
         * main (the primary GunGame configs)

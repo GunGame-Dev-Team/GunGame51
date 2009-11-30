@@ -30,7 +30,7 @@ from core.weapons.shortcuts import getTotalLevels
 #    Config Function Imports
 from core.cfg.shortcuts import loadConfig
 from core.cfg.shortcuts import unloadConfig
-from core.cfg.shortcuts import getConfigList
+from core.cfg.shortcuts import get_config_list
 
 #    Addon Function Imports
 from core.addons import AddonManager
@@ -141,7 +141,7 @@ def unload():
     Database().close()
 
     # Unload configs (removes flags from CVARs)
-    unloadConfig(getConfigList())
+    unloadConfig(get_config_list())
 
     # Enable Buyzones
     es.server.queuecmd('es_xfire %d func_buyzone Enable' % es.getuserid())
@@ -150,7 +150,7 @@ def unload():
     EventManager().gg_unload
     
 def initialize():
-    loadConfig(getConfigList())
+    loadConfig(get_config_list())
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
     

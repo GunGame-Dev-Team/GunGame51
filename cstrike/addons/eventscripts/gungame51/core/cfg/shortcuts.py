@@ -11,7 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # GunGame Imports
 from gungame51.core.cfg import ConfigManager
-from gungame51.core.cfg import getConfigList
+from gungame51.core.cfg import get_config_list
 
 def loadConfig(names=[]):
     if not isinstance(names, list):
@@ -28,13 +28,13 @@ def unloadConfig(names=[]):
         ConfigManager().unload(config)
 
 def getConfig(name):
-    return ConfigManager().getConfigByName(name)
+    return ConfigManager().get_config_by_name(name)
 
-def configExists(name):
-    return ConfigManager.configExists(name)
+def config_exists(name):
+    return ConfigManager.config_exists(name)
 
-def getConfigType(name):
-    return ConfigManager.getConfigType(name)
+def get_config_type(name):
+    return ConfigManager.get_config_type(name)
 
 # ============================================================================
 # >> DOCTSTRING REDIRECTS
@@ -46,10 +46,10 @@ loadConfig.__doc__ = ConfigManager().load.__doc__
 unloadConfig.__doc__ = ConfigManager().unload.__doc__
 
 # Declare the docstring for getConfig
-getConfig.__doc__ = ConfigManager().getConfigByName.__doc__
+getConfig.__doc__ = ConfigManager().get_config_by_name.__doc__
 
-# Declare the docstring for configExists
-configExists.__doc__ = ConfigManager.configExists.__doc__
+# Declare the docstring for config_exists
+config_exists.__doc__ = ConfigManager.config_exists.__doc__
 
-# Declare the docstring for getConfigType
-getConfigType.__doc__ = ConfigManager.getConfigType.__doc__
+# Declare the docstring for get_config_type
+get_config_type.__doc__ = ConfigManager.get_config_type.__doc__
