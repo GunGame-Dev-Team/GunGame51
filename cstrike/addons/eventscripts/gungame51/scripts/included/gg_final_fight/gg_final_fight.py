@@ -20,9 +20,12 @@ from playerlib import getUseridList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.messaging.shortcuts import msg
+from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.weapons.shortcuts import getLevelWeapon
 from gungame51.core.players.shortcuts import setAttribute
+from gungame51.core.weapons.shortcuts import getLevelWeapon
+
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -32,6 +35,7 @@ info.name = 'gg_final_fight'
 info.title = 'GG Final Fight'
 info.author = 'GG Dev Team'
 info.version = '0.1'
+info.translations = ['gg_final_fight']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -47,15 +51,25 @@ gg_deadstrip = es.ServerVar('gg_deadstrip')
 winnerId = []
 fightRunning = False
 fighters = []
+fightVote = None
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
     setAttribute('#all', 'inFinalFight', False)
+
+    # Create vote
+    createVote()
+
+    # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
 def unload():
+    # Delete the vote
+    deleteVote()
+    
+    # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 # ============================================================================
@@ -123,29 +137,74 @@ def player_spawn(event_var):
         # Slay or something ?
         pass
 
-    if userid == winnerId[0]:
-        # Send winner menu
+    #if userid == winnerId[0]:
+    #    # Send winner menu
 
         # Delete winner
-        del winnerId{:}
+        #del winnerId{:}
     
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def startVote(players):
-    pass
+def createVote():
+    global fightVote
+
+    # Create vote
+    fightVote = votelib.create('gungameFinalFight', voteFinish, voteSubmit)
+    # Set question and answers
+    fightVote.setquestion('Do you want to knife-fight?')
+    fightVote.addoption('Yes!')
+    fightVote.addoption('No.')
+
+def deleteVote():
+    # Delete the vote (if it exists, should not)
+    if votelib.exists('gungameFinalFight'):
+        votelib.delete('gungameFinalFight')
+
+def startVote():
+    # Create vote
+    createVote()
+    # Start the vote for 30 seconds
+    fightVote.start(30)
+    # Make bots vote yes
+    for bot in getUseridList('#bot, #alive'):
+        voteSubmit(bot.userid, 'gungameFinalFight', 1, 'Yes!') #not sure
     
-def voteSubmit():
-    pass
+def voteSubmit(userid, votename, choice, choicename):
+    # Did the player answer no?
+    if choice == 2:
+        fightVote.stop(1)
+        saytext2('#human', Player(userid).index, 'PlayerDenied',
+            {'player':es.getplayername(userid)}, False)
+        return
     
-def voteFinish():
+def voteFinish(votename, win, winname, winvotes, winpercent, total, tie, 
+  cancelled):
+    # Vote cancelled? (if somebody voted no)
+    if cancelled:
+        return
+
+    # Nobody voted?
+    if not total:
+        msg('#human', 'NoVotesReceived', {}, False)
+        return
+
+    # A tie vote? (Yes and no, occurs when the second player denies)
+    if tie:
+        msg('#human', 'FightVoteTied', {}, False)
+        return
+
     # Delete old winner
-    if winnerId:
-        del winnerId[:]
+    #if winnerId:
+    #    del winnerId[:]
 
     # Both yes ?
 
-    for userid in getPlayerList('#alive')
+    #for userid in getPlayerList('#alive'):
+    #    pass
+
+    # Delete vote
+    deleteVote()
     
 def startFight():
 
