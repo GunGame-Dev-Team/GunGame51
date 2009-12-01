@@ -1,9 +1,9 @@
-# ../addons/eventscripts/gungame/scripts/cfg/included/gg_warmup_round.py
+# ../addons/eventscripts/gungame/scripts/cfg/included/gg_handicap_config.py
 
 '''
-$Rev: 233 $
-$LastChangedBy: micbarr $
-$LastChangedDate: 2009-11-24 04:29:41 -0500 (Tue, 24 Nov 2009) $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================
@@ -56,8 +56,8 @@ def load():
                 'them up".')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap_update.')
-    config.text('   180 = (Enabled) Update the lowest level players every ' +
-                '180 seconds (3 minutes).')
+    config.text('   180 = (Enabled) Update the lowest level players')
+    config.text('                    every 180 seconds (3 minutes).')
     config.text('Default Value: 0')
     config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
                 'players\' levels using handicap.')
