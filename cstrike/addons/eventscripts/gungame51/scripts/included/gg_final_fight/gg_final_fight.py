@@ -24,7 +24,7 @@ from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import setAttribute
-from gungame51.core.weapons.shortcuts import getLevelWeapon
+from gungame51.core.weapons.shortcuts import get_level_weapon
 
 
 # ============================================================================

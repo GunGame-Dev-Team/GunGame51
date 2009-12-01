@@ -20,7 +20,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import add_attribute_callback
 from gungame51.core.players.shortcuts import remove_callbacks_for_addon
-from gungame51.core.weapons.shortcuts import getLevelWeapon
+from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # ============================================================================
 # >> GLOBALS
@@ -84,7 +84,7 @@ def give_weapon(userid, previousLevel):
     
     # Get the player's current GunGame weapons
     currentWeapon = "weapon_%s" % ggPlayer.weapon
-    previousWeapon = "weapon_%s" % getLevelWeapon(previousLevel)
+    previousWeapon = "weapon_%s" % get_level_weapon(previousLevel)
     
     stripWeapon = None
     

@@ -21,7 +21,7 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_count
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.leaders.shortcuts import is_leader
-from gungame51.core.weapons.shortcuts import getLevelMultiKill
+from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.sql.shortcuts import get_winners_list
 
 # ============================================================================

@@ -22,9 +22,9 @@ from weaponlib import getWeaponList
 # GunGame Imports
 
 #    Weapon Function Imports
-from core.weapons.shortcuts import get_weaponOrder
-from core.weapons.shortcuts import setWeaponOrder
-from core.weapons.shortcuts import getLevelMultiKill
+from core.weapons.shortcuts import get_weapon_order
+from core.weapons.shortcuts import set_weapon_order
+from core.weapons.shortcuts import get_level_multikill
 from core.weapons.shortcuts import get_total_levels
 
 #    Config Function Imports
@@ -163,7 +163,7 @@ def initialize():
     
     # Get weapon order file
     # Set this as the weapon order and set the weapon order type
-    currentOrder = setWeaponOrder(str(gg_weapon_order_file), 
+    currentOrder = set_weapon_order(str(gg_weapon_order_file), 
                                   str(gg_weapon_order_sort_type))
     
     # Set multikill override
@@ -352,7 +352,7 @@ def player_death(event_var):
     # =========================================================================
     
     # Get the current level's multikill value
-    multiKill = getLevelMultiKill(ggAttacker.level)
+    multiKill = get_level_multikill(ggAttacker.level)
     
     # If set to 1, level the player up
     if multiKill == 1:
@@ -378,7 +378,7 @@ def player_death(event_var):
     # Increment their current multikill value
     else:
         # Message the attacker
-        multiKill = getLevelMultiKill(ggAttacker.level)
+        multiKill = get_level_multikill(ggAttacker.level)
         ggAttacker.hudhint('MultikillNotification', 
                            {'kills': ggAttacker.multikill, 'total': multiKill})
             
@@ -511,7 +511,7 @@ def server_cvar(event_var):
                                                     'gg_multikill_override']:
         # Get weapon order file
         # Set this as the weapon order and set the weapon order type
-        currentOrder = setWeaponOrder(str(gg_weapon_order_file), 
+        currentOrder = set_weapon_order(str(gg_weapon_order_file), 
                                       str(gg_weapon_order_sort_type))
 
         # Set multikill override

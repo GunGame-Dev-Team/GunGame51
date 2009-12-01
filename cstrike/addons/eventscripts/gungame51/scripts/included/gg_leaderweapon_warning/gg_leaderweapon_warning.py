@@ -17,7 +17,7 @@ from playerlib import getUseridList
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
-from gungame51.core.weapons.shortcuts import getLevelWeapon
+from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # ============================================================================
 # >> GLOBALS
@@ -54,7 +54,7 @@ def es_map_start(event_var):
 
 def round_start(event_var):
     # Get leader weapon
-    leaderWeapon = getLevelWeapon(get_leader_level())
+    leaderWeapon = get_level_weapon(get_leader_level())
 
     # Knife level ?
     if leaderWeapon == 'knife':

@@ -22,8 +22,8 @@ from weaponlib import getWeaponNameList
 from usermsg import showVGUIPanel
 
 # GunGame Imports
-from gungame51.core.weapons.shortcuts import getLevelWeapon
-from gungame51.core.weapons.shortcuts import getLevelMultiKill
+from gungame51.core.weapons.shortcuts import get_level_weapon
+from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
 from gungame51.core.messaging import MessageManager
@@ -443,7 +443,7 @@ class BasePlayer(object):
     # >> BasePlayer() WEAPON CLASS METHODS
     # =========================================================================
     def get_weapon(self):
-        return getLevelWeapon(self.level)
+        return get_level_weapon(self.level)
 
     def give_weapon(self):
         '''

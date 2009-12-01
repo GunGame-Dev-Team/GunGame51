@@ -21,8 +21,8 @@ from playerlib import getPlayer
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.weapons.shortcuts import getLevelWeapon
-from gungame51.core.weapons.shortcuts import getLevelMultiKill
+from gungame51.core.weapons.shortcuts import get_level_weapon
+from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core.players.shortcuts import setAttribute
 
@@ -113,7 +113,7 @@ def gg_leveldown(event_var):
     oldlevel = int(event_var['old_level'])
     
     # Was Player on nade ?
-    if getLevelWeapon(oldlevel) == 'hegrenade':
+    if get_level_weapon(oldlevel) == 'hegrenade':
         
         # Reset bonus levels
         Player(userid).nadeBonusMulti = 0
@@ -163,7 +163,7 @@ def player_death(event_var):
             return
     
     # Multikil check
-    multiKill = getLevelMultiKill(ggPlayer.nadeBonusLevel, str(gg_nade_bonus))
+    multiKill = get_level_multikill(ggPlayer.nadeBonusLevel, str(gg_nade_bonus))
     
     # Checking for multikill level
     if multiKill > 1:
@@ -217,7 +217,7 @@ def using_weapon_list():
 def get_weapon(userid):
     # Using a weapon list ?
     if using_weapon_list():
-        return [getLevelWeapon(Player(userid).nadeBonusLevel, 
+        return [get_level_weapon(Player(userid).nadeBonusLevel, 
                                                 str(gg_nade_bonus))]
      
     # Getting regular weapon(s)

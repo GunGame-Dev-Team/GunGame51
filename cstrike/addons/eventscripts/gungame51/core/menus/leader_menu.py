@@ -19,7 +19,7 @@ from cmdlib import unregisterSayCommand
 # GunGame Imports
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.leaders.shortcuts import get_leader_names
-from gungame51.core.weapons.shortcuts import getLevelWeapon
+from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # ============================================================================
 # >> GLOBALS
@@ -66,7 +66,7 @@ def leader_menu_cmd(userid, args):
         # Add leader level and weapon
         leaderLevel = get_leader_level()
         newLeaderList.append('    Level %s (%s)' % (leaderLevel,
-                                getLevelWeapon(leaderLevel)))
+                                get_level_weapon(leaderLevel)))
 
         # Divider
         newLeaderList.append('-'*26)

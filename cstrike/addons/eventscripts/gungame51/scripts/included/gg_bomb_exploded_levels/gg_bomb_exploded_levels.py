@@ -18,7 +18,7 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.weapons.shortcuts import getLevelWeapon
+from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_total_levels
 
 # ============================================================================
@@ -96,7 +96,7 @@ def getLevelupList(currentLevel, levelupLevel):
     # Create a list of the weapon names for levels we plan to level the player
     # up past
     for level in xrange(currentLevel + 1, levelupLevel):
-        levelupList.append(getLevelWeapon(level))
+        levelupList.append(get_level_weapon(level))
 
     # Return the list
     return levelupList
