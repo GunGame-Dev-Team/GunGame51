@@ -503,7 +503,6 @@ class BasePlayer(object):
                 weapToStrip = pWeapon
 
             if weapToStrip:
-                es.dbgmsg(0, '**** GIVE WEAPON REMOVE!!')
                 es.server.queuecmd('es_xremove %s' % (
                                           pPlayer.getWeaponIndex(weapToStrip)))
 
@@ -578,7 +577,6 @@ class BasePlayer(object):
                                                     'weapon_' + self.weapon:
 
                 # Remove the weapon
-                es.dbgmsg(0, '**** NO WEAPON CHECK REMOVE!!')
                 es.server.queuecmd('es_xremove %s' % int_lastgive)
 
     def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
@@ -670,7 +668,6 @@ class BasePlayer(object):
                 continue
 
             # Remove the weapon
-            es.dbgmsg(0, '**** STRIP REMOVE!!')
             es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
 
     # =========================================================================

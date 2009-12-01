@@ -25,7 +25,7 @@ from gungame51.core.messaging import MessageManager
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-GG51version = None
+ggVersion = None
 
 # ============================================================================
 # >> CLASSES
@@ -628,8 +628,8 @@ def gungame_info(info, _info=None):
     Fetches the head revision number from all of gungame's files
     '''
     if info == 'version':
-        if GG51version:
-            return GG51version
+        if ggVersion:
+            return ggVersion
         rev = int(__doc__.split('$Rev: ')[1].split()[0])
         gen = get_file_list()
         while True:
@@ -637,9 +637,9 @@ def gungame_info(info, _info=None):
                 files = gen.next()
             except:
                 del doc_string
-                global GG51version
-                GG51version = '5.1.%s' % rev
-                return GG51version
+                global ggVersion
+                ggVersion = '5.1.%s' % rev
+                return ggVersion
             base_name = files[0].split('/')
             base_name = '.'.join(base_name[base_name.index('gungame51'):])
             if base_name.startswith('gungame51.scripts.custom'):
