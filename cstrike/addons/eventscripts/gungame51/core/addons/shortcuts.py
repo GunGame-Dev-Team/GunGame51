@@ -46,7 +46,7 @@ def get_addon_info(name=None):
     # Standardize the addon name to be a lower-case string
     if name:
         name = str(name).lower()
-    
+
     return AddonManager().get_addon_info(name)
     
 def get_addon_type(name):
@@ -78,5 +78,10 @@ def addon_exists(name):
     '''
     return AddonManager.addon_exists(name)
 
-def getLoadedAddonList():
-    return AddonManager().get_addon_info().keys()
+def get_loaded_addon_list(type=None):
+    addons = AddonManager().get_addon_info().keys()
+
+    if type in ['custom', 'included']:
+        return [x for x in addons if get_addon_type(x) == type]
+
+    return addons

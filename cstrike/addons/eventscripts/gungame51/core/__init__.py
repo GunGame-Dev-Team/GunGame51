@@ -14,6 +14,7 @@ from os import name as platform
 from os import listdir
 from os import path
 from os import lstat
+import path
 from stat import S_ISDIR
 
 # Eventscripts Imports
@@ -71,16 +72,5 @@ def get_file_list(top=get_game_dir('addons/eventscripts/gungame51')):
 
     (Excluding svn folders and files.)
     '''
-    names = [n for n in listdir(top) if n != '.svn']
-    yield [top, names]
-    for name in names:
-        if name == '.svn':
-            continue
-        try:
-            st = lstat(path.join(top, name))
-        except:
-            continue
-        if not S_ISDIR(st.st_mode):
-            continue
-        for (newtop, children) in get_file_list('%s/%s' % (top, name)):
-            yield [newtop, [c for c in children if c != '.svn']]
+    for name in path.path(top).walkdirs():
+        yield [str(name).replace('\\', '/'), [str(x.name) for x in name.files('*.py')]]
