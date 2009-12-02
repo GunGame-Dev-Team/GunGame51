@@ -129,14 +129,15 @@ def gungame_except_hook(tb_type, value, trace_back):
             log_file.seek(0)
 
             # Increase occurence count
-            error_count = (int(log_contents[(find_error_index - 92):(
-                                                find_error_index - 88)]) + 1)
-
+            error_count = (int(log_contents[(find_error_index - 92):\
+            (find_error_index - 88)]) + 1)
+            
             # Write change w/ new date and occurence count
-            log_file.write(log_contents[:(find_error_index - 161)] + ('LAST ' +
-            'EVENT: ' + '%s' % strftime('[%d-%m-%Y @ %H:%M:%S]') + ' '*10 +
-            'TOTAL OCCURENCES: [%04i]' % error_count).center(79) + '\n' +
-            log_contents[(find_error_index - 81):])
+            log_file.write(log_contents[:(find_error_index - 241)] + 
+            log_contents[(find_error_index + len(tb) + 2):] + '-='*39 + '-\n' +
+            (('LAST EVENT: ' + '%s' % strftime('[%m/%d/%Y @ %H:%M:%S]')) +
+            ' '*9 + ' TOTAL OCCURENCES: [%04i]' % error_count).center(79) + '\n' + '-='*39 +
+            '-\n\n' + tb + '\n\n')
             
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
