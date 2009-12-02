@@ -25,6 +25,7 @@ from weaponlib import getWeaponList
 from core.weapons.shortcuts import get_weapon_order
 from core.weapons.shortcuts import set_weapon_order
 from core.weapons.shortcuts import get_level_multikill
+from core.weapons.shortcuts import get_level_weapon
 from core.weapons.shortcuts import get_total_levels
 
 #    Config Function Imports
@@ -42,14 +43,17 @@ from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
 
 #    Leaders Function Imports
-from core.leaders.shortcuts import LeaderManager
+from core.leaders.shortcuts import get_leader_count
+from core.leaders.shortcuts import get_leader_level
 from core.leaders.shortcuts import is_leader
+from core.leaders.shortcuts import LeaderManager
 
 #    Core Function Imports
 from core import inMap
 from core import get_game_dir
 
 #   Messaging Function Imports
+#from core.messaging.shortcuts import lang
 from core.messaging.shortcuts import loadTranslation
 from core.messaging.shortcuts import unloadTranslation
 from core.messaging.shortcuts import saytext2
@@ -334,9 +338,41 @@ def player_spawn(event_var):
         # Reset AFK
         gamethread.delayed(0.60, ggPlayer.afk.reset)
 
+        # Get the level, total number of levels and leader level for the
+        # hudhint
+        level = ggPlayer.level
+        totalLevels = get_total_levels()
+        leaderLevel = get_leader_level()
+        """
+        # Create a string for the hudhint
+        text = lang(string='LevelInfo_CurrentLevel', tokens={
+                                'level': level,
+                                'total': totalLevels})
+        text += lang(string='LevelInfo_CurrentWeapon', tokens={
+                                'weapon': ggPlayer.weapon})
+        text += lang(string='LevelInfo_RequiredKills', tokens={
+                                'kills': ggPlayer.multikill,
+                                'total': get_level_multikill(level)})
+
+        leaderTokens = {}
+        # Choose the leaderString based on the player's leadership status
+        if get_leader_count() == 0:
+            leaderString = 'LevelInfo_NoLeaders'
+        elif is_leader(userid):
+            if get_leader_count() > 1:
+                leaderString = 'LevelInfo_AmongstLeaders'
+            leaderString = 'LevelInfo_CurrentLeader'
+        else:
+            leaderString = 'LevelInfo_LeaderLevel'
+            leaderTokens={'level': leaderLevel,
+                        'total': totalLevels,
+                        'weapon': get_level_weapon(leaderLevel)}
+
+        text += lang(string=leaderString, tokens=leaderTokens)
+        """
+        text = 'hi'
         # Send the level information hudhint
-        ggPlayer.hudhint('LevelInfo_CurrentLevel', {'level': ggPlayer.level,
-                                                  'total': get_total_levels()})
+        ggPlayer.hudhint(text)
 
         # Give the player their weapon
         gamethread.delayed(0.05, ggPlayer.give_weapon)

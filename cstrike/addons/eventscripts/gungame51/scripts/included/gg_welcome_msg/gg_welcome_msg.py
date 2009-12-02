@@ -141,6 +141,10 @@ def buildPopups():
     menu.timeout('view', int(gg_welcome_msg_timeout))
 
 def welcome(userid, args):
+    # Do not send to bots or non-existent players
+    if es.getplayersteamid(userid) == 'BOT' or not es.exists('userid', userid):
+        return
+
     # If the user has the popup open, remove it
     popuplib.unsendname('gg_welcome', userid)
     # Send the popup

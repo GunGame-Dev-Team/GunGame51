@@ -23,7 +23,6 @@ from usermsg import showVGUIPanel
 
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import get_level_weapon
-from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core import getOS
 from gungame51.core import GunGameError
 from gungame51.core.messaging import MessageManager
