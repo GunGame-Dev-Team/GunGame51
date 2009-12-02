@@ -545,8 +545,9 @@ def gg_start(event_var):
     resetPlayers()
 
     # Disable warmup due to "gg_multi_round"?
-    if gg_warmup_round_backup != int(gg_warmup_round):
-        es.server.queuecmd('gg_warmup_round 0')
+    if gg_warmup_round_backup != int(gg_warmup_round) and \
+        gg_warmup_round_backup:
+            es.server.queuecmd('gg_warmup_round 0')
 
     # Calculate round number
     RoundInfo().round += 1
