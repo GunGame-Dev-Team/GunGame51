@@ -146,16 +146,17 @@ def load():
     config.text('   * This option is only valid if "gg_multi_round" is set ' +
                 'to a value')
     config.text('     higher than "0".')
-    config.text('   * This will start an intermission timer similar to the ' +
-                'warmup timer')
+    config.text('   * This will load "gg_warmup_round" based off of the ' +
+                '"gg_warmup timer"')
     config.text('     between rounds.')
+    config.text('   * Without an intermission, the next GunGame round will ' +
+                'start immediately after a win.')
     config.text('Options:')
-    config.text('   # = The amount of time (in seconds) that the ' +
-                'intermission lasts')
-    config.text('       between rounds.')
-    config.text('Default Value: 20')
-    config.cvar('gg_multi_round_intermission', 20, 'The amount of time (in seconds) that ' +
-                'the intermission lasts between rounds.')
+    config.text('   0 = Do not have an intermission.')
+    config.text('   1 = Enable the intermission.')
+    config.text('Default Value: 0')
+    config.cvar('gg_multi_round_intermission', 0, 'The amount of time (in ' +
+                'seconds) that the intermission lasts between rounds.')
 
     # Dynamic End of Map Chat Time
     config.text('')

@@ -80,6 +80,10 @@ def player_disconnect(event_var):
     # Get the player's uniqueid
     steamid = ggPlayer.steamid
 
+    # If the steamid is "None", return
+    if not steamid:
+        return
+
     # Don't save level
     if 'BOT' in steamid:
         return

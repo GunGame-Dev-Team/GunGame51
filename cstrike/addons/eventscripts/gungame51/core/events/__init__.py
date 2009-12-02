@@ -16,6 +16,11 @@ import es
 from gungame51.core.weapons.shortcuts import get_total_levels
 
 # ============================================================================
+# >> GLOBAL VARIABLES
+# ============================================================================
+gg_multi_round = es.ServerVar('gg_multi_round')
+
+# ============================================================================
 # >> CLASSES
 # ============================================================================
 class EventManager(object):
@@ -51,10 +56,15 @@ class EventManager(object):
         
         # Check to see if the player just won
         if newLevel > get_total_levels():
-            '''
-            Note: fix "round"
-            '''
-            self.gg_win(playerInstance, victimInstance, round=0)
+            # If "gg_multi_round" is disabled
+            if not int(gg_multi_round):
+                # Fire the event "gg_win"
+                self.gg_win(playerInstance, victimInstance, round=0)
+                return True
+
+            # Fire the event "gg_win" and set the round
+            from gungame51.gungame51 import RoundInfo
+            self.gg_win(playerInstance, victimInstance, round=int(RoundInfo().remaining))
             return True
             
         playerInstance.level = newLevel
@@ -125,11 +135,10 @@ class EventManager(object):
                  '0' if not victimInstance else victimInstance.userid)
         es.event('setint', 'gg_win', 'loser',
                  '0' if not victimInstance else victimInstance.userid)
-        # Not sure how to handle this yet...commenting out for now
-        #es.event('setint', 'gg_win', 'round', '1' if dict_variables['roundsRemaining'] > 1 else '0')
-        es.event('setint', 'gg_win', 'round', '0')
+        es.event('setint', 'gg_win', 'round',
+                 int(round) if int(round) > 0 else '0')
         es.event('fire', 'gg_win')
-        
+
     # =========================================================================
     # >> LEADER EVENTS
     # =========================================================================

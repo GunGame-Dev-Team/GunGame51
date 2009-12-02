@@ -73,16 +73,37 @@ from core.menus import MenuManager
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
-gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
-gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
-gg_multikill_override = es.ServerVar('gg_multikill_override')
-gg_player_armor = es.ServerVar('gg_player_armor')
-sv_alltalk = es.ServerVar('sv_alltalk')
-gg_win_alltalk = es.ServerVar('gg_win_alltalk')
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
+gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
+gg_multi_round = es.ServerVar('gg_multi_round')
+gg_multi_round_intermission = es.ServerVar('gg_multi_round_intermission')
+gg_multikill_override = es.ServerVar('gg_multikill_override')
+gg_player_armor = es.ServerVar('gg_player_armor')
+gg_warmup_round = es.ServerVar('gg_warmup_round')
+gg_warmup_round_backup = None
+gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
+gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
+gg_win_alltalk = es.ServerVar('gg_win_alltalk')
+sv_alltalk = es.ServerVar('sv_alltalk')
+
+# ============================================================================
+# >> CLASSES
+# ============================================================================
+class RoundInfo(object):
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Set round information variables
+            cls._the_instance.round = 0
+        return cls._the_instance
+        
+    @property
+    def remaining(self):
+        total = int(gg_multi_round) - self.round
+        return total if total > 0 else 0
+
 
 # ============================================================================
 # >> ADDON REGISTRATION
@@ -150,7 +171,9 @@ def unload():
     EventManager().gg_unload
     
 def initialize():
+    # Load all configs
     loadConfig(get_config_list())
+
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
     
@@ -195,37 +218,58 @@ def initialize():
     
     # Load menus
     MenuManager().load('#all')
+    
+    # Set up "gg_multi_round"
+    if int(gg_multi_round):
+        RoundInfo().round = 0
+
+    # See if we need to fire event gg_start after everything is loaded
+    gamethread.delayed(2, check_priority)
 
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
+    '''
+    I believe this may not be our responsibility to track, or should it?
     # Check for priority addons
     if PriorityAddon():
         del PriorityAddon()[:]
-
+    '''
     # Make the sounds downloadable
     make_downloadable()
 
     # Load custom GunGame events
     es.loadevents('addons/eventscripts/' + 
                   'gungame51/core/events/data/es_gungame_events.res')
-    
+
     # Execute GunGame's autoexec.cfg
     es.delayed('1', 'exec gungame51/gg_server.cfg')
-    
+
     # Reset the GunGame players
     resetPlayers()
-    
+
     # Reset the GunGame leaders
     LeaderManager().reset()
 
     # Prune the DB
     prune_winners_db()
-    
+
     # Update players in winner's database
     for userid in getUseridList('#human'):
         Player(userid).database_update()
+
+    # Set up "gg_multi_round"
+    if int(gg_multi_round):
+        RoundInfo().round = 0
+
+    # See if we need to fire event gg_start after everything is loaded
+    gamethread.delayed(2, check_priority)
+
+def check_priority():
+    # If there is nothing in priority addons, fire event gg_start
+    if not PriorityAddon():
+        EventManager().gg_start()
 
 def round_start(event_var):
 
@@ -416,11 +460,6 @@ def gg_win(event_var):
     if not es.isbot(userid):
         Player(userid).wins += 1
 
-    '''
-    CURRENTLY, EVENT_VAR['ROUND'] WILL ALWAYS RETURN 0. I HAVE TO FIGURE OUT A
-    GOOD WAY TO IMPLEMENT THIS.
-    '''
-
     if event_var['round'] == '0':
         # ====================================================
         # MAP WIN
@@ -431,7 +470,6 @@ def gg_win(event_var):
         
         # Tell the world
         saytext2('#human', index, 'PlayerWon', {'player':playerName})
-        
 
         # Play the winner sound
         for userid in getUseridList('#human'):
@@ -441,33 +479,43 @@ def gg_win(event_var):
         # =====================================================================
         # ROUND WIN
         # =====================================================================
-        '''
-        # Calculate rounds remaining
-        dict_variables['roundsRemaining'] -= 1
-        '''
-        
+        # Reset the players
+        resetPlayers()
+
+        # Freeze players and put them in god mode
+        for playerid in es.getUseridList():
+            getPlayer(playerid).freeze = True
+            getPlayer(playerid).godmode = True
+
         # End the GunGame Round
         es.server.queuecmd('mp_restartgame 2')
-        
+
         # Check to see if the warmup round needs to be activated
-        if int(es.ServerVar('gg_round_intermission')):
-            '''
-            gungamelib.setGlobal('isIntermission', 1)
-            
-            es.server.queuecmd('es_xload ' +
-                               'gungame/included_addons/gg_warmup_round')
-            '''
+        if int(es.ServerVar('gg_multi_round_intermission')):
+            if not int(gg_warmup_round):
+                # Back up gg_warmup_round's value
+                global gg_warmup_round_backup
+                gg_warmup_round_backup = int(gg_warmup_round)
+
+                # Load gg_warmup_round - loading will start the warmup timer
+                es.server.queuecmd('gg_warmup_round 1')
+            else:
+                # Import and execute "do_warmup()" - starts the warmup timer
+                from scripts.included.gg_warmup_round import do_warmup
+                do_warmup()
+        else:
+            gamethread.delayed(2, EventManager().gg_start())
+
         # Tell the world
         saytext2('#human', index, 'PlayerWonRound', {'player': playerName})
-        
+
         # Play the winner sound
         for userid in getUseridList('#human'):
             Player(userid).playsound('winner')
-    
+
     # =========================================================================
     # ALL WINS
     # =========================================================================
-    
     # Enable alltalk
     if not int(sv_alltalk) and int(gg_win_alltalk):
         es.server.queuecmd('sv_alltalk 1')
@@ -495,7 +543,14 @@ def gg_win(event_var):
 def gg_start(event_var):
     # Reset all the players
     resetPlayers()
-    
+
+    # Disable warmup due to "gg_multi_round"?
+    if gg_warmup_round_backup != int(gg_warmup_round):
+        es.server.queuecmd('gg_warmup_round 0')
+
+    # Calculate round number
+    RoundInfo().round += 1
+
 def gg_addon_loaded(event_var):
     es.dbgmsg(0, 'gg_addon_loaded: "%s" ' % event_var['addon'] + 
                  'of type "%s"' % event_var['type'])
