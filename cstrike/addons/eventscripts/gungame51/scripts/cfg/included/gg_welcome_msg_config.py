@@ -38,12 +38,31 @@ def load():
                 'server and addon')
     config.text('information.')
     config.text('   Players can type !welcome to bring this menu back up.')
+    config.text('Note:')
+    config.text('   The configureable message is available in' +
+                '"gg_stats_logging.txt".')
     config.text('Options:')
     config.text('   0 = (Disabled)')
     config.text('   1 = (Enabled)')
     config.text('Default Value: 0')
     config.cvar('gg_welcome_msg', 0, 'Enables/Disables ' +
                 'gg_welcome_msg.')
+    config.text('')
+
+    # gg_welcome_msg_timeout
+    config.text('')
+    config.text('='*76)
+    config.text('>> GUNGAME WELCOME MESSAGE TIMEOUT')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The number (in seconds) it takes for the welcome message' +
+                ' to dissappear.')
+    config.text('Options:')
+    config.text('   (#) = (#) seconds')
+    config.text('   10 = 10 seconds')
+    config.text('Default Value: 10')
+    config.cvar('gg_welcome_msg_timeout', 10, 'Sets the number of seconds ' +
+                'for gg_welcome_msg_timeout.')
     config.text('')
 
     config.write()

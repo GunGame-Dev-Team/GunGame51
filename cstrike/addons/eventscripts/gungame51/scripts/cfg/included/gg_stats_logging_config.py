@@ -39,7 +39,7 @@ def load():
     config.text('   HLstatsX, Psychostats, and etc.')
     config.text('Notes:')
     # Not quite sure what this is, but I don't think I like it...
-    config.text('   * Other options available in "stats_logging.txt".')
+    config.text('   * Other options available in "gg_stats_logging.txt".')
     config.text('   * This should be used with third-party stats programs.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_stats_logging.')

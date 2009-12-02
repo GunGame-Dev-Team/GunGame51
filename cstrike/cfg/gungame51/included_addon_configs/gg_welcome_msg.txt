@@ -1,0 +1,15 @@
+//----------------------------------------------------------------------------
+// gg_welcome_msg.txt -- Events to log.
+//
+// This file contains the message that will be shown in the welcome message
+// popup, which is shown whenever a player connects with gg_welcome_msg is
+// enabled.
+//
+// Variables: $server -- Name of the server
+//            $date -- Date, in DD/MM/YY format
+//            $time -- Time, in HH:MM:SS format
+//
+// Note: Any alteration of this file requires a server restart or a reload of
+//       GunGame.
+//----------------------------------------------------------------------------
+You are playing on $date at $time

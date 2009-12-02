@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// stats logging.txt -- Events to log.
+// gg_stats_logging.txt -- Events to log.
 //
 // This file defines all the events to log for use with third-party
 // statistic applications. (e.g. HLstatsX, PsychoStats, etc.)
