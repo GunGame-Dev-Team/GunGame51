@@ -39,6 +39,7 @@ list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
 gg_respawn_cmd_override = es.ServerVar('gg_respawn_cmd_override')
+gg_soundpack = es.ServerVar('gg_soundpack')
 
 # ============================================================================
 # >> CLASSES
@@ -121,7 +122,6 @@ class PreventLevel(list):
         if name in self:
             list.remove(self, name)
 
-
 class BasePlayer(object):
     # =========================================================================
     # >> BasePlayer() CLASS INITIALIZATION
@@ -134,7 +134,7 @@ class BasePlayer(object):
         self.multikill = 0
         self.index = int(getPlayer(str(self.userid)).index)
         self.stripexceptions = []
-        self.soundpack = SoundPack('default')
+        self.soundpack = SoundPack(str(gg_soundpack))
         self.name = getPlayer(self.userid).name
 
     # =========================================================================

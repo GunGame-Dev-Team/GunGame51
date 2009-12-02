@@ -81,6 +81,7 @@ gg_multi_round = es.ServerVar('gg_multi_round')
 gg_multi_round_intermission = es.ServerVar('gg_multi_round_intermission')
 gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
+gg_player_defuser = es.ServerVar('gg_player_defuser')
 gg_warmup_round = es.ServerVar('gg_warmup_round')
 gg_warmup_round_backup = None
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
@@ -310,6 +311,19 @@ def player_spawn(event_var):
 
     ggPlayer = Player(userid)
 
+    # Retrieve the defuser setting
+    if int(gg_player_defuser):
+        gg_map_obj = int(es.ServerVar('gg_map_obj'))
+        # If bomb sites are enabled by gg_map_obj
+        if not gg_map_obj or gg_map_obj == 3:
+            # Check to see if this player is a CT
+            if es.getplayerteam(userid) == 3:
+                # Does the map have a bombsite?
+                if len(es.createentitylist('func_bomb_target')) > 0:
+                    # Make sure the player doesn't already have a defuser
+                    if not getPlayer(userid).get('defuser'):
+                        es.server.queuecmd('es_xgive %d item_defuser' % userid)
+    
     # Strip bots (sometimes they keep previous weapons)
     if es.isbot(userid):
         gamethread.delayed(0.25, ggPlayer.give_weapon)

@@ -59,42 +59,6 @@ def load():
 
     config.write()
     es.dbgmsg(0, '\tgg_default_addons.cfg')
-'''
-//=========================================================
-// WELCOME MESSAGE
-//=========================================================
-// Show a welcome message to everyone that connects.
-//
-// Note: More options available in the "welcome_msg" folder.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_welcome_msg 0
-
-//=========================================================
-// WELCOME MESSAGE TIMEOUT
-//=========================================================
-// How long until the welcome message dismisses itself.
-//
-// Default value: 5
-//
-// Options: 0 = Never dismiss
-//          <seconds> = Stay up for <seconds>
-
-gg_welcome_msg_timeout 5
-
-//=========================================================
-// CONVERTER
-//=========================================================
-// Allows you to upgrade your current winner database / spawnpoints from
-// previous versions of GunGame (3/4) to GunGame 5 format.
-//
-// Options: 0 = Disabled
-//          1 = Enabled
-
-gg_convert 0
-'''
 
 def unload():
     global config

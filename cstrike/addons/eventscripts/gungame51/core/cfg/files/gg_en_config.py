@@ -240,23 +240,6 @@ def load():
     config.cvar('gg_soundpack', 'default', 'The controls which sound pack ' +
                 'will be used by default.')
     config.text('')
-
-    # Leader Weapon Warning
-    config.text('')
-    config.text('='*76)
-    config.text('>> LEADER WEAPON WARNING')
-    config.text('='*76)
-    config.text('Note:')
-    config.text('   * Announces via sound at the beginning of each round ' +
-                'when a player')
-    config.text('     has reached either "hegrenade" or "knife" level.')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   1 = Enabled.')
-    config.text('Default Value: 0')
-    config.cvar('gg_leaderweapon_warning', 0, 'Play a sound when a player ' +
-                'reaches "hegrenade" or "knife" level.')
-    config.text('')
     config.text('')
 
 
