@@ -48,28 +48,28 @@
 
 => rideguys weapon order
 
-sg552 3
-aug 3
-m249 3
-awp 3
-m4a1 3
-ak47 3
-sg550 3
+sg552 2
+aug 2
+m249 2
+awp 2
+m4a1 2
+ak47 2
+g3sg1 2
 famas 2
 galil 2
 scout 1
-p90 2
-mp5navy 2
-ump45 2
-mac10 2
-tmp 2
-xm1014 2
-m3 2
-deagle 2
-fiveseven 2
-elite 2
-p228 2
-usp 2
-glock 2
-knife 2
-hegrenade 2
+p90 1
+mp5navy 1
+ump45 1
+mac10 1
+tmp 1
+xm1014 1
+m3 1
+deagle 1
+fiveseven 1
+elite 1
+p228 1
+usp 1
+glock 1
+knife
+hegrenade
