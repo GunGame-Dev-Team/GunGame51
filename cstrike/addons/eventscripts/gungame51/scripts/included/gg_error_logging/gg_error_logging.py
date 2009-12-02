@@ -49,7 +49,7 @@ mani_admin_plugin_version = es.ServerVar('mani_admin_plugin_version')
 est_version = es.ServerVar('est_version')
 
 file_name = (get_game_dir('addons/eventscripts/gungame51/logs') +
-                    '/GunGame_Error_Log.txt')
+                    '/GunGame%s_Log.txt' % gungame_info('version').replace('.','_'))
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -191,7 +191,7 @@ def make_log_file():
         while True:
             n += 1
             new_file_name = (get_game_dir('addons/eventscripts/gungame51/logs') +
-                                    '/GunGame_Error_Log[%01i].txt' % n)
+                                    '/GunGame%s_Log[%01i].txt' % (gungame_info('version').replace('.','_'), n))
             if not path.isfile(new_file_name):
                 break
 
