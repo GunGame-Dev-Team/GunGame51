@@ -385,7 +385,7 @@ class MessageManager(object):
                 usermsg.echo(userid, '%s%s' %(prefix,
                     self.__clean_string(self.__format_string(string, tokens, userid))))
 
-    def langstring(self, userid=0, string='', tokens={}, prefix=False):
+    def langstring(self, string='', tokens={}, userid=0, prefix=False):
         # Format the message with the prefix if needed
         prefix = self.__format_prefix(prefix, string)
 

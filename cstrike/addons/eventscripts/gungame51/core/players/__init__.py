@@ -436,7 +436,7 @@ class BasePlayer(object):
         MessageManager().echo(self.userid, level, string, tokens, prefix)
 
     def langstring(self, string, tokens={}, prefix=False):
-        return MessageManager().langstring(self.userid, string, tokens, prefix)
+        return MessageManager().langstring(string, tokens, self.userid, prefix)
 
     # =========================================================================
     # >> BasePlayer() WEAPON CLASS METHODS

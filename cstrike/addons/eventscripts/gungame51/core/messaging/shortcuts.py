@@ -26,8 +26,8 @@ def toptext(filter, duration, color, string, tokens={}):
 def echo(filter, level, string, tokens={}, prefix=False):
     MessageManager().echo(filter, level, string, tokens, prefix)
     
-def langstring(userid, string, tokens={}, prefix=False):
-    MessageManager().langstring(userid, string, tokens, prefix)
+def langstring(string, tokens={}, userid=0, prefix=False):
+    return MessageManager().langstring(string, tokens, userid, prefix)
     
 def loadTranslation(name, addon):
     MessageManager().load(name, addon)

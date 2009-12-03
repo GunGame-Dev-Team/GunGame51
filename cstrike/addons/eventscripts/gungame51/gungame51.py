@@ -53,7 +53,7 @@ from core import inMap
 from core import get_game_dir
 
 #   Messaging Function Imports
-#from core.messaging.shortcuts import lang
+from core.messaging.shortcuts import langstring
 from core.messaging.shortcuts import loadTranslation
 from core.messaging.shortcuts import unloadTranslation
 from core.messaging.shortcuts import saytext2
@@ -343,14 +343,15 @@ def player_spawn(event_var):
         level = ggPlayer.level
         totalLevels = get_total_levels()
         leaderLevel = get_leader_level()
-        """
+
         # Create a string for the hudhint
-        text = lang(string='LevelInfo_CurrentLevel', tokens={
+        text = langstring('LevelInfo_CurrentLevel', tokens={
                                 'level': level,
                                 'total': totalLevels})
-        text += lang(string='LevelInfo_CurrentWeapon', tokens={
+        print 't!', type(text)
+        text += langstring('LevelInfo_CurrentWeapon', tokens={
                                 'weapon': ggPlayer.weapon})
-        text += lang(string='LevelInfo_RequiredKills', tokens={
+        text += langstring('LevelInfo_RequiredKills', tokens={
                                 'kills': ggPlayer.multikill,
                                 'total': get_level_multikill(level)})
 
@@ -359,18 +360,17 @@ def player_spawn(event_var):
         if get_leader_count() == 0:
             leaderString = 'LevelInfo_NoLeaders'
         elif is_leader(userid):
+            leaderString = 'LevelInfo_CurrentLeader'
             if get_leader_count() > 1:
                 leaderString = 'LevelInfo_AmongstLeaders'
-            leaderString = 'LevelInfo_CurrentLeader'
         else:
             leaderString = 'LevelInfo_LeaderLevel'
             leaderTokens={'level': leaderLevel,
                         'total': totalLevels,
                         'weapon': get_level_weapon(leaderLevel)}
 
-        text += lang(string=leaderString, tokens=leaderTokens)
-        """
-        text = 'hi'
+        text += langstring(leaderString, tokens=leaderTokens)
+
         # Send the level information hudhint
         ggPlayer.hudhint(text)
 
