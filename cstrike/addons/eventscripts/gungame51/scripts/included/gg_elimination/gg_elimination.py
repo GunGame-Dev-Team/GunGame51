@@ -148,13 +148,13 @@ def respawnPlayer(userid, respawnRound):
     # Make sure the round is active
     if not roundInfo.active:
         return
-    
+
     # Check if respawn was issued in the current round
     if roundInfo.round != respawnRound:
         return
 
     # See if the player suicided due to disconnect
-    if not es.exists(userid):
+    if not es.exists('userid', userid):
         return
 
     # Retrieve the playerlib player object
@@ -163,18 +163,18 @@ def respawnPlayer(userid, respawnRound):
     # Make sure the player is respawnable
     if not plPlayer.isdead or es.getplayerteam(userid) < 2:
         return
-    
+
     # Retrieve the GunGame player object
     ggPlayer = Player(userid)
     
     # Tell everyone that they are respawning
     saytext2('#human', ggPlayer.index, 'RespawningPlayer', 
     {'player': es.getplayername(userid)}, True)
-    
+
     # Respawn player
     ggPlayer.respawn()
 
-def respawnEliminated(userid, respawnRound):       
+def respawnEliminated(userid, respawnRound):
     # Check if round is over
     if not roundInfo.active:
         return
@@ -197,7 +197,7 @@ def respawnEliminated(userid, respawnRound):
     # Respawn all victims eliminated players
     for playerid in ggPlayer.eliminated:
         # Make sure the player exists
-        if not es.exists(playerid):
+        if not es.exists('userid', playerid):
             continue
 
         # Make sure the player is respawnable
@@ -219,7 +219,7 @@ def respawnEliminated(userid, respawnRound):
     {'player': ', '.join(players)}, True)
 
     # Is the player that was killed still on the server (suicide disconnect)?
-    if es.exists(userid):
+    if es.exists('userid', userid):
         # Clear victims eliminated player list
         ggPlayer.eliminated = []
     else:
