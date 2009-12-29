@@ -99,7 +99,7 @@ def player_disconnect(event_var):
     ggPlayer = Player(userid)
 
     # Respawn eliminated players if needed
-    if ggPlayer.eliminated:
+    if hasattr(ggPlayer, 'eliminated') and ggPlayer.eliminated:
         respawnEliminated(userid, roundInfo.round)
     else:
         # Delete the "eliminated" attribute from the disconnecting player
