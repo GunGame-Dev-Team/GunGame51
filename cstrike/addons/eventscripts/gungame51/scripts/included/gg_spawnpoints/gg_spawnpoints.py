@@ -10,12 +10,13 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python Imports
-
+from os import path
 
 # Eventscripts Imports
 import es
-from cmdlib import registerClientCommand
-from cmdlib import unregisterClientCommand
+from cmdlib import registerServerCommand
+from cmdlib import unregisterServerCommand
+from playerlib import getPlayer
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -34,7 +35,8 @@ info.translations = ['gg_spawnpoints']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-
+filePath = es.ServerVar('eventscripts_gamedir') + '/cfg/gungame51/' + \
+    'spawnpoints/' + str(es.ServerVar('eventscripts_currentmap')) + '.txt'
 
 # ============================================================================
 # >> CLASSES
@@ -47,20 +49,24 @@ info.translations = ['gg_spawnpoints']
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
     
-    registerClientCommand('spawn_add', cmd_spawn_add, 'Adds a spawnpoint at the users location', 'ADMIN')
-    registerClientCommand('spawn_remove', cmd_spawn_remove, 'Remove spawnpoint at index', 'ADMIN')
-    registerClientCommand('spawn_remove_all', cmd_spawn_remove_all, 'Removes all spawn points', 'ADMIN')
-    registerClientCommand('spawn_show', cmd_spawn_show, 'Toggles spawn point models on and off', 'ADMIN')
-    registerClientCommand('spawn_print', cmd_spawn_print, 'Prints spawnpoints by index into the players console', 'ADMIN')
+    registerServerCommand('spawn_add', cmd_spawn_add, 'Adds a spawnpoint at the users location')
+    registerServerCommand('spawn_remove_all', cmd_spawn_remove_all, 'Removes all spawn points')
+    registerServerCommand('spawn_print', cmd_spawn_print, 'Prints spawnpoints into the server console')
+    """
+    registerServerCommand('spawn_remove', cmd_spawn_remove, 'Remove spawnpoint at index')
+    registerServerCommand('spawn_show', cmd_spawn_show, 'Toggles spawn point models on and off')
+    """
     
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
-    unregisterClientCommand('spawn_add')
-    unregisterClientCommand('spawn_remove')
-    unregisterClientCommand('spawn_remove_all')
-    unregisterClientCommand('spawn_show')
-    unregisterClientCommand('spawn_print')
+    unregisterServerCommand('spawn_add')
+    unregisterServerCommand('spawn_remove_all')
+    unregisterServerCommand('spawn_print')
+    """
+    unregisterServerCommand('spawn_remove')
+    unregisterServerCommand('spawn_show')
+    """
 
 # ============================================================================
 # >> GAME EVENTS
@@ -70,17 +76,59 @@ def unload():
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def invalid_syntax(syntax):
+    es.dbgmsg(0, 'Invalid Syntax. Use: %s' % syntax)
 
-def cmd_spawn_add(userid):
-    global spawnPoints
-    
-    # Get player info
-    playerlibPlayer = playerlib.getPlayer(userid)
-    playerLoc = es.getplayerlocation(userid)
-    playerViewAngle = playerlibPlayer.get('viewangle')
-    
-    # Create spawnpoint
-    addSpawnPoint(playerLoc[0], playerLoc[1], playerLoc[2], playerViewAngle[1])
-    
-    msg(userid, 'AddedSpawnpoint', {'index': spawnPoints.getTotalPoints()-1})
+def cmd_spawn_add(args):
+    if len(args) != 1:
+        invalid_syntax('spawn_add <userid>')
+        return
 
+    userid = args[0]
+    if not userid.isdigit():
+        invalid_syntax('spawn_add <userid>')
+        return
+
+    if not es.exists('userid', userid):
+        es.dbgmsg(0, 'Userid does not exist.')
+        return
+
+    pPlayer = getPlayer(userid)
+    location = es.getplayerlocation(userid)
+    angle = pPlayer.get('viewangle')
+
+    spawnPoint = '%s %s %s %s %s %s\n' % (location[0], location[1], \
+    location[2], angle[0], angle[1], angle[2])
+    currentSpawnPoints = read_spawn_points()
+    
+    for sp in currentSpawnPoints:
+        if sp.split(' ')[0:3] == spawnPoint.split(' ')[0:3]:
+            es.dbgmsg(0, 'Spawnpoint already exists.')
+            return
+
+    currentSpawnPoints.append(spawnPoint)
+
+    write_spawn_points(currentSpawnPoints)
+    es.dbgmsg(0, 'SpawnPoint Added: %s' % spawnPoint.strip('\n'))
+
+def cmd_spawn_remove_all(args):
+    write_spawn_points([])
+
+def cmd_spawn_print(args):
+    for spawnPoint in read_spawn_points():
+        es.dbgmsg(0, spawnPoint.strip('\n'))
+
+def read_spawn_points():
+    if not path.isfile(filePath):
+        return []
+
+    spawnPointFile = open(filePath, 'r')
+    spawnPoints = spawnPointFile.readlines()
+    spawnPointFile.close()
+
+    return spawnPoints
+
+def write_spawn_points(spawnpoints):
+    spawnPointFile = open(filePath, 'w')
+    spawnPointFile.writelines(spawnpoints)
+    spawnPointFile.close()
