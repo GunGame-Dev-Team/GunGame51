@@ -348,7 +348,7 @@ def player_spawn(event_var):
         text = langstring('LevelInfo_CurrentLevel', tokens={
                                 'level': level,
                                 'total': totalLevels})
-        print 't!', type(text)
+
         text += langstring('LevelInfo_CurrentWeapon', tokens={
                                 'weapon': ggPlayer.weapon})
         text += langstring('LevelInfo_RequiredKills', tokens={
