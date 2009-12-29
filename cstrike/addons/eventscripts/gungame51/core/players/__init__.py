@@ -522,7 +522,7 @@ class BasePlayer(object):
         pPlayer = getPlayer(self.userid)
 
         # Stop if the player is not eligiable for a new weapon
-        if es.exists('userid', self.userid) or pPlayer.isdead or \
+        if not es.exists('userid', self.userid) or pPlayer.isdead or \
           pPlayer.teamid < 2:
             return
 
