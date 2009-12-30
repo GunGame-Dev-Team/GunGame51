@@ -172,6 +172,9 @@ def unload():
     # Create a copy of the dependencies dictionary
     dict_dependencies = dependencies.copy()
 
+    # Unload Menus
+    MenuManager().unload('#all')
+
     # Loop through addons that have required dependencies
     for addon in list(set(map((lambda (x, y): y), [(x, y) for x in \
         dict_dependencies for y in dict_dependencies[x]]))):

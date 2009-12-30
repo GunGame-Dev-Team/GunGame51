@@ -37,16 +37,14 @@ class MenuManager(object):
     def __new__(cls, *p, **k):
         if not '_gg_menus' in cls.__dict__:
             cls._gg_menus = object.__new__(cls)
+            cls._gg_menus.__loaded__ = {}
 
         return cls._gg_menus
-
-    def __init__(self):
-        self.__loaded__ = {}
 
     def load(self, name):
         if name in self.__loaded__:
             raise NameError('GunGame menu "%s" is already loaded' % name)
-            
+
         menu_folder = get_game_dir('addons/eventscripts/gungame51/core/menus')
 
         if name == '#all':
@@ -73,10 +71,10 @@ class MenuManager(object):
 
         else:
             raise NameError('"%s" is not a valid menu name.' % name)
-        
+
     def unload(self, name):
         if name == '#all':
-            for menu_name in self.__loaded__:
+            for menu_name in self.__loaded__.keys():
                 self.unload(menu_name)
 
         elif name not in self.__loaded__:
@@ -86,19 +84,19 @@ class MenuManager(object):
             menu_instance = self.get_menu_by_name(name)
             self.call_block(menu_instance, 'unload')
             del self.__loaded__[name]
-            
+
     def send(self, name, filter_type):
         if name not in self.__loaded__:
             raise NameError('"%s" is not a loaded menu name.' % name)
-            
+
         elif str(filter_type).isdigit():
             menu_instance = self.get_menu_by_name(name)
             self.call_block(menu_instance, 'send_menu', filter_type)
-            
+
         elif str(filter_type).startswith('#'):
             for userid in getUseridList(filter_type):
                 self.send(name, userid)
-                
+
         else:
             raise ValueError('"%s" is not a value filter/userid' % filter_type)
 
@@ -123,7 +121,7 @@ class MenuManager(object):
         menu_globals = menu_instance.__dict__
         if blockname in menu_globals and callable(menu_globals[blockname]):
             menu_globals[blockname](*a, **kw)
-            
+
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================

@@ -37,7 +37,7 @@ def load():
 
     # Register commands
     registerSayCommand('!leader', leader_menu_cmd, 'Displays a !leader menu.')
-    registerSayCommand('!leaders', leader_menu_cmd, 'Displays a !leader menu.')
+    registerSayCommand('!leaders', leader_menu_cmd, 'Displays a !leaders menu.')
     
 def unload():
     # Delete the popup if it exists
