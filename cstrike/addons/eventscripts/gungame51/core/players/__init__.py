@@ -516,6 +516,17 @@ class BasePlayer(object):
             if es.isbot(self.userid):
                     es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
+    
+    def _dead_check_give_weapon(self):
+        '''
+        Make sure the player is alive, then give_weapon()
+        '''
+        # If the player is dead, stop here
+        if getPlayer(self.userid).isdead:
+            return
+        
+        # Fire give_weapon()
+        self.give_weapon()
 
     def no_weapon_check(self, newWeapon=None):
         # Retrieve a playerlib.Player() instance
@@ -545,7 +556,7 @@ class BasePlayer(object):
                 return
 
             # Repeat give_weapon to re-strip the slot and give your weapon
-            gamethread.delayed(0.025, Player(self.userid).give_weapon)
+            gamethread.delayed(0.025, Player(self.userid)._dead_check_give_weapon)
 
         # Get the index of the last given entity
         int_lastgive = int(eventscripts_lastgive)
