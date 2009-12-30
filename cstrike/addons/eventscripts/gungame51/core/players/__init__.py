@@ -556,7 +556,7 @@ class BasePlayer(object):
                 return
 
             # Repeat give_weapon to re-strip the slot and give your weapon
-            gamethread.delayed(0.025, Player(self.userid)._dead_check_give_weapon)
+            gamethread.delayed(0.025, self._dead_check_give_weapon)
 
         # Get the index of the last given entity
         int_lastgive = int(eventscripts_lastgive)
