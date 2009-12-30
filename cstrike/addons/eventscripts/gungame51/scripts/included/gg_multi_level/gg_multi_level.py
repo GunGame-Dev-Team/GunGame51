@@ -169,12 +169,9 @@ gravity = GravityManager()
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    # Load up each player and set their multilevel attributes
-    for userid in es.getUseridList():
-        Player(userid).multiLevels = 0
-
-        # Also add the userid to our playerList
-        Player(userid).multiLevelEntities = []
+    # Set each player's multilevel attributes
+    setAttribute('#all', 'multiLevels', 0)
+    setAttribute('#all', 'multiLevelEntities', [])
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
@@ -201,7 +198,7 @@ def unload():
 # ============================================================================
 def player_activate(event_var):
     ggPlayer = Player(event_var['userid'])
-    
+
     # Add the player's multikill attribute
     ggPlayer.multiLevels = 0
     ggPlayer.multiLevelEntities = []
@@ -256,8 +253,10 @@ def es_map_start(event_var):
 def round_start(event_var):
     # For all players
     for userid in es.getUseridList():
+        ggPlayer = Player(userid)
+        
         # Make sure they 
-        Player(userid).multiLevels = 0
+        ggPlayer.multiLevels = 0
         
         if userid in list_currentMultiLevel:
             # Cancel the gamethread
@@ -265,6 +264,8 @@ def round_start(event_var):
 
             # Remove bonus effects
             removeMultiLevel(userid)
+        
+        ggPlayer.multiLevelEntities = []
 
     # Clear the list of players currently multi-leveling
     del list_currentMultiLevel[:]
