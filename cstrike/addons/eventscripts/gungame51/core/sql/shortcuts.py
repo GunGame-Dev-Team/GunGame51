@@ -35,7 +35,7 @@ def get_winners_list(n=10):
         n = 50
     ggDB = Database()
     winner_list = ggDB.select('gg_wins', ('name', 'wins'),
-                                            'ORDER BY wins DESC', True, n)
+                                            'ORDER BY ABS(wins) DESC', True, n)
     if winner_list:
         return winner_list
     return []
