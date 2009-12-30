@@ -267,6 +267,9 @@ def add_winner(name, uniqueid, wins, timestamp):
     currentWins = ggDB.select('gg_wins', 'wins', "where uniqueid = '%s'" % \
     uniqueid)
 
+    # Escape single quotes in the SQL query
+    name = name.replace("'", "''")
+    
     # If the uniqueid is not in the database, add it
     if currentWins == None:
         ggDB.query("INSERT INTO gg_wins " + "(name, uniqueid, wins, " +
