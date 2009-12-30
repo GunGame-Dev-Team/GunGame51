@@ -144,9 +144,29 @@ def load():
         es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
         es.unload('gungame')
 
+    # If the public variables exist, remove them
+    if not es.exists('variable','eventscripts_gg'):
+        es.ServerVar('eventscripts_gg').removeFlag('notify')
+        es.ServerVar('eventscripts_gg').removeFlag('replicated')
+    if not es.exists('variable','eventscripts_gg5'):
+        es.ServerVar('eventscripts_gg5').removeFlag('notify')
+        es.ServerVar('eventscripts_gg5').removeFlag('replicated')
+
+    # Create the public variables
+    es.ServerVar('eventscripts_gg').set(gungame_info('version'))
+    es.ServerVar('eventscripts_gg').makepublic()
+    es.ServerVar('eventscripts_gg5').set(gungame_info('version'))
+    es.ServerVar('eventscripts_gg5').makepublic()
+
 def unload():
     # Unload translations
     unloadTranslation('gungame', 'gungame')
+    
+    # Remove the public variables
+    es.ServerVar('eventscripts_gg').removeFlag('notify')
+    es.ServerVar('eventscripts_gg').removeFlag('replicated')
+    es.ServerVar('eventscripts_gg5').removeFlag('notify')
+    es.ServerVar('eventscripts_gg5').removeFlag('replicated')
 
     from core.addons import dependencies
     # Create a copy of the dependencies dictionary
