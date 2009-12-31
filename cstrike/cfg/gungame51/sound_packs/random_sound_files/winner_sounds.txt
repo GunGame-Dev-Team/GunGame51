@@ -1,0 +1,5 @@
+music/HL2_song14.mp3
+music/HL2_song15.mp3
+music/HL2_song20_submix4
+music/HL2_song23_SuitSong3.mp3
+music/HL2_song31.mp3
