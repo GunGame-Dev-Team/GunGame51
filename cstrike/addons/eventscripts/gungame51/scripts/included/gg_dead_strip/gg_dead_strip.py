@@ -9,12 +9,14 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-import spe
 
 # Eventscripts Imports
 import es
 from playerlib import getPlayer
 from weaponlib import getWeaponNameList
+
+# SPE Imports
+import spe
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -112,11 +114,9 @@ def item_pickup(event_var):
 # ============================================================================
 def remove_weapon(userid, item):
     # Remove weapon
-    #es.server.queuecmd('es_xremove %s' % getPlayer(userid).getWeaponIndex(
-    #                                                "weapon_%s" % item))
-    # es.msg("[REMOVE]: remove_weapon. gg_dead_strip.py")
-    spe.removeEntityByIndex( getPlayer(userid).getWeaponIndex("weapon_%s" % item) )
-    
+    spe.removeEntityByIndex( getPlayer(userid).getWeaponIndex(
+                            "weapon_%s" % item) )
+
 def drop_filter(userid, args):
     # If command not drop, continue
     if args[0].lower() != 'drop':

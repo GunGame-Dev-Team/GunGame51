@@ -246,7 +246,8 @@ class BasePlayer(object):
 
             # Import SPE if installed
             try:
-                from spe.games import cstrike
+                #from spe.games import cstrike
+                import spe
 
             # No SPE ?
             except ImportError:
@@ -260,7 +261,11 @@ class BasePlayer(object):
                         'ic.php?t=29657 and download the latest version!')
 
             # Change the team
-            cstrike.switchTeam(self.userid, value)
+            # With the latest SPE, you no longer have to import 
+            # cstrike manually. Just do spe.<moduleFunction>!
+            spe.switchTeam(self.userid, value)
+            
+            #cstrike.switchTeam(self.userid, value)
 
             # Change the model
             if value == 1:
@@ -486,7 +491,10 @@ class BasePlayer(object):
             # Player owns this weapon.
             if spe.ownsWeapon( self.userid, 'weapon_%s' % self.weapon ):
                 
-                # Make them use it
+                # Make them use it. If we don't do this, a very 
+                # strange bug comes up which prevents the player 
+                # from getting their current level's weapon after
+                # being stripped,
                 es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (self.userid, self.weapon))
 
                 # Done.
@@ -508,7 +516,11 @@ class BasePlayer(object):
                     weapToStrip = pWeapon
 
                 if weapToStrip:
-                    #spe.removeEntityByIndex( pPlayer.getWeaponIndex(weapToStrip) )
+                    
+                    # Make them drop the weapon
+                    spe.call('DropWeapon', spe.getPlayer(self.userid), weapToStrip)
+                    
+                    # Now remove it
                     spe.removeEntityByInstance( weapToStrip )
                 
                 # Now give them the weapon.
