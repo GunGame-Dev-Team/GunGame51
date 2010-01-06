@@ -474,51 +474,61 @@ class BasePlayer(object):
 
         # Nade ?
         elif self.weapon == 'hegrenade':
-            es.server.queuecmd('es_xgive %s weapon_hegrenade;' % (
-                                                                self.userid))
+            #es.server.queuecmd('es_xgive %s weapon_hegrenade;' % (
+            #                                                    self.userid))
+            
+            # Strip all weapons
             self.strip()
+            
+            # Give them a grenade.
+            spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_%s' % self.weapon, 0)
 
-        # All other weapons
         else:
-            # Get player's weapons
-            pPlayer = getPlayer(self.userid)
-            pWeapon = pPlayer.getPrimary()
-            sWeapon = pPlayer.getSecondary()
-            weapToStrip = None
+        
+            # Check to see if the player already owns this gun.
+            theWeapon = spe.ownsWeapon( self.userid, 'weapon_%s' % self.weapon )
 
-            # Already have the current weapon ?
-            if 'weapon_%s' % self.weapon == pWeapon or \
-                'weapon_%s' % self.weapon == sWeapon:
-
-                # Use it ?
-                if pPlayer.weapon != 'weapon_%s' % self.weapon:
-                    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (
-                                                    self.userid, self.weapon))
-                return
-
-            # Strip secondary weapon ?
-            if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
-                weapToStrip = sWeapon
-
-            # Strip primary weapon ?
-            elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
-                weapToStrip = pWeapon
-
-            if weapToStrip:
-                spe.removeEntityByIndex( pPlayer.getWeaponIndex(weapToStrip) )
+            # Player owns this weapon.
+            if theWeapon != None:
                 
-                # Check for no weapon in 0.05 seconds
-                gamethread.delayed(0.05, Player(self.userid).no_weapon_check)
+                # Make them use it
+                es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (self.userid, self.weapon))
 
-            # Give new gun
-            es.server.queuecmd('es_xgive %s weapon_%s' % (self.userid,
-                                                                self.weapon))
+                # Done.
+                return
+                
+            # Player DOES NOT own this weapon.
+            else:
+                pPlayer = getPlayer(self.userid)
+                #pWeapon = pPlayer.getPrimary()
+                #sWeapon = pPlayer.getSecondary()
+                pWeapon = spe.getWeaponFromSlot( self.userid, 0 )
+                sWeapon = spe.getWeaponFromSlot( self.userid, 1 )
+                weapToStrip = None
+                
+                # Strip secondary weapon ?
+                if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
+                    weapToStrip = sWeapon
 
-            # Make bots use it ? (Bots sometimes don't equip the new gun.)
-            if es.isbot(self.userid):
+                # Strip primary weapon ?
+                elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
+                    weapToStrip = pWeapon
+
+                if weapToStrip:
+                    #spe.removeEntityByIndex( pPlayer.getWeaponIndex(weapToStrip) )
+                    spe.removeEntityByInstance( weapToStrip )
+                
+                # Now give them the weapon.
+                spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_%s' % self.weapon, 0)
+                
+                # Make bots use it ? (Bots sometimes don't equip the new gun.)
+                if es.isbot(self.userid):
                     es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
-    
+            
+            # Done!
+            return
+
     def _dead_check_give_weapon(self):
         '''
         Make sure the player is alive, then give_weapon()

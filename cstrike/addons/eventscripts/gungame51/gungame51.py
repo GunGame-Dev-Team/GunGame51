@@ -19,6 +19,9 @@ from playerlib import getPlayer
 from playerlib import getUseridList
 from weaponlib import getWeaponList
 
+# SPE Imports
+import spe
+
 # GunGame Imports
 
 #    Weapon Function Imports
@@ -131,6 +134,9 @@ info.About = ('\n' +
 def load():
     # Load translations
     loadTranslation('gungame', 'gungame')
+    
+    # Load signature file
+    spe.parseINI('gungame51/ini/signatures.ini')
     
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
