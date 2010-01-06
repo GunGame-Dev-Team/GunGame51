@@ -531,79 +531,7 @@ class BasePlayer(object):
                     es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
 
-    def _dead_check_give_weapon(self):
-        '''
-        Make sure the player is alive, then give_weapon()
-        '''
-        # If the player is dead, stop here
-        if getPlayer(self.userid).isdead:
-            return
-        
-        # Fire give_weapon()
-        self.give_weapon()
-
-    def no_weapon_check(self, newWeapon=None):
-        # Retrieve a playerlib.Player() instance
-        pPlayer = getPlayer(self.userid)
-
-        # Stop if the player is not eligiable for a new weapon
-        if not es.exists('userid', self.userid) or pPlayer.isdead or \
-          pPlayer.teamid < 2:
-            return
-
-        # Store the weapon you are holding in the weapon slot which your
-        #  level's weapon should be in
-
-        if "weapon_%s" % self.weapon in list_pWeapons:
-            weapon = pPlayer.getPrimary()
-        elif "weapon_%s" % self.weapon in list_sWeapons:
-            weapon = pPlayer.getSecondary()
-        else:
-            return
-
-        # If you have a weapon, return
-        if not weapon:
-
-            # Using give() ?
-            if newWeapon:
-                self.give(newWeapon)
-                return
-
-            # Repeat give_weapon to re-strip the slot and give your weapon
-            gamethread.delayed(0.025, self._dead_check_give_weapon)
-
-        # Get the index of the last given entity
-        int_lastgive = int(eventscripts_lastgive)
-
-        # If there was no lastgive, return
-        if not int_lastgive:
-            return
-
-        # If the last given entity is held by someone other than you
-        owner = es.getindexprop(int_lastgive, 'CBaseEntity.m_hOwnerEntity')
-
-        if owner != es.getplayerhandle(self.userid):
-            # Owner is a person ?
-            if owner > 0:
-                owner_userid = es.getuserid(owner)
-                # Make the wrong owner use their own weapon ?
-                if getPlayer(owner_userid).weapon != \
-                    'weapon_%s' % Player(owner_userid).weapon:
-                    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (
-                        owner_userid, Player(owner_userid).weapon))
-
-            # Make sure index is still existing
-            if not es.createentitylist().has_key(int_lastgive):
-                return
-
-            # If the weapon is the same as the weapon that was dropped
-            if es.createentitylist()[int_lastgive]['classname'] == \
-                                                    'weapon_' + self.weapon:
-
-                # Remove the weapon
-                spe.removeEntityByIndex( int_lastgive )
-
-    def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
+    def give(self, weapon, useWeapon=False, strip=False):
 
         '''
         Gives a player the specified weapon.
@@ -611,10 +539,6 @@ class BasePlayer(object):
 
         Setting strip to True will make it strip the weapon currently
         held in the slot you are trying to give to.
-
-        Setting no_weapon_check to True will make give() preform alot like
-        give_weapon() It will verify the weapon was not delivered to the wrong
-        player, and that the correct player ends up with the weapon you give.
         '''
 
         # Format weapon
@@ -665,11 +589,6 @@ class BasePlayer(object):
             cmd += ' es_xsexec %s "use %s"' % (self.userid, weapon)
 
         es.server.queuecmd(cmd)
-
-        # No weapon check
-        if noWeaponCheck:
-            gamethread.delayed(0.065, Player(self.userid).no_weapon_check,
-                                                                        weapon)
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
