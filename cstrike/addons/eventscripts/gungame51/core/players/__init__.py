@@ -474,9 +474,7 @@ class BasePlayer(object):
 
         # Nade ?
         elif self.weapon == 'hegrenade':
-            #es.server.queuecmd('es_xgive %s weapon_hegrenade;' % (
-            #                                                    self.userid))
-            
+
             # Strip all weapons
             self.strip()
             
@@ -500,8 +498,6 @@ class BasePlayer(object):
             # Player DOES NOT own this weapon.
             else:
                 pPlayer = getPlayer(self.userid)
-                #pWeapon = pPlayer.getPrimary()
-                #sWeapon = pPlayer.getSecondary()
                 pWeapon = spe.getWeaponFromSlot( self.userid, 0 )
                 sWeapon = spe.getWeaponFromSlot( self.userid, 1 )
                 weapToStrip = None
@@ -525,9 +521,6 @@ class BasePlayer(object):
                 if es.isbot(self.userid):
                     es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
                                                     self.userid, self.weapon))
-            
-            # Done!
-            return
 
     def _dead_check_give_weapon(self):
         '''
