@@ -483,11 +483,8 @@ class BasePlayer(object):
 
         else:
         
-            # Check to see if the player already owns this gun.
-            theWeapon = spe.ownsWeapon( self.userid, 'weapon_%s' % self.weapon )
-
             # Player owns this weapon.
-            if theWeapon != None:
+            if spe.ownsWeapon( self.userid, 'weapon_%s' % self.weapon ):
                 
                 # Make them use it
                 es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (self.userid, self.weapon))
