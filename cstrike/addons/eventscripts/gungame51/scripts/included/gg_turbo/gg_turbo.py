@@ -15,6 +15,9 @@ import gamethread
 from playerlib import getPlayer
 from weaponlib import getWeaponNameList
 
+# SPE Imports
+import spe
+
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
@@ -98,8 +101,7 @@ def give_weapon(userid, previousLevel):
 
     # Did we find a weapon to strip ?
     if stripWeapon:
-        es.server.queuecmd('es_xremove %s' % (
-                                          pPlayer.getWeaponIndex(stripWeapon)))
+        spe.removeEntityByIndex( pPlayer.getWeaponIndex(stripWeapon) )
 
     # Make them use it ?
     if pPlayer.weapon != currentWeapon:

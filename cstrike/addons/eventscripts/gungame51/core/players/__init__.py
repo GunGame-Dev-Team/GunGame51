@@ -21,6 +21,9 @@ from playerlib import getPlayer
 from weaponlib import getWeaponNameList
 from usermsg import showVGUIPanel
 
+# SPE Imports
+import spe
+
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core import getOS
@@ -502,9 +505,8 @@ class BasePlayer(object):
                 weapToStrip = pWeapon
 
             if weapToStrip:
-                es.server.queuecmd('es_xremove %s' % (
-                                          pPlayer.getWeaponIndex(weapToStrip)))
-
+                spe.removeEntityByIndex( pPlayer.getWeaponIndex(weapToStrip) )
+                
                 # Check for no weapon in 0.05 seconds
                 gamethread.delayed(0.05, Player(self.userid).no_weapon_check)
 
@@ -587,7 +589,7 @@ class BasePlayer(object):
                                                     'weapon_' + self.weapon:
 
                 # Remove the weapon
-                es.server.queuecmd('es_xremove %s' % int_lastgive)
+                spe.removeEntityByIndex( int_lastgive )
 
     def give(self, weapon, useWeapon=False, strip=False, noWeaponCheck=False):
 
@@ -642,8 +644,7 @@ class BasePlayer(object):
 
             # Strip the weapon
             if stripWeapon:
-                es.server.queuecmd('es_xremove %s' % (
-                                          pPlayer.getWeaponIndex(stripWeapon)))
+                spe.removeEntityByIndex( pPlayer.getWeaponIndex(stripWeapon) )
 
         # Give the player the weapon
         cmd = 'es_xgive %s %s;' % (self.userid, weapon)

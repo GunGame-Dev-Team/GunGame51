@@ -14,6 +14,9 @@ import es
 import gamethread
 from playerlib import getPlayer
 
+# SPE Imports
+import spe
+
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players import Player
@@ -395,7 +398,7 @@ def removeMultiLevel(userid):
             # If the saved index of the index given to the player still exists
             #   remove it.
             if ind in validIndexes.keys():
-                es.server.queuecmd('es_xremove %i' % ind)
+                spe.removeEntityByIndex( ind )
 
         # Remove the player from the current multi level list
         list_currentMultiLevel.remove(userid)
