@@ -610,7 +610,8 @@ class BasePlayer(object):
                 continue
 
             # Remove the weapon
-            es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
+            #es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
+            spe.removeEntityByInstance(spe.ownsWeapon(self.userid, weapon))
 
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS
