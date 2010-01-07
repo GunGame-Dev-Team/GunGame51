@@ -503,7 +503,7 @@ class BasePlayer(object):
             # Player DOES NOT own this weapon.
             else:
                 pPlayer = getPlayer(self.userid)
-                pWeapon = spe.getWeaponFromSlot( self.userid, 0 )
+                pWeapon = spe.getWeaponFromSlot( self.userid, 2 )
                 sWeapon = spe.getWeaponFromSlot( self.userid, 1 )
                 weapToStrip = None
                 

@@ -114,8 +114,7 @@ def item_pickup(event_var):
 # ============================================================================
 def remove_weapon(userid, item):
     # Remove weapon
-    spe.removeEntityByIndex( getPlayer(userid).getWeaponIndex(
-                            "weapon_%s" % item) )
+    spe.removeEntityByInstance(spe.ownsWeapon(userid, "weapon_%s" % item))
 
 def drop_filter(userid, args):
     # If command not drop, continue
