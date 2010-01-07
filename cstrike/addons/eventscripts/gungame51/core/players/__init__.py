@@ -456,6 +456,7 @@ class BasePlayer(object):
         '''
         Gives a player their current levels weapon.
         '''
+        es.msg("give_weapon")
         error = None
         # Make sure player is on a team
         if es.getplayerteam(self.userid) < 2:
@@ -503,10 +504,10 @@ class BasePlayer(object):
             # Player DOES NOT own this weapon.
             else:
                 pPlayer = getPlayer(self.userid)
-                pWeapon = spe.getWeaponFromSlot( self.userid, 2 )
+                pWeapon = spe.getWeaponFromSlot( self.userid, 0 )
                 sWeapon = spe.getWeaponFromSlot( self.userid, 1 )
                 weapToStrip = None
-                
+
                 # Strip secondary weapon ?
                 if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
                     weapToStrip = sWeapon
@@ -519,12 +520,15 @@ class BasePlayer(object):
                     
                     # Make them drop the weapon
                     spe.call('DropWeapon', spe.getPlayer(self.userid), weapToStrip)
-                    
+                
                     # Now remove it
                     spe.removeEntityByInstance( weapToStrip )
                 
                 # Now give them the weapon.
                 spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_%s' % self.weapon, 0)
+                
+                if not spe.ownsWeapon( self.userid, 'weapon_knife' ):
+                    spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_knife', 0)
                 
                 # Make bots use it ? (Bots sometimes don't equip the new gun.)
                 if es.isbot(self.userid):
@@ -540,7 +544,7 @@ class BasePlayer(object):
         Setting strip to True will make it strip the weapon currently
         held in the slot you are trying to give to.
         '''
-
+        es.msg("give")
         # Format weapon
         weapon = 'weapon_%s' % str(weapon).replace('weapon_', '')
 
