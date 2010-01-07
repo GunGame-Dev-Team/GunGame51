@@ -12,6 +12,7 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
+import gamethread
 from playerlib import getPlayer
 from weaponlib import getWeaponNameList
 
@@ -94,12 +95,8 @@ def item_pickup(event_var):
     # Remove player's weapon
     remove_weapon(userid, item)
 
-    # Player carrying the item ?
-    if currentWeapon != item:
-        return
-
     # Check if player is on nade level
-    if weapon == 'hegrenade':
+    if currentWeapon == 'hegrenade':
 
         # Switch the player knife ?
         if not getPlayer(userid).he:
@@ -107,14 +104,17 @@ def item_pickup(event_var):
             return
 
     # Switch to their gungame weapon
-    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, weapon))
+    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon))
+    gamethread.delayed(0, es.setplayerprop, (userid, 'CBaseCombatCharacter.bcc_localdata.m_flNextAttack', 0))
     
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def remove_weapon(userid, item):
     # Remove weapon
-    spe.removeEntityByInstance(spe.ownsWeapon(userid, "weapon_%s" % item))
+    theWeapon = spe.ownsWeapon(userid, "weapon_%s" % item)
+    if theWeapon:
+        spe.removeEntityByInstance(theWeapon)
 
 def drop_filter(userid, args):
     # If command not drop, continue
