@@ -303,7 +303,7 @@ def give_bonus(userid, sound=False, turboCheck=False):
     
     # Give weapons
     for weapon in weapons:
-        ggPlayer.give(weapon, False, True, True)
+        ggPlayer.give(weapon, False, True)
 
 def check_bonus(userid):
     # Valid userid?

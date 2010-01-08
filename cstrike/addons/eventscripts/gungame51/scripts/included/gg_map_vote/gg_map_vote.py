@@ -91,7 +91,7 @@ ggVote = None
 voteUserids = []
 
 # True/False if vote has allready been ran this map
-voteHasStarted = None
+voteHasStarted = False
                     
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -152,10 +152,14 @@ def gg_levelup(event_var):
     # Vote has allready been started?
     if voteHasStarted:
         return
-    
+
     # Start vote ? 
     if get_leader_level() <= (get_total_levels() - int(gg_map_vote_trigger)):
         return
+
+    # Change global so we dont fire the vote twice
+    global voteHasStarted
+    voteHasStarted = True
     
     # Use 3rd party voting system ?  
     if int(gg_map_vote) > 1:
@@ -416,10 +420,6 @@ def voteStart():
     
     # Fire event
     EventManager().gg_vote()
-
-    # Set var so we know the vote has started    
-    global voteHasStarted
-    voteHasStarted = True
             
 def voteCountDown():
     ggRepeat = repeat.find('gg_map_vote')
