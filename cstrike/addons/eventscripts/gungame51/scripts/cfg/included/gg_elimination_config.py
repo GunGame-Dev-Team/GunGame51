@@ -72,6 +72,22 @@ def load():
     config.cvar('gg_elimination', 0, 'Enables/Disables ' +
                 'gg_elimination.')
 
+    # Elimination Spawn
+    config.text('')
+    config.text('='*76)
+    config.text('>> ELIMINATION SPAWN')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Allow players to spawn when they join, if they didn\'t ')
+    config.text('   spawn already that round.')
+    config.text('Options:')
+    config.text('   0 = (Disabled) Have players wait until the round ends ' +
+                'to spawn.')
+    config.text('   1 = (Enabled) Have players spawn when they join.')
+    config.text('Default Value: 0')
+    config.cvar('gg_elimination_spawn', 0, 'Have players spawn when they ' +
+                'join if they haven\'t already for that round.')
+
     config.write()
     es.dbgmsg(0, '\tgg_elimination.cfg')
 

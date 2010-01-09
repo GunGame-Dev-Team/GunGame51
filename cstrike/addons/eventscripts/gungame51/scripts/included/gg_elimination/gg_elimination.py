@@ -44,6 +44,8 @@ info.translations = ['gg_elimination']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
+gg_elimination_spawn = es.ServerVar('gg_elimination_spawn')
+roundSpawned = []
 
 # ============================================================================
 # >> CLASSES
@@ -86,13 +88,55 @@ def round_start(event_var):
     msg('#human', 'RoundInfo', prefix=True)
 
 def round_end(event_var):
+    global roundSpawned
+
     # Set round inactive
     roundInfo.active = False
+    
+    # If gg_elimination_spawn is loaded, reset the spawned list
+    if int(gg_elimination_spawn):
+        roundSpawned = []
 
 def player_activate(event_var):
     # Create player dictionary
     userid = int(event_var['userid'])
     setAttribute(userid, 'eliminated', [])
+
+def player_spawn(event_var):
+    steamid = event_var['es_steamid']
+
+    # If gg_elimination_spawn isn't loaded, stop here
+    if not int(gg_elimination_spawn):
+        return
+
+    # If the player didn't join an active team, stop here
+    if not event_var['es_userteam'] in ['2', '3']:
+        return
+
+    # If the player is already in roundSpawned, stop here
+    if steamid in roundSpawned:
+        return
+    
+    roundSpawned.append(steamid)
+
+def player_team(event_var):
+    userid = int(event_var['userid'])
+    steamid = es.getplayersteamid(userid)
+
+    # If gg_elimination_spawn isn't loaded, stop here
+    if not int(gg_elimination_spawn):
+        return
+    
+    # If the player didn't join an active team, stop here
+    if not event_var['team'] in ['2', '3']:
+        return
+    
+    # If the player already has spawned this round, stop here
+    if steamid in roundSpawned:
+        return
+    
+    # Spawn the player in 4 seconds
+    gamethread.delayed(4, respawnPlayer, (userid, roundInfo.round))
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
