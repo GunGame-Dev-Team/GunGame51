@@ -456,7 +456,6 @@ class BasePlayer(object):
         '''
         Gives a player their current levels weapon.
         '''
-        es.msg("give_weapon")
         error = None
         # Make sure player is on a team
         if es.getplayerteam(self.userid) < 2:
@@ -485,12 +484,12 @@ class BasePlayer(object):
             self.strip()
             
             # Give them a grenade.
-            spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_%s' % self.weapon, 0)
+            spe.giveNamedItem(self.userid, "weapon_hegrenade")
 
         else:
         
             # Player owns this weapon.
-            if spe.ownsWeapon( self.userid, 'weapon_%s' % self.weapon ):
+            if spe.ownsWeapon(self.userid, "weapon_%s" % self.weapon):
                 
                 # Make them use it. If we don't do this, a very 
                 # strange bug comes up which prevents the player 
@@ -500,35 +499,42 @@ class BasePlayer(object):
 
                 # Done.
                 return
-                
+
             # Player DOES NOT own this weapon.
             else:
-                pPlayer = getPlayer(self.userid)
-                pWeapon = spe.getWeaponFromSlot( self.userid, 0 )
-                sWeapon = spe.getWeaponFromSlot( self.userid, 1 )
-                weapToStrip = None
+                # Retrieve a list of all weapon names in the player's possession
+                playerWeapons = spe.getWeaponDict(self.userid)
 
-                # Strip secondary weapon ?
-                if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
-                    weapToStrip = sWeapon
+                if playerWeapons:
 
-                # Strip primary weapon ?
-                elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
-                    weapToStrip = pWeapon
+                    # See if there is a primary weapon in the list of weapons
+                    pWeapon = set(playerWeapons.keys()).intersection(list_pWeapons)
 
-                if weapToStrip:
-                    
-                    # Make them drop the weapon
-                    spe.call('DropWeapon', spe.getPlayer(self.userid), weapToStrip)
-                
-                    # Now remove it
-                    spe.removeEntityByInstance( weapToStrip )
-                
+                    # See if there is a primary weapon in the list of weapons
+                    sWeapon = set(playerWeapons.keys()).intersection(list_sWeapons)
+
+                    # Set up the weapon to strip
+                    weapToStrip = None
+
+                    # Strip secondary weapon ?
+                    if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
+                        weapToStrip = sWeapon.pop()
+
+                    # Strip primary weapon ?
+                    elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
+                        weapToStrip = pWeapon.pop()
+
+                    if weapToStrip:
+
+                        # Make them drop the weapon
+                        spe.dropWeapon(self.userid, weapToStrip)
+
+                        # Now remove it
+                        spe.removeEntityByInstance(playerWeapons[weapToStrip]["instance"])
+
                 # Now give them the weapon.
-                spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_%s' % self.weapon, 0)
-                
-                if not spe.ownsWeapon( self.userid, 'weapon_knife' ):
-                    spe.call('GiveNamedItem', spe.getPlayer(self.userid), 'weapon_knife', 0)
+                spe.giveNamedItem(self.userid, "weapon_%s" % self.weapon)
+
                 
                 # Make bots use it ? (Bots sometimes don't equip the new gun.)
                 if es.isbot(self.userid):
@@ -536,7 +542,6 @@ class BasePlayer(object):
                                                     self.userid, self.weapon))
 
     def give(self, weapon, useWeapon=False, strip=False):
-
         '''
         Gives a player the specified weapon.
         Weapons given by this method will not be stripped by gg_dead_strip.
@@ -544,7 +549,6 @@ class BasePlayer(object):
         Setting strip to True will make it strip the weapon currently
         held in the slot you are trying to give to.
         '''
-        es.msg("give")
         # Format weapon
         weapon = 'weapon_%s' % str(weapon).replace('weapon_', '')
 
@@ -562,37 +566,46 @@ class BasePlayer(object):
             # Delay removing the weapon long enough for gg_dead_strip to fire
             gamethread.delayed(0.10, self.stripexceptions.remove, (weapon[7:]))
 
-        pPlayer = getPlayer(self.userid)
-        sWeapon = pPlayer.secondary
-        pWeapon = pPlayer.primary
 
-        # Player allready has weapon ?
-        if weapon in [sWeapon, pWeapon]:
+        # Player owns this weapon.
+        if spe.ownsWeapon(self.userid, weapon):
             return
 
         # Strip the weapon ?
         if strip:
-            stripWeapon = None
+            # Retrieve a list of all weapon names in the player's possession
+            playerWeapons = spe.getWeaponNameList(self.userid)
 
-            # Holding a primary weapon ?
-            if weapon in list_pWeapons and pWeapon:
-                stripWeapon = pWeapon
+            if playerWeapons:
+                # See if there is a primary weapon in the list of weapons
+                pWeapon = set(playerWeapons).intersection(list_pWeapons)
 
-            # Holding a secondary weapon ?
-            elif weapon in list_sWeapons and sWeapon:
-                stripWeapon = sWeapon
+                # See if there is a primary weapon in the list of weapons
+                sWeapon = set(playerWeapons).intersection(list_sWeapons)
 
-            # Strip the weapon
-            if stripWeapon:
-                spe.removeEntityByIndex( pPlayer.getWeaponIndex(stripWeapon) )
+                stripWeapon = None
+
+                # Holding a primary weapon ?
+                if weapon in list_pWeapons and pWeapon:
+                    stripWeapon = pWeapon.pop()
+
+                # Holding a secondary weapon ?
+                elif weapon in list_sWeapons and sWeapon:
+                    stripWeapon = sWeapon.pop()
+
+                # Strip the weapon
+                if stripWeapon:
+                    # Make them drop the weapon
+                    spe.dropWeapon(self.userid, stripWeapon)
+
+                    # Remove the weapon
+                    spe.removeEntityByInstance(playerWeapons[stripWeapon]["instance"])
 
         # Give the player the weapon
-        cmd = 'es_xgive %s %s;' % (self.userid, weapon)
+        spe.giveNamedItem(self.userid, weapon)
 
         if useWeapon:
-            cmd += ' es_xsexec %s "use %s"' % (self.userid, weapon)
-
-        es.server.queuecmd(cmd)
+            es.server.queuecmd('es_xsexec %s "use %s"' % (self.userid, weapon))
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
@@ -604,18 +617,19 @@ class BasePlayer(object):
             * Exceptions can be entered in list format, and anything in the
               exceptions will not be stripped.
         '''
-        # Retrieve a playerlib.Player() instance
-        pPlayer = getPlayer(self.userid)
+        # Retrieve a dictionary of the player's weapons
+        pWeapons = spe.getWeaponDict(self.userid)
 
-        for weapon in pPlayer.getWeaponList():
+        if not pWeapons:
+            return
+
+        for weapon in pWeapons:
             if (self.weapon == weapon[7:] and not levelStrip) or \
               weapon == 'weapon_knife' or weapon[7:] in exceptions:
 
                 continue
 
-            # Remove the weapon
-            #es.server.cmd('es_xremove %s' %pPlayer.getWeaponIndex(weapon))
-            spe.removeEntityByInstance(spe.ownsWeapon(self.userid, weapon))
+            spe.removeEntityByInstance(pWeapons[weapon]["instance"])
 
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS
