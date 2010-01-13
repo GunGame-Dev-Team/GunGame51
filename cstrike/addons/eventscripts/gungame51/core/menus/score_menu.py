@@ -67,7 +67,7 @@ def score_menu_cmd(userid, args):
 
     # Get the page the player is on
     page = ((newScoreList.index('[%s] %s' % (Player(userid).level,
-                                        es.getplayername(player))) + 1) / 10)
+                                        es.getplayername(userid))) + 1) / 10)
                                         
     # Menu has not changed ?
     if newScoreList == scoreList:
