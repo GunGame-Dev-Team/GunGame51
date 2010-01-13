@@ -13,7 +13,6 @@ $LastChangedDate$
 import es
 import popuplib
 from playerlib import getUseridList
-from playerlib import getPlayer
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
@@ -86,7 +85,7 @@ def level_menu_cmd(userid, args):
         ggPlayer = Player(checkUserid)
 
         # Send the results
-        saytext2(userid, getPlayer(checkUserid).index, 'LevelInfo_PlayerSearch',
+        saytext2(userid, ggPlayer.index, 'LevelInfo_PlayerSearch',
                             {'player': ggPlayer.name, 'level': ggPlayer.level,
                             'weapon': ggPlayer.weapon})
     else:
