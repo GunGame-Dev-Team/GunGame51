@@ -61,7 +61,7 @@ def removeReturnChars(text):
     text = text.replace('\\r', '')
     return text.replace('\\n', '')
 
-def get_file_list(top=get_game_dir('addons/eventscripts/gungame51')):
+def get_file_list(top=get_game_dir('addons/eventscripts')):
     '''
     Generator that returns a list of files from within the gungame51 directory
     recursively.
@@ -73,4 +73,7 @@ def get_file_list(top=get_game_dir('addons/eventscripts/gungame51')):
     (Excluding svn folders and files.)
     '''
     for name in path.path(top).walkdirs():
+        if not "gungame51" in name:
+            continue
+
         yield [str(name).replace('\\', '/'), [str(x.name) for x in name.files('*.py')]]
