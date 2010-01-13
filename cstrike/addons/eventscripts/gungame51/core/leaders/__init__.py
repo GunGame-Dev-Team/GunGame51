@@ -275,3 +275,9 @@ class LeaderManager(object):
         if userid in self.previous:
             # Remove the userid from the previous leader list
             del self.previous[self.previous.index(userid)]
+
+    def _reset(self):
+        """Resets the leader lists."""
+        del self.useridlist[:]
+        del self.levellist[:]
+        del self.previous[:]

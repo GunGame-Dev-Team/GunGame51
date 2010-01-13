@@ -43,3 +43,7 @@ def get_leader_names():
 def get_leader_level():
     """Returns the current leader level."""
     return LeaderManager().leaderlevel
+
+def reset_leaders():
+    """Resets the internal leader lists."""
+    LeaderManager()._reset()

@@ -18,6 +18,7 @@ from playerlib import getPlayerList
 # GunGame Imports
 from gungame51.core.players import Player
 from gungame51.core.players import PlayerDict
+from gungame51.core.leaders.shortcuts import reset_leaders
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -96,6 +97,8 @@ def resetPlayers():
           player attributes.
     '''
     PlayerDict().clear()
+    reset_leaders()
+    
     
 # ============================================================================
 # >> DOCTSTRING REDIRECTS
