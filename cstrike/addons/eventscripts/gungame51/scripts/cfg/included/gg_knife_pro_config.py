@@ -85,12 +85,12 @@ def load():
                 ' cannot levelup.')
     config.text('Notes:')
     config.text('   * Allows attackers to level up even if the victim is on' +
-                'level 1.')
+                ' level 1.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not allow attackers to level up if the' +
                 ' victim is on')
     config.text('                  level 1.')
-    config.text('   0 = (Enabled) Allow attackers to level up if the victim ' +
+    config.text('   1 = (Enabled) Allow attackers to level up if the victim ' +
                 'is on level 1.')
     config.text('Default Value: 0')
     config.cvar('gg_knife_pro_rookie', 0, 'Enables/Disables stealing levels ' +
