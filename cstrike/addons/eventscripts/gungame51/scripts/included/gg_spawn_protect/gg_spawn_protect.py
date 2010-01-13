@@ -143,7 +143,7 @@ def startProtect(userid):
                      gg_spawn_protect_alpha)
 
     # Start Invincible
-    es.setplayerprop(userid, 'CCSPlayer.baseclass.m_lifeState', 0)
+    pPlayer.godmode = 1
 
     # Set PreventLevel if needed
     if not int(gg_spawn_protect_can_level_up):
@@ -176,7 +176,7 @@ def endProtect(userid):
     pPlayer.color = (255, 255, 255, 255)
 
     # End Invincible
-    es.setplayerprop(userid, 'CCSPlayer.baseclass.m_lifeState', 512)
+    pPlayer.godmode = 0
 
     # Remove PreventLevel if it was enabled
     if not int(gg_spawn_protect_can_level_up):

@@ -252,6 +252,9 @@ def es_map_start(event_var):
         
         # Remove them from the gravity class
         gravity.removeGravityChange(userid)
+    
+    # Clear the list of players currently multi-leveling
+    del list_currentMultiLevel[:]
 
 def round_start(event_var):
     # For all players

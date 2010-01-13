@@ -582,9 +582,6 @@ def gg_win(event_var):
     gamethread.delayed(1.5, Database().commit)
         
 def gg_start(event_var):
-    # Reset all the players
-    resetPlayers()
-
     # Disable warmup due to "gg_multi_round"?
     if gg_warmup_round_backup != int(gg_warmup_round) and \
         gg_warmup_round_backup:

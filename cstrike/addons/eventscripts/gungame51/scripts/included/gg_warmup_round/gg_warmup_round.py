@@ -9,9 +9,14 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
+# Python Imports
+from os import name as platform
+
 # Eventscripts Imports
 import es
+import cmdlib
 import repeat
+import spe
 import gamethread
 from playerlib import getPlayer
 from playerlib import getPlayerList
@@ -20,6 +25,7 @@ from playerlib import getPlayerList
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import hudhint
+from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.addons import PriorityAddon
 
@@ -46,6 +52,12 @@ gg_deathmatch = es.ServerVar('gg_deathmatch')
 gg_elimination = es.ServerVar('gg_elimination')
 priority_addons_added = []
 
+# Store the game rules for use in round end prevention
+gpGameRules = None
+
+# Approximates the number of seconds from round start to play beginning
+GG_WARMUP_EXTRA_TIME = 3
+
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
@@ -55,6 +67,10 @@ def load():
     
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
+    
+    # Register a server command to to cancel an in-progress warmup round
+    cmdlib.registerServerCommand('gg_end_warmup', servercmd_end_warmup,
+    	"Immediately ends the warmup round if there is one in progress.")
     
 def unload():
     # Deleting warmup timer
@@ -68,7 +84,39 @@ def unload():
     
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-        
+    
+    # Unregister the server command that cancels an in-progress warmup round
+    cmdlib.unregisterServerCommand('gg_end_warmup')
+    
+# ============================================================================
+# >> COMMAND CALLBACKS
+# ============================================================================
+def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
+    # Get the timer/repeat instance
+    warmupCountDown = repeat.find('gungameWarmupTimer')
+    
+    # Break out if the timer is invalid (implies warmup is not in progress)
+    if not warmupCountDown:
+        return
+    
+    # Stop the round from being able to end
+    disable_round_end()
+    
+    # Restart the round ourselves in 1 second
+    es.server.queuecmd('mp_restartgame 1')
+    
+    # Before the round ends up restarting, prepare gungame to be ready
+    # for the first round of play
+    gamethread.delayed(0.8, prepare_game)
+    
+    # End the warmup round
+    # Delayed to allow mp_restartgame to strip all weapons before gg gives them
+    # (Emulating behavior of call to mp_restartgame in count_down() below)
+    gamethread.delayed(1, end_warmup, ('Warmup_End_Forced'))
+    
+    # Display a chat message with the same message
+    msg("#human", 'Warmup_End_Forced', prefix=True)
+    
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
@@ -121,6 +169,11 @@ def player_spawn(event_var):
     # Is a spectator or dead?
     if int(event_var['es_userteam']) < 2 or getPlayer(userid).isdead:
         return
+    
+    # If it is the last split second before mp_restartgame fires, protect the
+    # player
+    if not 'gg_warmup_round' in PriorityAddon():
+        getPlayer(userid).godmode = 1
     
     # Get player object
     ggPlayer = Player(userid)
@@ -218,12 +271,12 @@ def do_warmup(useBackupVars=True):
     # Start it up if it exists
     if warmupCountDown:
         warmupCountDown.stop()
-        warmupCountDown.start(1, int(gg_warmup_timer) + 3)
+        warmupCountDown.start(1, int(gg_warmup_timer) + GG_WARMUP_EXTRA_TIME)
         return
             
     # Create a timer
     warmupCountDown = repeat.create('gungameWarmupTimer', count_down)
-    warmupCountDown.start(1, int(gg_warmup_timer) + 3)
+    warmupCountDown.start(1, int(gg_warmup_timer) + GG_WARMUP_EXTRA_TIME)
     
 def count_down():
     warmupCountDown = repeat.find('gungameWarmupTimer')
@@ -248,30 +301,73 @@ def count_down():
             # Play beep
             play_beep()
         
-        # mp_restartgame triggered a little early to prevent someone leveling
-        if warmupCountDown['remaining'] == 2:
-            es.delayed(0.95, 'mp_restartgame 1')
-    
+        # 1 second left in warmup
+        if warmupCountDown['remaining'] == 1:
+            # Stop the round from being able to end
+            disable_round_end()
+            
+            # Restart the round ourselves in 1 second
+            es.server.queuecmd('mp_restartgame 1')
+            
+            # Before the round ends up restarting, prepare gungame to be ready
+            # for the first round of play
+            gamethread.delayed(0.8, prepare_game)
+            
     # No time left
     elif warmupCountDown['remaining'] == 0:
-        # Send hint
-        hudhint('#human', 'Timer_Ended')
-        
-        # Play beep
-        play_beep()
-        
-        # Delete the timer
-        repeat.delete('gungameWarmupTimer')
-        
-        # Removing addons added to priority_addons
-        for addedAddon in priority_addons_added:
-            PriorityAddon().remove(addedAddon)                   
-        
-        # Reset server vars back
-        reset_server_vars(False)
-        
-        # Fire gg_start event
-        EventManager().gg_start()
+        end_warmup('Timer_Ended')
+
+def prepare_game():
+    # Give players godmode so that they can't level up
+    for userid in getPlayerList("#alive"):
+        getPlayer(userid).godmode = 1
+
+    # Remove addons added to priority_addons
+    for addedAddon in priority_addons_added:
+        PriorityAddon().remove(addedAddon)
+
+    # Fire gg_start event
+    EventManager().gg_start()
+
+def round_start(event_var):
+    global gpGameRules
+
+    # If warmup is over
+    if 'gg_warmup_round' in PriorityAddon():
+        return
+    
+    # Re-allow ending of rounds
+    gpGameRules = None
+
+def round_end(event_var):
+    # If disable_round_end has fired, disable round ending
+    if gpGameRules:
+        realgamerules = spe.getLocVal("i", gpGameRules)
+        s = spe.getLocVal("i", realgamerules)
+        spe.setLocVal("i", s + 576, 0)
+
+def disable_round_end():
+    global gpGameRules
+    
+    # Prepare gpGameRules to be able to properly prevent round_end in
+    # round_end(event_var)
+    if platform == 'nt':
+        gpGameRules = spe.getPointer("\x8B\x0D\x2A\x2A\x2A\x2A\x85\xC9\x74\x2A\x8B\x01\x6A\x01\xFF\x50", 2)
+    elif platform == 'posix':
+        gpGameRules = spe.findSymbol("g_pGameRules")
+    
+def end_warmup(message):
+    # Send hint
+    hudhint('#human', message)
+    
+    # Play beep
+    play_beep()
+    
+    # Delete the timer
+    repeat.delete('gungameWarmupTimer')             
+    
+    # Reset server vars back
+    reset_server_vars(False)
 
 def play_beep():
     for userid in getPlayerList('#human'):
