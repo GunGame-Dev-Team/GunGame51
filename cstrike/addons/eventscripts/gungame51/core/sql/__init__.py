@@ -113,7 +113,7 @@ class Database(object):
             return self.curs.fetchall()
     
     def safe_query(self, query):
-        return str(query).replace("\\", "\\\\").replace("'", "\\'")
+        return str(query).replace("\\", "\\\\")
 
     def close(self):
         try:
