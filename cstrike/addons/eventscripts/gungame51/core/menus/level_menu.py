@@ -13,15 +13,19 @@ $LastChangedDate$
 import es
 import popuplib
 from playerlib import getUseridList
+from playerlib import getPlayer
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
 # GunGame Imports
+from gungame51.core.menus.leader_menu import leader_menu_cmd
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_count
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.leaders.shortcuts import is_leader
 from gungame51.core.weapons.shortcuts import get_level_multikill
+from gungame51.core.messaging.shortcuts import saytext2
+from gungame51.core.messaging.shortcuts import msg
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -43,7 +47,7 @@ def load():
     ggLevelMenu.addline('->2. WINS')
     ggLevelMenu.addline('   * ')
     ggLevelMenu.addline('->   9. View Leaders Menu')
-    ggLevelMenu.submenu(9, 'ggLeadersMenu')
+    ggLevelMenu.select(9, send_leader_menu)
     ggLevelMenu.prepuser = prep_level_menu
     ggLevelMenu.timeout('send', 10)
     ggLevelMenu.timeout('view', 10)
@@ -68,8 +72,26 @@ def level_menu_cmd(userid, args):
     if not es.exists('userid', userid):
         return
 
-    # Send menu
-    popuplib.send('ggLevelMenu', userid)
+    if len(args):
+        # Send user level search
+        searchInput = str(args)
+        checkUserid = es.getuserid(searchInput)
+
+        # If the search failed, tell them and return
+        if not checkUserid:
+            msg(userid, 'LevelInfo_PlayerSearchFailed', {'player': searchInput})
+            return
+
+        # Get the player instance
+        ggPlayer = Player(checkUserid)
+
+        # Send the results
+        saytext2(userid, getPlayer(checkUserid).index, 'LevelInfo_PlayerSearch',
+                            {'player': ggPlayer.name, 'level': ggPlayer.level,
+                            'weapon': ggPlayer.weapon})
+    else:
+        # Send menu
+        popuplib.send('ggLevelMenu', userid)
 
 def prep_level_menu(userid, popupid):
     # Make sure the popup exists
@@ -125,3 +147,7 @@ def prep_level_menu(userid, popupid):
 
     # Wins information
     ggLevelMenu.modline(6, '   * You have won %s time(s)' % ggPlayer.wins)
+
+def send_leader_menu(userid, choice, popupname):
+    # Send the leader menu
+    leader_menu_cmd(userid, '')
