@@ -87,6 +87,10 @@ def round_start(event_var):
     # Send the round information message
     msg('#human', 'RoundInfo', prefix=True)
 
+def gg_start(event_var):
+    # Reset all eliminated player counters
+    setAttribute('#all', 'eliminated', [])
+
 def round_end(event_var):
     global roundSpawned
 
