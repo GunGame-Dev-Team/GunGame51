@@ -309,14 +309,14 @@ class BasePlayer(object):
 
             # Has won before
             if self.wins:
-                ggDB.query("UPDATE gg_wins SET wins=%s " % value +
-                           "WHERE uniqueid = '%s'" % self.steamid)
+                ggDB.query('UPDATE gg_wins SET wins=%s ' % value +
+                           'WHERE uniqueid = "%s"' % self.steamid)
 
             # New entry
             else:
-                ggDB.query("INSERT INTO gg_wins " +
-                    "(name, uniqueid, wins, timestamp) " +
-                    "VALUES ('%s', '%s', '%s', strftime('%s','now'))" %
+                ggDB.query('INSERT INTO gg_wins ' +
+                    '(name, uniqueid, wins, timestamp) ' +
+                    'VALUES ("%s", "%s", "%s", strftime("%s","now"))' %
                     (self.name, self.steamid, value, '%s'))
 
             ggDB.commit()
@@ -334,7 +334,7 @@ class BasePlayer(object):
         # From winners DB?
         if name == 'wins':
             _query = Database().select('gg_wins', 'wins',
-                                    "where uniqueid = '%s'" % self.steamid)
+                                    'where uniqueid = "%s"' % self.steamid)
 
             if _query:
                 return int(_query)
@@ -724,10 +724,10 @@ class BasePlayer(object):
         '''
         if self.wins:
             ggDB = Database()
-            ggDB.query("UPDATE gg_wins SET " +
-                       "timestamp=strftime('%s','now'), " +
-                       "name='%s' " % self.name +
-                       "WHERE uniqueid = '%s'" % self.steamid)
+            ggDB.query('UPDATE gg_wins SET ' +
+                       'timestamp=strftime("%s","now"), ' +
+                       'name="%s" ' % self.name +
+                       'WHERE uniqueid = "%s"' % self.steamid)
             ggDB.commit()
 
 class PlayerDict(dict):

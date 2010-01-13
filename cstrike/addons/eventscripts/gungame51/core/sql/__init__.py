@@ -108,9 +108,12 @@ class Database(object):
         except:
             self.connect()
 
-        self.curs.execute(_query)
+        self.curs.execute(self.safe_query(_query))
         if getReturn:
             return self.curs.fetchall()
+    
+    def safe_query(self, query):
+        return str(query).replace("\\", "\\\\").replace("'", "\\'")
 
     def close(self):
         try:

@@ -264,16 +264,13 @@ def write_spawnpoint_file(fileName, mapName, convertedSpawnPoints):
 def add_winner(name, uniqueid, wins, timestamp):
     # Store the number of wins that the player currently has, or None if they
     # do not exist
-    currentWins = ggDB.select('gg_wins', 'wins', "where uniqueid = '%s'" % \
+    currentWins = ggDB.select('gg_wins', 'wins', 'where uniqueid = "%s"' % \
     uniqueid)
-
-    # Escape single quotes in the SQL query
-    name = name.replace("'", "''")
     
     # If the uniqueid is not in the database, add it
     if currentWins == None:
-        ggDB.query("INSERT INTO gg_wins " + "(name, uniqueid, wins, " +
-        "timestamp) " + "VALUES ('%s', '%s', '%s', %d)" % (name, uniqueid, \
+        ggDB.query('INSERT INTO gg_wins ' + '(name, uniqueid, wins, ' +
+        'timestamp) ' + 'VALUES ("%s", "%s", "%s", %d)' % (name, uniqueid, \
         wins, timestamp))
     # If the uniqueid is in the database
     else:
@@ -285,5 +282,5 @@ def add_winner(name, uniqueid, wins, timestamp):
             totalWins = wins
 
         # Update the number of wins stored for the uniqueid
-        ggDB.query("UPDATE gg_wins SET wins=%s " % totalWins + "WHERE " + \
-        "uniqueid = '%s'" % uniqueid)
+        ggDB.query('UPDATE gg_wins SET wins=%s ' % totalWins + 'WHERE ' + \
+        'uniqueid = "%s"' % uniqueid)

@@ -50,6 +50,6 @@ def prune_winners_db(days=None):
         days = int(gg_prune_database)
 
     ggDB = Database()
-    ggDB.query("DELETE FROM gg_wins WHERE " +
-                "timestamp < strftime('%s','now', '-%s days')" % ('%s', days))
+    ggDB.query('DELETE FROM gg_wins WHERE ' +
+                'timestamp < strftime("%s","now", "-%s days")' % ('%s', days))
     ggDB.commit()
