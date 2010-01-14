@@ -462,7 +462,8 @@ def getMapList():
         with open(dict_mapListSource[int(gg_map_vote_list_source)], 'r') as f:
             # Normal list ?
             if int(gg_map_vote_list_source) != 3:
-                maps = [x.strip() for x in f.readlines() if x.strip() != '']
+                maps = [x.strip() for x in f.readlines() if x.strip() != ''
+                        and not x.strip().startswith("//")]
             
             # Restriction list ?
             else:
