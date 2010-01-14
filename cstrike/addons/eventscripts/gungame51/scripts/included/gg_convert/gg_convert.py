@@ -23,6 +23,8 @@ import keyvalues
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.sql import Database
+from gungame51.core.sql.shortcuts import insert_winner
+from gungame51.core.sql.shortcuts import update_winner
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -217,7 +219,7 @@ def check_delete():
     # If gg_convert is set to overwrite the current database
     if int(gg_convert) == 2:
         # Delete everything from it
-        ggDB.query("DELETE FROM gg_wins")
+        ggDB._query("DELETE FROM gg_wins")
 
 def write_spawnpoint_file(fileName, mapName, convertedSpawnPoints):
     # The name of the new spawnpoints file
@@ -269,9 +271,7 @@ def add_winner(name, uniqueid, wins, timestamp):
     
     # If the uniqueid is not in the database, add it
     if currentWins == None:
-        ggDB.query('INSERT INTO gg_wins ' + '(name, uniqueid, wins, ' +
-        'timestamp) ' + 'VALUES ("%s", "%s", "%s", %d)' % (name, uniqueid, \
-        wins, timestamp))
+        insert_winner(name, uniqueid, wins, timestamp)
     # If the uniqueid is in the database
     else:
         # If gg_convert is set to add the converted and current wins
@@ -282,5 +282,4 @@ def add_winner(name, uniqueid, wins, timestamp):
             totalWins = wins
 
         # Update the number of wins stored for the uniqueid
-        ggDB.query('UPDATE gg_wins SET wins=%s ' % totalWins + 'WHERE ' + \
-        'uniqueid = "%s"' % uniqueid)
+        update_winner('wins', totalWins, uniqueid=uniqueid)

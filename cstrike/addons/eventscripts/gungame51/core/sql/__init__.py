@@ -30,7 +30,7 @@ class Database(object):
         Example ussage:
             x = Database()
             x.select('tbl_name', ('name', 'age'), 'where city="dallas"')
-            x.query('create table zomg_i_has_table')
+            x._query('create table zomg_i_has_table')
         
         returnDict will return the information back in dictionary form:
             [{'name': 'luke', 'age': 24}, {name: 'michael', 'age': 90}]
@@ -46,11 +46,11 @@ class Database(object):
 
         # Initilize the Database
         self._ggSQL.text_factory = str
-        self.query("CREATE TABLE IF NOT EXISTS gg_wins(name " +
+        self._query("CREATE TABLE IF NOT EXISTS gg_wins(name " +
                      "varchar(31), uniqueid varchar(20), wins varchar(10) " +
                      "DEFAULT 0, timestamp varchar(31), " +
                      "PRIMARY KEY(uniqueid DESC))")
-        self.query("PRAGMA auto_vacuum = 1")
+        self._query("PRAGMA auto_vacuum = 1")
         self.commit()
 
     def select(self, table, fields=None, conditions=None, returnDict=False,
@@ -75,7 +75,7 @@ class Database(object):
             f = '*'
             if returnDict:
                 fields = [z[1] for z in [y for y in
-                           self.query('PRAGMA table_info(%s)' % table, True)]]
+                           self._query('PRAGMA table_info(%s)' % table, True)]]
 
         self.curs.execute('select %s from %s' % (f, table))
 
@@ -101,19 +101,19 @@ class Database(object):
 
         return selected
 
-    def query(self, _query, getReturn=False):
+    def _query(self, queryString, values=None, getReturn=False):
         try:
             if self._ggSQL.total_changes:
                 pass
         except:
             self.connect()
 
-        self.curs.execute(self.safe_query(_query))
+        if values:
+            self.curs.execute(queryString, values)
+        else:
+            self.curs.execute(queryString)
         if getReturn:
             return self.curs.fetchall()
-    
-    def safe_query(self, query):
-        return str(query).replace("\\", "\\\\")
 
     def close(self):
         try:

@@ -86,7 +86,7 @@ def level_menu_cmd(userid, args):
 
         # Send the results
         saytext2(userid, ggPlayer.index, 'LevelInfo_PlayerSearch',
-                            {'player': ggPlayer.name, 'level': ggPlayer.level,
+                            {'player': es.getplayername(checkUserid), 'level': ggPlayer.level,
                             'weapon': ggPlayer.weapon})
     else:
         # Send menu

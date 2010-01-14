@@ -72,6 +72,7 @@ from core.sound import make_downloadable
 
 #   Database
 from core.sql.shortcuts import prune_winners_db
+from core.sql.shortcuts import update_winner
 from core.sql.shortcuts import Database
 
 #   Menus
@@ -614,9 +615,9 @@ def server_cvar(event_var):
             currentOrder.set_multikill_override(int(gg_multikill_override))
 
 def player_changename(event_var):
-    # Update the Player() instance's name attr (used for the db)
-    userid = int(event_var['userid'])
-    Player(userid).name = getPlayer(userid).name
+    # Update the player's name in the winners database if they are in it
+    if Player(int(event_var['userid'])).wins:
+        update_winner('name', event_var['newname'], uniqueid=event_var['es_steamid'])
 
 def player_activate(event_var):
     # Update the player in the database

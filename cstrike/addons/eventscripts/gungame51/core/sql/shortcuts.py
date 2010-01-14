@@ -23,6 +23,87 @@ gg_prune_database = ServerVar('gg_prune_database')
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def insert_winner(name, uniqueid, wins, timestamp='strftime("%s","now")'):
+    '''
+    Inserts a new entry into the database.
+    '''
+    # Send to be queried
+    ggDB = Database()
+    ggDB._query("INSERT INTO gg_wins (name, uniqueid, wins, timestamp) VALUES" +
+                "(?, ?, ?, ?)", values=(name, uniqueid, wins, timestamp))
+    ggDB.commit()
+
+def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
+            timestamp=None):
+    '''
+    Updates the database for the columns in columnTuple with the values in
+    valueTuple of the same index. 
+    '''
+    # Valid columnTuple entries
+    validEntries = ("name", "wins", "timestamp")
+
+    # If there are no columns to update, stop here
+    if not columnTuple:
+        return
+
+    # Make sure that we are working with tuples
+    if not isinstance(columnTuple, tuple):
+        columnTuple = (columnTuple,)
+    if not isinstance(valueTuple, tuple):
+        valueTuple = (valueTuple,)
+
+    # If the columnTuple and valueTuple aren't equal in length, raise a
+    # valueError
+    if len(columnTuple) != len(valueTuple):
+        raise ValueError("columnTuple and valueTuple must be the same length")
+    
+    # Check columnTuple for valid entries
+    for column in columnTuple:
+        if column in validEntries:
+            continue
+
+        raise NameError("Valid columnTuple entries are %s, %s, and %s" %
+                validEntries)
+    
+    conditionParams = {'name':name, 'uniqueid':uniqueid, 'wins':wins,
+                        'timestamp':timestamp}
+    
+    conditions = ""
+    conditionValues = []
+    # Create the WHERE conditions
+    for condition in conditionParams:
+        # If the condition was a parameter
+        if conditionParams[condition]:
+            # If this is the first conditions, add WHERE, otherwise add AND
+            if not len(conditions):
+                conditions = "WHERE"
+            else:
+                conditions += " AND"
+            
+            # Add the condition
+            conditions += " %s=?" % condition
+            
+            conditionValues.append(conditionParams[condition])
+    
+    updateString = ""
+    # Create the SET statement
+    for column in columnTuple:
+        if len(updateString):
+            updateString += ", "
+
+        updateString += "%s=?" % column
+    
+    # Add the updateString and conditions to queryString
+    queryString = "UPDATE gg_wins SET %s %s" % (updateString, conditions)
+    
+    # Include the values for the conditions in the valueTuple
+    valueTuple += tuple(conditionValues)
+    
+    # Send to be queried
+    ggDB = Database()
+    ggDB._query(queryString, values=valueTuple)
+    ggDB.commit()
+
 def get_winners_list(n=10):
     '''
     Returns an ordered list dicts of (n) player names in order from highest
@@ -50,6 +131,6 @@ def prune_winners_db(days=None):
         days = int(gg_prune_database)
 
     ggDB = Database()
-    ggDB.query('DELETE FROM gg_wins WHERE ' +
+    ggDB._query('DELETE FROM gg_wins WHERE ' +
                 'timestamp < strftime("%s","now", "-%s days")' % ('%s', days))
     ggDB.commit()

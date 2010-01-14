@@ -32,6 +32,8 @@ from gungame51.core.messaging import MessageManager
 from gungame51.core.sound import SoundPack
 from gungame51.core.leaders.shortcuts import LeaderManager
 from gungame51.core.sql import Database
+from gungame51.core.sql.shortcuts import insert_winner
+from gungame51.core.sql.shortcuts import update_winner
 from afk import AFK
 
 # ============================================================================
@@ -137,7 +139,6 @@ class BasePlayer(object):
         self.index = int(getPlayer(str(self.userid)).index)
         self.stripexceptions = []
         self.soundpack = SoundPack(str(gg_soundpack))
-        self.name = getPlayer(self.userid).name
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
@@ -305,21 +306,18 @@ class BasePlayer(object):
                 return
 
             value = int(value)
-            ggDB = Database()
-
             # Has won before
             if self.wins:
-                ggDB.query('UPDATE gg_wins SET wins=%s ' % value +
-                           'WHERE uniqueid = "%s"' % self.steamid)
+                update_winner('wins', value, uniqueid=self.steamid)
 
             # New entry
             else:
-                ggDB.query('INSERT INTO gg_wins ' +
-                    '(name, uniqueid, wins, timestamp) ' +
-                    'VALUES ("%s", "%s", "%s", strftime("%s","now"))' %
-                    (self.name, self.steamid, value, '%s'))
+                name = es.getplayername(self.userid)
 
-            ggDB.commit()
+                if not name:
+                    name = "unnamed"
+
+                insert_winner(name, self.steamid, value)
             return
 
         # Set the attribute value
@@ -333,11 +331,11 @@ class BasePlayer(object):
 
         # From winners DB?
         if name == 'wins':
-            _query = Database().select('gg_wins', 'wins',
+            winsQuery = Database().select('gg_wins', 'wins',
                                     'where uniqueid = "%s"' % self.steamid)
 
-            if _query:
-                return int(_query)
+            if winsQuery:
+                return int(winsQuery)
 
             return 0
 
@@ -723,13 +721,8 @@ class BasePlayer(object):
         Updates the time and the player's name in the database
         '''
         if self.wins:
-            ggDB = Database()
-            ggDB.query('UPDATE gg_wins SET ' +
-                       'timestamp=strftime("%s","now"), ' +
-                       'name="%s" ' % self.name +
-                       'WHERE uniqueid = "%s"' % self.steamid)
-            ggDB.commit()
-
+            update_winner(('name', 'timestamp'), (es.getplayername(self.userid),
+                    'strftime("%s","now")'), uniqueid=self.steamid)
 
 class PlayerManager(dict):
     '''
