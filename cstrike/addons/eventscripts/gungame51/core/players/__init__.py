@@ -574,14 +574,14 @@ class BasePlayer(object):
         # Strip the weapon ?
         if strip:
             # Retrieve a list of all weapon names in the player's possession
-            playerWeapons = spe.getWeaponNameList(self.userid)
+            playerWeapons = spe.getWeaponDict(self.userid)
 
             if playerWeapons:
                 # See if there is a primary weapon in the list of weapons
-                pWeapon = set(playerWeapons).intersection(list_pWeapons)
+                pWeapon = set(playerWeapons.keys()).intersection(list_pWeapons)
 
                 # See if there is a primary weapon in the list of weapons
-                sWeapon = set(playerWeapons).intersection(list_sWeapons)
+                sWeapon = set(playerWeapons.keys()).intersection(list_sWeapons)
 
                 stripWeapon = None
 
