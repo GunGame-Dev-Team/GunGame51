@@ -752,12 +752,15 @@ class PlayerDict(dict):
         '''
         userid = int(userid)
 
-        # If the userid is not already set, and the player is in the server,
-        # check if they have a player instance. If they don't make one, if they
-        # do, update it
-        if userid not in self and es.exists('userid', userid):
-            # Get the uniqueid
-            steamid = uniqueid(str(userid), 1)
+        if userid not in self:
+            if es.exists('userid', userid):
+                # Get the uniqueid
+                steamid = uniqueid(str(userid), 1)
+            else:
+                # Set steamid to None, so that it will not be found when
+                # searching in the if statement below, and a new BasePlayer
+                # instance will be made
+                steamid = None
 
             # Search for the player's uniqueid to see if they played previously
             if not steamid in [self[playerid].steamid for playerid in self]:
