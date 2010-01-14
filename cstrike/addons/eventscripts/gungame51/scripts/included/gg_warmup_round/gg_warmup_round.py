@@ -311,7 +311,7 @@ def count_down():
             
             # Before the round ends up restarting, prepare gungame to be ready
             # for the first round of play
-            gamethread.delayed(0.8, prepare_game)
+            gamethread.delayed(0.6, prepare_game)
             
     # No time left
     elif warmupCountDown['remaining'] == 0:
