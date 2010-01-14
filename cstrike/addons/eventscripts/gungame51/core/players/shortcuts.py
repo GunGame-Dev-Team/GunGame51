@@ -17,7 +17,7 @@ from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.players import Player
-from gungame51.core.players import PlayerDict
+from gungame51.core.players import PlayerManager
 from gungame51.core.leaders.shortcuts import reset_leaders
 
 # ============================================================================
@@ -86,7 +86,7 @@ def deleteAttribute(filter, attribute):
 
 def resetPlayers():
     '''
-    Resets the PlayerDict instance, deleting all instances of BasePlayer
+    Resets the PlayerManager instance, deleting all instances of BasePlayer
     contained within, which effectively resets all players' attributes.
     
     Notes:
@@ -96,7 +96,7 @@ def resetPlayers():
           the scripter uses event gg_start to re-initialize custom
           player attributes.
     '''
-    PlayerDict().clear()
+    PlayerManager().clear()
     reset_leaders()
     
     

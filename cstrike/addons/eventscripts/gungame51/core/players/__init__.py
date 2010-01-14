@@ -730,7 +730,8 @@ class BasePlayer(object):
                        'WHERE uniqueid = "%s"' % self.steamid)
             ggDB.commit()
 
-class PlayerDict(dict):
+
+class PlayerManager(dict):
     '''
     A class-based dictionary to contain instances of BasePlayer.
 
@@ -743,7 +744,7 @@ class PlayerDict(dict):
         return cls._the_instance
 
     # =========================================================================
-    # >> PlayerDict() CLASS ATTRIBUTE METHODS
+    # >> PlayerManager() CLASS ATTRIBUTE METHODS
     # =========================================================================
     def __getitem__(self, userid):
         '''
@@ -783,81 +784,26 @@ class PlayerDict(dict):
                         break
 
         # We don't want to call our __getitem__ again
-        return super(PlayerDict, self).__getitem__(userid)
+        return super(PlayerManager, self).__getitem__(userid)
 
     def clear(self):
         '''
         Clear the player dictionary to start fresh with a clean slate.
         '''
-        super(PlayerDict, self).clear()
+        super(PlayerManager, self).clear()
 
 
-class Player(object):
-    '''
-    This class is intended to be used as the class container for interaction
-    with all GunGame-based player attributes. This class forwards to the stored
-    PlayerDict instance of the player's userid, which in return forwards to the
-    BasePlayer class.
-
-    Usage:
-        # Setting attributes
-        Player(userid).customattribute = value
-        Player(userid)['customattribute'] = value
-
-        # Getting attributes
-        level = Player(userid).level
-        level = Player(userid)['level']
-
-        # Deleting custom attributes
-        del Player(userid).customattribute
-
-    Note:
-        For class methods, see the gungame.core.players.BasePlayer class.
-    '''
+class Player(PlayerManager):
+    """Redirects to the PlayerManager instance for ease of use"""
     # =========================================================================
     # >> Player() CLASS INITIALIZATION
     # =========================================================================
-    def __init__(self, userid):
-        self.userid = int(userid)
+    def __new__(cls, userid):
+        return PlayerManager().__getitem__(userid)
 
     # =========================================================================
-    # >> Player() CLASS ATTRIBUTE METHODS
+    # BasePlayer() STATIC CLASS METHODS
     # =========================================================================
-    def __getitem__(self, item):
-        # We only directly allow the attribute "userid" to be set
-        return PlayerDict()[self.userid][item]
-
-    def __setitem__(self, item, value):
-        # We only directly allow the attribute "userid" to be set
-        PlayerDict()[self.userid][item] = value
-
-    def __getattr__(self, name):
-        if name == 'userid':
-            # We only directly allow the attribute "userid" to be retrieved
-            object.__getattr__(self, name)
-        else:
-            # Redirect to the PlayerDict instance
-            return PlayerDict()[self.userid][name]
-
-    def __setattr__(self, name, value):
-        if name == 'userid':
-            # We only directly allow the attribute "userid" to be set
-            object.__setattr__(self, name, value)
-        else:
-            # Redirect to the PlayerDict instance
-            PlayerDict()[self.userid][name] = value
-
-    def __delitem__(self, name):
-        # Redirect to the PlayerDict instance
-        del PlayerDict()[self.userid][name]
-
-    def __delattr__(self, name):
-        # Redirect to the PlayerDict instance
-        del PlayerDict()[self.userid][name]
-
-    # ========================================================================
-    # Player() STATIC CLASS METHODS
-    # ========================================================================
     @staticmethod
     def add_attribute_callback(attribute, function, addon):
         '''

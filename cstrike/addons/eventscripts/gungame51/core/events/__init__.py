@@ -39,7 +39,7 @@ class EventManager(object):
 
         Arguments:
             * playerInstance: (required)
-                The stored BasePlayer instance contained within the PlayerDict.
+                The stored BasePlayer instance contained within the PlayerManager.
                     - AKA "player[userid]"
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.
@@ -103,7 +103,7 @@ class EventManager(object):
 
         Arguments:
             * playerInstance: (required)
-                The stored BasePlayer instance contained within the PlayerDict.
+                The stored BasePlayer instance contained within the PlayerManager.
                     - AKA "player[userid]"
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.

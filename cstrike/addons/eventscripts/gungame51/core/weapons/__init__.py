@@ -370,7 +370,7 @@ class WeaponManager(object):
         else:
             if not self.currentorder:
                 raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
-            # Redirect to the PlayerDict instance
+            # Redirect to the WeaponOrdersDict instance
             return WeaponOrdersDict()[self.currentorder][name]
 
     def __setattr__(self, name, value):
@@ -381,7 +381,7 @@ class WeaponManager(object):
             if not self.currentorder:
                 raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
 
-            # Redirect to the PlayerDict instance
+            # Redirect to the WeaponOrdersDict instance
             WeaponOrdersDict()[self.currentorder][name] = value
 
     # =========================================================================
