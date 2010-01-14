@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # EventScripts Imports
 import es
+import gamethread
 
 # GunGame imports
 from gungame51.core.weapons.shortcuts import get_total_levels
@@ -19,6 +20,7 @@ from gungame51.core.weapons.shortcuts import get_total_levels
 # >> GLOBAL VARIABLES
 # ============================================================================
 gg_multi_round = es.ServerVar('gg_multi_round')
+recentWinner = False
 
 # ============================================================================
 # >> CLASSES
@@ -56,6 +58,16 @@ class EventManager(object):
         
         # Check to see if the player just won
         if newLevel > get_total_levels():
+            # If there was a recentWinner, stop here
+            if recentWinner:
+                return False
+            
+            global recentWinner
+            # Set recentWinner to True
+            recentWinner = True
+            # In 1 second, remove the recentWinner
+            gamethread.delayed(1, self.remove_recent_winner)
+
             # If "gg_multi_round" is disabled
             if not int(gg_multi_round):
                 # Fire the event "gg_win"
@@ -283,3 +295,8 @@ class EventManager(object):
         es.event('setint', 'gg_multi_level', 'userid', attacker)
         es.event('setint', 'gg_multi_level', 'leveler', attacker)
         es.event('fire', 'gg_multi_level')
+    
+    def remove_recent_winner(self):
+        global recentWinner
+
+        recentWinner = False
