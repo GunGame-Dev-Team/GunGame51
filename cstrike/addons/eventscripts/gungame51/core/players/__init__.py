@@ -747,14 +747,8 @@ class PlayerManager(dict):
         userid = int(userid)
 
         if userid not in self:
-            if es.exists('userid', userid):
-                # Get the uniqueid
-                steamid = uniqueid(str(userid), 1)
-            else:
-                # Set steamid to None, so that it will not be found when
-                # searching in the if statement below, and a new BasePlayer
-                # instance will be made
-                steamid = None
+            # Get the uniqueid
+            steamid = uniqueid(str(userid), 1)
 
             # Search for the player's uniqueid to see if they played previously
             if not steamid in [self[playerid].steamid for playerid in self]:
