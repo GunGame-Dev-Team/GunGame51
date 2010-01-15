@@ -66,14 +66,12 @@ def player_death(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def give_nade(userid):
-    pPlayer = getPlayer(userid)
-
     # Is the player dead ?
-    if pPlayer.isdead:
+    if getPlayer(userid).isdead:
         return
         
     # Is the player on a team ?
-    if pPlayer.teamid < 2:
+    if es.getplayerteam(userid) < 2:
         return
 
     # Only give a nade if this player does not have one.

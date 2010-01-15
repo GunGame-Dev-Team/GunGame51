@@ -311,7 +311,7 @@ def check_bonus(userid):
         return False
 
     # Valid team?
-    if getPlayer(userid).teamid < 2:
+    if es.getplayerteam(userid) < 2:
         return False
     
     # Dead?

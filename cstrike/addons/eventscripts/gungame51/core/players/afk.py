@@ -56,7 +56,7 @@ class AFK(object):
             event player_jump
         '''
         # Make sure player is on a team
-        if getPlayer(self.userid).team < 2:
+        if es.getplayerteam(self.userid) < 2:
             raise ValueError('Unable to make player active (%s): not on a team.' % self.userid)
 
         # Reset player math total
@@ -70,7 +70,7 @@ class AFK(object):
         Recalculates the player's location automatically for the scripter.
         '''
         # Make sure player is on a team
-        if getPlayer(self.userid).team < 2:
+        if es.getplayerteam(self.userid) < 2:
             raise ValueError('Unable to teleport player (%s): not on a team.'
                 %self.userid)
 
@@ -93,7 +93,7 @@ class AFK(object):
     def eyeangles(self, eyeAngle0=0, eyeAngle1=0):
         '''Sets a players view angle.'''
         # Make sure player is on a team
-        if getPlayer(self.userid).team < 2:
+        if es.getplayerteam(self.userid) < 2:
             raise ValueError('Unable to set player angles (%s): not on a team'
                 %self.userid)
 

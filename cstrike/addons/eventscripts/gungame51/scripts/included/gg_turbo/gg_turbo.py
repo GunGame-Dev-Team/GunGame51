@@ -74,7 +74,7 @@ def give_weapon(userid, previousLevel):
     pPlayer = getPlayer(userid)
 
     # Is player dead or a spectator?
-    if pPlayer.isdead or pPlayer.teamid < 2:
+    if pPlayer.isdead or es.getplayerteam(userid) < 2:
         return
 
     # Give them their next weapon
