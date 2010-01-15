@@ -59,7 +59,7 @@ def round_start(event_var):
 def player_spawn(event_var):
     userid = event_var['userid']
 
-    if getPlayer(userid).isobserver:
+    if getPlayer(userid).team < 2:
         return
 
     if getPlayer(userid).isdead:

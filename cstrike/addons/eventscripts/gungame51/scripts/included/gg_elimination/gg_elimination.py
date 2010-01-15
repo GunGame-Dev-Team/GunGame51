@@ -186,6 +186,10 @@ def player_death(event_var):
         ggVictim.saytext2(index, 'RespawnWhenAttackerDies', 
         {'attacker': event_var['es_attackername']}, True)
 
+    # If the player does not have the eliminated attribute, stop here
+    if not hasattr(ggVictim, 'eliminated'):
+        return
+
     # Check if victim had any Eliminated players
     gamethread.delayed(1, respawnEliminated, (userid, roundInfo.round))
 

@@ -340,7 +340,7 @@ def player_spawn(event_var):
     pPlayer = getPlayer(userid)
 
     # Is a spectator or dead ?
-    if pPlayer.isobserver or pPlayer.isdead:
+    if pPlayer.team < 2 or pPlayer.isdead:
         return
 
     ggPlayer = Player(userid)
@@ -360,7 +360,7 @@ def player_spawn(event_var):
     
     # Strip bots (sometimes they keep previous weapons)
     if es.isbot(userid):
-        gamethread.delayed(0.25, ggPlayer.give_weapon)
+        gamethread.delayed(0.25, give_weapon_check(userid))
         gamethread.delayed(0.35, ggPlayer.strip)
         
     # Player is human
@@ -371,7 +371,7 @@ def player_spawn(event_var):
         send_level_info_hudhint(ggPlayer)
 
         # Give the player their weapon
-        gamethread.delayed(0.05, ggPlayer.give_weapon)
+        gamethread.delayed(0.05, give_weapon_check(userid))
 
 def player_death(event_var):
     # Check for priority addons
@@ -685,3 +685,13 @@ def send_level_info_hudhint(ggPlayer):
 
     # Send the level information hudhint
     ggPlayer.hudhint(text)
+
+def give_weapon_check(userid):
+    pPlayer = getPlayer(userid)
+    
+    # Is a spectator or dead ?
+    if pPlayer.team < 2 or pPlayer.isdead:
+        return
+    
+    # Give the weapon
+    Player(userid).give_weapon()
