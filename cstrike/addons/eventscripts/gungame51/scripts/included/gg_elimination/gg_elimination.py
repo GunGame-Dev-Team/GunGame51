@@ -141,17 +141,10 @@ def player_team(event_var):
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
     ggPlayer = Player(userid)
-
-    # If the player does not have the eliminated attribute, stop here
-    if not hasattr(ggPlayer, 'eliminated'):
-        return
     
     # Respawn eliminated players if needed
     if ggPlayer.eliminated:
         respawnEliminated(userid, roundInfo.round)
-    else:
-        # Delete the "eliminated" attribute from the disconnecting player
-        del ggPlayer.eliminated
 
 def player_death(event_var):
     
@@ -185,10 +178,6 @@ def player_death(event_var):
 
         ggVictim.saytext2(index, 'RespawnWhenAttackerDies', 
         {'attacker': event_var['es_attackername']}, True)
-
-    # If the player does not have the eliminated attribute, stop here
-    if not hasattr(ggVictim, 'eliminated'):
-        return
 
     # Check if victim had any Eliminated players
     gamethread.delayed(1, respawnEliminated, (userid, roundInfo.round))
@@ -270,10 +259,5 @@ def respawnEliminated(userid, respawnRound):
     saytext2('#human', index, 'RespawningPlayer', 
     {'player': ', '.join(players)}, True)
 
-    # Is the player that was killed still on the server (suicide disconnect)?
-    if es.exists('userid', userid):
-        # Clear victims eliminated player list
-        ggPlayer.eliminated = []
-    else:
-        # Delete the "eliminated" attribute from the disconnected player
-        del ggPlayer.eliminated
+    # Clear victims eliminated player list
+    ggPlayer.eliminated = []
