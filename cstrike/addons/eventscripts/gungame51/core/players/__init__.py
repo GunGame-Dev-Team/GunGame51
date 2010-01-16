@@ -799,6 +799,10 @@ class PlayerManager(dict):
     def reset(self, userid=None):
         # If a single userid was implemented, reset them
         if userid:
+            # If the userid is not int he player manager, stop here
+            if not userid in self:
+                return
+
             userid = int(userid)
             self[userid].__init__(userid)
             return
