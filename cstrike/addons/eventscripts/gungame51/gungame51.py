@@ -42,6 +42,7 @@ from core.addons import PriorityAddon
 from core.addons import gungame_info
 
 #    Player Function Imports
+from core.players import PlayerManager
 from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
 
@@ -96,6 +97,7 @@ gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 gg_win_alltalk = es.ServerVar('gg_win_alltalk')
 sv_alltalk = es.ServerVar('sv_alltalk')
+firstPlayerSpawned = False
 
 # ============================================================================
 # >> CLASSES
@@ -166,6 +168,9 @@ def load():
     es.ServerVar('eventscripts_gg5').makepublic()
 
 def unload():
+    # Remove all player instances
+    PlayerManager().clear()
+    
     # Unload translations
     unloadTranslation('gungame', 'gungame')
     
@@ -271,6 +276,10 @@ def es_map_start(event_var):
     if PriorityAddon():
         del PriorityAddon()[:]
     '''
+    # Set firstPlayerSpawned to False, so player_spawn will know when the first
+    # spawn is
+    firstPlayerSpawned = False
+    
     # Make the sounds downloadable
     make_downloadable()
 
@@ -332,6 +341,15 @@ def round_start(event_var):
     equip_player()
 
 def player_spawn(event_var):
+    if not firstPlayerSpawned:
+        # Replace this with whatever PlayerManager() uses to remove
+        # non-existant players
+        PlayerManager().remove_old()
+
+        # The first player has spawned
+        global firstPlayerSpawned
+        firstPlayerSpawned = True
+
     # Check for priority addons
     if PriorityAddon():
         return

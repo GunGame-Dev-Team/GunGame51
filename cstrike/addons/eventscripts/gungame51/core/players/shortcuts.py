@@ -86,8 +86,7 @@ def deleteAttribute(filter, attribute):
 
 def resetPlayers():
     '''
-    Resets the PlayerManager instance, deleting all instances of BasePlayer
-    contained within, which effectively resets all players' attributes.
+    Resets the BasePlayer instances, setting their attributes back to default.
     
     Notes:
         * All custom attributes will have to be re-declared after this
@@ -96,7 +95,7 @@ def resetPlayers():
           the scripter uses event gg_start to re-initialize custom
           player attributes.
     '''
-    PlayerManager().clear()
+    PlayerManager().reset()
     reset_leaders()
     
     

@@ -22,7 +22,13 @@ from weaponlib import getWeaponNameList
 from usermsg import showVGUIPanel
 
 # SPE Imports
-import spe
+# Import SPE if installed
+try:
+    import spe
+except ImportError:
+    raise ImportError('SPE Is not installed on this server! Please visit ' +
+        'http://forums.eventscripts.com/viewtopic.php?t=29657 and download ' +
+        'the latest version!')
 
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import get_level_weapon
@@ -130,13 +136,18 @@ class BasePlayer(object):
     # =========================================================================
     # >> BasePlayer() CLASS INITIALIZATION
     # =========================================================================
+    def __new__(cls, userid):
+        self = object.__new__(cls, userid)
+        self.userid = int(userid)
+        self.steamid = uniqueid(self.userid, 1)
+        self.afk = AFK(self.userid)
+        self.index = int(getPlayer(str(self.userid)).index)
+        return self
+    
     def __init__(self, userid):
-        self.userid = userid
         self.preventlevel = PreventLevel()
         self.level = 1
-        self.afk = AFK(self.userid)
         self.multikill = 0
-        self.index = int(getPlayer(str(self.userid)).index)
         self.stripexceptions = []
         self.soundpack = SoundPack(str(gg_soundpack))
 
@@ -149,18 +160,6 @@ class BasePlayer(object):
         Return the weapon name
         '''
         return self.get_weapon()
-
-    @property
-    def steamid(self):
-        '''
-        This was done because playerlib will throw an error for bots from
-        time to time
-        '''
-        try:
-            _steamid = uniqueid(str(self.userid), 1)
-        except:
-            _steamid = None
-        return _steamid
 
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
@@ -637,15 +636,6 @@ class BasePlayer(object):
         Respawns the player.
         '''
         if str(gg_respawn_cmd_override) in ('', '0'):
-            # Import SPE if installed
-            try:
-                from spe.games import cstrike
-
-            except ImportError:
-                raise ImportError('SPE Is not installed on this server! ' +
-                        'Please visit http://forums.eventscripts.com/viewtop' +
-                        'ic.php?t=29657 and download the latest version!')
-
             # Player on server ?
             if not es.exists('userid', self.userid):
                 return
@@ -658,7 +648,7 @@ class BasePlayer(object):
             if not getPlayer(self.userid).isdead and not force:
                 return
                 
-            cstrike.respawn(self.userid)
+            spe.respawn(self.userid)
 
         # Check if the respawn command requires the "#" symbol
         elif '#' not in str(gg_respawn_cmd_override):
@@ -746,29 +736,44 @@ class PlayerManager(dict):
         '''
         userid = int(userid)
 
+        # Do we have an instance for this userid?
         if userid not in self:
+            # Does the userid exist on the server?
+            if not es.exists("userid", userid):
+                # Without a way to find the uniqueid, the is no legitimate way
+                # to see if the player has played previously. Nor is there any
+                # reason to create a "junk" instance for this player.
+                raise ValueError('Unable to retrieve or create a player' +
+                    'instance for userid "%s".' %userid)
+
             # Get the uniqueid
-            steamid = uniqueid(str(userid), 1)
+            steamid = uniqueid(userid, 1)
 
             # Search for the player's uniqueid to see if they played previously
-            if not steamid in [self[playerid].steamid for playerid in self]:
+            # in this round. Do so by iterating through all steamids in this
+            # dictionary via list comprehension. If a match is found, add the
+            # player instance to the list. Otherwise, the list will be empty.
+            list_check = [self[x] for x in self.copy() \
+                if self[x].steamid == steamid]
+
+            # The list is empty - no player was found
+            if not list_check:
+                # Create a new instance
                 self[userid] = BasePlayer(userid)
+
+            # A previous BasePlayer instance was found
             else:
-                for playerid in self.copy():
-                    if self[playerid].steamid == steamid:
-                        # Copy the BasePlayer() instance to the current userid
-                        self[userid] = self[playerid]
+                # Copy the BasePlayer() instance to the current userid
+                self[userid] = list_check.pop()
 
-                        # Delete the old BasePlayer() instance
-                        del self[playerid]
+                # Delete the old BasePlayer() instance
+                del self[self[userid].userid]
 
-                        # Set the BasePlayer() instance userid to the current
-                        self[userid].userid = userid
+                # Set the BasePlayer() instance userid to the current
+                self[userid].userid = userid
 
-                        # Set the BasePlayer() .AFK() instance userid
-                        self[userid].afk.userid = userid
-
-                        break
+                # Set the BasePlayer() .AFK() instance userid
+                self[userid].afk.userid = userid
 
         # We don't want to call our __getitem__ again
         return super(PlayerManager, self).__getitem__(userid)
@@ -779,6 +784,28 @@ class PlayerManager(dict):
         '''
         super(PlayerManager, self).clear()
 
+    def remove_old(self):
+        useridList = es.getUseridList()
+
+        # For all userids
+        for userid in self.copy():
+            # If the userid is on the server, stop here
+            if userid in useridList:
+                continue
+
+            # If the user is no longer in the server, remove their instance
+            del self[userid]
+
+    def reset(self, userid=None):
+        # If a single userid was implemented, reset them
+        if userid:
+            userid = int(userid)
+            self[userid].__init__(userid)
+            return
+
+        # Reset all userids
+        for userid in self:
+            self[userid].__init__(userid)
 
 class Player(PlayerManager):
     """Redirects to the PlayerManager instance for ease of use"""
@@ -862,5 +889,6 @@ class Player(PlayerManager):
 
             # Remove the custom attribute callback
             CustomAttributeCallbacks().remove(attribute, addon)
+
 
 from gungame51.core.events.shortcuts import EventManager
