@@ -67,8 +67,8 @@ def player_activate(event_var):
     if ggPlayer.level < handicapLevel:
         ggPlayer.level = handicapLevel
 
-        # Tell the player that their level was adjustedG
-        ggPlayer.msg('LevelLowest', {'level':handicapLevel})
+        # Tell the player that their level was adjusted
+        ggPlayer.msg('LevelLowest', {'level':handicapLevel}, prefix=True)
 
 def round_start(event_var):
     # Start loop
@@ -134,7 +134,7 @@ def handicapUpdate():
             ggPlayer.level = handicapLevel
 
             # Tell the player that their level was adjusted
-            ggPlayer.msg('LevelLowest', {'level':handicapLevel})
+            ggPlayer.msg('LevelLowest', {'level':handicapLevel}, prefix=True)
 
             # Play the update sound
             ggPlayer.playsound('handicap') 
