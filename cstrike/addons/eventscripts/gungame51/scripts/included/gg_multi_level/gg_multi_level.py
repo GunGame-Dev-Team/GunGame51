@@ -337,7 +337,7 @@ def doMultiLevel(userid):
         saytext2('#all', Player(userid).index, 'MultiLevelled', {'name': name})
 
         # Play game sound
-        Player(userid).playsound('multilevel')
+        Player(userid).emitsound('multilevel')
 
         # Create env_spark
         cmd = 'es_xgive %s env_spark; ' %userid
@@ -386,9 +386,12 @@ def removeMultiLevel(userid):
         # Reset player speed and gravity (yes, I know this is the lame way)
         getPlayer(userid).set('speed', 1.0)
         gravity.removeGravityChange(userid)
-
+        
         # Get the Player() object
         ggPlayer = Player(userid)
+        
+        # Stop the sound
+        Player(userid).stopsound('multilevel')
 
         # Remove the ent indexes
         while ggPlayer.multiLevelEntities:
