@@ -684,7 +684,7 @@ class BasePlayer(object):
             # Play the sound
             es.playsound(self.userid, sound, volume)
 
-    def emitsound(self, sound, volume=1.0, attenuation=0.0):
+    def emitsound(self, sound, volume=1.0, attenuation=1.0):
         '''
         Emits the declared sound from the player.
         '''
