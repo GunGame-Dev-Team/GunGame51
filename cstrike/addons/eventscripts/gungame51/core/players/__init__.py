@@ -476,23 +476,21 @@ class BasePlayer(object):
 
         # Nade ?
         elif self.weapon == 'hegrenade':
-
             # Strip all weapons
             self.strip()
             
             # Give them a grenade.
-            spe.giveNamedItem(self.userid, "weapon_hegrenade")
+            given_weapon = spe.giveNamedItem(self.userid, "weapon_hegrenade")
 
         else:
-        
             # Player owns this weapon.
             if spe.ownsWeapon(self.userid, "weapon_%s" % self.weapon):
-                
                 # Make them use it. If we don't do this, a very 
                 # strange bug comes up which prevents the player 
                 # from getting their current level's weapon after
                 # being stripped,
-                es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (self.userid, self.weapon))
+                es.server.queuecmd('es_xsexec %s "use weapon_%s"' 
+                    % (self.userid, self.weapon))
 
                 # Done.
                 return
@@ -503,7 +501,6 @@ class BasePlayer(object):
                 playerWeapons = spe.getWeaponDict(self.userid)
 
                 if playerWeapons:
-
                     # See if there is a primary weapon in the list of weapons
                     pWeapon = set(playerWeapons.keys()).intersection(list_pWeapons)
 
@@ -522,17 +519,30 @@ class BasePlayer(object):
                         weapToStrip = pWeapon.pop()
 
                     if weapToStrip:
-
                         # Make them drop the weapon
                         spe.dropWeapon(self.userid, weapToStrip)
 
                         # Now remove it
                         spe.removeEntityByInstance(playerWeapons[weapToStrip]["instance"])
 
-                # Now give them the weapon.
-                spe.giveNamedItem(self.userid, "weapon_%s" % self.weapon)
+                # Now give them the weapon and save the weapon instance
+                given_weapon = spe.giveNamedItem(self.userid,
+                    "weapon_%s" % self.weapon)
 
-                
+                # Retrieve the weapon instance of the weapon they "should" own
+                weapon_check = spe.ownsWeapon(self.userid, "weapon_%s"
+                    % self.weapon)
+
+                # Make sure that the player owns the weapon we gave them
+                if weapon_check != given_weapon:
+                    # Remove the given weapon since the player does not own it
+                    spe.removeEntityByInstance(given_weapon)
+
+                    # If they don't have the right weapon, fire give_weapon()
+                    if not weapon_check:
+                        self.give_weapon()
+                        return
+
                 # Make bots use it ? (Bots sometimes don't equip the new gun.)
                 if es.isbot(self.userid):
                     es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
