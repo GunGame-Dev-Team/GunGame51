@@ -212,9 +212,8 @@ def player_spawn(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def add_priority_addon(name):
-    if name not in PriorityAddon():
-        priority_addons_added.append(name)
-        PriorityAddon().append(name)            
+    priority_addons_added.append(name)
+    PriorityAddon().append(name)            
 
 def do_warmup(useBackupVars=True):
     # Looking for warmup timer
