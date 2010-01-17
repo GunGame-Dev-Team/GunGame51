@@ -140,7 +140,11 @@ def player_team(event_var):
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
-    ggPlayer = Player(userid)
+    # Players may disconnect before activating, causing an error
+    try:
+        ggPlayer = Player(userid)
+    except ValueError:
+        return
     
     # Respawn eliminated players if needed
     if ggPlayer.eliminated:

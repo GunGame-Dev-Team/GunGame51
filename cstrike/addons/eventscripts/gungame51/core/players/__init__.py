@@ -744,7 +744,7 @@ class PlayerManager(dict):
                 # to see if the player has played previously. Nor is there any
                 # reason to create a "junk" instance for this player.
                 raise ValueError('Unable to retrieve or create a player' +
-                    'instance for userid "%s".' %userid)
+                    ' instance for userid "%s".' %userid)
 
             # Get the uniqueid
             steamid = uniqueid(userid, 1)

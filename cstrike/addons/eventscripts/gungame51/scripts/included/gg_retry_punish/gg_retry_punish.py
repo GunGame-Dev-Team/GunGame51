@@ -75,7 +75,11 @@ def player_activate(event_var):
 
 def player_disconnect(event_var):
     # Get the Player() object
-    ggPlayer = Player(event_var['userid'])
+    # Players may disconnect before activating, causing an error
+    try:
+        ggPlayer = Player(event_var['userid'])
+    except ValueError:
+        return
 
     # Get the player's uniqueid
     steamid = ggPlayer.steamid

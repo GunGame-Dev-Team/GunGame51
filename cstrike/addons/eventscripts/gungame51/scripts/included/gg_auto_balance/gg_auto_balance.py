@@ -310,9 +310,13 @@ def player_death(event_var):
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
 
-    # Was the player supposed to change teams ?
-    ggPlayer = Player(userid)
+    # Players may disconnect before activating, causing an error
+    try:
+        ggPlayer = Player(userid)
+    except ValueError:
+        return
 
+    # Was the player supposed to change teams ?
     if ggPlayer.changeTeam:
         ggPlayer.changeTeam = False
 
