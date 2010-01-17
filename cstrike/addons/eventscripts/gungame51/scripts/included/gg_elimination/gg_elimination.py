@@ -156,7 +156,6 @@ def player_death(event_var):
     userid = int(event_var['userid'])
     attacker = int(event_var['attacker'])
     ggVictim = Player(userid)
-    ggAttacker = Player(attacker)
 
     # Was suicide?
     if userid == attacker or attacker == 0:
@@ -170,6 +169,8 @@ def player_death(event_var):
 
     # Was a normal death
     else:
+        ggAttacker = Player(attacker)
+
         # Add victim to the attackers eliminated players
         ggAttacker.eliminated.append(userid)
 
