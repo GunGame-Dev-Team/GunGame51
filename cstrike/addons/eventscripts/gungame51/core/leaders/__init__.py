@@ -17,6 +17,7 @@ import es
 # GunGame Imports
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging.shortcuts import saytext2
+from gungame51.core.messaging.shortcuts import msg
 
 # =============================================================================
 # >> CLASSES
@@ -253,11 +254,25 @@ class LeaderManager(object):
         self.__remove_userid(userid)
         
         # Trigger new leader messaging if a single leader is found
-        if newLeader and len(self.current) == 1:
-            from gungame51.core.players.shortcuts import Player
+        if not newLeader:
+            return
+
+        from gungame51.core.players.shortcuts import Player
+
+        # One new leader?
+        if len(self.current) == 1:
+            leader = self.current[0]
             # Message about new leader 
-            saytext2('#human', Player(userid).index, 'NewLeader',
-                {'player': es.getplayername(userid),
+            saytext2('#human', Player(leader).index, 'NewLeader',
+                {'player': es.getplayername(leader),
+                'level': self.leaderlevel}, False)
+
+        # More than one leader
+        else:
+            # Message about the multiple new leaders
+            msg('#human', 'NewLeaders',
+                {'players': ", ".join(
+                    [es.getplayername(x) for x in self.current]),
                 'level': self.leaderlevel}, False)
 
     def __remove_userid(self, userid):
