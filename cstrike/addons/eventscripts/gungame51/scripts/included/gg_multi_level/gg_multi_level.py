@@ -219,10 +219,14 @@ def player_disconnect(event_var):
 
         # Cancel the gamethread
         gamethread.cancelDelayed("%i_multilevel" % userid)
-        
-    # Kill off our custom attributes
-    deleteAttribute(userid, "multiLevels")
-    deleteAttribute(userid, "multiLevelEntities")
+
+    # Players may disconnect before activating, causing an error
+    try:
+        # Kill off our custom attributes
+        deleteAttribute(userid, "multiLevels")
+        deleteAttribute(userid, "multiLevelEntities")
+    except ValueError:
+        return
 
 def player_death(event_var):
     # Get event information
