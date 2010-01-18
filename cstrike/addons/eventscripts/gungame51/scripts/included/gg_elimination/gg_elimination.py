@@ -232,10 +232,6 @@ def respawnEliminated(userid, respawnRound):
     # Get the GunGame player object
     ggPlayer = Player(userid)
 
-    # Check the player has any eliminated players
-    if not ggPlayer.eliminated:
-        return
-
     # Set variables
     players = []
     index = 0
@@ -245,7 +241,7 @@ def respawnEliminated(userid, respawnRound):
         # Make sure the player exists
         if not es.exists('userid', playerid):
             continue
-
+        
         # Make sure the player is respawnable
         if not getPlayer(playerid).isdead or es.getplayerteam(playerid) < 2:
             continue
@@ -254,11 +250,15 @@ def respawnEliminated(userid, respawnRound):
         Player(playerid).respawn()
 
         # Add to message format
-        players.append('\3%s\1' % getPlayer(playerid).name)
+        players.append('\3%s\1' % es.getplayername(playerid))
 
         # Get index
         if not index:
             index = Player(playerid).index
+
+    # Check if anyone is respawning
+    if not players:
+        return
 
     # Tell everyone that they are respawning
     saytext2('#human', index, 'RespawningPlayer', 

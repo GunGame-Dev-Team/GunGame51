@@ -127,10 +127,13 @@ def unload():
 #  GAME EVENTS
 # =============================================================================
 def es_map_start(event_var):
+    global voteHasStarted
+    voteHasStarted = False
+
     # Check to see if GunGame's voting system is to be used
     if int(gg_map_vote) > 1:
         return
-        
+
     # Store the map to the list of recently played maps
     if int(gg_map_vote_dont_show_last_maps):
         
@@ -143,11 +146,8 @@ def es_map_start(event_var):
             del list_lastMaps[0]
 
     cleanVote()
-    mapFileClean()    
+    mapFileClean()
 
-    global voteHasStarted
-    voteHasStarted = False
-    
 def gg_levelup(event_var):
     # Vote has allready been started?
     if voteHasStarted:
@@ -160,7 +160,7 @@ def gg_levelup(event_var):
     # Change global so we dont fire the vote twice
     global voteHasStarted
     voteHasStarted = True
-    
+
     # Use 3rd party voting system ?  
     if int(gg_map_vote) > 1:
         es.server.queuecmd('%s' % gg_map_vote_command)

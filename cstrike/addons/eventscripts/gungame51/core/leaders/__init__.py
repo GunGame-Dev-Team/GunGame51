@@ -259,8 +259,12 @@ class LeaderManager(object):
 
         from gungame51.core.players.shortcuts import Player
 
+        leaderCount = len(self.current)
+        # No new leaders?
+        if not leaderCount:
+            return
         # One new leader?
-        if len(self.current) == 1:
+        elif leaderCount == 1:
             leader = self.current[0]
             # Message about new leader 
             saytext2('#human', Player(leader).index, 'NewLeader',

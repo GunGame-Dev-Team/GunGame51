@@ -185,7 +185,7 @@ def unload():
         gamethread.cancelDelayed("%i_multilevel" % userid)
 
         # Remove bonus effects
-        removeMultiLevel(userid)
+        remove_multi_level(userid)
 
     # Make sure that the listener shuts down
     gravity.deleteGravityList()
@@ -213,7 +213,7 @@ def player_disconnect(event_var):
     # Remove this player and any of their entities
     if userid in list_currentMultiLevel:
         # Get rid of their multilevel
-        removeMultiLevel(userid)
+        remove_multi_level(userid)
 
         gravity.removeGravityChange(userid)
 
@@ -238,7 +238,7 @@ def player_death(event_var):
         gamethread.cancelDelayed("%i_multilevel" % userid)
 
         # Remove bonus effects
-        removeMultiLevel(userid)
+        remove_multi_level(userid)
     
     # Do we ignore team kills?
     if event_var['es_attackerteam'] == event_var['es_userteam']:
@@ -261,24 +261,10 @@ def es_map_start(event_var):
     del list_currentMultiLevel[:]
 
 def round_start(event_var):
-    # For all players
-    for userid in es.getUseridList():
-        ggPlayer = Player(userid)
-        
-        # Make sure they 
-        ggPlayer.multiLevels = 0
-        
-        if userid in list_currentMultiLevel:
-            # Cancel the gamethread
-            gamethread.cancelDelayed("%i_multilevel" % userid)
+    stop_multi_levelers()
 
-            # Remove bonus effects
-            removeMultiLevel(userid)
-        
-        ggPlayer.multiLevelEntities = []
-
-    # Clear the list of players currently multi-leveling
-    del list_currentMultiLevel[:]
+def gg_win(event_var):
+    stop_multi_levelers()
 
 def gg_levelup(event_var):
     # Get event information
@@ -311,10 +297,10 @@ def gg_levelup(event_var):
             gamethread.cancelDelayed("%i_multilevel" % attacker)
 
             # Remove the bonus
-            removeMultiLevel(attacker)
+            remove_multi_level(attacker)
 
         # Multi-Level them
-        doMultiLevel(attacker)
+        do_multi_level(attacker)
 
         # Add the player to the multi level list
         list_currentMultiLevel.append(attacker)
@@ -324,12 +310,32 @@ def gg_levelup(event_var):
 
         # Remove multilevel in 10
         gamethread.delayedname(10, "%i_multilevel" % attacker, 
-                               removeMultiLevel, attacker)
+                               remove_multi_level, attacker)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
-def doMultiLevel(userid):
+def stop_multi_levelers():
+    # For all players
+    for userid in es.getUseridList():
+        ggPlayer = Player(userid)
+        
+        # Make sure they 
+        ggPlayer.multiLevels = 0
+        
+        if userid in list_currentMultiLevel:
+            # Cancel the gamethread
+            gamethread.cancelDelayed("%i_multilevel" % userid)
+
+            # Remove bonus effects
+            remove_multi_level(userid)
+        
+        ggPlayer.multiLevelEntities = []
+
+    # Clear the list of players currently multi-leveling
+    del list_currentMultiLevel[:]
+
+def do_multi_level(userid):
     # Check userid validity
     if es.exists('userid', userid):
         
@@ -383,7 +389,7 @@ def doMultiLevel(userid):
         es.event('setint', 'gg_multi_level', 'leveler', userid)
         es.event('fire', 'gg_multi_level')
 
-def removeMultiLevel(userid):
+def remove_multi_level(userid):
     # Check validity
     if es.exists('userid', userid):
 
