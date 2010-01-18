@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/menu/level_menu.py
+# ../addons/eventscripts/gungame/core/menu/winners_menu.py
 
 '''
 $Rev$
@@ -98,7 +98,7 @@ def winner_menu_cmd(userid, args):
     # Make new menu
     global ggWinnersMenu
     ggWinnersMenu = popuplib.easylist('ggWinnersMenu', rankings)
-    ggWinnersMenu.settitle('GunGame !winners Menu')
+    ggWinnersMenu.settitle('GunGame: Winners Menu')
     ggWinnersMenu.timeout('view', 30)
     ggWinnersMenu.timeout('send', 30)
     

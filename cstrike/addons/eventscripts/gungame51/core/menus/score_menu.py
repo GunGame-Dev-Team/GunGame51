@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/menu/level_menu.py
+# ../addons/eventscripts/gungame/core/menu/score_menu.py
 
 '''
 $Rev$
@@ -86,7 +86,7 @@ def score_menu_cmd(userid, args):
     # Let's create the new ggScoreMenu popup
     global ggScoreMenu
     ggScoreMenu = popuplib.easylist('ggScoreMenu', newScoreList)
-    ggScoreMenu.settitle('GunGame !score Menu')
+    ggScoreMenu.settitle('GunGame: Score Menu')
     ggScoreMenu.timeout('view', 15)
     ggScoreMenu.timeout('send', 15)
 
