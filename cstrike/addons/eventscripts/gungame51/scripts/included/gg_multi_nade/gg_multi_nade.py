@@ -1,9 +1,9 @@
 # ../addons/eventscripts/gungame/scripts/included/gg_multi_nade/gg_multi_nade.py
 
 '''
-$Rev: 206 $
-$LastChangedBy: Monday $
-$LastChangedDate: 2009-10-28 15:35:41 -0400 (Wed, 28 Oct 2009) $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================

@@ -1,9 +1,9 @@
 # ../addons/eventscripts/gungame/scripts/cfg/included/gg_multi_nade_config.py
 
 '''
-$$
-$$
-$$
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================
