@@ -1,9 +1,9 @@
-# ../addons/eventscripts/gungame/scripts/cfg/included/gg_warmup_round.py
+# ../addons/eventscripts/gungame/scripts/cfg/included/gg_multi_nade_config.py
 
 '''
-$Rev$
-$LastChangedBy$
-$LastChangedDate$
+$$
+$$
+$$
 '''
 
 # ============================================================================
@@ -20,7 +20,7 @@ from gungame51.core.cfg import generate_header
 # >> GLOBAL VARIABLES
 # ============================================================================
 config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_unl_grenade.cfg')
+    'gungame51/included_addon_configs/gg_multi_nade.cfg')
         
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -28,10 +28,10 @@ config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
 def load():
     generate_header(config)
     
-    # Unlimited Grenades
+    # Multiple Grenades
     config.text('')
     config.text('='*76)
-    config.text('>> UNLIMITED GRENADES')
+    config.text('>> MULTIPLE GRENADES')
     config.text('='*76)
     config.text('Description:')
     config.text('   When a player reaches grenade level, they are given ' +
@@ -40,14 +40,29 @@ def load():
     config.text('Note:')
     config.text('   * Will not load with "gg_earn_nades" enabled.')
     config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_unl_grenade.')
-    config.text('   1 = (Enabled) Load gg_unl_grenade.')
+    config.text('   0 = (Disabled) Do not load gg_multi_nade.')
+    config.text('   1 = (Enabled) Load gg_multi_nade.')
     config.text('Default Value: 0')
-    config.cvar('gg_unl_grenade', 0, 'Enables/Disables ' +
-                'gg_unl_grenade.')
+    config.cvar('gg_multi_nade', 0, 'Enables/Disables ' +
+                'gg_multi_nade.')
     
+    # Max Grenades
+    config.text('')
+    config.text('='*76)
+    config.text('>> MAX GRENADES')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   Defines the maximum number of grenades that a player ')
+    config.text('   can be given during one life.')
+    config.text('Options:')
+    config.text('   0 = Unlimited - Always give the player another nade.')
+    config.text('   # = Numerical limit - Only give up to # grenades.')
+    config.text('Default Value: 0')
+    config.cvar('gg_multi_nade_max_nades', 0, 'The number of ' +
+                'grenades a player on nade level gets per life.')
+
     config.write()
-    es.dbgmsg(0, '\tgg_unl_grenade.cfg')
+    es.dbgmsg(0, '\tgg_multi_nade.cfg')
 
 def unload():
     global config

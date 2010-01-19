@@ -1,9 +1,9 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_unl_grenade/gg_unl_grenade.py
+# ../addons/eventscripts/gungame/scripts/included/gg_multi_nade/gg_multi_nade.py
 
 '''
-$Rev$
-$LastChangedBy$
-$LastChangedDate$
+$Rev: 206 $
+$LastChangedBy: Monday $
+$LastChangedDate: 2009-10-28 15:35:41 -0400 (Wed, 28 Oct 2009) $
 '''
 
 # ============================================================================
@@ -14,6 +14,7 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
+import spe
 from playerlib import getPlayer
 
 # GunGame Imports
@@ -24,11 +25,18 @@ from gungame51.core.players.shortcuts import Player
 # >> ADDON REGISTRATION/INFORMATION
 # ============================================================================
 info = AddonInfo()
-info.name = 'gg_unl_grenade'
-info.title = 'GG Unlimited Grenades' 
+info.name = 'gg_multi_nade'
+info.title = 'GG Multiple Grenades' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
 info.conflicts = ['gg_earn_nade']
+
+# ============================================================================
+# >> GLOBALS
+# ============================================================================
+
+# A global variable to hold the value of the server var by the same name
+gg_multi_nade_max_nades = es.ServerVar("gg_multi_nade_max_nades")
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -42,7 +50,22 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
+
+def player_spawn(event_var):
+
+    # Set the grenades_detonated counter for the spawning player to 0
+    Player(int(event_var['userid'])).grenades_detonated = 0
+
+
+def gg_levelup(event_var):
+
+    # If someone levels up, from nade to nade level, do this
+    Player(int(event_var['leveler'])).grenades_detonated = 0
+
+
 def hegrenade_detonate(event_var):
+
+    # Get the userid as int
     userid = int(event_var['userid'])
     
     # If the player is not on an active team, return
@@ -56,6 +79,16 @@ def hegrenade_detonate(event_var):
     # If the player is dead, return
     if getPlayer(userid).isdead:
         return
-    
+
+    # If there is a limit to the number of nades a player can get...
+    if int(gg_multi_nade_max_nades) > 0:
+
+        # Increment the player's grenades_detonated count
+        Player(userid).grenades_detonated += 1
+
+        # Find out if they exceeded the limit and break out if so
+        if Player(userid).grenades_detonated >= int(gg_multi_nade_max_nades):
+            return
+
     # Give the player a new hegrenade
-    es.server.queuecmd('es_xgive %s weapon_hegrenade' % userid)
+    spe.giveNamedItem(userid, "weapon_hegrenade")
