@@ -1,9 +1,9 @@
 # ../addons/eventscripts/gungame/core/menu/weapons_menu.py
 
 '''
-$Rev: 264 $
-$LastChangedBy: micbarr $
-$LastChangedDate: 2009-11-30 23:19:08 -0500 (Mon, 30 Nov 2009) $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================
