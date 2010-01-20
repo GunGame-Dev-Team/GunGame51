@@ -30,6 +30,7 @@ from core.weapons.shortcuts import set_weapon_order
 from core.weapons.shortcuts import get_level_multikill
 from core.weapons.shortcuts import get_level_weapon
 from core.weapons.shortcuts import get_total_levels
+from core.weapons import WeaponManager
 
 #    Config Function Imports
 from core.cfg.shortcuts import loadConfig
@@ -78,6 +79,7 @@ from core.sql.shortcuts import Database
 
 #   Menus
 from core.menus import MenuManager
+from core.menus.weapons_menu import generate_weapons_menu
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -306,6 +308,11 @@ def es_map_start(event_var):
     # Set up "gg_multi_round"
     if int(gg_multi_round):
         RoundInfo().round = 0
+
+    # If gg_weapon_order_sort_type is #random, re-randomize it
+    if str(gg_weapon_order_sort_type) == "#random":
+        WeaponManager().type = "#random"
+        generate_weapons_menu()
 
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
