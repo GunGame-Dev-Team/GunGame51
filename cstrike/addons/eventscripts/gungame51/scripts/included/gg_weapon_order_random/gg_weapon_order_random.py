@@ -37,19 +37,21 @@ info.version = '0.1'
 # Get the es.ServerVar() instance of "gg_weapon_order_random"
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 
+# =============================================================================
+# >> LOAD & UNLOAD
+# =============================================================================
 def load():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 def unload():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+# ============================================================================
+# >> GAME EVENTS
+# ============================================================================
 def es_map_start(event_var):
-    # Get the weapon_orders directory
-    baseDir = get_game_dir('cfg/gungame5/weapon_orders/')
-
     # Get a list of files in the weapon_orders directory
-    files = filter(lambda x: os.path.splitext(x)[1] == '.txt',
-                os.listdir(baseDir))
+    files = get_game_dir('cfg/gungame51/weapon_orders').files("*.txt")
 
     # Get the current weapon order's file name
     currentFile = get_weapon_order().file
