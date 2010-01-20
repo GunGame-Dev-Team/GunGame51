@@ -63,7 +63,7 @@ def load():
     config.text('   2 = Move the player to spectator.')
     config.text('Default Value: 0')
     config.cvar('gg_afk_punish', 0, 'The punishment for players who are AFK ' +
-                'longer than "gg_afk_rounds".')
+                'longer than "gg_afk_rounds".').addFlag('notify')
 
     # Suicide Punishment
     config.text('')
@@ -76,7 +76,7 @@ def load():
                 'commit suicide.')
     config.text('Default Value: 0')
     config.cvar('gg_suicide_punish', 0, 'The number of levels a player ' +
-                'will lose if they commit suicide.')
+                'will lose if they commit suicide.').addFlag('notify')
 
     # Team Kill Punishment
     config.text('')
@@ -90,7 +90,7 @@ def load():
     config.text('       teammate.')
     config.text('Default Value: 0')
     config.cvar('gg_tk_punish', 0, 'The number of levels a player will lose ' +
-                'if they kill a teammate.')
+                'if they kill a teammate.').addFlag('notify')
 
     # Retry Punishment
     config.text('')
@@ -104,7 +104,7 @@ def load():
     config.text('       in the same round.')
     config.text('Default Value: 0')
     config.cvar('gg_retry_punish', 0, 'The number of levels a player will ' +
-                'lose if they reconnect in the same round.')
+                'lose if they reconnect in the same round.').addFlag('notify')
 
     # This line creates/updates the .cfg file
     config.write()

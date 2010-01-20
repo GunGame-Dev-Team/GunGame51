@@ -50,7 +50,7 @@ def load():
     config.text('                 multi-level bonus.')
     config.text('Default Value: 0')
     config.cvar('gg_multi_level', 0, 'The # of levels it takes to get the ' +
-                'multi-level bonus.')
+                'multi-level bonus.').addFlag('notify')
 
     # Multi-Level Gravity
     config.text('')

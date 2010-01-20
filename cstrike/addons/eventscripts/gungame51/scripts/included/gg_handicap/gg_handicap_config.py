@@ -42,7 +42,7 @@ def load():
     config.text('       Basically "catching them up".')
     config.text('Default Value: 0')
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
-                'adjusting their level.')
+                'adjusting their level.').addFlag('notify')
 
     # Handicap Update
     config.text('')

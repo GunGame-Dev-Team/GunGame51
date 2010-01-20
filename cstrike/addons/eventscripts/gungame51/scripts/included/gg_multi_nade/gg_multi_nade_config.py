@@ -44,7 +44,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_multi_nade.')
     config.text('Default Value: 0')
     config.cvar('gg_multi_nade', 0, 'Enables/Disables ' +
-                'gg_multi_nade.')
+                'gg_multi_nade.').addFlag('notify')
     
     # Max Grenades
     config.text('')

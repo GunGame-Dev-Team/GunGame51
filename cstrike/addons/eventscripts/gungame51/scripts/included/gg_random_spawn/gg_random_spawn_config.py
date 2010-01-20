@@ -41,7 +41,8 @@ def load():
     config.text('   0 = (Disabled) Do not load gg_random_spawn.')
     config.text('   1 = (Enabled) Load gg_random_spawn.')
     config.text('Default Value: 0')
-    config.cvar('gg_random_spawn', 0, 'Enables/Disables random spawn points')
+    config.cvar('gg_random_spawn', 0, 'Enables/Disables random spawn ' +
+        'points').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_random_spawn.cfg')

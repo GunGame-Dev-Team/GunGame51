@@ -48,7 +48,8 @@ def load():
     config.text('   0 = (Disabled) Do not load gg_knife_pro.')
     config.text('   1 = (Enabled) Load gg_knife_pro.')
     config.text('Default Value: 0')
-    config.cvar('gg_knife_pro', 0, 'Enables/Disables gg_knife_pro')
+    config.cvar('gg_knife_pro', 0, 'Enables/Disables ' + 
+        'gg_knife_pro').addFlag('notify')
     
     # Knife Pro Limit
     config.text('')

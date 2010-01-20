@@ -40,7 +40,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_noblock.')
     config.text('Default Value: 0')
     config.cvar('gg_noblock', 0, 'Enables/Disables ' +
-                'gg_noblock.')
+                'gg_noblock.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_noblock.cfg')

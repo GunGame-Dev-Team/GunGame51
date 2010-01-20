@@ -46,7 +46,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_stats_logging.')
     config.text('Default Value: 0')
     config.cvar('gg_stats_logging', 0, 'Enables/Disables ' +
-                'stats logging for third-party programs.')
+                'stats logging for third-party programs.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_stats_logging.cfg')

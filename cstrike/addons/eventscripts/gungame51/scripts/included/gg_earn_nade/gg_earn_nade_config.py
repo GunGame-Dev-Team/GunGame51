@@ -44,7 +44,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_earn_nade.')
     config.text('Default Value: 0')
     config.cvar('gg_earn_nade', 0, 'Enables/Disables ' +
-                'gg_earn_nade.')
+                'gg_earn_nade.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_earn_nade.cfg')

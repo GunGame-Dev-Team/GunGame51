@@ -58,8 +58,6 @@ class ConfigManager(object):
         Notes:
             * Attempts to execute the python file's "load" function if it
               exists.
-            * Adds the "notify" flag to all CVARs declared in the config's
-              python file.
             * Executes the config.
             * The scripter is responsible for the cfglib.AddonCFG().write()
               method.
@@ -80,8 +78,6 @@ class ConfigManager(object):
                 for cvar, value, description in cfg.getCvars().values():
                     # Add the CVAR and default value to the dictionary
                     self.__cvardefaults__[cvar] = value
-                    # Add the "notify" flag to the CVAR
-                    es.ServerVar(cvar).addFlag('notify')
                 global cfgExecuting
                 cfgExecuting = True
                 gamethread.delayed(0, self._reset_config_execution, ())

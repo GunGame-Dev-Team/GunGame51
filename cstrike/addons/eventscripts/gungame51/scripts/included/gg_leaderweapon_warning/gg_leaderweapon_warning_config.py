@@ -43,7 +43,7 @@ def load():
     config.text('   1 = (Enabled)')
     config.text('Default Value: 0')
     config.cvar('gg_leaderweapon_warning', 0, 'Play a sound when a player ' +
-                'reaches "hegrenade" or "knife" level.')
+                'reaches "hegrenade" or "knife" level.').addFlag('notify')
     config.text('')
 
     config.write()

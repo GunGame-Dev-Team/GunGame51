@@ -54,7 +54,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_deathmatch.')
     config.text('Default Value: 0')
     config.cvar('gg_deathmatch', 0, 'Enables/Disables ' +
-                'gg_deathmatch.')
+                'gg_deathmatch.').addFlag('notify')
 
     # Deathmatch Respawn Delay
     config.text('')

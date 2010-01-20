@@ -46,7 +46,7 @@ def load():
     config.text('   1 = (Enabled) Log errors.')
     config.text('Default Value: 1')
     config.cvar('gg_error_logging', 1, 'Logs all GunGame-related ' +
-                'errors.') 
+                'errors.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_error_logging.cfg')

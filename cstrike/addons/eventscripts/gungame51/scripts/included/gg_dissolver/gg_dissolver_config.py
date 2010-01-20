@@ -45,7 +45,7 @@ def load():
     config.text('   6 = Random Effect')
     config.text('Default Value: 0')
     config.cvar('gg_dissolver', 0, 'Enables/Disables ' +
-                'gg_dissolver.')
+                'gg_dissolver.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_dissolver.cfg')

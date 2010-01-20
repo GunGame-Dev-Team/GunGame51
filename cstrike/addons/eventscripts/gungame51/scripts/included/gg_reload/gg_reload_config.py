@@ -41,7 +41,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_reload.')
     config.text('Default Value: 0')
     config.cvar('gg_reload', 0, 'Enables/Disables ' +
-                'gg_reload.')
+                'gg_reload.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_reload.cfg')

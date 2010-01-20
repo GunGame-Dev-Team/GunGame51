@@ -27,24 +27,7 @@ config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
 # ============================================================================
 def load():
     generate_header(config)
-    '''
-    config.text('*'*76)
-    config.text('*' +
-                'gg_elimination.cfg -- Elimination Configuration'.center(74) +
-                '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*' + 'This file defines GunGame Addon settings.'.center(74) +
-                '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*' +
-                'Note: Any alteration of this file requires a'.center(74) +
-                '*')
-    config.text('*' + 'server restart or a reload of GunGame.'.center(74) +
-                '*')
-    config.text('*'*76)
-    config.text('')
-    config.text('')
-    '''
+
     # Elimination
     config.text('')
     config.text('='*76)
@@ -70,7 +53,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_elimination.')
     config.text('Default Value: 0')
     config.cvar('gg_elimination', 0, 'Enables/Disables ' +
-                'gg_elimination.')
+                'gg_elimination.').addFlag('notify')
 
     # Elimination Spawn
     config.text('')

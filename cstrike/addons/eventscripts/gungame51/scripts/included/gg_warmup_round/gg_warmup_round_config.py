@@ -42,7 +42,7 @@ def load():
     config.text('   1 = Enabled.')
     config.text('Default Value: 0')
     config.cvar('gg_warmup_round', 0, 'Enables or disables warmup' +
-                'round.')
+                'round.').addFlag('notify')
 
     # Warmup Round Timer
     config.text('')

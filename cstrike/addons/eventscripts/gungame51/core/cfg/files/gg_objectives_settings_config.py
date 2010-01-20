@@ -46,7 +46,8 @@ def load():
     config.text('   2 = Bomb objective disabled.')
     config.text('   3 = Hostage objective disabled.')
     config.text('Default Value: 0')
-    config.cvar('gg_map_obj', 0, 'Controls which objectives will be disabled.')
+    config.cvar('gg_map_obj', 0, 'Controls which objectives will be ' +
+        'disabled.').addFlag('notify')
 
     # Bomb Defused Leveling
     config.text('')
@@ -61,7 +62,7 @@ def load():
                 'defusal')
     config.text('Default Value: 0')
     config.cvar('gg_bomb_defused_levels', 0, 'Levels to reward a player for ' +
-                'bomb defusal.')
+                'bomb defusal.').addFlag('notify')
 
     # Bomb Defused Leveling Knife
     config.text('')
@@ -110,7 +111,7 @@ def load():
                 'bomb exploding')
     config.text('Default Value: 0')
     config.cvar('gg_bomb_exploded_levels', 0, 'Levels to reward a player ' +
-                'for bomb exploding.')
+                'for bomb exploding.').addFlag('notify')
 
     # Bomb Exploded Leveling Knife
     config.text('')

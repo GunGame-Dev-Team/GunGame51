@@ -46,7 +46,7 @@ def load():
     config.text('   1 = (Enabled)')
     config.text('Default Value: 0')
     config.cvar('gg_welcome_msg', 0, 'Enables/Disables ' +
-                'gg_welcome_msg.')
+                'gg_welcome_msg.').addFlag('notify')
     config.text('')
 
     # gg_welcome_msg_timeout

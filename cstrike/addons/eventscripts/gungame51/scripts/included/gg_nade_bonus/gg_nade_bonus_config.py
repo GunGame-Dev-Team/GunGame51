@@ -65,7 +65,7 @@ def load():
     config.text('   0 = (Disabled) Do not load gg_nade_bonus.')
     config.text('Default Value: 0')
     config.cvar('gg_nade_bonus', 0, 'The weapon(s) to be given as a grenade ' +
-                'level bonus weapon.')
+                'level bonus weapon.').addFlag('notify')
     config.text('')
     config.text('')
     

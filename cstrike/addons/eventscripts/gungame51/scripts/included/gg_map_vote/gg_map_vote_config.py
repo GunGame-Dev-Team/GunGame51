@@ -42,7 +42,8 @@ def load():
     config.text('   1 = (Enabled) Use GunGame\'s map voting system.')
     config.text('   2 = (Enabled) Use a 3rd-party voting system.')
     config.text('Default Value: 0')
-    config.cvar('gg_map_vote', 0, 'Controls GunGame\'s map voting.')
+    config.cvar('gg_map_vote', 0, 'Controls GunGame\'s map ' +
+        'voting.').addFlag('notify')
     config.text('')
     config.text('')
     

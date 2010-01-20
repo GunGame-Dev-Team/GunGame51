@@ -57,7 +57,7 @@ def load():
     config.text('     order.')
     config.text('Default Value: "default_weapon_order"')
     config.cvar('gg_weapon_order_file', 'default_weapon_order', 'The file ' +
-                'that will be used for the weapon order.')
+                'that will be used for the weapon order.').addFlag('notify')
 
     # Random Weapon Order File
     config.text('')
@@ -70,7 +70,7 @@ def load():
     config.text('   1 = (Enabled) get a new weapon order each map change.')
     config.text('Default Value: 0')
     config.cvar('gg_weapon_order_random', 0, 'Randomly select a new weapon ' +
-                'order file each map.')
+                'order file each map.').addFlag('notify')
 
     # Weapon Order Sort Type
     config.text('')
@@ -83,7 +83,7 @@ def load():
     config.text('   #random   = Order will be randomly shuffled.')
     config.text('Default Value: "#default"')
     config.cvar('gg_weapon_order_sort_type', '#default', 'The order in which' +
-                ' the weapons and levels will be sorted.')
+                ' the weapons and levels will be sorted.').addFlag('notify')
 
     # Multikill Override
     config.text('')
@@ -98,7 +98,7 @@ def load():
                 'always 1.')
     config.text('Default Value: 0')
     config.cvar('gg_multikill_override', 0, 'The amount of kills a player ' +
-                'needs to level up per weapon.')
+                'needs to level up per weapon.').addFlag('notify')
 
     # Weapon Removal
     config.text('')

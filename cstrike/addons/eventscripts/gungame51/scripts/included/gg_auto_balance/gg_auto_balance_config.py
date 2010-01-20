@@ -48,7 +48,7 @@ def load():
     config.text('   1 = (Enabled)')
     config.text('Default Value: 0')
     config.cvar('gg_auto_balance', 0, 'Enables/Disables ' +
-                'gg_auto_balance.')
+                'gg_auto_balance.').addFlag('notify')
     config.text('')
     
     # gg_auto_balance_threshold

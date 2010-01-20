@@ -42,7 +42,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_dead_strip.')
     config.text('Default Value: 0')
     config.cvar('gg_dead_strip', 0, 'Enables/Disables ' +
-                'gg_dead_strip.')
+                'gg_dead_strip.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_dead_strip.cfg')

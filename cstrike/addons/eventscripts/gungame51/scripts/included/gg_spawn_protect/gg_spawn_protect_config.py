@@ -43,7 +43,7 @@ def load():
     config.text('   # = Time (in seconds) for players to be spawn protected.')
     config.text('Default Value: 0')
     config.cvar('gg_spawn_protect', 0, 'Enables/Disables spawn ' +
-                'protection.')
+                'protection.').addFlag('notify')
     config.text('')
 
     # Spawn Protection Colors

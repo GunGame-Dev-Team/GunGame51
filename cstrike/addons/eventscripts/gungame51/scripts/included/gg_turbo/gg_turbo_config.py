@@ -40,7 +40,7 @@ def load():
     config.text('   0 = (Disabled) Do not load gg_turbo.')
     config.text('   1 = (Enabled) Load gg_turbo.')
     config.text('Default Value: 0')
-    config.cvar('gg_turbo', 0, 'Enables/Disables gg_turbo.')
+    config.cvar('gg_turbo', 0, 'Enables/Disables gg_turbo.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_turbo.cfg')

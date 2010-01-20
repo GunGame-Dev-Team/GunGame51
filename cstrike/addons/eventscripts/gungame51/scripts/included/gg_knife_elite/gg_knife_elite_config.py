@@ -45,7 +45,7 @@ def load():
     config.text('   1 = (Enabled) Load gg_knife_elite.')
     config.text('Default Value: 0')
     config.cvar('gg_knife_elite', 0, 'Enables/Disables ' +
-                'gg_knife_elite.')
+                'gg_knife_elite.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_knife_elite.cfg')

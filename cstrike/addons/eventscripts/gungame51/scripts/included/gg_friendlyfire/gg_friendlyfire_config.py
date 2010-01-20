@@ -53,7 +53,7 @@ def load():
     config.text('                 below the last level.')
     config.text('Default Value: 0')
     config.cvar('gg_friendlyfire', 0, 'The number (+1) of levels below the ' +
-                'last level to enable friendly fire.')
+                'last level to enable friendly fire.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_friendlyfire.cfg')

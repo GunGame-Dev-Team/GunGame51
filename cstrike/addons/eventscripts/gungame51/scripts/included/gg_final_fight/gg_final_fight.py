@@ -44,7 +44,7 @@ info.translations = ['gg_final_fight']
 gg_final_fight = es.ServerVar('gg_final_fight')
 gg_final_fight_bots = es.ServerVar('gg_final_fight_bots') # 0 = no, 1 = w/ human, 2 = no worries
 gg_knife_pro = es.ServerVar('gg_knife_pro')
-gg_deadstrip = es.ServerVar('gg_deadstrip')
+gg_deadstrip = es.ServerVar('gg_dead_strip')
 
 
 # Misc
@@ -113,7 +113,7 @@ def item_pickup(event_var):
         return
 
     # Let dead strip do it?
-    if int(gg_deadstrip):
+    if int(gg_dead_strip):
         return
 
     userid = int(event_var['userid'])

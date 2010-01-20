@@ -40,7 +40,8 @@ def load():
     config.text('   0 = (Disabled) Do not load gg_spawnpoints.')
     config.text('   1 = (Enabled) Load gg_spawnpoints.')
     config.text('Default Value: 0')
-    config.cvar('gg_spawnpoints', 0, 'Spawn point management.')
+    config.cvar('gg_spawnpoints', 0, 'Spawn point ' +
+        'management.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_spawnpoints.cfg')

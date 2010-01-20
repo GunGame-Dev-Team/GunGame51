@@ -42,7 +42,7 @@ def load():
     config.text('   1 = Enabled')
     config.text('Default Value: 1')
     config.cvar('gg_thanks', 1, 'Displays a list of those involved with ' +
-                'development and testing of GunGame.')
+                'development and testing of GunGame.').addFlag('notify')
     
     config.write()
     es.dbgmsg(0, '\tgg_thanks.cfg')
