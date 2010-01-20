@@ -61,12 +61,16 @@ roundInfo = RoundInfo()
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    es.dbgmsg(0, 'Loaded: %s' % info.name)
+
     if inMap():
         roundInfo.active = True
 
     # Get userids of all connected players
     setAttribute('#all', 'eliminated', [])
-    
+
+def unload():
+    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 # ============================================================================
 # >> GAME EVENTS

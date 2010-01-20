@@ -11,11 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Python Imports
 from os import name as platform
-from os import listdir
-from os import path
-from os import lstat
-import path
-from stat import S_ISDIR
+from path import path
 
 # Eventscripts Imports
 from es import ServerVar
@@ -44,8 +40,8 @@ def get_game_dir(folder=None):
     @return An absolute path to the game directory plus \p dir.'''
     if folder:
         folder = str(folder).replace('\\', '/')
-        return '%s/%s' % (gamePath, folder)
-    return gamePath
+        return path('%s/%s' % (gamePath, folder))
+    return path(gamePath)
 
 def getOS():
     return platform
@@ -72,7 +68,7 @@ def get_file_list(top=get_game_dir('addons/eventscripts')):
 
     (Excluding svn folders and files.)
     '''
-    for name in path.path(top).walkdirs():
+    for name in path(top).walkdirs():
         if not "gungame51" in name:
             continue
 

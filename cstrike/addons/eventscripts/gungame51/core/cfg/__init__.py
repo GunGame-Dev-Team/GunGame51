@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Python Imports
 import os.path
+from path import path
 
 # EventScripts Imports
 import es
@@ -135,13 +136,16 @@ class ConfigManager(object):
         # Get the config type
         cfgType = ConfigManager.get_config_type(name)
 
+        # Get the name of the addon the config belongs to
+        addon = name.replace("_config", "")
+
         # Import the config and store the module
         if cfgType == 'main':
             self.__loaded__[name] = __import__('gungame51.core.cfg.files.%s'
                 %name, globals(), locals(), [''])
         else:
-            self.__loaded__[name] = __import__('gungame51.scripts.cfg' + \
-                '.%s.%s' %(cfgType, name), globals(), locals(), [''])
+            self.__loaded__[name] = __import__('gungame51.scripts' + \
+                '.%s.%s.%s' %(cfgType, addon, name), globals(), locals(), [''])
 
         # We have to reload the module to re-instantiate the globals
         reload(self.__loaded__[name])
@@ -199,12 +203,14 @@ class ConfigManager(object):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
-        return int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'core/cfg/files/%s.py' %name))) or \
-            int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/cfg/included/%s.py' %name))) or \
-            int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/cfg/custom/%s.py' %name)))
+        return get_game_dir('addons/eventscripts/gungame51/' +
+            'core/cfg/files/%s.py' %name).isfile() or \
+            get_game_dir('addons/eventscripts/gungame51/' +
+            'scripts/included/%s/%s.py' \
+                %(name.replace("_config", ""), name)).isfile() or \
+            get_game_dir('addons/eventscripts/gungame51/' +
+            'scripts/custom/%s/%s.py' \
+                %(name.replace("_config", ""), name)).isfile()
 
     @staticmethod
     def get_config_type(name):
@@ -220,74 +226,74 @@ class ConfigManager(object):
                 % name)
 
         # Get config type
-        if os.path.isfile(get_game_dir('addons/eventscripts/gungame51/core/cfg' +
-            '/files/%s.py' %name)):
-            return 'main'
-        elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/cfg/included/%s.py' %name)):
-            return 'included'
-        elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/cfg/custom/%s.py' %name)):
-            return 'custom'
+        if get_game_dir('addons/eventscripts/gungame51/core/cfg' +
+            '/files/%s.py' %name).isfile():
+                return 'main'
+        elif get_game_dir('addons/eventscripts/gungame51/scripts/' +
+            'included/%s/%s.py' %(name.replace("_config", ""), name)).isfile():
+                return 'included'
+        elif get_game_dir('addons/eventscripts/gungame51/scripts/' +
+            'custom/%s/%s.py' %(name.replace("_config", ""), name)).isfile():
+                return 'custom'
 
 
 # Register the ConfigManager instance for the "server_cvar" event
 es.addons.registerForEvent(ConfigManager(), 'server_cvar', ConfigManager().server_cvar)
 
+dict_config_types = {
+    "main":get_game_dir("/addons/eventscripts/gungame51/core/cfg/files"),
+    "included":get_game_dir("/addons/eventscripts/gungame51/scripts/included"),
+    "custom":get_game_dir("/addons/eventscripts/gungame51/scripts/custom")
+    }
 
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
 def get_config_list(type=None):
     '''
-    Retrieves a list of configlib configs of the following types:
+    Retrieves a list of cfglib configs of the following types:
         * main (the primary GunGame configs)
         * included (included addon configs)
-        * custom (custom addon configs)a
-        
+        * custom (custom addon configs)
+
     Note:
         If no argument is provided, all possible configs will be returned 
         in the list.
     '''
-    dict_types = {'main':get_game_dir('addons/eventscripts/gungame51/core/cfg/' +
-                  'files'),
-                  'included':get_game_dir('addons/eventscripts/gungame51/' +
-                  'scripts/cfg/included'),
-                  'custom':get_game_dir('addons/eventscripts/gungame51/scripts' +
-                  '/cfg/custom')}
-
+    # Initialize a blank list to store the config names
     list_configs = []
 
+    # Did they supply us with a type?
     if type:
-        if type not in ['main', 'included', 'custom']:
-            raise TypeError('Invalid argument type: "%s". Use only: "%s"'
-                %(type, '", "'.join(dict_types.keys())) + ', or None.')
+        # Make sure they provided us with a valid argument value
+        if type not in dict_config_types.keys():
+            raise ValueError('Invalid argument type: "%s". Use only: "%s"'
+                %(type, '", "'.join(dict_config_types.keys())) + ', or None.')
 
-        searchList = [dict_types[type]]
+        # Only search for the specific type
+        searchList = [dict_config_types[type]]
+
+    # No type argument
     else:
-        searchList = [dict_types['main'], dict_types['included'],
-                      dict_types['custom']]
+        # Search all possible configs
+        searchList = [x for x in dict_config_types.values()]
 
-    for path in searchList:
-        for item in os.listdir(path):
-            # Ignore subfolders
-            if os.path.isdir(os.path.join(path, item)):
+        # Reverse the search list to execute "main" configs first
+        searchList.reverse()
+
+    # Loop through each config path
+    for cfgpath in searchList:
+        # Walk through all files in the path
+        for file in cfgpath.walkfiles('*.py'):
+            # We require the configs to end with "_config.py"
+            if not file.name.endswith("_config.py"):
                 continue
 
-            # Split the filename and extension
-            filename, extension = item.split('.')
+            # Append the config to our list of configs
+            list_configs.append(file.namebase)
 
-            # Ignore .pyc files
-            if extension == 'pyc':
-                continue
-
-            # Ignore __init__ files
-            if filename == '__init__':
-                continue
-
-            # Append the filename (without the extension)
-            list_configs.append(filename)
-
+    # Return the list of config names (no ".py" extension)
+    print list_configs
     return list_configs
     
 def generate_header(config):
