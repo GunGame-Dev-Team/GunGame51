@@ -293,7 +293,6 @@ def get_config_list(type=None):
             list_configs.append(file.namebase)
 
     # Return the list of config names (no ".py" extension)
-    print list_configs
     return list_configs
     
 def generate_header(config):
