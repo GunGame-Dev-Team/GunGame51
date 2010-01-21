@@ -65,14 +65,15 @@ class AddonStrings(object):
         self.strings = None
         self.__denied__ = []
 
+        # Retrieve the addon INI
+        addonINI = self.get_addon_ini(addon)
+
         # Load the addon's translations via langlib.Strings() if they exist
-        if not os.path.isfile(get_game_dir('cfg/gungame51/translations/%s.ini'
-            %self.addon)):
+        if not addonINI.isfile():
             return
 
         # Retrieve the langlib Strings()
-        self.strings = Strings(get_game_dir('cfg/gungame51/translations/%s.ini'
-            %self.addon))
+        self.strings = Strings(addonINI)
 
         # Loop through all strings
         for string in self.strings:
@@ -83,6 +84,25 @@ class AddonStrings(object):
                 if not string in self.__denied__:
                     self.__denied__.append(string)
                 es.dbgmsg(0, '%s: %s' %(self.addon, e))
+
+    # ========================================================================
+    # AddonStrings() STATIC CLASS METHODS
+    # ========================================================================
+    @staticmethod
+    def get_addon_ini(addon):
+        # If the INI is the main GunGame INI, return the path to the INI
+        if addon == "gungame":
+            return get_game_dir("addons/eventscripts/gungame51/gungame.ini")
+
+        # The INI must be either included or custom at this point
+        from gungame51.core.addons import AddonManager
+
+        # Get the addon type
+        addon_type = AddonManager().get_addon_type(addon)
+
+        # Return the path to the addon INI
+        return get_game_dir("addons/eventscripts/gungame51/scripts/" + \
+            "%s/%s/%s.ini" %(addon_type, addon, addon))
 
 
 class MessageManager(object):
