@@ -48,7 +48,7 @@ sourcemod_version = es.ServerVar('sourcemod_version')
 mani_admin_plugin_version = es.ServerVar('mani_admin_plugin_version')
 est_version = es.ServerVar('est_version')
 
-file_name = (get_game_dir('addons/eventscripts/gungame51/logs') +
+file_name = (get_game_dir('cfg/gungame51/logs') +
                     '/GunGame%s_Log.txt' % gungame_info('version').replace('.','_'))
 
 # ============================================================================

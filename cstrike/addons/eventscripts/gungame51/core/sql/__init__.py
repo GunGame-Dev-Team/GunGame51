@@ -131,5 +131,5 @@ class Database(object):
 
     def connect(self):
         self._ggSQL = connect(get_game_dir(
-                    'addons/eventscripts/gungame51/core/sql/gg_database.db'))
+                    'cfg/gungame51/database/gg_database.db'))
         self.curs = self._ggSQL.cursor()
