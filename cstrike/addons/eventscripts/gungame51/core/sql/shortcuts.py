@@ -104,6 +104,18 @@ def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
     ggDB._query(queryString, values=valueTuple)
     ggDB.commit()
 
+def get_rank(uniqueid):
+    ggDB = Database()
+    # Get the current number of wins for the uniqueid
+    currentWins = ggDB.select('gg_wins', 'wins', 'where uniqueid = "%s"' % \
+                                                                    uniqueid)
+    # Return the count + 1 of players who have more wins than the uniqueid
+    return ggDB.select("gg_wins", ("COUNT(*)"), "WHERE ABS(wins) > %s" % \
+                                                            currentWins) + 1
+
+def get_winner_count():
+    return Database().select("gg_wins", ("COUNT(*)"))
+
 def get_winners_list(n=10):
     '''
     Returns an ordered list dicts of (n) player names in order from highest
