@@ -49,6 +49,7 @@ def load():
 
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+    remove_callbacks_for_addon(info.name)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
