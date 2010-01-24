@@ -97,8 +97,13 @@ def player_death(event_var):
     ggAttacker = Player(attacker)
     # gg_levelup fires before this because internal events fire first, so:
     # If the player just got off of knife level, set their weapon to knife
-    attackerWeapon = "knife" if attacker in recentlyOffKnife else \
-                                                            ggAttacker.weapon
+    # and their level to knife level
+    if attacker in recentlyOffKnife:
+        attackerWeapon = "knife"
+        attackerLevel = ggAttacker.level - 1
+    else:
+        attackerWeapon = ggAttacker.weapon
+        attackerLevel = ggAttacker.level
 
     # ===================
     # Attacker checks
@@ -111,6 +116,13 @@ def player_death(event_var):
         if not (int(gg_allow_afk_levels) and int(gg_allow_afk_levels_knife)):
             msg(attacker, 'VictimAFK', prefix=True)
             return
+    
+    # If the level difference is higher than the limit, stop here
+    if (attackerLevel - ggVictim.level) > int(gg_knife_pro_limit) and \
+                                            int(gg_knife_pro_limit) != 0:
+        msg(attacker, 'LevelDifferenceLimit', 
+            {'limit': int(gg_knife_pro_limit)}, prefix=True)
+        return
 
     # Never skip hegrenade level
     if attackerWeapon == 'hegrenade':
@@ -138,14 +150,6 @@ def player_death(event_var):
         # Checking for always level mode
         if not int(gg_knife_pro_always_level):
             msg(attacker, 'VictimLevel1', prefix=True)
-            return
-
-    # If the level difference is higher than the limit
-    if is_out_of_limit(ggAttacker.level, ggVictim.level):
-        # If gg_knife_pro_always_level is off, stop here
-        if not int(gg_knife_pro_always_level):
-            msg(attacker, 'LevelDifferenceLimit', 
-                {'limit': int(gg_knife_pro_limit)}, prefix=True)
             return
 
     # ===================
@@ -182,13 +186,6 @@ def level_down_victim(attacker, victim):
             # The steal event didn't get fired
             return False
 
-    # Level down the victim
-    # If the level difference is higher than the limit, stop here
-    if is_out_of_limit(ggAttacker.level, ggVictim.level):
-
-        # The steal event didn't get fired
-        return False
-
     # Play sound & send message
     ggVictim.playsound('leveldown')
     ggVictim.leveldown(1, attacker, 'steal')
@@ -196,13 +193,6 @@ def level_down_victim(attacker, victim):
     fire_gg_knife_steal(attacker, victim)
     # The steal event got fired
     return True
-
-def is_out_of_limit(attackerLevel, victimLevel):
-    # Is the level difference higher than the limit?
-    if (attackerLevel - victimLevel) > int(gg_knife_pro_limit) and \
-                                            int(gg_knife_pro_limit) != 0:
-        return True
-    return False
 
 def fire_gg_knife_steal(attacker, victim):
     ggAttacker = Player(attacker)

@@ -78,8 +78,9 @@ def load():
     config.text('Description:')
     config.text('    The attacker will always level up unless they are on ' +
                 'hegrenade level.')
-    config.text('    The vitim will always level down unless ' +
-                'gg_knife_pro_limit takes effect.')
+    config.text('    The victim will always level down.')
+    config.text('Note:')
+    config.text('    gg_knife_pro_limit still prevents leveling if enabled.')
     config.text('Options:')
     config.text('    0 = (Disabled) Conform to logical gg_knife_pro ruling')
     config.text('    1 = (Enabled) Always affect levels with exception to the' +
