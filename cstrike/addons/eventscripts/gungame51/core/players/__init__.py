@@ -782,6 +782,9 @@ class PlayerManager(dict):
                 # Set the BasePlayer() instance userid to the current
                 self[userid].userid = userid
 
+                # Set the BasePlayer() instance index to the current
+                self[userid].index = int(getPlayer(str(userid)).index)
+
                 # Set the BasePlayer() .AFK() instance userid
                 self[userid].afk.userid = userid
 
