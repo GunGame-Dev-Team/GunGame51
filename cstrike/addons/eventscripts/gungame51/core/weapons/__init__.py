@@ -18,6 +18,8 @@ import es
 from weaponlib import getWeaponList
 from gamethread import delayedname
 from gamethread import cancelDelayed
+from playerlib import getPlayer
+from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core import get_game_dir
@@ -250,6 +252,16 @@ class BaseWeaponOrders(object):
         if not self.file == WeaponManager().gungameorder:
             return
 
+        # Give players godmode so that they can't level up
+        #
+        # Spawning players in the next 2 seconds will be killable, but this is
+        # unlikely and not worth the resources to prevent because killing a
+        # spawning player in the 2 seconds after a weapon order is changed on
+        # an active map (through rcon) will likely never happen, and if so,
+        # will result in a levelup
+        for userid in getPlayerList("#alive"):
+            getPlayer(userid).godmode = 1
+            
         es.server.cmd('mp_restartgame 2')
         es.msg('Weapon Order Changed! Restarting in 2 seconds!')
 

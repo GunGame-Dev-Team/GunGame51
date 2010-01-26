@@ -43,6 +43,7 @@ from core.addons import gungame_info
 from core.players import PlayerManager
 from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
+from core.players.shortcuts import setAttribute
 
 #    Leaders Function Imports
 from core.leaders.shortcuts import get_leader_count
@@ -505,7 +506,12 @@ def gg_levelup(event_var):
         return
     
     userid = int(event_var['userid'])
-    
+
+    # If the userid defaulted to 0 (for levelups triggered without a victim),
+    # stop here
+    if not userid:
+        return
+
     # Is a bot?
     if es.isbot(userid):
         return
@@ -622,8 +628,11 @@ def server_cvar(event_var):
 
     if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type', 
                                                     'gg_multikill_override']:
-        # Get weapon order file
-        # Set this as the weapon order and set the weapon order type
+        # For weapon order file and sort type, reset player's levels to 1
+        if cvarName != "gg_multikill_override":
+            setAttribute("#all", "level", 1)
+        
+        # Set the weapon order and set the weapon order type
         currentOrder = set_weapon_order(str(gg_weapon_order_file), 
                                       str(gg_weapon_order_sort_type))
 

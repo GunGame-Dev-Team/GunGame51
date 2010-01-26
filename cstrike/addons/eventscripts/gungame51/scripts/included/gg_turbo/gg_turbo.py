@@ -24,6 +24,7 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import add_attribute_callback
 from gungame51.core.players.shortcuts import remove_callbacks_for_addon
 from gungame51.core.weapons.shortcuts import get_level_weapon
+from gungame51.core.weapons.shortcuts import get_total_levels
 
 # ============================================================================
 # >> GLOBALS
@@ -82,6 +83,11 @@ def give_weapon(userid, previousLevel):
     ggPlayer = Player(userid)
     ggPlayer.give_weapon()
 
+    # If previousLevel is not in the order due to weapon orders changing,
+    # stop here
+    if previousLevel > get_total_levels():
+        return
+    
     # Get the player's current Held weapons
     pWeapon = pPlayer.getPrimary()
     sWeapon = pPlayer.getSecondary()
