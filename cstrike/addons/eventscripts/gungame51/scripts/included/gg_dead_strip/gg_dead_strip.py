@@ -106,7 +106,13 @@ def item_pickup(event_var):
     # Switch to their gungame weapon
     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon))
     gamethread.delayed(0, es.setplayerprop, (userid, 'CBaseCombatCharacter.bcc_localdata.m_flNextAttack', 0))
-    
+
+def player_death(event_var):
+    # For each instance for weapons the player owned
+    for instance in Player(event_var["userid"]).ownedWeapons:
+        # Remove the weapon by its instance
+        spe.removeEntityByInstance(instance)
+
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================

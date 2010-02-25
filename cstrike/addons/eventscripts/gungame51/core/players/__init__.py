@@ -47,6 +47,7 @@ from afk import AFK
 # ============================================================================
 list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
+list_allWeapons = getWeaponNameList()
 eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
 gg_respawn_cmd_override = es.ServerVar('gg_respawn_cmd_override')
 gg_soundpack = es.ServerVar('gg_soundpack')
@@ -149,6 +150,7 @@ class BasePlayer(object):
         self.level = 1
         self.multikill = 0
         self.stripexceptions = []
+        self.ownedWeapons = []
         self.soundpack = SoundPack(str(gg_soundpack))
 
     # =========================================================================
@@ -344,7 +346,7 @@ class BasePlayer(object):
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
         if name in ('userid', 'level', 'preventlevel', 'steamid', 'soundpack',
-          'stripexceptions', 'multikill', 'wins', 'team', 'name', 'index',
+          'stripexceptions', 'ownedWeapons', 'multikill', 'wins', 'team', 'name', 'index',
                                                                         'afk'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
@@ -543,6 +545,11 @@ class BasePlayer(object):
                         self.give_weapon()
                         return
 
+                # If gg_dead_strip is loaded, we need to keep track of which weapons
+                # the player has so that they can be removed whent he player dies
+                if int(es.ServerVar('gg_dead_strip')):
+                    gamethread.delayed(0, self.update_owned_weapons)
+
                 # Make bots use it ? (Bots sometimes don't equip the new gun.)
                 if es.isbot(self.userid):
                     es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
@@ -610,9 +617,32 @@ class BasePlayer(object):
 
         # Give the player the weapon
         spe.giveNamedItem(self.userid, weapon)
+        
+        # If gg_dead_strip is loaded, we need to keep track of which weapons
+        # the player has so that they can be removed whent he player dies
+        if int(es.ServerVar('gg_dead_strip')):
+            gamethread.delayed(0, self.update_owned_weapons)
 
         if useWeapon:
             es.server.queuecmd('es_xsexec %s "use %s"' % (self.userid, weapon))
+
+    def update_owned_weapons(self):
+        # Set the ownedWeapons list to empty
+        self.ownedWeapons = []
+
+        # Get the list of the player's weapons
+        playerWeapons = spe.getWeaponDict(self.userid)
+
+        # For each weapon the player owns
+        for weapon in playerWeapons:
+            # If the weapon is a knife, c4, or not a real weapon, stop here
+            if not weapon in list_allWeapons or weapon[7:] in \
+                                                            ["knife", "c4"]:
+                continue
+
+            # Add the weapon's instance to the ownedWeapons list so that it can
+            # be removed when the player dies with gg_dead_strip enabled
+            self.ownedWeapons.append(playerWeapons[weapon]["instance"])
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
