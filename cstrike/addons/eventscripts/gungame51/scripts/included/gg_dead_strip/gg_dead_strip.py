@@ -108,10 +108,10 @@ def item_pickup(event_var):
     gamethread.delayed(0, es.setplayerprop, (userid, 'CBaseCombatCharacter.bcc_localdata.m_flNextAttack', 0))
 
 def player_death(event_var):
-    # For each instance for weapons the player owned
-    for instance in Player(event_var["userid"]).ownedWeapons:
+    # For each index for weapons the player owned
+    for index in Player(event_var["userid"]).ownedWeapons:
         # Remove the weapon by its instance
-        spe.removeEntityByInstance(instance)
+        spe.removeEntityByIndex(index)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS

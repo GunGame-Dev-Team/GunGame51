@@ -545,8 +545,9 @@ class BasePlayer(object):
                         self.give_weapon()
                         return
 
-                # If gg_dead_strip is loaded, we need to keep track of which weapons
-                # the player has so that they can be removed whent he player dies
+                # If gg_dead_strip is loaded, we need to keep track of which
+                # weapons the player has so that they can be removed whent he
+                # player dies
                 if int(es.ServerVar('gg_dead_strip')):
                     gamethread.delayed(0, self.update_owned_weapons)
 
@@ -640,9 +641,9 @@ class BasePlayer(object):
                                                             ["knife", "c4"]:
                 continue
 
-            # Add the weapon's instance to the ownedWeapons list so that it can
+            # Add the weapon's index to the ownedWeapons list so that it can
             # be removed when the player dies with gg_dead_strip enabled
-            self.ownedWeapons.append(playerWeapons[weapon]["instance"])
+            self.ownedWeapons.append(playerWeapons[weapon]["index"])
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
