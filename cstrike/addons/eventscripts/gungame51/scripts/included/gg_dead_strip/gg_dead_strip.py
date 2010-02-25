@@ -110,7 +110,7 @@ def item_pickup(event_var):
 def player_death(event_var):
     # For each index for weapons the player owned
     for index in Player(event_var["userid"]).ownedWeapons:
-        # Remove the weapon by its instance
+        # Remove the weapon by its index
         spe.removeEntityByIndex(index)
 
 # ============================================================================
