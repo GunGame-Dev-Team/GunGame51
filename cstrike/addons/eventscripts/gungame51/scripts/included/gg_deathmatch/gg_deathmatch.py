@@ -28,8 +28,8 @@ info.name = 'gg_deathmatch'
 info.title = 'GG Deathmatch' 
 info.author = 'GG Dev Team' 
 info.version = '0.1' 
-info.requires = ['gg_turbo', 'gg_dead_strip', 'gg_dissolver'] 
-info.conflicts= ['gg_map_obj', 'gg_knife_elite', 'gg_elimination']
+info.requires = ['gg_dead_strip', 'gg_dissolver'] 
+info.conflicts= ['gg_elimination']
 info.translations = ['gg_deathmatch']
 
 # ============================================================================
