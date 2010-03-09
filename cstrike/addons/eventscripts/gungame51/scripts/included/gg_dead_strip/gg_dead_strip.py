@@ -110,6 +110,11 @@ def item_pickup(event_var):
 def player_death(event_var):
     # For each index for weapons the player owned
     for index in Player(event_var["userid"]).ownedWeapons:
+        # If the index has an owner, meaning that the index is no longer valid,
+        # skip this index
+        if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') != -1:
+            continue
+
         # Remove the weapon by its index
         spe.removeEntityByIndex(index)
 
