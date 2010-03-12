@@ -123,6 +123,9 @@ class OrderedMenu(object):
     This class only creates single page popups, for the page the player has
       requested. This way, it only makes a popup for requested pages. It stores
       all of the data for the menu in the list "items".
+    
+    Note: highlightIndex will highlight the item at it's number in the menu.
+            Menu numbering starts at 1.
     '''
     def __init__(self, userid, title, items=[], options=10,
                                                         highlightIndex=None):

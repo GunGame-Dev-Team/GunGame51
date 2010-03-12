@@ -11,37 +11,23 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
-import popuplib
 from playerlib import getUseridList
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
 # GunGame Imports
 from gungame51.core.players.shortcuts import Player
-
-# ============================================================================
-# >> GLOBALS
-# ============================================================================
-scoreList = []
-ggScoreMenu = None
+from gungame51.core.menus import OrderedMenu
+from gungame51.core.menus.shortcuts import get_index_page
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    # Delete the popup if it exists
-    if popuplib.exists('ggScoreMenu'):
-        popuplib.unsendname('ggScoreMenu', getUseridList('#human'))
-        popuplib.delete('ggScoreMenu')
-
     # Register command
     registerSayCommand('!score', score_menu_cmd, 'Displays a !score menu.')
 
 def unload():
-    # Delete the popup if it exists
-    if popuplib.exists('ggScoreMenu'):
-        ggScoreMenu.delete()
-
     # Unregister commands
     unregisterSayCommand('!score')
 
@@ -54,41 +40,24 @@ def score_menu_cmd(userid, args):
         return
 
     # Get list of levels
-    newScoreList = []
+    scoreList = []
     for player in getUseridList('#all'):
-        newScoreList.append('[%s] %s' % (Player(player).level,
+        scoreList.append('[%s] %s' % (Player(player).level,
                                                     es.getplayername(player)))
     # Sort from highest to lowest
-    newScoreList.sort(lambda a,b: cmp(int(b[1:].split("]")[0]), int(a[1:].split("]")[0])))
+    scoreList.sort(lambda a,b: cmp(int(b[1:].split("]")[0]), int(a[1:].split("]")[0])))
 
     # Is the list empty ?
-    if not newScoreList:
+    if not scoreList:
         return
 
-    # Get the page the player is on
-    page = ((newScoreList.index('[%s] %s' % (Player(userid).level,
-                                        es.getplayername(userid))) + 1) / 10)
-                                        
-    # Menu has not changed ?
-    if newScoreList == scoreList:
-        ggScoreMenu.sendPage(userid, page)
-        return
-        
-    # Rewrite scoreList
-    del scoreList[:]
-    scoreList.extend(newScoreList)
+    # Get the list number the player is at
+    listNumber = scoreList.index('[%s] %s' % (Player(userid).level,
+                                                es.getplayername(userid))) + 1
 
-    # Delete the popup if it exists
-    if popuplib.exists('ggScoreMenu'):
-        popuplib.unsendname('ggScoreMenu', getUseridList('#human'))
-        popuplib.delete('ggScoreMenu')
+    # Create a new OrderedMenu
+    ggScoreMenu = OrderedMenu(userid, 'GunGame: Score Menu', scoreList,
+                                                    highlightIndex=listNumber)
 
-    # Let's create the new ggScoreMenu popup
-    global ggScoreMenu
-    ggScoreMenu = popuplib.easylist('ggScoreMenu', newScoreList)
-    ggScoreMenu.settitle('GunGame: Score Menu')
-    ggScoreMenu.timeout('view', 15)
-    ggScoreMenu.timeout('send', 15)
-
-    # Send menu
-    ggScoreMenu.sendPage(userid, page)
+    # Send the OrderedMenu on the page the player is on
+    ggScoreMenu.send_page(get_index_page(listNumber))

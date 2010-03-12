@@ -77,7 +77,6 @@ from core.sql.shortcuts import Database
 
 #   Menus
 from core.menus import MenuManager
-from core.menus.weapons_menu import generate_weapons_menu
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -307,7 +306,6 @@ def es_map_start(event_var):
     # If gg_weapon_order_sort_type is #random, re-randomize it
     if str(gg_weapon_order_sort_type) == "#random":
         WeaponManager().type = "#random"
-        generate_weapons_menu()
 
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)

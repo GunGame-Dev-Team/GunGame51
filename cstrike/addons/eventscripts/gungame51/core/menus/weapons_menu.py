@@ -11,55 +11,35 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
-import popuplib
-from playerlib import getUseridList
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
 # GunGame Imports
+from gungame51.core.players import Player
+from gungame51.core.menus import OrderedMenu
+from gungame51.core.menus.shortcuts import get_index_page
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.weapons.shortcuts import get_total_levels
 
 # ============================================================================
-# >> GLOBALS
-# ============================================================================
-ggWeaponsMenu = None
-
-# ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
-    generate_weapons_menu()
-
-    # Register for the "server_cvar" event
-    es.addons.registerForEvent(__import__(__name__), 'server_cvar', server_cvar)
-
     # Register command
     registerSayCommand('!weapons', weapons_menu_cmd, 'Displays a !weapons menu.')
 
 def unload():
-    # Delete the popup if it exists
-    if popuplib.exists('ggWeaponsMenu'):
-        ggWeaponsMenu.delete()
-    
-    # Register for the "server_cvar" event
-    es.addons.unregisterForEvent(__import__(__name__), 'server_cvar')
-
     # Unregister commands
     unregisterSayCommand('!weapons')
 
 # ============================================================================
 # >> MENU FUNCTIONS
 # ============================================================================
-def generate_weapons_menu():
-    global ggWeaponsMenu
-
-    # Does the popup exist ?
-    if popuplib.exists('ggWeaponsMenu'):
-        # Delete the old menu
-        popuplib.unsendname('ggWeaponsMenu', getUseridList('#human'))
-        popuplib.delete('ggWeaponsMenu')
+def weapons_menu_cmd(userid, args):
+    # Make sure player exists
+    if not es.exists('userid', userid):
+        return
 
     weaponOrder = []
     level = 1
@@ -69,21 +49,12 @@ def generate_weapons_menu():
         weaponOrder.append("[%s] %s" % (get_level_multikill(level), get_level_weapon(level)))
         level += 1
 
-    # Make new menu
-    ggWeaponsMenu = popuplib.easylist('ggWeaponsMenu', weaponOrder)
-    ggWeaponsMenu.settitle('GunGame: Weapons Menu')
-    ggWeaponsMenu.timeout('view', 30)
-    ggWeaponsMenu.timeout('send', 30)
+    # Get the level the player is on
+    ggLevel = Player(userid).level
 
-def weapons_menu_cmd(userid, args):
-    # Make sure player exists
-    if not es.exists('userid', userid):
-        return
+    # Create a new OrderedMenu
+    ggWeaponsMenu = OrderedMenu(userid, 'GunGame: Weapons Menu', weaponOrder,
+                                                    highlightIndex=ggLevel)
 
-    # Send the new menu
-    ggWeaponsMenu.send(userid)
-
-def server_cvar(event_var):
-    if event_var['cvarname'] in ['gg_weapon_order_file',
-                        'gg_weapon_order_sort_type', 'gg_multikill_override']:
-        generate_weapons_menu()
+    # Send the OrderedMenu on the page the player's weapon is on
+    ggWeaponsMenu.send_page(get_index_page(ggLevel))
