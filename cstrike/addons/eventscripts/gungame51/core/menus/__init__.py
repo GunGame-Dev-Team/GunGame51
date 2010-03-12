@@ -23,11 +23,6 @@ from gungame51.core import get_file_list
 from gungame51.core import get_game_dir
 
 # ============================================================================
-# >> GLOBAL VARIABLES
-# ============================================================================
-
-
-# ============================================================================
 # >> CLASSES
 # ============================================================================
 class MenuManager(object):
@@ -122,6 +117,93 @@ class MenuManager(object):
         if blockname in menu_globals and callable(menu_globals[blockname]):
             menu_globals[blockname](*a, **kw)
 
-# ============================================================================
-# >> FUNCTIONS
-# ============================================================================
+class OrderedMenu(object):
+    '''
+    Creates an ordered menu with continuous numbering throughout pages.
+    This class only creates single page popups, for the page the player has
+      requested. This way, it only makes a popup for requested pages. It stores
+      all of the data for the menu in the list "items".
+    '''
+    def __init__(self, userid, title, items=[], options=10,
+                                                        highlightIndex=None):
+        self.userid = userid
+        self.title = title
+        self.items = items
+        self.options = options
+        self.highlightIndex = highlightIndex
+        self.totalPages = (len(items) / options) + (1 if len(items) % options \
+                                                                    > 0 else 0)
+
+    def send_page(self, page):
+        # If a page less than 1 is requested, send page 1
+        if page < 1:
+            page = 1
+        # If a page more than the total number of pages is requested, send the
+        # last page
+        elif page > self.totalPages:
+            page = self.totalPages
+
+        # Create a popup
+        popup = popuplib.Popup_popup("OrderedMenu_p%s" % page)
+        # Get the index of the first item on the current page
+        startIndex = (page - 1) * self.options
+        # Add the title
+        popup.addline("%s%s(%s/%s)" % (self.title, " " * 5, page, 
+                                                            self.totalPages))
+        popup.addline("-----------------------------")
+
+        # Add all of the options
+        for index in xrange(startIndex, startIndex + self.options):
+            # If it is the last page, and we are out of data, add empty lines
+            if index >= len(self.items):
+                popup.addline(" ")
+                continue
+            
+            # If the current index is the highlightIndex, add -> in front
+            highlight = "->" if index + 1 == self.highlightIndex else ""
+            # Add the line to the popup
+            popup.addline("%s%s. %s" % (highlight, index + 1,
+                                                            self.items[index]))
+
+        popup.addline("-----------------------------")
+
+        # Add the back and next buttons based on page number
+        if page > 1:
+            popup.addline("->8. Back")
+        else:
+            popup.addline(" ")
+
+        if page < self.totalPages:
+            popup.addline("->9. Next")
+        else:
+            popup.addline(" ")
+
+        # Finish setting up the popup
+        popup.addline("0. Exit")
+        # Have self.menuselect fire when the player makes a selection
+        popup.menuselect = self.menuselect
+
+        popup.timeout('view', 30)
+        popup.timeout('send', 30)
+
+        # Send the page
+        popup.send(self.userid)
+
+    def menuselect(self, userid, choice, popupName):
+        # Get the page number from the popup name
+        currentPage = int(popupName.replace("OrderedMenu_p", ""))
+        
+        # Close the menu
+        if choice == 10:
+            return
+        # Decrement the page number
+        elif choice == 8:
+            newPage = currentPage - 1
+            self.send_page(newPage)
+        # Increment the page number
+        elif choice == 9:
+            newPage = currentPage + 1
+            self.send_page(newPage)
+        # Resend the page
+        else:
+            self.send_page(currentPage)

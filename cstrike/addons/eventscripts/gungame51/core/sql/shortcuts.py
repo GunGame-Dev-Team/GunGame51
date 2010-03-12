@@ -109,6 +109,11 @@ def get_rank(uniqueid):
     # Get the current number of wins for the uniqueid
     currentWins = ggDB.select('gg_wins', 'wins', 'where uniqueid = "%s"' % \
                                                                     uniqueid)
+
+    # Return -1 if the player has no wins
+    if currentWins == None:
+        return -1
+
     # Return the count + 1 of players who have more wins than the uniqueid
     return ggDB.select("gg_wins", ("COUNT(*)"), "WHERE ABS(wins) > %s" % \
                                                             currentWins) + 1
@@ -124,10 +129,8 @@ def get_winners_list(n=10):
     if not str(n).isdigit():
         raise ValueError('Expected digit, and got a str() (%s)' % n)
     n = int(n)
-    if n > 50:
-        n = 50
     ggDB = Database()
-    winner_list = ggDB.select('gg_wins', ('name', 'wins'),
+    winner_list = ggDB.select('gg_wins', ('name', 'uniqueid', 'wins'),
                                             'ORDER BY ABS(wins) DESC', True, n)
     if winner_list:
         return winner_list

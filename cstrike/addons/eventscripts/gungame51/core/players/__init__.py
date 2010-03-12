@@ -634,6 +634,10 @@ class BasePlayer(object):
         # Get the list of the player's weapons
         playerWeapons = spe.getWeaponDict(self.userid)
 
+        # If playerWeapons returned None, stop here
+        if not playerWeapons:
+            return
+
         # For each weapon the player owns
         for weapon in playerWeapons:
             # If the weapon is a knife, c4, or not a real weapon, stop here
