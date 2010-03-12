@@ -233,7 +233,7 @@ class LeaderManager(object):
         userid = int(userid)
 
         # Make sure the userid no longer exists on the server
-        if es.exists(userid):
+        if es.exists("userid", userid):
             return
 
         # Make sure this player is a leader
