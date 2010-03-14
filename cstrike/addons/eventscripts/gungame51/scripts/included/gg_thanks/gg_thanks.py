@@ -9,8 +9,6 @@ $LastChangedDate$
 # ============================================================================
 # >> IMPORTS
 # ============================================================================
-# Python Imports
-
 
 # Eventscripts Imports
 import es
@@ -29,6 +27,7 @@ info.name = 'gg_thanks'
 info.title = 'GG Thanks' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ["gg_thanks"]
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -36,13 +35,13 @@ info.version = '0.1'
 credits = {
     'Project Leaders':
         ['XE_ManUp',
-        'RideGuy',
         'Warren Alpert',
         'your-name-here',
         'Monday'],
 
     'Developers':
-        ['cagemonkey'],
+        ['cagemonkey',
+        'RideGuy'],
 
     'Beta Testers':
         [],

@@ -582,8 +582,10 @@ class BasePlayer(object):
             gamethread.delayed(0.10, self.stripexceptions.remove, (weapon[7:]))
 
 
-        # Player owns this weapon.
-        if spe.ownsWeapon(self.userid, weapon):
+        # If the player owns the weapon and the player is not being given a
+        # second flashbang, stop here
+        if spe.ownsWeapon(self.userid, weapon) and not (weapon == \
+                    "weapon_flashbang" and getPlayer(self.userid).getFB() < 2):
             return
 
         # Strip the weapon ?

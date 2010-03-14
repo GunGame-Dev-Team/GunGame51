@@ -302,7 +302,17 @@ def give_bonus(userid, sound=False, turboCheck=False):
         return
     
     # Give weapons
+    count = 0
     for weapon in weapons:
+        # If the weapon is flashbang, and it is not the first flashbang in the
+        # list, give it without stripping the first one we gave, and continue
+        if weapon == "flashbang" and weapons.count("flashbang") > 1 and \
+                                        count != weapons.index("flashbang"):
+            ggPlayer.give(weapon, False, False)
+            continue
+
+        count += 1
+
         ggPlayer.give(weapon, False, True)
 
 def check_bonus(userid):
