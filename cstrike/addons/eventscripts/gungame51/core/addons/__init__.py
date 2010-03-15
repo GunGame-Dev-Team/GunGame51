@@ -26,7 +26,6 @@ from gungame51.core.messaging import MessageManager
 # >> GLOBAL VARIABLES
 # ============================================================================
 ggVersion = None
-
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -636,35 +635,23 @@ def gungame_info(info, _info=None):
             try:
                 files = gen.next()
             except:
-                del doc_string
                 global ggVersion
                 ggVersion = '5.1.%s' % rev
                 return ggVersion
-            base_name = files[0].split('/')
-            base_name = '.'.join(base_name[base_name.index('gungame51'):])
-            if base_name.startswith('gungame51.scripts.custom'):
+            base_name = files[0]
+
+            if 'gungame51/scripts/custom' in base_name:
                 continue
-            if base_name.startswith('gungame51.core.events.data'):
+            if 'gungame51/core/events/data' in base_name:
                 continue
-            if base_name.startswith('gungame51.scripts.included'):
-                mod_name = base_name.split('.')[-1]
-                AM = AddonManager()
-                if mod_name in AM.get_addon_info().keys():
-                    ver = AM.get_addon_info()[mod_name].version[4:]
-                    if ver > rev:
-                        rev = ver
+
+            for fileName in files[1]:
+                if not fileName.endswith(".py"):
                     continue
-            modules = [c.split('.py')[0] for c in files[1]
-                                                        if c.endswith('.py')]
-            for module in modules:
+
                 try:
-                    if module == '__init__':
-                        doc_string = __import__(base_name, globals(), locals(),
-                                                                 ['']).__doc__
-                    else:
-                        doc_string = __import__('%s.%s' % (base_name, module),
-                                            globals(), locals(), ['']).__doc__
-                    ver = int(doc_string.split('$Rev: ')[1].split()[0])
+                    file = open(base_name + "/" + fileName, 'r')
+                    ver = int(file.read().split('$Rev: ')[1].split()[0])
                     if ver > rev:
                         rev = ver
                 except:
