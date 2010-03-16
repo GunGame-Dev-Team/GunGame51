@@ -476,8 +476,12 @@ class BasePlayer(object):
             es.server.queuecmd('es_xsexec %s "use weapon_knife"' % (
                                                                 self.userid))
 
-            # Strip previous weapons
-            self.strip_weapons(get_level_weapon(self.level - 1))
+            # If there is a level below the user's current level
+            if self.level > 1:
+                # Strip previous weapons
+                self.strip_weapons(get_level_weapon(self.level - 1))
+            else:
+                self.strip()
 
         # Nade ?
         elif self.weapon == 'hegrenade':
@@ -488,8 +492,12 @@ class BasePlayer(object):
             es.server.queuecmd('es_xsexec %s "use weapon_hegrenade"' % (
                                                                 self.userid))
 
-            # Strip previous weapons
-            self.strip_weapons(get_level_weapon(self.level - 1))
+            # If there is a level below the user's current level
+            if self.level > 1:
+                # Strip previous weapons
+                self.strip_weapons(get_level_weapon(self.level - 1))
+            else:
+                self.strip()
 
         else:
             # Player owns this weapon.
