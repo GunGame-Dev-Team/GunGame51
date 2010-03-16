@@ -30,8 +30,6 @@ from gungame51.scripts.included.gg_nade_bonus.gg_nade_bonus import get_weapon
 # ============================================================================
 # >> GLOBALS
 # ============================================================================
-list_pWeapons = getWeaponNameList("#primary")
-list_sWeapons = getWeaponNameList("#secondary")
 gg_nade_bonus = es.ServerVar("gg_nade_bonus")
 
 # ============================================================================
@@ -74,7 +72,7 @@ def give_weapon(userid, previousLevel):
     if not es.exists('userid', userid):
         return
 
-    # Get ggPlayer
+    # Get playerlib object
     pPlayer = getPlayer(userid)
 
     # Is player dead or a spectator?
@@ -84,59 +82,17 @@ def give_weapon(userid, previousLevel):
     # Give them their next weapon
     ggPlayer = Player(userid)
     ggPlayer.give_weapon()
-
+    
     # If previousLevel is not in the order due to weapon orders changing,
     # stop here
     if previousLevel > get_total_levels():
         return
-    
-    # Get the player's current Held weapons
-    pWeapon = pPlayer.getPrimary()
-    sWeapon = pPlayer.getSecondary()
-    hegrenades = pPlayer.getHE()
-    flashbangs = pPlayer.getFB()
-    smokegrenades = pPlayer.getSG()
-    
-    # Get the player's current GunGame weapon
-    currentWeapon = "weapon_%s" % ggPlayer.weapon
-    # Get the player's previous GunGame weapon
-    previousWeapons = [get_level_weapon(previousLevel)]
 
+    weapsToStrip = [get_level_weapon(previousLevel)]
     # If the player is was on hegrenade level, and gg_nade_bonus is enabled,
     # get the list of their bonus weapons
-    if previousWeapons[0] == "hegrenade" and str(gg_nade_bonus) != "0":
-        previousWeapons.extend(get_weapon(userid))
-    
-    # Loop through any previous weapons
-    for previousWeapon in previousWeapons:
-        stripWeapon = None
-        previousWeapon = "weapon_%s" % previousWeapon
-        
-        # Strip secondary weapon ? (Move to primary)
-        if previousWeapon == sWeapon and currentWeapon in list_pWeapons:
-            stripWeapon = sWeapon
+    if weapsToStrip[0] == "hegrenade" and str(gg_nade_bonus) != "0":
+        weapsToStrip.extend(get_weapon(userid))
 
-        # Strip primary weapon ? (Move to seconary)
-        elif previousWeapon == pWeapon and currentWeapon in list_sWeapons:
-            stripWeapon = pWeapon
-
-        # If previousWeapon is a hegrenade, and the player is carrying it,
-        # remove it
-        elif previousWeapon == "weapon_hegrenade" and hegrenades:
-            stripWeapon = previousWeapon
-        # If previousWeapon is a flashbang, and the player is carrying it,
-        # remove it
-        elif previousWeapon == "weapon_flashbang" and flashbangs:
-            stripWeapon = previousWeapon
-        # If previousWeapon is a smokegrenade, and the player is carrying it,
-        # remove it
-        elif previousWeapon == "weapon_smokegrenade" and smokegrenades:
-            stripWeapon = previousWeapon
-
-        # Did we find a weapon to strip ?
-        if stripWeapon:
-            spe.removeEntityByIndex( pPlayer.getWeaponIndex(stripWeapon) )
-
-    # Make them use it ?
-    if pPlayer.weapon != currentWeapon:
-        es.server.queuecmd('es_xsexec %s "use %s"' % (userid, currentWeapon))
+    # Strip the previous weapons
+    ggPlayer.strip_weapons(weapsToStrip)

@@ -472,17 +472,24 @@ class BasePlayer(object):
 
         # Knife ?
         if self.weapon == 'knife':
+            # Make them use their knife
             es.server.queuecmd('es_xsexec %s "use weapon_knife"' % (
                                                                 self.userid))
-            self.strip()
+
+            # Strip previous weapons
+            self.strip_weapons(get_level_weapon(self.level - 1))
 
         # Nade ?
         elif self.weapon == 'hegrenade':
-            # Strip all weapons
-            self.strip()
-            
             # Give them a grenade.
             given_weapon = spe.giveNamedItem(self.userid, "weapon_hegrenade")
+
+            # Make them use the grenade
+            es.server.queuecmd('es_xsexec %s "use weapon_hegrenade"' % (
+                                                                self.userid))
+
+            # Strip previous weapons
+            self.strip_weapons(get_level_weapon(self.level - 1))
 
         else:
             # Player owns this weapon.
@@ -551,10 +558,8 @@ class BasePlayer(object):
                 if int(es.ServerVar('gg_dead_strip')):
                     gamethread.delayed(0, self.update_owned_weapons)
 
-                # Make bots use it ? (Bots sometimes don't equip the new gun.)
-                if es.isbot(self.userid):
-                    es.delayed(0.25, 'es_xsexec %s "use weapon_%s"' % (
-                                                    self.userid, self.weapon))
+                es.server.queuecmd('es_xsexec %s "use weapon_%s"' 
+                    % (self.userid, self.weapon))
 
     def give(self, weapon, useWeapon=False, strip=False):
         '''
@@ -673,7 +678,49 @@ class BasePlayer(object):
 
                 continue
 
+            spe.dropWeapon(self.userid, weapon)
             spe.removeEntityByInstance(pWeapons[weapon]["instance"])
+
+    def strip_weapons(self, stripWeapons):
+        '''
+        Strips a list of weapons from a player. (Used primarily for selective
+            weapon removal when a player gets a new weapon)
+        stripWeapons must be a list.
+        '''
+        # Get the player's current held weapons
+        playerWeapons = spe.getWeaponDict(self.userid)
+
+        # Loop through any weapons to strip
+        for stripWeapon in stripWeapons:
+            weapToStrip = None
+            stripWeapon = "weapon_%s" % stripWeapon
+
+            # If the player does not own the weapon, stop here
+            if not stripWeapon in playerWeapons:
+                continue
+
+            # If the weapon to strip is primary or secondary, set it up to be
+            # stripped
+            if stripWeapon in list_pWeapons or stripWeapon in list_sWeapons:
+                weapToStrip = stripWeapon
+
+            # If stripWeapon is a grenade, and the player is has it,
+            # set it up to be stripped
+            elif stripWeapon == "weapon_hegrenade" and \
+                                        "weapon_hegrenade" in playerWeapons:
+                weapToStrip = stripWeapon
+            elif stripWeapon == "weapon_flashbang" and \
+                                                getPlayer(self.userid).getFB():
+                weapToStrip = stripWeapon
+            elif stripWeapon == "weapon_smokegrenade" and \
+                                        "weapon_smokegrenade" in playerWeapons:
+                weapToStrip = stripWeapon
+
+            # Did we find a weapon to strip ?
+            if weapToStrip:
+                # Drop and remove the weapon
+                spe.dropWeapon(self.userid, weapToStrip)
+                spe.removeEntityByIndex(playerWeapons[weapToStrip]["index"])
 
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS

@@ -105,7 +105,6 @@ def item_pickup(event_var):
 
     # Switch to their gungame weapon
     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon))
-    gamethread.delayed(0, es.setplayerprop, (userid, 'CBaseCombatCharacter.bcc_localdata.m_flNextAttack', 0))
 
 def player_death(event_var):
     # For each index for weapons the player owned
