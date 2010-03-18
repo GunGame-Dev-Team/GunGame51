@@ -191,7 +191,7 @@ def make_log_file():
         while True:
             n += 1
             new_file_name = (get_game_dir('cfg/gungame51/logs') +
-                                    '/GunGame%s_Log[%01i].txt' % (gungame_info('version').replace('.','_'), n))
+                                    '/GunGame%s_Log_Old[%01i].txt' % (gungame_info('version').replace('.','_'), n))
             if not path.isfile(new_file_name):
                 break
 

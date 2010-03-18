@@ -16,7 +16,6 @@ from os import name as platform
 import es
 import cmdlib
 import repeat
-import spe
 import gamethread
 from playerlib import getPlayer
 from playerlib import getPlayerList
@@ -52,9 +51,6 @@ gg_deathmatch = es.ServerVar('gg_deathmatch')
 gg_elimination = es.ServerVar('gg_elimination')
 priority_addons_added = []
 
-# Store the game rules for use in round end prevention
-gpGameRules = None
-
 # Approximates the number of seconds from round start to play beginning
 GG_WARMUP_EXTRA_TIME = 3
 
@@ -86,7 +82,7 @@ def unload():
 
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
+    
     # Unregister the server command that cancels an in-progress warmup round
     cmdlib.unregisterServerCommand('gg_end_warmup')
 
@@ -101,15 +97,15 @@ def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
     if not warmupCountDown:
         return
 
-    # Stop the round from being able to end
-    disable_round_end()
-
     # Restart the round ourselves in 1 second
     es.server.queuecmd('mp_restartgame 1')
 
     # Before the round ends up restarting, prepare gungame to be ready
     # for the first round of play
-    gamethread.delayed(0.8, prepare_game)
+    gamethread.delayed(0.7, prepare_game)
+
+    # Make sure that during the first round nobody has godmode
+    gamethread.delayed(1.4, remove_godmode)
 
     # End the warmup round
     # Delayed to allow mp_restartgame to strip all weapons before gg gives them
@@ -302,15 +298,15 @@ def count_down():
 
         # 1 second left in warmup
         if warmupCountDown['remaining'] == 1:
-            # Stop the round from being able to end
-            disable_round_end()
-
             # Restart the round ourselves in 1 second
             es.server.queuecmd('mp_restartgame 1')
 
             # Before the round ends up restarting, prepare gungame to be ready
             # for the first round of play
-            gamethread.delayed(0.6, prepare_game)
+            gamethread.delayed(0.7, prepare_game)
+            
+            # Make sure that during the first round nobody has godmode
+            gamethread.delayed(1.4, remove_godmode)
 
     # No time left
     elif warmupCountDown['remaining'] == 0:
@@ -328,32 +324,12 @@ def prepare_game():
     # Fire gg_start event
     EventManager().gg_start()
 
-def round_start(event_var):
-    global gpGameRules
-
-    # If warmup is over
-    if 'gg_warmup_round' in PriorityAddon():
-        return
-
-    # Re-allow ending of rounds
-    gpGameRules = None
-
-def round_end(event_var):
-    # If disable_round_end has fired, disable round ending
-    if gpGameRules:
-        realgamerules = spe.getLocVal("i", gpGameRules)
-        s = spe.getLocVal("i", realgamerules)
-        spe.setLocVal("i", s + 576, 0)
-
-def disable_round_end():
-    global gpGameRules
-
-    # Prepare gpGameRules to be able to properly prevent round_end in
-    # round_end(event_var)
-    if platform == 'nt':
-        gpGameRules = spe.getPointer("\x8B\x0D\x2A\x2A\x2A\x2A\x85\xC9\x74\x2A\x8B\x01\x6A\x01\xFF\x50", 2)
-    elif platform == 'posix':
-        gpGameRules = spe.findSymbol("g_pGameRules")
+def remove_godmode():
+    '''
+    Ran during the first round to make sure no players have godmode.
+    '''
+    for userid in getPlayerList("#alive"):
+        getPlayer(userid).godmode = 0
 
 def end_warmup(message):
     # Send hint
