@@ -497,7 +497,17 @@ def player_disconnect(event_var):
     
     # Check to see if player was the leader
     LeaderManager().disconnected_leader(userid)
-    
+
+def player_team(event_var):
+    # If it was a disconnect, stop here
+    if int(event_var['disconnect']) == 1:
+        return
+
+    # If the player joined from a non-active team to an active team, play the
+    # welcome sound
+    if int(event_var['oldteam']) < 2 and int(event_var['team']) > 1:
+        Player(int(event_var['userid'])).playsound('welcome')
+
 def gg_levelup(event_var):
     # Check for priority addons
     if PriorityAddon():
