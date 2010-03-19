@@ -154,7 +154,7 @@ def gg_levelup(event_var):
         return
 
     # Start vote ? 
-    if get_leader_level() <= (get_total_levels() - int(gg_map_vote_trigger)):
+    if get_leader_level() < (get_total_levels() - int(gg_map_vote_trigger)):
         return
 
     # Change global so we dont fire the vote twice
