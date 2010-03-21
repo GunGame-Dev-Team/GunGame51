@@ -45,9 +45,6 @@ def load():
     config.text('   * Will not load with "gg_deathmatch" enabled.')
     config.text('   * Will not load with "gg_knife_elite" enabled.')
     config.text('   * Will not load with "gg_map_obj" enabled.')
-    config.text('   * This addon requires usage of the "gg_respawn_cmd" ' +
-                'found in the')
-    config.text('     gg_en_config.cfg')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_elimination.')
     config.text('   1 = (Enabled) Load gg_elimination.')

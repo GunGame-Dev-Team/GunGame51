@@ -49,7 +49,6 @@ list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 list_allWeapons = getWeaponNameList()
 eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
-gg_respawn_cmd_override = es.ServerVar('gg_respawn_cmd_override')
 gg_soundpack = es.ServerVar('gg_soundpack')
 
 # ============================================================================
@@ -737,29 +736,19 @@ class BasePlayer(object):
         '''
         Respawns the player.
         '''
-        if str(gg_respawn_cmd_override) in ('', '0'):
-            # Player on server ?
-            if not es.exists('userid', self.userid):
-                return
+        # Player on server ?
+        if not es.exists('userid', self.userid):
+            return
 
-            # Player in spec ?
-            if self.team == 1:
-                return
+        # Player in spec ?
+        if self.team == 1:
+            return
 
-            # Player alive? (require force)
-            if not getPlayer(self.userid).isdead and not force:
-                return
-                
-            spe.respawn(self.userid)
-
-        # Check if the respawn command requires the "#" symbol
-        elif '#' not in str(gg_respawn_cmd_override):
-            # Userids not requiring the "#" symbol
-            es.server.queuecmd('%s %s' % (gg_respawn_cmd_override,
-                                                                  self.userid))
-        else:
-            # SourceMod Workaround
-            es.server.queuecmd('%s%s' % (gg_respawn_cmd_override, self.userid))
+        # Player alive? (require force)
+        if not getPlayer(self.userid).isdead and not force:
+            return
+            
+        spe.respawn(self.userid)
 
     # =========================================================================
     # >> BasePlayer() SOUND CLASS METHODS

@@ -82,7 +82,6 @@ def load():
     config.text('>> WARMUP ROUND DEATHMATCH MODE')
     config.text('='*76)
     config.text('Notes:')
-    config.text('   * Requires the usage of "gg_respawn_cmd".')
     config.text('   * Please check the gg_default_addons.cfg for information' +
                 ' regarding')
     config.text('     what is required to be enabled and disabled when')
@@ -103,7 +102,6 @@ def load():
     config.text('>> WARMUP ROUND ELIMINATION MODE')
     config.text('='*76)
     config.text('Notes:')
-    config.text('   * Requires the usage of "gg_respawn_cmd" (found below).')
     config.text('   * Please check the gg_default_addons.cfg for information' +
                 ' regarding')
     config.text('     what is required to be enabled and disabled when')

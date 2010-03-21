@@ -239,46 +239,6 @@ def load():
     config.text('Default Value: "default"')
     config.cvar('gg_soundpack', 'default', 'The controls which sound pack ' +
                 'will be used by default.')
-    config.text('')
-    config.text('')
-
-
-    config.text('+'*76)
-    config.text('|' + ' '*26 + 'MISCELLANEOUS SETTINGS' + ' '*26 + '|')
-    config.text('+'*76)
-
-
-    # Respawn Command
-    config.text('')
-    config.text('')
-    config.text('='*76)
-    config.text('>> RESPAWN COMMAND')
-    config.text('='*76)
-    config.text('Note:')
-    config.text('   * This setting is required for "gg_deathmatch".')
-    config.text('   * This setting is required for "gg_elimination".')
-    config.text('   * This setting is required if you plan on respawning ' +
-                'players')
-    config.text('     using GunGame.')
-    config.text('   * Options listed below are not "all-inclusive". Any ' +
-                'command that')
-    config.text('     can be issued via console to respawn a player via ' +
-                'userid can')
-    config.text('     be used for this setting.')
-    config.text('   * All options to respawn players current require an ' +
-                'external')
-    config.text('     plugin (ES Tool, GunGame Utils, Sourcemod, etc.) to be' +
-                ' able to')
-    config.text('     respawn players. Be sure that you have installed the ' +
-                'appropriate')
-    config.text('     plugin prior to attempting to use this option. ' +
-                'Otherwise, players')
-    config.text('     will not respawn.')
-    config.text('Options:')
-    config.text('\t"est_spawn"\t"gg_spawn"\t"sm_respawn #"')
-    config.text('Default Value: "est_spawn"')
-    config.cvar('gg_respawn_cmd', 'est_spawn', 'The console command that is ' +
-                'used to respawn a player.')
 
     # This line creates/updates the .cfg file
     config.write()
