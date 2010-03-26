@@ -122,9 +122,11 @@ def player_death(event_var):
 # ============================================================================
 def remove_weapon(userid, item):
     # Remove weapon
-    theWeapon = spe.ownsWeapon(userid, "weapon_%s" % item)
+    weaponName = "weapon_%s" % item
+    theWeapon = spe.ownsWeapon(userid, weaponName)
     if theWeapon:
-        spe.removeEntityByInstance(theWeapon)
+        spe.dropWeapon(userid, weaponName)
+        gamethread.delayed(0, spe.removeEntityByInstance, (theWeapon))
 
 def drop_filter(userid, args):
     # If command not drop, continue

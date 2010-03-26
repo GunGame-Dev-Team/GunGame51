@@ -539,7 +539,7 @@ class BasePlayer(object):
                         spe.dropWeapon(self.userid, weapToStrip)
 
                         # Now remove it
-                        spe.removeEntityByInstance(playerWeapons[weapToStrip]["instance"])
+                        gamethread.delayed(0, spe.removeEntityByInstance, (playerWeapons[weapToStrip]["instance"]))
 
                 # Now give them the weapon and save the weapon instance
                 given_weapon = spe.giveNamedItem(self.userid,
@@ -552,7 +552,7 @@ class BasePlayer(object):
                 # Make sure that the player owns the weapon we gave them
                 if weapon_check != given_weapon:
                     # Remove the given weapon since the player does not own it
-                    spe.removeEntityByInstance(given_weapon)
+                    gamethread.delayed(0, spe.removeEntityByInstance, (given_weapon))
 
                     # If they don't have the right weapon, fire give_weapon()
                     if not weapon_check:
@@ -628,7 +628,7 @@ class BasePlayer(object):
                     spe.dropWeapon(self.userid, stripWeapon)
 
                     # Remove the weapon
-                    spe.removeEntityByInstance(playerWeapons[stripWeapon]["instance"])
+                    gamethread.delayed(0, spe.removeEntityByInstance, (playerWeapons[stripWeapon]["instance"]))
 
         # Give the player the weapon
         spe.giveNamedItem(self.userid, weapon)
@@ -686,7 +686,7 @@ class BasePlayer(object):
                 continue
 
             spe.dropWeapon(self.userid, weapon)
-            spe.removeEntityByInstance(pWeapons[weapon]["instance"])
+            gamethread.delayed(0, spe.removeEntityByInstance, (pWeapons[weapon]["instance"]))
 
     def strip_weapons(self, stripWeapons):
         '''
@@ -727,7 +727,7 @@ class BasePlayer(object):
             if weapToStrip:
                 # Drop and remove the weapon
                 spe.dropWeapon(self.userid, weapToStrip)
-                spe.removeEntityByIndex(playerWeapons[weapToStrip]["index"])
+                gamethread.delayed(0, spe.removeEntityByIndex, (playerWeapons[weapToStrip]["index"]))
 
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS
