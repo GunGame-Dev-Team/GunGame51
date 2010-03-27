@@ -345,8 +345,8 @@ class BasePlayer(object):
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
         if name in ('userid', 'level', 'preventlevel', 'steamid', 'soundpack',
-          'stripexceptions', 'ownedWeapons', 'multikill', 'wins', 'team', 'name', 'index',
-                                                                        'afk'):
+          'stripexceptions', 'ownedWeapons', 'multikill', 'wins', 'team', 
+                                                    'name', 'index', 'afk'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
 
@@ -513,15 +513,18 @@ class BasePlayer(object):
 
             # Player DOES NOT own this weapon.
             else:
-                # Retrieve a list of all weapon names in the player's possession
+                # Retrieve a list of all weapon names in the player's
+                # possession
                 playerWeapons = spe.getWeaponDict(self.userid)
 
                 if playerWeapons:
                     # See if there is a primary weapon in the list of weapons
-                    pWeapon = set(playerWeapons.keys()).intersection(list_pWeapons)
+                    pWeapon = set(playerWeapons.keys()).intersection(
+                                                                list_pWeapons)
 
                     # See if there is a primary weapon in the list of weapons
-                    sWeapon = set(playerWeapons.keys()).intersection(list_sWeapons)
+                    sWeapon = set(playerWeapons.keys()).intersection(
+                                                                list_sWeapons)
 
                     # Set up the weapon to strip
                     weapToStrip = None
@@ -531,7 +534,8 @@ class BasePlayer(object):
                         weapToStrip = sWeapon.pop()
 
                     # Strip primary weapon ?
-                    elif 'weapon_%s' % self.weapon in list_pWeapons and pWeapon:
+                    elif 'weapon_%s' % self.weapon in list_pWeapons and \
+                                                                    pWeapon:
                         weapToStrip = pWeapon.pop()
 
                     if weapToStrip:
@@ -539,7 +543,8 @@ class BasePlayer(object):
                         spe.dropWeapon(self.userid, weapToStrip)
 
                         # Now remove it
-                        gamethread.delayed(0, spe.removeEntityByInstance, (playerWeapons[weapToStrip]["instance"]))
+                        gamethread.delayed(0, spe.removeEntityByInstance,
+                                    (playerWeapons[weapToStrip]["instance"]))
 
                 # Now give them the weapon and save the weapon instance
                 given_weapon = spe.giveNamedItem(self.userid,
@@ -552,7 +557,8 @@ class BasePlayer(object):
                 # Make sure that the player owns the weapon we gave them
                 if weapon_check != given_weapon:
                     # Remove the given weapon since the player does not own it
-                    gamethread.delayed(0, spe.removeEntityByInstance, (given_weapon))
+                    gamethread.delayed(0, spe.removeEntityByInstance, (
+                                                                given_weapon))
 
                     # If they don't have the right weapon, fire give_weapon()
                     if not weapon_check:
@@ -628,7 +634,8 @@ class BasePlayer(object):
                     spe.dropWeapon(self.userid, stripWeapon)
 
                     # Remove the weapon
-                    gamethread.delayed(0, spe.removeEntityByInstance, (playerWeapons[stripWeapon]["instance"]))
+                    gamethread.delayed(0, spe.removeEntityByInstance, (
+                                    playerWeapons[stripWeapon]["instance"]))
 
         # Give the player the weapon
         spe.giveNamedItem(self.userid, weapon)
@@ -686,7 +693,8 @@ class BasePlayer(object):
                 continue
 
             spe.dropWeapon(self.userid, weapon)
-            gamethread.delayed(0, spe.removeEntityByInstance, (pWeapons[weapon]["instance"]))
+            gamethread.delayed(0, spe.removeEntityByInstance, 
+                                                (pWeapons[weapon]["instance"]))
 
     def strip_weapons(self, stripWeapons):
         '''
@@ -727,7 +735,8 @@ class BasePlayer(object):
             if weapToStrip:
                 # Drop and remove the weapon
                 spe.dropWeapon(self.userid, weapToStrip)
-                gamethread.delayed(0, spe.removeEntityByIndex, (playerWeapons[weapToStrip]["index"]))
+                gamethread.delayed(0, spe.removeEntityByIndex,
+                                        (playerWeapons[weapToStrip]["index"]))
 
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS
@@ -802,8 +811,8 @@ class BasePlayer(object):
         Updates the time and the player's name in the database
         '''
         if self.wins:
-            update_winner(('name', 'timestamp'), (es.getplayername(self.userid),
-                    'strftime("%s","now")'), uniqueid=self.steamid)
+            update_winner(('name', 'timestamp'), (es.getplayername(
+                self.userid), 'strftime("%s","now")'), uniqueid=self.steamid)
 
 class PlayerManager(dict):
     '''

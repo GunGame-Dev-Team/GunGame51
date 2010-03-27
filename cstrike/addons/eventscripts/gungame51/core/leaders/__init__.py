@@ -106,7 +106,6 @@ class LeaderManager(object):
         index = self.__find_index(userid)
 
         # Does the userid exist in the userid list?
-        # DEV NOTE: "if index" will not work due to returning an index of 0
         if index != None:
             # Update the userid with the appropriate level
             self.levellist[index] = level

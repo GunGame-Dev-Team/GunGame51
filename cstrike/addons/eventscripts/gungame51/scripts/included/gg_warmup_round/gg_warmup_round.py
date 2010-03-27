@@ -189,11 +189,6 @@ def player_spawn(event_var):
         es.sexec(userid, 'use weapon_knife')
         return
 
-    '''>> Note to Developers:
-            This delay arrangement was needed because it was crashing
-            the server when bots spawned during a warmup round.
-    '''
-
     delay = 0.07
 
     if es.isbot(userid):

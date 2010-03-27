@@ -104,7 +104,8 @@ def item_pickup(event_var):
             return
 
     # Switch to their gungame weapon
-    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon))
+    es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon)
+                                                                            )
 
 def player_death(event_var):
     # For each index for weapons the player owned
