@@ -422,7 +422,12 @@ class AddonManager(object):
             if PriorityAddon():
                 # The addon's event does not fire if it is not a priority addon
                 if name not in PriorityAddon():
-                    continue
+                    # Always fire these events
+                    if not name in current_event or not \
+                            current_event[name].__name__ in ["es_map_start",
+                                    "player_activate", "es_player_validated",
+                                                        "player_disconnect"]:
+                        continue
 
             # If the addon name is in the current event, call the function
             if name in current_event:

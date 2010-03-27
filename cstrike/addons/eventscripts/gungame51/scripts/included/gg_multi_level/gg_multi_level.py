@@ -320,7 +320,7 @@ def stop_multi_levelers():
     for userid in es.getUseridList():
         ggPlayer = Player(userid)
         
-        # Make sure they 
+        # Make sure their multiLevels are reset
         ggPlayer.multiLevels = 0
         
         if userid in list_currentMultiLevel:
