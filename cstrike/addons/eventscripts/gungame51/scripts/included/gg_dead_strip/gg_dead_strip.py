@@ -116,7 +116,7 @@ def player_death(event_var):
             continue
 
         # Remove the weapon by its index
-        spe.removeEntityByIndex(index)
+        gamethread.delayed(0, spe.removeEntityByIndex, (index))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
