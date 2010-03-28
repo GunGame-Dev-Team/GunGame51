@@ -102,7 +102,7 @@ def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
 
     # Before the round ends up restarting, prepare gungame to be ready
     # for the first round of play
-    gamethread.delayed(0.7, prepare_game)
+    gamethread.delayed(0.5, prepare_game)
 
     # Make sure that during the first round nobody has godmode
     gamethread.delayed(1.4, remove_godmode)
@@ -298,7 +298,7 @@ def count_down():
 
             # Before the round ends up restarting, prepare gungame to be ready
             # for the first round of play
-            gamethread.delayed(0.7, prepare_game)
+            gamethread.delayed(0.5, prepare_game)
             
             # Make sure that during the first round nobody has godmode
             gamethread.delayed(1.4, remove_godmode)

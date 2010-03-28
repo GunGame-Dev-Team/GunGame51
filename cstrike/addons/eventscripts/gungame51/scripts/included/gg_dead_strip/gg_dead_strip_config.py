@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/cfg/included/gg_warmup_round.py
+# ../addons/eventscripts/gungame/scripts/cfg/included/gg_dead_strip_config.py
 
 '''
 $Rev$
