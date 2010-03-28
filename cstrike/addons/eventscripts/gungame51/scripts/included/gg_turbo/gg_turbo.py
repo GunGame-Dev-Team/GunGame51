@@ -89,10 +89,17 @@ def give_weapon(userid, previousLevel):
         return
 
     weapsToStrip = [get_level_weapon(previousLevel)]
+
     # If the player is was on hegrenade level, and gg_nade_bonus is enabled,
-    # get the list of their bonus weapons
-    if weapsToStrip[0] == "hegrenade" and str(gg_nade_bonus) != "0":
+    # and the current level is not hegrenade as well, get the list of their
+    # bonus weapons
+    if weapsToStrip[0] == "hegrenade" and str(gg_nade_bonus) != "0" and \
+                                                ggPlayer.weapon != "hegrenade":
         weapsToStrip.extend(get_weapon(userid))
+
+    # If any weapons to be removed were just given, do not strip them
+    if ggPlayer.weapon in weapsToStrip:
+        weapsToStrip.remove(ggPlayer.weapon)
 
     # Strip the previous weapons
     ggPlayer.strip_weapons(weapsToStrip)
