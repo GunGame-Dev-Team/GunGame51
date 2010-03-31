@@ -102,7 +102,7 @@ def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
 
     # Before the round ends up restarting, prepare gungame to be ready
     # for the first round of play
-    gamethread.delayed(0.5, prepare_game)
+    gamethread.delayed(0.7, prepare_game)
 
     # Make sure that during the first round nobody has godmode
     gamethread.delayed(1.4, remove_godmode)
@@ -186,18 +186,18 @@ def player_spawn(event_var):
         es.sexec(userid, 'use weapon_knife')
         return
 
-    delay = 0.07
+    delay = 0.05
 
     if es.isbot(userid):
-        delay += 0.25
+        delay += 0.2
 
     # Strip the player's weapons (split second delay)
     gamethread.delayed(delay, ggPlayer.strip, (True, [gg_warmup_weapon]))
 
     # Delay giving the weapon by a split second, because the code in round
     #   start removes all weapons
-    gamethread.delayed((delay + 0.05), ggPlayer.give, (str(gg_warmup_weapon),
-                                                            True, True))
+    gamethread.delayed((delay), ggPlayer.give, (str(gg_warmup_weapon),
+                                                                True, True))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -298,7 +298,7 @@ def count_down():
 
             # Before the round ends up restarting, prepare gungame to be ready
             # for the first round of play
-            gamethread.delayed(0.5, prepare_game)
+            gamethread.delayed(0.7, prepare_game)
             
             # Make sure that during the first round nobody has godmode
             gamethread.delayed(1.4, remove_godmode)

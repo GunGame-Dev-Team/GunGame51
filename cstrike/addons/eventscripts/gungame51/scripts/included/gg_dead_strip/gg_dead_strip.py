@@ -116,7 +116,7 @@ def player_death(event_var):
             continue
 
         # Remove the weapon by its index
-        gamethread.delayed(0, spe.removeEntityByIndex, (index))
+        spe.removeEntityByIndex(index)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -127,7 +127,7 @@ def remove_weapon(userid, item):
     theWeapon = spe.ownsWeapon(userid, weaponName)
     if theWeapon:
         spe.dropWeapon(userid, weaponName)
-        gamethread.delayed(0, spe.removeEntityByInstance, (theWeapon))
+        spe.removeEntityByInstance(theWeapon)
 
 def drop_filter(userid, args):
     # If command not drop, continue
