@@ -53,6 +53,11 @@ def load():
 def unload():
     # Unregister the drop command
     es.addons.unregisterClientCommandFilter(drop_filter)
+    
+    # Make sure that all weapons can be picked up
+    for userid in es.getUseridList():
+        for weapon in spe.getWeaponDict(userid):
+            set_spawn_flags(userid, weapon[7:], 0)
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
@@ -83,6 +88,8 @@ def item_pickup(event_var):
 
     # Check to see if the weapon is in the player's strip exceptions
     if item in Player(userid).stripexceptions + ['flashbang', 'smokegrenade']:
+        # Make sure this weapon can't be picked up
+        set_spawn_flags(userid, item, 2)
         return
 
     # Get the player's GunGame weapon
@@ -90,6 +97,8 @@ def item_pickup(event_var):
 
     # Check to see if the weapon is their gungame weapon
     if item == currentWeapon:
+        # Make sure this weapon can't be picked up
+        set_spawn_flags(userid, item, 2)
         return
 
     # Remove player's weapon
@@ -107,20 +116,13 @@ def item_pickup(event_var):
     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon)
                                                                             )
 
-def player_death(event_var):
-    # For each index for weapons the player owned
-    for index in Player(event_var["userid"]).ownedWeapons:
-        # If the index has an owner, meaning that the index is no longer valid,
-        # skip this index
-        if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') != -1:
-            continue
-
-        # Remove the weapon by its index
-        spe.removeEntityByIndex(index)
-
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def set_spawn_flags(userid, weapon, flag):
+    # Adjusts the ability for weapons to be picked up
+    es.server.queuecmd('es_xfire %s weapon_%s addoutput \"spawnflags %s\"' % (userid, weapon, flag))
+
 def remove_weapon(userid, item):
     # Remove weapon
     weaponName = "weapon_%s" % item

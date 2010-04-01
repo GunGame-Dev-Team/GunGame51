@@ -515,10 +515,11 @@ class AddonManager(object):
         Adds dependencies to be unloaded later that were loaded as a result of
         as sub-addon.
         '''
-        if addon_name in self.__loaded__:
+        if dependency in self.__loaded__:
             return
-        es.set(depe, 1)
-        load(subaddon)
+
+        es.set(dependency, 1)
+        load(dependency)
         AddonLoadedByDependency().add(dependency, addon_name)
 
     def remove_loaded_by_dependency(self, name):

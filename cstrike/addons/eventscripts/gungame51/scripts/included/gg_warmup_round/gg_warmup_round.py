@@ -47,6 +47,7 @@ gg_warmup_timer = es.ServerVar('gg_warmup_timer')
 gg_warmup_weapon = es.ServerVar('gg_warmup_weapon')
 gg_warmup_deathmatch = es.ServerVar('gg_warmup_deathmatch')
 gg_warmup_elimination = es.ServerVar('gg_warmup_elimination')
+gg_dead_strip = es.ServerVar('gg_dead_strip')
 gg_deathmatch = es.ServerVar('gg_deathmatch')
 gg_elimination = es.ServerVar('gg_elimination')
 priority_addons_added = []
@@ -213,11 +214,13 @@ def do_warmup(useBackupVars=True):
     if useBackupVars:
         # Setting globals for backup variables
         global mp_freezetime_backup
+        global gg_dead_strip_backup
         global gg_deathmatch_backup
         global gg_elimination_backup
 
         # Setting backup variables
         mp_freezetime_backup = int(mp_freezetime)
+        gg_dead_strip_backup = int(gg_dead_strip)
         gg_deathmatch_backup = int(gg_deathmatch)
         gg_elimination_backup = int(gg_elimination)
 
@@ -227,8 +230,13 @@ def do_warmup(useBackupVars=True):
     # Added priority addons list
     del priority_addons_added[:]
 
-    # Checking for warmup in the priority addons list
+    # Adding warmup and dead strip to the priority addons list
     add_priority_addon('gg_warmup_round')
+    add_priority_addon("gg_dead_strip")
+
+    # If gg_dead_strip is not loaded, load it
+    if not int(gg_dead_strip):
+        es.server.queuecmd("gg_dead_strip 1")
 
     # Checking for warmup deathmatch
     if (int(gg_warmup_deathmatch) or int(gg_deathmatch)) and \
@@ -374,6 +382,10 @@ def reset_server_vars(unload):
         # Back to normal ?
         elif not gg_deathmatch_backup:
             es.server.queuecmd('gg_deathmatch 0')
+
+    # If gg_dead_strip was not loaded previously, unload it
+    if not gg_dead_strip_backup:
+        es.server.queuecmd("gg_dead_strip 0")
 
     # Changing mp_freezetime back
     if int(mp_freezetime) != mp_freezetime_backup:
