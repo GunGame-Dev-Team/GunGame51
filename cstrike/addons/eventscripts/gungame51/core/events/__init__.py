@@ -66,7 +66,7 @@ class EventManager(object):
             # Set recentWinner to True
             recentWinner = True
             # In 1 second, remove the recentWinner
-            gamethread.delayed(1, self.remove_recent_winner)
+            gamethread.delayed(3, self.remove_recent_winner)
 
             # If "gg_multi_round" is disabled
             if not int(gg_multi_round):

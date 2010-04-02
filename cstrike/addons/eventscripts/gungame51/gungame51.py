@@ -106,7 +106,7 @@ class RoundInfo(object):
         if not '_the_instance' in cls.__dict__:
             cls._the_instance = object.__new__(cls)
             # Set round information variables
-            cls._the_instance.round = 0
+            cls._the_instance.round = 1
         return cls._the_instance
         
     @property
@@ -257,7 +257,7 @@ def initialize():
     
     # Set up "gg_multi_round"
     if int(gg_multi_round):
-        RoundInfo().round = 0
+        RoundInfo().round = 1
 
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
@@ -301,7 +301,7 @@ def es_map_start(event_var):
 
     # Set up "gg_multi_round"
     if int(gg_multi_round):
-        RoundInfo().round = 0
+        RoundInfo().round = 1
 
     # If gg_weapon_order_sort_type is #random, re-randomize it
     if str(gg_weapon_order_sort_type) == "#random":
@@ -553,6 +553,9 @@ def gg_win(event_var):
         # =====================================================================
         # ROUND WIN
         # =====================================================================
+        # Calculate round number
+        RoundInfo().round += 1
+        
         # Reset the players
         resetPlayers()
 
@@ -619,9 +622,6 @@ def gg_start(event_var):
     if gg_warmup_round_backup != int(gg_warmup_round) and \
         gg_warmup_round_backup:
             es.server.queuecmd('gg_warmup_round 0')
-
-    # Calculate round number
-    RoundInfo().round += 1
 
 def gg_addon_loaded(event_var):
     es.dbgmsg(0, 'gg_addon_loaded: "%s" ' % event_var['addon'] + 
