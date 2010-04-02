@@ -19,6 +19,9 @@ from playerlib import getPlayer
 from playerlib import getUseridList
 from weaponlib import getWeaponList
 
+# SPE Imports
+import spe
+
 # GunGame Imports
 
 #    Weapon Function Imports
@@ -334,8 +337,13 @@ def round_start(event_var):
         if weapon in list_noStrip:
             continue
 
-        # Remove the weapon from the map
-        es.server.queuecmd('es_xfire %s %s kill' % (userid, weapon))
+        # Remove all weapons of this type from the map
+        for index in weapon.indexlist:
+            # If the weapon has an owner, stop here
+            if es.getindexprop(index,'CBaseEntity.m_hOwnerEntity') != -1:
+                continue
+
+            spe.removeEntityByIndex(index)
 
     # Equip players with a knife and possibly item_kevlar or item_assaultsuit
     equip_player()
@@ -725,6 +733,6 @@ def give_weapon_check(userid):
     # Is a spectator or dead ?
     if es.getplayerteam(userid) < 2 or getPlayer(userid).isdead:
         return
-    
+
     # Give the weapon
     Player(userid).give_weapon()
