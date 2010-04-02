@@ -37,8 +37,8 @@ def load():
     config.text('   Helps newly connected players by adjusting their level.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap.')
-    config.text('   1 = Set player to the level of the lowest level of all ' +
-                'the other players.')
+    config.text('   1 = Set player to the lowest level of all the other ' +
+                'players.')
     config.text('       Basically "catching them up".')
     config.text('Default Value: 0')
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
