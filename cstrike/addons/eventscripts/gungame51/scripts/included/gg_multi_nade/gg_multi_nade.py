@@ -29,7 +29,6 @@ info.name = 'gg_multi_nade'
 info.title = 'GG Multiple Grenades' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
-info.conflicts = ['gg_earn_nade']
 
 # ============================================================================
 # >> GLOBALS
@@ -62,7 +61,6 @@ def gg_levelup(event_var):
     # If someone levels up, from nade to nade level, do this
     Player(int(event_var['leveler'])).grenades_detonated = 0
 
-
 def hegrenade_detonate(event_var):
 
     # Get the userid as int
@@ -83,8 +81,10 @@ def hegrenade_detonate(event_var):
     # If there is a limit to the number of nades a player can get...
     if int(gg_multi_nade_max_nades) > 0:
 
-        # Increment the player's grenades_detonated count
-        Player(userid).grenades_detonated += 1
+        # Don't keep counting if the player has already hit the max
+        if Player(userid).grenades_detonated < int(gg_multi_nade_max_nades):
+            # Increment the player's grenades_detonated count
+            Player(userid).grenades_detonated += 1
 
         # Find out if they exceeded the limit and break out if so
         if Player(userid).grenades_detonated >= int(gg_multi_nade_max_nades):

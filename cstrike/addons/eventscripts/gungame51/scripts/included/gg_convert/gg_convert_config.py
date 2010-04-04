@@ -46,6 +46,10 @@ def load():
     config.text('       GunGame3: es_gg_winners_db.txt')
     config.text('       GunGame4: es_gg_database.sqldb')
     config.text('       GunGame5: winnersdata.db')
+    config.text('Note:')
+    config.text('   GunGame5.0 SpawnPoint files have not been changed in ' +
+                'GunGame5.1.')
+    config.text('        (Simply drag them to ../cfg/gungame51/spawnpoints/)')
     config.text('Options:')
     config.text('   0 = (Disabled)')
     config.text('   1 = (Enabled) Add together the current and converted ' +

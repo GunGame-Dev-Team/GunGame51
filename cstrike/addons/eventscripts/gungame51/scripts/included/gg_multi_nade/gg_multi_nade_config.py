@@ -37,8 +37,6 @@ def load():
     config.text('   When a player reaches grenade level, they are given ' +
                 'another grenade when')
     config.text('   their thrown grenade detonates.')
-    config.text('Note:')
-    config.text('   * Will not load with "gg_earn_nades" enabled.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_multi_nade.')
     config.text('   1 = (Enabled) Load gg_multi_nade.')
@@ -52,8 +50,10 @@ def load():
     config.text('>> MAX GRENADES')
     config.text('='*76)
     config.text('Description:')
-    config.text('   Defines the maximum number of grenades that a player ')
-    config.text('   can be given during one life.')
+    config.text('   Defines the maximum number of grenades that a player ' +
+                'can be given during')
+    config.text('   one life. (This includes the hegrenade the player ' +
+                'spawns with)')
     config.text('Options:')
     config.text('   0 = Unlimited - Always give the player another nade.')
     config.text('   # = Numerical limit - Only give up to # grenades.')
