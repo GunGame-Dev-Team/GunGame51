@@ -181,6 +181,10 @@ def getLevelAboveLowest():
         if not playerLevel in levels:
             levels.append(playerLevel)
 
+    # If there are no valid players to base the handicap on, return level 1
+    if not levels:
+        return 1
+
     # If there is only one level, return it
     if len(levels) == 1:
         return levels[0]
