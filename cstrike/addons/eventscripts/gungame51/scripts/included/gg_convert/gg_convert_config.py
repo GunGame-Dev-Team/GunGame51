@@ -41,7 +41,7 @@ def load():
     config.text('   * Place a copy of your winners database or spawnpoint ' +
                 'files in this')
     config.text('folder:')
-    config.text('       ../cfg/gungame51/gg_convert/')
+    config.text('       ../cfg/gungame51/converter/')
     config.text('   * Database files include:')
     config.text('       GunGame3: es_gg_winners_db.txt')
     config.text('       GunGame4: es_gg_database.sqldb')
