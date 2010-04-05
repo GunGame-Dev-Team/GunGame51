@@ -21,6 +21,7 @@ import spe
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.addons import PriorityAddon
 from gungame51.core.players.shortcuts import Player
 
 # ============================================================================
@@ -47,6 +48,11 @@ list_weaponNameList = getWeaponNameList()
 def load():
     # Register the drop command to prevent it from being used.
     es.addons.registerClientCommandFilter(drop_filter)
+
+    # Make sure that all owned weapons can NOT be picked up
+    for userid in es.getUseridList():
+        for weapon in spe.getWeaponDict(userid):
+            set_spawn_flags(userid, weapon[7:], 2)
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
@@ -138,6 +144,11 @@ def drop_filter(userid, args):
 
     # Get player's GunGame weapon
     weapon = Player(userid).weapon
+
+    # If gg_warmup_round is loaded, the weapon they should have is the warmup
+    # weapon
+    if 'gg_warmup_round' in PriorityAddon():
+        weapon = str(es.ServerVar("gg_warmup_weapon"))
 
     # Get the player's current weapon
     curWeapon = getPlayer(userid).attributes['weapon']

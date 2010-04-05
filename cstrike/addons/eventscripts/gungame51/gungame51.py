@@ -190,11 +190,19 @@ def unload():
     for addon in list(set(map((lambda (x, y): y), [(x, y) for x in \
         dict_dependencies for y in dict_dependencies[x]]))):
 
+        # If an addon we just unloaded unloaded this addon, skip it
+        if not addon in AddonManager().__loaded__:
+            continue
+        
         # Unload the addons that have required dependencies
         AddonManager().unload(addon, True)
 
     # Unload any remaining addons now that dependencies are handled
     for addon in AddonManager().__order__[:]:
+        # If an addon we just unloaded unloaded this addon, skip it
+        if not addon in AddonManager().__loaded__:
+            continue
+
         AddonManager().unload(addon, True)
 
     # Close the database

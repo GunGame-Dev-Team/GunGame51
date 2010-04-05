@@ -22,11 +22,13 @@ from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.addons import PriorityAddon
+from gungame51.core.addons import load as addon_load
+from gungame51.core.addons import unload as addon_unload
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.events.shortcuts import EventManager
-from gungame51.core.addons import PriorityAddon
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -79,7 +81,7 @@ def unload():
         warmupCountDown.delete()
 
     # Reset server vars
-    reset_server_vars(True)
+    reset_server_vars()
 
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
@@ -236,7 +238,8 @@ def do_warmup(useBackupVars=True):
 
     # If gg_dead_strip is not loaded, load it
     if not int(gg_dead_strip):
-        es.server.queuecmd("gg_dead_strip 1")
+        gg_dead_strip.set(1)
+        addon_load("gg_dead_strip")
 
     # Checking for warmup deathmatch
     if (int(gg_warmup_deathmatch) or int(gg_deathmatch)) and \
@@ -244,11 +247,13 @@ def do_warmup(useBackupVars=True):
 
         # Making sure elimination is off
         if int(gg_elimination):
-            es.server.queuecmd('gg_elimination 0')            
+            gg_elimination.set(0)
+            addon_unload('gg_elimination')            
 
         # Enable gg_deathmatch
         if not int(gg_deathmatch):
-            es.server.queuecmd('gg_deathmatch 1')
+            gg_deathmatch.set(1)
+            addon_load('gg_deathmatch')
 
         # Checking for deathmatch in the priority addons list
         add_priority_addon('gg_deathmatch')
@@ -259,11 +264,13 @@ def do_warmup(useBackupVars=True):
 
         # Making sure deathmatch is off
         if int(gg_deathmatch):
-            es.server.queuecmd('gg_deathmatch 0')   
+            gg_deathmatch.set(0)
+            addon_unload('gg_deathmatch')   
 
         # Enable gg_elimination
         if not int(gg_elimination):
-            es.server.queuecmd('gg_elimination 1')
+            gg_elimination.set(1)
+            addon_load('gg_elimination')
 
         # Checking for elimination in the priority addons list
         add_priority_addon('gg_elimination')
@@ -345,47 +352,47 @@ def end_warmup(message):
     repeat.delete('gungameWarmupTimer')             
 
     # Reset server vars back
-    reset_server_vars(False)
+    reset_server_vars()
 
 def play_beep():
     for userid in getPlayerList('#human'):
         Player(userid).playsound('countDownBeep')
 
-def reset_server_vars(unload):
-    # Warmup elimination or deathmatch previously loaded?
-    if int(gg_warmup_elimination) or int(gg_deathmatch_backup):
+def reset_server_vars():
+    # If both warmup addons were loaded, we did no loading, so do no unloading
+    if not int(gg_warmup_deathmatch) and int(gg_warmup_elimination):
+        # If warmup deathmatch was enabled
+        if int(gg_warmup_deathmatch):
+            # Unload gg_deathmatch if we are not going into deathmatch gameplay
+            # now
+            if not int(gg_deathmatch_backup):
+                gg_deathmatch.set(0)
+                addon_unload("gg_deathmatch")
+        # If warmup elimination was enabled
+        elif int(gg_warmup_elimination):
+            # Unload gg_elimination if we are not going into elimination
+            # gameplay now
+            if not int(gg_elimination_backup):
+                gg_elimination.set(0)
+                addon_unload("gg_elimination")
 
-        # Back to DM ?
-        if gg_deathmatch_backup:
-            es.server.queuecmd('gg_elimination 0')
+    # If we are going into deathmatch gameplay
+    if int(gg_deathmatch_backup):
+        # If we didn't already choose to leave deathmatch on above, load it
+        if not int(gg_warmup_deathmatch):
+            gg_deathmatch.set(1)
+            addon_load("gg_deathmatch")
+    # If we are going into elimination gameplay
+    elif int(gg_elimination_backup):
+        # If we didn't already choose to leave elimination on above, load it
+        if not int(gg_warmup_elimination):
+            gg_elimination.set(1)
+            addon_load("gg_elimination")
 
-            if unload:
-                gg_deathmatch.set(1)
-            else:
-                es.server.queuecmd('gg_deathmatch 1')
-
-        # Back to normal ?
-        elif not gg_elimination_backup:
-            es.server.queuecmd('gg_elimination 0')
-
-    # Warmup DM or elimination previously loaded?
-    elif int(gg_warmup_deathmatch) or int(gg_elimination_backup):
-        # Back to elimination ?
-        if gg_elimination_backup:
-            es.server.queuecmd('gg_deathmatch 0')
-
-            if unload:
-                gg_elimination.set(1)
-            else:
-                es.server.queuecmd('gg_elimination 1')
-
-        # Back to normal ?
-        elif not gg_deathmatch_backup:
-            es.server.queuecmd('gg_deathmatch 0')
-
-    # If gg_dead_strip was not loaded previously, unload it
+    # If gg_dead_strip disabled before warmup, disable it again
     if not gg_dead_strip_backup:
-        es.server.queuecmd("gg_dead_strip 0")
+        gg_dead_strip.set(0)
+        addon_unload("gg_dead_strip")
 
     # Changing mp_freezetime back
     if int(mp_freezetime) != mp_freezetime_backup:
