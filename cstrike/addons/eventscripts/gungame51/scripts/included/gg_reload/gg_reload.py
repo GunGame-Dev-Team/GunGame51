@@ -17,6 +17,7 @@ from playerlib import getPlayer
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
+from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -43,7 +44,7 @@ def player_death(event_var):
     # Get the userids of the attacker and victim
     attacker = int(event_var['attacker'])
     userid = int(event_var['userid'])
-    
+
     # If there is no attacker (falling to death), return
     if not attacker:
         return
@@ -59,8 +60,13 @@ def player_death(event_var):
     # Get the name of the weapon used to get the kill
     weapon = event_var['weapon']
 
-    # If the weapon name doesn't match the player's level's weapon name, return
-    if weapon != Player(attacker).weapon:
+    # The player has already leveled up internally, so check their last level
+    previousLevel = Player(attacker).level - 1
+    previousLevel = 1 if previousLevel < 1 else previousLevel
+
+    # If the weapon name doesn't match the player's level's weapon name at the
+    # time, return
+    if weapon != get_level_weapon(previousLevel):
         return
 
     # If the player is on hegrenade or knife level, return
