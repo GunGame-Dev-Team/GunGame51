@@ -25,7 +25,6 @@ import spe
 # GunGame Imports
 
 #    Weapon Function Imports
-from core.weapons.shortcuts import get_weapon_order
 from core.weapons.shortcuts import set_weapon_order
 from core.weapons.shortcuts import get_level_multikill
 from core.weapons.shortcuts import get_level_weapon
@@ -53,10 +52,6 @@ from core.leaders.shortcuts import get_leader_count
 from core.leaders.shortcuts import get_leader_level
 from core.leaders.shortcuts import is_leader
 from core.leaders.shortcuts import LeaderManager
-
-#    Core Function Imports
-from core import inMap
-from core import get_game_dir
 
 #   Messaging Function Imports
 from core.messaging.shortcuts import langstring
@@ -97,8 +92,6 @@ gg_warmup_round = es.ServerVar('gg_warmup_round')
 gg_warmup_round_backup = None
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
-gg_win_alltalk = es.ServerVar('gg_win_alltalk')
-sv_alltalk = es.ServerVar('sv_alltalk')
 firstPlayerSpawned = False
 
 # ============================================================================
@@ -223,37 +216,40 @@ def initialize():
 
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
-    
+
+    # Make the sounds downloadable
+    make_downloadable()
+
     # Load custom events
     es.loadevents('declare', 
         'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
-    
+
     # Fire the gg_server.cfg
     es.server.cmd('exec gungame51/gg_server.cfg')
-    
+
     # Get weapon order file
     # Set this as the weapon order and set the weapon order type
     currentOrder = set_weapon_order(str(gg_weapon_order_file), 
                                   str(gg_weapon_order_sort_type))
-    
+
     # Set multikill override
     if int(gg_multikill_override) > 1:
         currentOrder.set_multikill_override(int(gg_multikill_override))
-        
+
     # Echo the weapon order to console
     es.dbgmsg(0, '[GunGame]')
     currentOrder.echo()
     es.dbgmsg(0, '[GunGame]')
-    
+
     # Clear out the GunGame system
     resetPlayers()
-    
+
     # Restart map
     msg('#human', 'Loaded')
-    
+
     # Fire gg_load event
     EventManager().gg_load()
-    
+
     # Print load completed
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
 
@@ -262,10 +258,10 @@ def initialize():
 
     # Set es.AddonInfo()
     gungame_info('addoninfo', info)
-    
+
     # Load menus
     MenuManager().load('#all')
-    
+
     # Set up "gg_multi_round"
     if int(gg_multi_round):
         RoundInfo().round = 1
@@ -286,7 +282,7 @@ def es_map_start(event_var):
     # Set firstPlayerSpawned to False, so player_spawn will know when the first
     # spawn is
     firstPlayerSpawned = False
-    
+
     # Make the sounds downloadable
     make_downloadable()
 
@@ -609,10 +605,6 @@ def gg_win(event_var):
     # =========================================================================
     # ALL WINS
     # =========================================================================
-    # Enable alltalk
-    if not int(sv_alltalk) and int(gg_win_alltalk):
-        es.server.queuecmd('sv_alltalk 1')
-    
     # Tell the world (center message)
     centermsg('#human', 'PlayerWon_Center', {'player': playerName})
     gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center', 
