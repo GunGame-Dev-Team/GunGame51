@@ -207,7 +207,7 @@ def player_spawn(event_var):
 # ============================================================================
 def add_priority_addon(name):
     priority_addons_added.append(name)
-    PriorityAddon().append(name)            
+    PriorityAddon().append(name)
 
 def do_warmup(useBackupVars=True):
     # Looking for warmup timer
@@ -241,39 +241,39 @@ def do_warmup(useBackupVars=True):
         gg_dead_strip.set(1)
         addon_load("gg_dead_strip")
 
-    # Checking for warmup deathmatch
-    if (int(gg_warmup_deathmatch) or int(gg_deathmatch)) and \
-        not int(gg_warmup_elimination):
-
-        # Making sure elimination is off
-        if int(gg_elimination):
-            gg_elimination.set(0)
-            addon_unload('gg_elimination')            
-
-        # Enable gg_deathmatch
-        if not int(gg_deathmatch):
-            gg_deathmatch.set(1)
-            addon_load('gg_deathmatch')
-
-        # Checking for deathmatch in the priority addons list
-        add_priority_addon('gg_deathmatch')
-
-    # Checking for warmup elimination
-    elif (int(gg_warmup_elimination) or int(gg_elimination)) and \
-        not int(gg_warmup_deathmatch):
-
-        # Making sure deathmatch is off
-        if int(gg_deathmatch):
+    # If deathmatch is enabled on the server, and elimination is not
+    if int(gg_deathmatch_backup) and not int(gg_elimination_backup):
+        # If we have no warmup deathmatch, we need to unload deathmatch
+        if not int(gg_warmup_deathmatch):
             gg_deathmatch.set(0)
-            addon_unload('gg_deathmatch')   
+            addon_unload("gg_deathmatch")
+    # Otherwise, if elimination is on the server
+    elif int(gg_elimination_backup):
+        # If we have no warmup elimination, we need to unload elimination
+        if not int(gg_warmup_elimination):
+            gg_elimination.set(0)
+            addon_unload("gg_elimination")
 
-        # Enable gg_elimination
-        if not int(gg_elimination):
-            gg_elimination.set(1)
-            addon_load('gg_elimination')
-
-        # Checking for elimination in the priority addons list
-        add_priority_addon('gg_elimination')
+    # If only one warmup mode is selected, proceed
+    if not (int(gg_warmup_deathmatch) and int(gg_warmup_elimination)):
+        # If warmup deathmatch is enabled, add it to priority addons
+        if int(gg_warmup_deathmatch):
+            add_priority_addon('gg_deathmatch')
+            # If deathmatch is not enabled, we need to load it now
+            if not int(gg_deathmatch_backup):
+                gg_deathmatch.set(1)
+                addon_load("gg_deathmatch")
+        # Otherwise, if warmup elimination is enabled, add it to priority
+        # addons
+        elif int(gg_warmup_elimination):
+            add_priority_addon('gg_elimination')
+            # If elimination is not enabled, or deathmatch is enabled due to
+            # both dm and elim set to 1 and dm overruling elim, we need to load
+            # it now.
+            if not int(gg_elimination_backup) or int(gg_deathmatch_backup) \
+                                                and int(gg_elimination_backup):
+                gg_elimination.set(1)
+                addon_load("gg_elimination")
 
     # Start it up if it exists
     if warmupCountDown:
@@ -360,7 +360,7 @@ def play_beep():
 
 def reset_server_vars():
     # If both warmup addons were loaded, we did no loading, so do no unloading
-    if not int(gg_warmup_deathmatch) and int(gg_warmup_elimination):
+    if not (int(gg_warmup_deathmatch) and int(gg_warmup_elimination)):
         # If warmup deathmatch was enabled
         if int(gg_warmup_deathmatch):
             # Unload gg_deathmatch if we are not going into deathmatch gameplay
