@@ -56,9 +56,10 @@ def load():
                     'will be issued when.') 
     config.text('   the vote is triggered.')
     config.text('Examples:')
-    config.text('   Mani:        gg_map_vote_command "ma_voterandom end 4"')
-    config.text('   BeetlesMod:  gg_map_vote_command "admin_votemaps"')
-    config.text('   SourceMod:   gg_map_vote_command "sm_map_vote"')
+    config.text(' Mani:        gg_map_vote_command "ma_voterandom end 4"')
+    config.text(' BeetlesMod:  gg_map_vote_command "admin_votemaps"')
+    config.text(' SourceMod:   gg_map_vote_command "sm_mapvote" (with ' +
+                'mapchooser.smx enabled)')
     config.text('Default Value: "ma_voterandom end 4"')
     config.cvar('gg_map_vote_command', "ma_voterandom end 4", 
                                         'Triggers 3rd party voting.')
