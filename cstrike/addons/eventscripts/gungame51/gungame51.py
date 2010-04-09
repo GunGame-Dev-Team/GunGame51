@@ -128,7 +128,7 @@ info.About = ('\n' +
 
 # ============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================    
+# ============================================================================
 def load():
     # Load translations
     loadTranslation('gungame', 'gungame')
@@ -551,8 +551,8 @@ def gg_win(event_var):
         # MAP WIN
         # ====================================================
         # End game
-        es.server.cmd('es_xgive %s game_end;es_xfire %s game_end EndGame'
-            % (userid, userid))
+        es.server.queuecmd("es_xgive %s game_end" % userid)
+        es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
         
         # Tell the world
         saytext2('#human', index, 'PlayerWon', {'player':playerName})
