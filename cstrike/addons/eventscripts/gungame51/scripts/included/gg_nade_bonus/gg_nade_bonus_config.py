@@ -54,7 +54,7 @@ def load():
     config.text('Examples:')
     config.text('   * gg_nade_bonus aug')
     config.text('   * gg_nade_bonus glock,aug')
-    config.text('   * gg_nade_bonus "nade_bonus_order"')
+    config.text('   * gg_nade_bonus nade_bonus_order')
     config.text('Options:')
     config.text('   awp      scout   aug      mac10   tmp     mp5navy   ump45')
     config.text('   galil    famas   ak47     sg552   sg550   g3sg1     m249')

@@ -183,11 +183,7 @@ def player_death(event_var):
             # Give new weapon
             give_bonus(attacker, True, True)
 
-        # Add multiKill
         else:
-            # Add to multikill count
-            ggPlayer.nadeBonusMulti += 1
-
             # Play sound
             ggPlayer.playsound('multikill')
 
@@ -330,6 +326,9 @@ def give_bonus(userid, sound=False, turboCheck=False):
         # the total number of levels
         if previousLevel < 1:
             previousLevel = get_total_levels(str(gg_nade_bonus))
+            # If the total number of levels is 1, don't strip them
+            if previousLevel == 1:
+                return
 
         # Strip the previous weapons
         ggPlayer.strip_weapons([get_level_weapon(previousLevel,
