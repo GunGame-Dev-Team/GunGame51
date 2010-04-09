@@ -261,8 +261,8 @@ class BaseWeaponOrders(object):
         # will result in a levelup
         for userid in getPlayerList("#alive"):
             getPlayer(userid).godmode = 1
-            
-        es.server.cmd('mp_restartgame 2')
+
+        es.server.queuecmd('mp_restartgame 2')
         es.msg('Weapon Order Changed! Restarting in 2 seconds!')
 
     def echo(self):
