@@ -32,14 +32,28 @@ info.version = '0.1'
 # ============================================================================
 
 spawnPoints = []
-pointsLoaded = 0
+pointsLoaded = False
 es_gamedir = es.ServerVar('eventscripts_gamedir')
 
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    loadSpawnFile(str(es.ServerVar("eventscripts_currentmap")))
     es.dbgmsg(0, 'Loaded: %s' % info.name)
+
+    userid = es.getuserid()
+    
+    # If there are no players on the server, stop here
+    if not userid:
+        return
+
+    pointsLoaded = True
+
+    if not spawnPoints:
+        return
+
+    loadRandomPoints(userid)
     
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
@@ -50,8 +64,8 @@ def unload():
 
 def es_map_start(event_var):
     global pointsLoaded
-    
-    pointsLoaded = 0
+
+    pointsLoaded = False
     loadSpawnFile(event_var['mapname'])
 
 def player_activate(event_var):
@@ -60,7 +74,7 @@ def player_activate(event_var):
     if pointsLoaded:
         return
     
-    pointsLoaded = 1
+    pointsLoaded = True
     
     if not spawnPoints:
         return
@@ -76,7 +90,7 @@ def loadSpawnFile(mapName):
     global pointsLoaded
     
     spawnPoints = []
-    pointsLoaded = 0
+    pointsLoaded = False
     
     # Get spawnpoint file
     spawnFile = '%s/cfg/gungame51/spawnpoints/%s.txt' % (str(es_gamedir).replace('\\', '/'), mapName)
@@ -96,9 +110,9 @@ def loadSpawnFile(mapName):
 def loadRandomPoints(userid):
     # Remove existing spawnpoints
     for tSpawn in es.createentitylist('info_player_terrorist'):
-        es.server.cmd('es_xremove info_player_terrorist')
+        es.server.cmd('es_xremove %s' % tSpawn)
     for ctSpawn in es.createentitylist('info_player_counterterrorist'):
-        es.server.cmd('es_xremove info_player_counterterrorist')
+        es.server.cmd('es_xremove %s' % ctSpawn)
     
     # Loop through the spawnpoints
     for spawn in spawnPoints:

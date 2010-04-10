@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
+import gamethread
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -32,6 +33,10 @@ info.translations = ['gg_suicide_punish']
 # Get the es.ServerVar() instance of "gg_suicide_punish"
 gg_suicide_punish = es.ServerVar('gg_suicide_punish')
 
+# Store a list of those who recently changed teams, to not punish them if they
+# committed suicide to do so
+recentTeamChange = []
+
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
@@ -40,6 +45,15 @@ def load():
 
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
+def player_team(event_var):
+    userid = int(event_var["userid"])
+    
+    # Store them here so we don't punish them if this team change caused a
+    # suicide
+    if not userid in recentTeamChange:
+        recentTeamChange.append(userid)
+        gamethread.delayed(0.2, recentTeamChange.remove, userid)
 
 def player_death(event_var):
     '''
@@ -56,8 +70,13 @@ def player_death(event_var):
     if not es.exists('userid', userid):
         return
 
-    # If the attacker is not "world or the userid of the victim, it is not a suicide
+    # If the attacker is not "world or the userid of the victim, it is not a
+    # suicide
     if not ((attacker == 0) or (attacker == userid)):
+        return
+
+    # If the suicide was caused by a team change, stop here
+    if userid in recentTeamChange:
         return
 
     # Get victim object
