@@ -66,6 +66,11 @@ def load():
     
     # Respawn all dead players
     for userid in getUseridList('#dead'):
+        # If the player is not on CT or T, stop here
+        if es.getplayerteam(userid) < 2:
+            continue
+
+        # Start the respawn countdown
         repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))
     
@@ -117,14 +122,12 @@ def player_team(event_var):
     if not respawnPlayer:
         repeat.create('gungameRespawnPlayer%s' % userid,
                                                 respawn_count_down, userid)
-    
     # Don't allow spectators or players that are unassigned to respawn
     if int(event_var['team']) < 2:
         if repeat.status('gungameRespawnPlayer%s' % userid) != 1:
             repeat.stop('gungameRespawnPlayer%s' % userid)
             hudhint(userid, 'RespawnCountdown_CancelTeam')
         return
-    
     # Respawn the player
     repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))
