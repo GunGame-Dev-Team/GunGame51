@@ -232,9 +232,12 @@ def do_warmup(useBackupVars=True):
     # Added priority addons list
     del priority_addons_added[:]
 
-    # Adding warmup and dead strip to the priority addons list
+    # Adding warmup and dead strip, and other addons we don't mind running
+    # during gg_warmup_round to the priority addons list
     add_priority_addon('gg_warmup_round')
     add_priority_addon("gg_dead_strip")
+    add_priority_addon("gg_noblock")
+    add_priority_addon("gg_dissolver")
 
     # If gg_dead_strip is not loaded, load it
     if not int(gg_dead_strip):

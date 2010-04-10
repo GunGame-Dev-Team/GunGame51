@@ -60,13 +60,18 @@ def player_death(event_var):
     # Get the name of the weapon used to get the kill
     weapon = event_var['weapon']
 
+    ggPlayer = Player(attacker)
+    level = ggPlayer.level
+
     # The player has already leveled up internally, so check their last level
-    previousLevel = Player(attacker).level - 1
-    previousLevel = 1 if previousLevel < 1 else previousLevel
+    # if the player isn't in the middle of a level with multikill
+    if not ggPlayer.multikill:
+        level -= 1
+        level = 1 if level < 1 else level
 
     # If the weapon name doesn't match the player's level's weapon name at the
     # time, return
-    if weapon != get_level_weapon(previousLevel):
+    if weapon != get_level_weapon(level):
         return
 
     # If the player is on hegrenade or knife level, return
