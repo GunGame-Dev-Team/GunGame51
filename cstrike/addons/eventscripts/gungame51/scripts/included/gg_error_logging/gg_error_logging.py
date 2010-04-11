@@ -70,6 +70,11 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def gungame_except_hook(tb_type, value, trace_back):
+    # If this error was called to stop an attribute from being set, do not log
+    # it.
+    if str(value) == "gg_cancel_callback":
+        return
+
     tb = traceback.format_exception(tb_type, value, trace_back)
 
     # If not a gungame error, send to ES and return
