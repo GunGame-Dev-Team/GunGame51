@@ -524,20 +524,16 @@ def gg_levelup(event_var):
     # Check for priority addons
     if PriorityAddon():
         return
-    
+
+    attacker = int(event_var['attacker'])
     userid = int(event_var['userid'])
 
-    # If the userid defaulted to 0 (for levelups triggered without a victim),
-    # stop here
-    if not userid:
-        return
+    # If each player exists and is not a bot, send the level info hudhint
+    if attacker and not es.isbot(attacker):
+        send_level_info_hudhint(Player(attacker))
+    if userid and not es.isbot(userid):
+        send_level_info_hudhint(Player(userid))
 
-    # Is a bot?
-    if es.isbot(userid):
-        return
-
-    send_level_info_hudhint(Player(userid))
-    
 def gg_win(event_var):
     # Get player info
     userid = int(event_var['winner'])

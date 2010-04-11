@@ -11,6 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Python Imports
 from os import name as platform
+from random import shuffle
 
 # Eventscripts Imports
 import es
@@ -19,6 +20,7 @@ import repeat
 import gamethread
 from playerlib import getPlayer
 from playerlib import getPlayerList
+from weaponlib import getWeaponNameList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -29,6 +31,7 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.events.shortcuts import EventManager
+from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -52,7 +55,18 @@ gg_warmup_elimination = es.ServerVar('gg_warmup_elimination')
 gg_dead_strip = es.ServerVar('gg_dead_strip')
 gg_deathmatch = es.ServerVar('gg_deathmatch')
 gg_elimination = es.ServerVar('gg_elimination')
+
+# possible_random_weapons includes all primaries, secondaries, and hegrenade
+possible_random_weapons = getWeaponNameList("#primary")
+possible_random_weapons.extend(getWeaponNameList("#secondary"))
+possible_random_weapons.append("hegrenade")
+
+# Used to make sure we don't set the warmup weapon twice on load
+warmupWeaponSetOnLoad = False
+
 priority_addons_added = []
+random_warmup_weapons = []
+warmup_weapon = None
 
 # Approximates the number of seconds from round start to play beginning
 GG_WARMUP_EXTRA_TIME = 3
@@ -61,6 +75,14 @@ GG_WARMUP_EXTRA_TIME = 3
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    global warmupWeaponSetOnLoad
+
+    # Set the warmup weapon
+    set_warmup_weapon()
+
+    # Make sure we don't set the warmup weapon twice on load
+    warmupWeaponSetOnLoad = True
+
     # Load warmup round (delayed)
     gamethread.delayed(1, do_warmup)
 
@@ -155,7 +177,7 @@ def hegrenade_detonate(event_var):
 
     # Give user a hegrenade, if eligable
     if int(event_var['es_userteam']) > 1 and not getPlayer(userid).isdead and \
-        str(gg_warmup_weapon) == 'hegrenade':
+        warmup_weapon == 'hegrenade':
             Player(userid).give('hegrenade')
 
 def player_spawn(event_var):
@@ -179,13 +201,8 @@ def player_spawn(event_var):
     # Get player object
     ggPlayer = Player(userid)
 
-    # Check if the warmup weapon is the level 1 weapon
-    if str(gg_warmup_weapon) in ('0', '', '0.0'):
-        ggPlayer.give_weapon()
-        return
-
     # Check if the warmup weapon is a knife
-    if str(gg_warmup_weapon) == 'knife':
+    if warmup_weapon == 'knife':
         es.sexec(userid, 'use weapon_knife')
         return
 
@@ -195,21 +212,72 @@ def player_spawn(event_var):
         delay += 0.2
 
     # Strip the player's weapons (split second delay)
-    gamethread.delayed(delay, ggPlayer.strip, (True, [gg_warmup_weapon]))
+    gamethread.delayed(delay, ggPlayer.strip, (True, [warmup_weapon]))
 
     # Delay giving the weapon by a split second, because the code in round
     #   start removes all weapons
-    gamethread.delayed((delay), ggPlayer.give, (str(gg_warmup_weapon),
+    gamethread.delayed((delay), ggPlayer.give, (warmup_weapon,
                                                                 True, True))
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def get_warmup_weapon():
+    '''
+    Used to get the warmup weapon from other addons.
+    '''
+    return warmup_weapon
+
+def set_warmup_weapon():
+    global warmup_weapon, random_warmup_weapons, warmupWeaponSetOnLoad
+
+    # If the warmup weapon was just set when gg_warmup_round was loaded, do not
+    # set it again
+    if warmupWeaponSetOnLoad:
+        warmupWeaponSetOnLoad = False
+        return
+
+    # If the random weapons list has more than one item in it
+    if len(random_warmup_weapons) > 1:
+        # Remove the first item and set the warmup weapon to the next in line
+        random_warmup_weapons.pop(0)
+        warmup_weapon = random_warmup_weapons[0]
+        # If the warmup weapon includes weapon_, remove the prefix
+        if warmup_weapon[:7] == "weapon_":
+            warmup_weapon = warmup_weapon[7:]
+    # If there is nothing in the random weapons list
+    else:
+        # If the warmup weapon is set to #random
+        if str(gg_warmup_weapon) == "#random":
+            # Make a random list, and select the first one
+            random_warmup_weapons = possible_random_weapons
+            shuffle(random_warmup_weapons)
+            warmup_weapon = random_warmup_weapons[0][7:]
+        # If the warmup weapon is set to a list of possible weapons
+        elif "," in str(gg_warmup_weapon):
+            # Get the list of possible weapons, shuffle it, and select the
+            # first one
+            random_warmup_weapons = str(gg_warmup_weapon).split(",")
+            shuffle(random_warmup_weapons)
+            warmup_weapon = random_warmup_weapons[0]
+        # If the warmup weapon is neither #random or a list
+        else:
+            # If the warmup weapon is 0, , or 0.0, set it to the first level
+            # weapon
+            if str(gg_warmup_weapon) in ('0', '', '0.0'):
+                warmup_weapon = get_level_weapon(1)
+            # The warmup weapon must be the name of a single weapon
+            else:
+                warmup_weapon = str(gg_warmup_weapon)
+
 def add_priority_addon(name):
     priority_addons_added.append(name)
     PriorityAddon().append(name)
 
 def do_warmup(useBackupVars=True):
+    # Set the new warmup weapon
+    set_warmup_weapon()
+
     # Looking for warmup timer
     warmupCountDown = repeat.find('gungameWarmupTimer')
 

@@ -23,6 +23,7 @@ import spe
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import PriorityAddon
 from gungame51.core.players.shortcuts import Player
+from gungame51.scripts.included.gg_warmup_round.gg_warmup_round import get_warmup_weapon
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -148,7 +149,7 @@ def drop_filter(userid, args):
     # If gg_warmup_round is loaded, the weapon they should have is the warmup
     # weapon
     if 'gg_warmup_round' in PriorityAddon():
-        weapon = str(es.ServerVar("gg_warmup_weapon"))
+        weapon = get_warmup_weapon()
 
     # Get the player's current weapon
     curWeapon = getPlayer(userid).attributes['weapon']
