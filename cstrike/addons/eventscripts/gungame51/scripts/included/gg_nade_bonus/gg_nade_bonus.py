@@ -319,6 +319,10 @@ def give_bonus(userid, sound=False, turboCheck=False):
 
         ggPlayer.give(weapon, False, True)
 
+    # if they are carrying an hegrenade, make them use it
+    if int(getPlayer(userid).get('he')) != 0:
+        es.sexec(userid, 'use weapon_hegrenade')
+
     # If a weapon list is being used, strip the previous weapons
     if using_weapon_list():
         previousLevel = Player(userid).nadeBonusLevel - 1

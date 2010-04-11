@@ -247,13 +247,13 @@ def do_warmup(useBackupVars=True):
     # If deathmatch is enabled on the server, and elimination is not
     if int(gg_deathmatch_backup) and not int(gg_elimination_backup):
         # If we have no warmup deathmatch, we need to unload deathmatch
-        if not int(gg_warmup_deathmatch):
+        if not int(gg_warmup_deathmatch) and int(gg_deathmatch):
             gg_deathmatch.set(0)
             addon_unload("gg_deathmatch")
     # Otherwise, if elimination is on the server
     elif int(gg_elimination_backup):
         # If we have no warmup elimination, we need to unload elimination
-        if not int(gg_warmup_elimination):
+        if not int(gg_warmup_elimination) and int(gg_elimination):
             gg_elimination.set(0)
             addon_unload("gg_elimination")
 
@@ -263,7 +263,7 @@ def do_warmup(useBackupVars=True):
         if int(gg_warmup_deathmatch):
             add_priority_addon('gg_deathmatch')
             # If deathmatch is not enabled, we need to load it now
-            if not int(gg_deathmatch_backup):
+            if not int(gg_deathmatch_backup) and not int(gg_deathmatch):
                 gg_deathmatch.set(1)
                 addon_load("gg_deathmatch")
         # Otherwise, if warmup elimination is enabled, add it to priority
@@ -273,8 +273,8 @@ def do_warmup(useBackupVars=True):
             # If elimination is not enabled, or deathmatch is enabled due to
             # both dm and elim set to 1 and dm overruling elim, we need to load
             # it now.
-            if not int(gg_elimination_backup) or int(gg_deathmatch_backup) \
-                                                and int(gg_elimination_backup):
+            if (not int(gg_elimination_backup) or (int(gg_deathmatch_backup) \
+                and int(gg_elimination_backup))) and not int(gg_elimination):
                 gg_elimination.set(1)
                 addon_load("gg_elimination")
 
@@ -368,32 +368,32 @@ def reset_server_vars():
         if int(gg_warmup_deathmatch):
             # Unload gg_deathmatch if we are not going into deathmatch gameplay
             # now
-            if not int(gg_deathmatch_backup):
+            if not int(gg_deathmatch_backup) and int(gg_deathmatch):
                 gg_deathmatch.set(0)
                 addon_unload("gg_deathmatch")
         # If warmup elimination was enabled
         elif int(gg_warmup_elimination):
             # Unload gg_elimination if we are not going into elimination
             # gameplay now
-            if not int(gg_elimination_backup):
+            if not int(gg_elimination_backup) and int(gg_elimination):
                 gg_elimination.set(0)
                 addon_unload("gg_elimination")
 
     # If we are going into deathmatch gameplay
     if int(gg_deathmatch_backup):
         # If we didn't already choose to leave deathmatch on above, load it
-        if not int(gg_warmup_deathmatch):
+        if not int(gg_warmup_deathmatch) and not int(gg_deathmatch):
             gg_deathmatch.set(1)
             addon_load("gg_deathmatch")
     # If we are going into elimination gameplay
     elif int(gg_elimination_backup):
         # If we didn't already choose to leave elimination on above, load it
-        if not int(gg_warmup_elimination):
+        if not int(gg_warmup_elimination) and not int(gg_elimination):
             gg_elimination.set(1)
             addon_load("gg_elimination")
 
     # If gg_dead_strip disabled before warmup, disable it again
-    if not gg_dead_strip_backup:
+    if not gg_dead_strip_backup and int(gg_dead_strip):
         gg_dead_strip.set(0)
         addon_unload("gg_dead_strip")
 
