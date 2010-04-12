@@ -81,6 +81,10 @@ def load():
     config.text('   #default  = Order will go Top -> Bottom.')
     config.text('   #reversed = Order will go Bottom -> Top.')
     config.text('   #random   = Order will be randomly shuffled.')
+    config.text('Note:')
+    config.text('   #reversed and #random sort types will move hegrenade ' +
+                'and knife levels')
+    config.text('   to the end of the order.')
     config.text('Default Value: "#default"')
     config.cvar('gg_weapon_order_sort_type', '#default', 'The order in which' +
                 ' the weapons and levels will be sorted.').addFlag('notify')

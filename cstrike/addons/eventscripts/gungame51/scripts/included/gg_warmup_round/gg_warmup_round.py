@@ -154,12 +154,12 @@ def es_map_start(event_var):
             # Stop timer
             warmupCountDown.stop()
 
-            do_warmup(False)
+            gamethread.delayed(1, do_warmup, False)
             return
 
     # Start warmup timer. This is delayed to ensure that all addons get to fire
     # es_map_start events before priority addons are set.
-    do_warmup()
+    gamethread.delayed(1, do_warmup)
 
 def hegrenade_detonate(event_var):
     # Making sure warmup round is running
