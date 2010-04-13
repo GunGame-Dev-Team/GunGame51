@@ -48,7 +48,6 @@ from afk import AFK
 list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 list_allWeapons = getWeaponNameList()
-eventscripts_lastgive = es.ServerVar('eventscripts_lastgive')
 gg_soundpack = es.ServerVar('gg_soundpack')
 
 # ============================================================================
@@ -763,7 +762,7 @@ class BasePlayer(object):
 
     def _format_sound(self, sound):
         if not self.soundpack[sound]:
-            return sound
+            return None
         return self.soundpack[sound]
 
     # =========================================================================

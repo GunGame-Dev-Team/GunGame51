@@ -173,6 +173,10 @@ def make_downloadable():
                     # Remove the line return character and whitespace,
                     sound = sound.strip('\\n').strip()
 
+                    # Do not add comment lines
+                    if sound.startswith("//"):
+                        continue
+
                     # If we are on a random winner sound, add it to the
                     # random winner sounds list
                     if name == "winner":
