@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/__init__.py
+# ../addons/eventscripts/gungame51/scripts/__init__.py
 
 '''
 $Rev$

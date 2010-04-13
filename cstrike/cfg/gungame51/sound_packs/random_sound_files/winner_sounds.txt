@@ -1,3 +1,17 @@
+//----------------------------------------------------------------------------
+// winner_sounds.txt -- Random winner sound file definitions.
+//
+// In the chosen soundpack file, "winner" MUST be set to "winner_sounds.txt"
+// for this to work.
+//
+// All files are relative to "../cstrike/sound/".
+//
+// Example: gungame/winner.mp3 would be ../cstrike/sound/gungame/winner.mp3
+//          on the server.
+//
+// Note: Any alteration of this file requires a server restart or a reload of
+//       GunGame.
+//----------------------------------------------------------------------------
 music/HL2_song14.mp3
 music/HL2_song15.mp3
 music/HL2_song23_SuitSong3.mp3

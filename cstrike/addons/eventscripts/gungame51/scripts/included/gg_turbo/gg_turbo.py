@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_turbo/gg_turbo.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_turbo/gg_turbo.py
 
 '''
 $Rev$

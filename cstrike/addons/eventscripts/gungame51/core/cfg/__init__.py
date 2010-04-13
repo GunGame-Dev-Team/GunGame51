@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/cfg/__init__.py
+# ../addons/eventscripts/gungame51/core/cfg/__init__.py
 
 '''
 $Rev$
@@ -154,7 +154,7 @@ class ConfigManager(object):
     @staticmethod
     def server_cvar(event_var):
         '''
-        Handles CVARs that are loaded via GunGame/'s ConfigManager.
+        Handles CVARs that are loaded via GunGame's ConfigManager.
         '''
         cvarName = event_var['cvarname']
         cvarValue = event_var['cvarvalue']

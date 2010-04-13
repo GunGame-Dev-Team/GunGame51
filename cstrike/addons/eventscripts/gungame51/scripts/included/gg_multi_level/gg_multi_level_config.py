@@ -52,6 +52,23 @@ def load():
     config.cvar('gg_multi_level', 0, 'The # of levels it takes to get the ' +
                 'multi-level bonus.').addFlag('notify')
 
+    # Multi-Level Speed
+    config.text('')
+    config.text('='*76)
+    config.text('>> MULTI-LEVEL SPEED')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The percentage of speed that players receieving the ' +
+                'multi-level bonus')
+    config.text('   will have.')
+    config.text('Options:')
+    config.text('   100 = (Disabled) Keep the player\'s speed unchanged.')
+    config.text('   # = (Enabled) The percentage of normal speed the ' +
+                'player will have.')
+    config.text('Default Value: 150')
+    config.cvar('gg_multi_level_speed', 150, 'The percentage of gravity ' +
+                'included with the multi-level bonus.')
+
     # Multi-Level Gravity
     config.text('')
     config.text('='*76)
@@ -64,8 +81,7 @@ def load():
     config.text('Options:')
     config.text('   100 = (Disabled) Keep the player\'s gravity unchanged.')
     config.text('   # = (Enabled) The percentage of normal gravity the ' +
-                'player')
-    config.text('                 will have.')
+                'player will have.')
     config.text('Default Value: 100')
     config.cvar('gg_multi_level_gravity', 100, 'The percentage of gravity ' +
                 'included with the multi-level bonus.')

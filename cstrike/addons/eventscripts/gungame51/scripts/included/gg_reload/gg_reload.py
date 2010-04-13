@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_reload/gg_reload.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_reload/gg_reload.py
 
 '''
 $Rev$

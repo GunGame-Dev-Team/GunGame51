@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/cfg/files/gg_en_config.py
+# ../addons/eventscripts/gungame51/core/cfg/files/gg_en_config.py
 
 '''
 $Rev$

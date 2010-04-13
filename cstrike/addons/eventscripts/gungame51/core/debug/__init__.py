@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/debug/__init__.py
+# ../addons/eventscripts/gungame51/core/debug/__init__.py
 '''
 $Rev$
 $LastChangedBy$

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_map_obj/gg_map_obj.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_map_obj/gg_map_obj.py
 
 '''
 $Rev$

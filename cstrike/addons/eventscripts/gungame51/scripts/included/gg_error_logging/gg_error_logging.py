@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_error_logging/gg_error_logging.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_error_logging/gg_error_logging.py
 
 '''
 $Rev$

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/weapons/__init__.py
+# ../addons/eventscripts/gungame51/core/weapons/__init__.py
 
 '''
 $Rev$
@@ -445,7 +445,7 @@ class WeaponManager(object):
 # ============================================================================
 def load_weapon_orders():
     '''
-    Loads all weapon orders in the "../<MOD>/cfg/gungame/weapon_orders"
+    Loads all weapon orders in the "../<MOD>/cfg/gungame51/weapon_orders"
     directory.
     '''
     weaponOrderPath = get_game_dir('cfg/gungame51/weapon_orders')

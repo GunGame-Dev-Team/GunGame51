@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_bomb_defused_levels/gg_bomb_defused_levels.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_bomb_defused_levels/gg_bomb_defused_levels.py
 
 '''
 $Rev$

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_deathmatch/gg_deathmatch.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_deathmatch/gg_deathmatch.py
 
 '''
 $Rev$

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_suicide_punish/gg_suicide_punish.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_suicide_punish/gg_suicide_punish.py
 
 '''
 $Rev$

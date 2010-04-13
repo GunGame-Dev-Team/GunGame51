@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_tk_punish/gg_tk_punish.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_tk_punish/gg_tk_punish.py
 
 '''
 $Rev$

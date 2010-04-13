@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/weapons/shortcuts.py
+# ../addons/eventscripts/gungame51/core/weapons/shortcuts.py
 
 '''
 $Rev$
@@ -40,7 +40,7 @@ def set_weapon_order(name, type='#default'):
     Notes:
         * name: (required)
             The name of the weapon order file as found in
-                "../<MOD>/cfg/gungame/weapon_orders/"
+                "../<MOD>/cfg/gungame51/weapon_orders/"
             minus the ".txt" extension.
         * type: (optional)
             The weapon order type:

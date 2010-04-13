@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_welcom_msg/__init__.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_welcom_msg/__init__.py
 
 '''
 $Rev$

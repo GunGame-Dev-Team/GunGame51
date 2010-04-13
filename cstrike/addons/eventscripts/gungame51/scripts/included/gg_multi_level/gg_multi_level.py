@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_multi_level/gg_multi_level.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_multi_level/gg_multi_level.py
 
 '''
 $Rev$
@@ -38,17 +38,10 @@ info.translations = ['gg_multi_level']
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
-# Get the es.ServerVar() instance of "gg_multi_level"
 gg_multi_level = es.ServerVar("gg_multi_level")
-
-# Get the es.ServerVar() instance of "gg_multi_level_gravity"
 gg_multi_level_tk_reset = es.ServerVar("gg_multi_level_tk_reset")
-
-# Get the es.ServerVar() instance of "gg_multi_level_gravity"
+gg_multi_level_speed = es.ServerVar("gg_multi_level_speed")
 gg_multi_level_gravity = es.ServerVar("gg_multi_level_gravity")
-
-# Get the es.ServerVar() instance of "eventscripts_lastgive"
-eventscripts_lastgive = es.ServerVar("eventscripts_lastgive")
 
 # List of players currently getting the multi-level boost
 list_currentMultiLevel = []
@@ -350,22 +343,19 @@ def do_multi_level(userid):
         Player(userid).emitsound('multilevel')
 
         # Create env_spark
-        cmd = 'es_xgive %s env_spark; ' %userid
-        cmd += 'es_xfire %s env_spark SetParent !activator;' %userid
+        spark_instance = spe.giveNamedItem(userid, "env_spark")
+        spark_index = spe.getIndexOfEntity(spark_instance)
+
+        cmd = 'es_xfire %s env_spark SetParent !activator;' %userid
         cmd += 'es_xfire %s env_spark AddOutput "spawnflags 896";' %userid
         cmd += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' %userid
         cmd += 'es_xfire %s env_spark AddOutput "magnitude 8";' %userid
         cmd += 'es_xfire %s env_spark AddOutput "traillength 3";' %userid
         cmd += 'es_xfire %s env_spark StartSpark' %userid
-        es.server.cmd(cmd)
+        es.server.queuecmd(cmd)
 
-        # Grab it's index
-        spark_index = int(eventscripts_lastgive)
-
-        # Create player_speedmod
-        cmd = 'es_xgive %i player_speedmod; ' %userid
-        cmd += 'es_xfire %i player_speedmod ModifySpeed 1.5; ' %userid
-        es.server.cmd(cmd)
+        # Set the player's speed
+        getPlayer(userid).speed = int(gg_multi_level_speed) / 100.0
 
         # If gg_multi_level_gravity is enabled, ajust the player's gravity
         if int(gg_multi_level_gravity) != 100 and \
@@ -373,17 +363,11 @@ def do_multi_level(userid):
             gravity.addGravityChange(userid, 
                                      int(gg_multi_level_gravity) * 0.01)
 
-        # Grab it's index
-        speedmod_index = int(eventscripts_lastgive)
-
-        # Append it to this player's list
+        # Append the spark's index to this player's list
         if spark_index:
             Player(userid).multiLevelEntities.append(spark_index)
-        if speedmod_index:
-            Player(userid).multiLevelEntities.append(speedmod_index)
 
         # Fire gg_multi_level
-        es.dbgmsg(0, "Firing gg_multi_level event!")
         es.event('initialize', 'gg_multi_level')
         es.event('setint', 'gg_multi_level', 'userid', userid)
         es.event('setint', 'gg_multi_level', 'leveler', userid)
@@ -393,8 +377,8 @@ def remove_multi_level(userid):
     # Check validity
     if es.exists('userid', userid):
 
-        # Reset player speed and gravity (yes, I know this is the lame way)
-        getPlayer(userid).set('speed', 1.0)
+        # Reset player speed and gravity
+        getPlayer(userid).speed = 1.0
         gravity.removeGravityChange(userid)
         
         # Get the Player() object
@@ -407,9 +391,8 @@ def remove_multi_level(userid):
         while ggPlayer.multiLevelEntities:
             ind = ggPlayer.multiLevelEntities.pop()
 
-            # Create entitylists for the speed and sparks
-            validIndexes = es.createentitylist('player_speedmod')
-            validIndexes.update(es.createentitylist('env_spark'))
+            # Create entitylists for the sparks
+            validIndexes = es.createentitylist('env_spark')
 
             # If the saved index of the index given to the player still exists
             #   remove it.

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_weapon_order_random/gg_weapon_order_random.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_weapon_order_random/gg_weapon_order_random.py
 
 '''
 $Rev$

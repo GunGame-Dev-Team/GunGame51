@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_map_vote/gg_map_vote.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_map_vote/gg_map_vote.py
 
 '''
 $Rev$
@@ -224,7 +224,7 @@ def mapFileClean(fromLoad=False):
         return
         
     # Look for file in other common folders
-    for folder in ('cfg/', 'cfg/gungame/', 'cfg/gungame51/'):
+    for folder in ('cfg/', 'cfg/gungame51/'):
         possible_path = get_game_dir(folder + '%s.txt' % str(gg_map_vote_file) \
              if not '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
         
@@ -233,7 +233,7 @@ def mapFileClean(fromLoad=False):
             dict_mapListSource[3] = possible_path
             es.dbgmsg(0,'>>>> GunGame has found "%s" ' % gg_map_vote_file +
                         'in (%s) Please change your config file to ' % folder + 
-                        'reflect the location! (I.E. cfg/gungame/myfile.txt)')
+                        'reflect the location! (I.E. cfg/gungame51/myfile.txt)')
             return
     
     # File couldn't be found, raising error

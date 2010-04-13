@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/addons/shortcuts.py
+# ../addons/eventscripts/gungame51/core/addons/shortcuts.py
 
 '''
 $Rev$
@@ -67,8 +67,8 @@ def addon_exists(name):
         This function only searches for addons that are to be included
         with GunGame 5.1+. It searches for the "addon_name.py" in the
         directories:
-            "../<MOD>/addons/eventscripts/gungame/scripts/included"
-            "../<MOD>/addons/eventscripts/gungame/scripts/custom"
+            "../<MOD>/addons/eventscripts/gungame51/scripts/included"
+            "../<MOD>/addons/eventscripts/gungame51/scripts/custom"
             
         If the "addon_name.py" of the script does not exist, 0 will be
         returned.

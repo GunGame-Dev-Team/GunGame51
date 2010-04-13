@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_convert/gg_convert.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_convert/gg_convert.py
 
 '''
 $Rev$

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/cfg/included/gg_warmup_round.py
+# ../addons/eventscripts/gungame51/scripts/cfg/included/gg_warmup_round.py
 
 '''
 $Rev$
@@ -34,7 +34,7 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   Logs all GunGame-related errors to a log file located in:')
-    config.text('      "../<MOD>/addons/eventscripts/gungame/logs/"')
+    config.text('      "../<MOD>/addons/eventscripts/gungame51/logs/"')
     config.text('Notes:')
     config.text('   * If something in GunGame is not working and you are ' +
                 'going to post a bug,')

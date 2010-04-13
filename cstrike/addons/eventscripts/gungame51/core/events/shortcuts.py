@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/events/shortcuts.py
+# ../addons/eventscripts/gungame51/core/events/shortcuts.py
 
 '''
 $Rev$

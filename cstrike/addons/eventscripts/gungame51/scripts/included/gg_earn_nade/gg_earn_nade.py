@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_earn_nade/gg_earn_nade.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_earn_nade/gg_earn_nade.py
 
 '''
 $Rev$

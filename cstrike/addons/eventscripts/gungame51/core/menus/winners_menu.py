@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/menu/winners_menu.py
+# ../addons/eventscripts/gungame51/core/menu/winners_menu.py
 
 '''
 $Rev$

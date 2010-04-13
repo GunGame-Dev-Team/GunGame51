@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_afk_punisment/gg_afk_punisment.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_afk_punisment/gg_afk_punisment.py
 
 '''
 $Rev$

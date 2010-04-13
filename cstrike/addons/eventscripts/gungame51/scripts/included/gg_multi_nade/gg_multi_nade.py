@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_multi_nade/gg_multi_nade.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_multi_nade/gg_multi_nade.py
 
 '''
 $Rev$

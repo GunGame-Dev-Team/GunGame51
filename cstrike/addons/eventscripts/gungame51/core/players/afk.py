@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/players/afk.py
+# ../addons/eventscripts/gungame51/core/players/afk.py
 
 '''
 $Rev$

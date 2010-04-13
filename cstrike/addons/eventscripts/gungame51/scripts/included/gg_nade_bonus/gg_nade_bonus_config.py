@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/cfg/included/gg_nade_bonus.py
+# ../addons/eventscripts/gungame51/scripts/cfg/included/gg_nade_bonus.py
 
 '''
 $Rev$
@@ -48,7 +48,7 @@ def load():
     config.text('   * You can list a weapon order file that players will ' +
                 'will')
     config.text('     progress through while remaining on hegrenade level.')
-    config.text('   * /cfg/gungame/weapon_orders/nade_bonus_order.txt has ' +
+    config.text('   * /cfg/gungame51/weapon_orders/nade_bonus_order.txt has ' +
                 'examples') 
     config.text('       and more information on this feature.')    
     config.text('Examples:')

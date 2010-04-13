@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_dissolver/gg_dissolver.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_dissolver/gg_dissolver.py
 
 '''
 $Rev$

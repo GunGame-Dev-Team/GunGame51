@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/cfg/included/gg_map_vote.py
+# ../addons/eventscripts/gungame51/scripts/cfg/included/gg_map_vote.py
 
 '''
 $Rev$
@@ -195,7 +195,7 @@ def load():
     config.text('   * You can NOT add filters to "maplist.txt" and '
                         '"mapcycle.txt"')                        
     config.text('Examples:')
-    config.text('   gg_map_vote_file "cfg/gungame/my_list.txt"')
+    config.text('   gg_map_vote_file "cfg/gungame51/my_list.txt"')
     config.text('   gg_map_vote_file "cfg/my_other_list.txt"')
     config.text('Default Value: cfg/gungame51/gg_vote_list.txt')
     config.cvar('gg_map_vote_file', 'cfg/gungame51/gg_vote_list.txt', 

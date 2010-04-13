@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/core/players/options.py
+# ../addons/eventscripts/gungame51/core/players/options.py
 
 '''
 $Rev$

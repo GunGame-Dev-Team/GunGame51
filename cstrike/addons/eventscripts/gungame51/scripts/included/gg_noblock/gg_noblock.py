@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_noblock/gg_noblock.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_noblock/gg_noblock.py
 
 '''
 $Rev$

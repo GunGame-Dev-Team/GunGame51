@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_random_spawn/gg_random_spawn.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_random_spawn/gg_random_spawn.py
 
 '''
 $Rev$

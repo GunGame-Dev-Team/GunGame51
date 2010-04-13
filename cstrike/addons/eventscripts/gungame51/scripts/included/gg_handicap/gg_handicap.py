@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame/scripts/included/gg_handicap/gg_handicap.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_handicap/gg_handicap.py
 
 '''
 $Rev$
