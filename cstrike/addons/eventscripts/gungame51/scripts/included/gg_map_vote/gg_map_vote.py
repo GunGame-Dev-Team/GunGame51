@@ -60,6 +60,9 @@ gg_map_vote_list_source = es.ServerVar('gg_map_vote_list_source')
 gg_map_vote_player_command = es.ServerVar('gg_map_player_command')
 gg_map_vote_after_death = es.ServerVar('gg_map_vote_after_death')
 eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
+eventscripts_maphandler = es.ServerVar('eventscripts_maphandler')
+eventscripts_maphandler_backup = int(eventscripts_maphandler)
+eventscripts_maphandler.set(1)
 
 # Player command backup var
 player_command_backup = '%s' % gg_map_vote_player_command 
@@ -90,9 +93,11 @@ ggVote = None
 # Holds a list of userids at the time the vote was started
 voteUserids = []
 
+winningMap = None
+
 # True/False if vote has allready been ran this map
 voteHasStarted = False
-                    
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -116,7 +121,9 @@ def load():
 def unload():
     # Unregister player command ?
     if int(es.exists('saycommand', '%s' % gg_map_vote_player_command)):        
-        es.unregsaycmd('%s' % gg_map_vote_player_command)    
+        es.unregsaycmd('%s' % gg_map_vote_player_command)
+
+    eventscripts_maphandler.set(eventscripts_maphandler_backup)
    
     cleanVote()
     
@@ -126,6 +133,10 @@ def unload():
 # =============================================================================
 #  GAME EVENTS
 # =============================================================================
+def gg_win(event_var):
+    if winningMap:
+        es.set('nextlevel', winningMap)
+
 def es_map_start(event_var):
     global voteHasStarted
     voteHasStarted = False
@@ -297,7 +308,8 @@ def voteSubmit(userid, choice, popupname):
     if isVoteDone():
         voteEnd()             
         
-def voteEnd():   
+def voteEnd():
+    global winningMap
     # Stop repeat ?
     ggRepeat = repeat.find('gg_map_vote')
     if ggRepeat:
@@ -349,13 +361,15 @@ def voteEnd():
     # Random winner
     winner = random.choice(winner)
 
-    # Win message    
+    winningMap = winner
+
+    # Win message
     msg('#human', 'WinningMap', {'map': winner.lower(),
      'totalVotes': total_votes, 'votes': win_votes}, True)
     
     # Set eventscripts_nextmapoverride to the winning map
     es.ServerVar('eventscripts_nextmapoverride').set(winner)
-    
+
     # Set Mani 'nextmap' if Mani is loaded
     if str(es.ServerVar('mani_admin_plugin_version')) != '0':
         es.server.queuecmd('ma_setnextmap %s' % winner)
@@ -420,7 +434,7 @@ def voteStart():
     
     # Fire event
     EventManager().gg_vote()
-            
+
 def voteCountDown():
     ggRepeat = repeat.find('gg_map_vote')
     if not ggRepeat:
