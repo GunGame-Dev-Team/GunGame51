@@ -24,12 +24,16 @@ info.name = 'gg_tk_punish'
 info.title = 'GG TK Punish' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_tk_punish']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
 # ============================================================================
 # Get the es.ServerVar() instance of "gg_tk_punish"
 gg_tk_punish = es.ServerVar('gg_tk_punish')
+
+# Is the round live?
+liveRound = True
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -43,7 +47,19 @@ def unload():
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
+def round_start(event_var):
+    global liveRound
+    liveRound = True
+
+def round_end(event_var):
+    global liveRound
+    liveRound = False
+
 def player_death(event_var):
+    # Has the round ended?
+    if not liveRound:
+        return
+
     # Set player ids
     userid = int(event_var['userid'])
     attacker = int(event_var['attacker'])
@@ -67,7 +83,7 @@ def player_death(event_var):
         ggAttacker.leveldown(int(gg_tk_punish), userid, 'tk')
 
         # Message
-        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level})
+        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level}, prefix='gg_tk_punish')
 
         # Play the leveldown sound
         ggAttacker.playsound('leveldown')

@@ -37,6 +37,9 @@ gg_suicide_punish = es.ServerVar('gg_suicide_punish')
 # committed suicide to do so
 recentTeamChange = []
 
+# Is the round live?
+liveRound = True
+
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
@@ -45,6 +48,17 @@ def load():
 
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
+# ============================================================================
+# >> GAME EVENTS
+# ============================================================================
+def round_start(event_var):
+    global liveRound
+    liveRound = True
+
+def round_end(event_var):
+    global liveRound
+    liveRound = False
 
 def player_team(event_var):
     userid = int(event_var["userid"])
@@ -62,6 +76,10 @@ def player_death(event_var):
         is killed by the bomb exploding. Therefore, we no longer need to keep
         track of counting bomb deaths as suicide.
     '''
+    # Has the round ended?
+    if not liveRound:
+        return
+
     # Set player ids
     userid = int(event_var['userid'])
     attacker = int(event_var['attacker'])
