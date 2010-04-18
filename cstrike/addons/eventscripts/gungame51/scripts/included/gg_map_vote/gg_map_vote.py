@@ -15,6 +15,7 @@ import random
 from os import listdir
 from os.path import splitext
 from os.path import exists
+from operator import itemgetter
 
 # Eventscripts Imports
 import es
@@ -29,6 +30,7 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import hudhint
+from gungame51.core.messaging.shortcuts import langstring
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import get_total_levels
@@ -449,16 +451,32 @@ def voteCountDown():
 
     votes = len(reduce(lambda a, b: a + b, mapVoteOptions.values()))
 
-    if timeleft == 1:
-        hudhint('#human', 'Countdown_Singular', {'time': int(gg_map_vote_time), 
-            'voteInfo': None, 'votes': votes, 
-            'totalVotes': len(voteUserids)})
-        return     
+    voteInfo = ""
+    mapsAdded = 0
+    # For the map with the most votes to the least
+    for map in sorted(mapVoteOptions.items(), key=itemgetter(1), reverse=True):
+        # Add up to three maps
+        voteInfo += langstring('MapVotes', tokens={'map': map[0],
+                                                        'votes': len(map[1])})
+        mapsAdded += 1
+        if mapsAdded >= 3:
+            break
 
+    # Should we play the countdown beep
     if timeleft <= 5:
-        hudhint('#human', 'Countdown_Plural', {'time': int(gg_map_vote_time), 
-            'voteInfo': None, 'votes': votes, 
-            'totalVotes': len(voteUserids)})
+        for userid in getUseridList('#human'):
+            Player(userid).playsound('countDownBeep')
+
+        # Show the singular hudhint and stop here
+        if timeleft == 1:
+            hudhint('#human', 'Countdown_Singular', {'time': timeleft, 
+                'voteInfo': voteInfo, 'votes': votes, 
+                'totalVotes': len(voteUserids)})
+            return
+    # Show the normal hudhint
+    hudhint('#human', 'Countdown_Plural', {'time': timeleft, 
+        'voteInfo': voteInfo, 'votes': votes, 
+        'totalVotes': len(voteUserids)})
 
 def getMapList():
     # Check to make sure the value of "gg_map_vote" is 1-4
