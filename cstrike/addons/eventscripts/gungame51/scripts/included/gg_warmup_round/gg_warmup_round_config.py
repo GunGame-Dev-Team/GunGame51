@@ -86,13 +86,10 @@ def load():
     config.text('>> WARMUP ROUND DEATHMATCH MODE')
     config.text('='*76)
     config.text('Notes:')
-    config.text('   * Please check the gg_default_addons.cfg for information' +
+    config.text('   * Please check the gg_deathmatch.cfg for information' +
                 ' regarding')
     config.text('     what is required to be enabled and disabled when')
     config.text('     running gg_deathmatch.')
-    config.text('   * It is not necessary to enable deathmatch mode for the ' +
-                'warmup')
-    config.text('     round if "gg_deathmatch" has been set to "1".')
     config.text('Options:')
     config.text('   0 = Disabled.')
     config.text('   1 = Enabled.')
@@ -106,13 +103,10 @@ def load():
     config.text('>> WARMUP ROUND ELIMINATION MODE')
     config.text('='*76)
     config.text('Notes:')
-    config.text('   * Please check the gg_default_addons.cfg for information' +
+    config.text('   * Please check the gg_elimination.cfg for information' +
                 ' regarding')
     config.text('     what is required to be enabled and disabled when')
     config.text('     running gg_elimination.')
-    config.text('   * It is not necessary to enable elimination mode for the' +
-                ' warmup')
-    config.text('     round if "gg_elimination" has been set to "1".')
     config.text('Options:')
     config.text('   0 = Disabled.')
     config.text('   1 = Enabled.')
