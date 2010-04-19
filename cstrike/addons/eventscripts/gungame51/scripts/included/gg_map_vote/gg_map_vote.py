@@ -112,7 +112,7 @@ def load():
 
         # Store the current map in the list of recently played maps
         if int(gg_map_vote_dont_show_last_maps):
-            list_lastMaps.append(eventscripts_currentmap)
+            list_lastMaps.append(str(eventscripts_currentmap))
 
         # Check file location if using list_source = 3
         mapFileClean(True)
@@ -487,7 +487,7 @@ def getMapList():
     # Check the maps directory for a list of all maps (option 4)
     if int(gg_map_vote_list_source) == 4:
         files = listdir(dict_mapListSource[4])
-        maps = [x.strip('.bsp') for x in files if splitext(x)[1] == '.bsp']
+        maps = [x[:-4] for x in files if splitext(x)[1] == '.bsp']
 
     else:
         # Check a specific file for a list of all maps (options 1-3)
