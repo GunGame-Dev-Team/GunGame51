@@ -43,8 +43,9 @@ gg_multi_level_tk_reset = es.ServerVar("gg_multi_level_tk_reset")
 gg_multi_level_speed = es.ServerVar("gg_multi_level_speed")
 gg_multi_level_gravity = es.ServerVar("gg_multi_level_gravity")
 
-# List of players currently getting the multi-level boost
-list_currentMultiLevel = []
+# Dict of players currently getting the multi-level boost and the sound played
+# for them
+currentMultiLevel = {}
 
 # ============================================================================
 # >> CLASSES
@@ -173,7 +174,7 @@ def load():
 
 def unload():
     # For all users currently multi-leveling
-    for userid in list_currentMultiLevel:
+    for userid in currentMultiLevel:
         # Cancel the gamethread
         gamethread.cancelDelayed("%i_multilevel" % userid)
 
@@ -204,7 +205,7 @@ def player_disconnect(event_var):
     userid = int(event_var['userid'])
 
     # Remove this player and any of their entities
-    if userid in list_currentMultiLevel:
+    if userid in currentMultiLevel:
         # Get rid of their multilevel
         remove_multi_level(userid)
 
@@ -226,7 +227,7 @@ def player_death(event_var):
     userid = int(event_var['userid'])
 
     # Does the player currently have a multi-level bonus?
-    if userid in list_currentMultiLevel:
+    if userid in currentMultiLevel:
         # Cancel the gamethread
         gamethread.cancelDelayed("%i_multilevel" % userid)
 
@@ -243,7 +244,7 @@ def player_death(event_var):
     
 def es_map_start(event_var):
     # For all players
-    for userid in list_currentMultiLevel:
+    for userid in currentMultiLevel:
         # Cancel the gamethread
         gamethread.cancelDelayed("%i_multilevel" % userid)
         
@@ -251,7 +252,7 @@ def es_map_start(event_var):
         gravity.removeGravityChange(userid)
     
     # Clear the list of players currently multi-leveling
-    del list_currentMultiLevel[:]
+    currentMultiLevel.clear()
 
 def round_start(event_var):
     stop_multi_levelers()
@@ -284,7 +285,7 @@ def gg_levelup(event_var):
     if ggPlayer.multiLevels >= int(gg_multi_level):
         
         # If they currently have the bonus
-        if attacker in list_currentMultiLevel:
+        if attacker in currentMultiLevel:
             
             # Cancel the gamethread
             gamethread.cancelDelayed("%i_multilevel" % attacker)
@@ -294,9 +295,6 @@ def gg_levelup(event_var):
 
         # Multi-Level them
         do_multi_level(attacker)
-
-        # Add the player to the multi level list
-        list_currentMultiLevel.append(attacker)
 
         # Reset their kills
         ggPlayer.multiLevels = 0
@@ -316,7 +314,7 @@ def stop_multi_levelers():
         # Make sure their multiLevels are reset
         ggPlayer.multiLevels = 0
         
-        if userid in list_currentMultiLevel:
+        if userid in currentMultiLevel:
             # Cancel the gamethread
             gamethread.cancelDelayed("%i_multilevel" % userid)
 
@@ -326,12 +324,12 @@ def stop_multi_levelers():
         ggPlayer.multiLevelEntities = []
 
     # Clear the list of players currently multi-leveling
-    del list_currentMultiLevel[:]
+    currentMultiLevel.clear()
 
 def do_multi_level(userid):
     # Check userid validity
     if es.exists('userid', userid):
-        
+
         # Retrieve the player's name
         name = es.getplayername(userid)
 
@@ -340,7 +338,11 @@ def do_multi_level(userid):
         saytext2('#all', Player(userid).index, 'MultiLevelled', {'name': name})
 
         # Play game sound
-        Player(userid).emitsound('multilevel')
+        sound = Player(userid).emitsound('multilevel')
+        
+        # Add the player to the multi-leveling dictionary with the sound to
+        # remove
+        currentMultiLevel[userid] = sound
 
         # Create env_spark
         spark_instance = spe.giveNamedItem(userid, "env_spark")
@@ -383,9 +385,6 @@ def remove_multi_level(userid):
         
         # Get the Player() object
         ggPlayer = Player(userid)
-        
-        # Stop the sound
-        Player(userid).stopsound('multilevel')
 
         # Remove the ent indexes
         while ggPlayer.multiLevelEntities:
@@ -399,5 +398,8 @@ def remove_multi_level(userid):
             if ind in validIndexes.keys():
                 spe.removeEntityByIndex( ind )
 
+        # Stop the sound
+        es.stopsound(userid, currentMultiLevel[userid])
+
         # Remove the player from the current multi level list
-        list_currentMultiLevel.remove(userid)
+        del currentMultiLevel[userid]
