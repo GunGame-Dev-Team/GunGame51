@@ -84,7 +84,7 @@ def load():
     warmupWeaponSetOnLoad = True
 
     # Load warmup round (delayed)
-    gamethread.delayed(1, do_warmup)
+    gamethread.delayedname(1, "gg_do_warmup", do_warmup)
 
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -94,6 +94,9 @@ def load():
     	"Immediately ends the warmup round if there is one in progress.")
 
 def unload():
+    # Cancel any do_warmup delays
+    gamethread.cancelDelayed("gg_do_warmup")
+
     # Deleting warmup timer
     warmupCountDown = repeat.find('gungameWarmupTimer') 
 
@@ -144,6 +147,9 @@ def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
+    # Cancel any do_warmup delays
+    gamethread.cancelDelayed("gg_do_warmup")
+
     # Looking for running warmup timer
     warmupCountDown = repeat.find('gungameWarmupTimer')
     if warmupCountDown:
@@ -154,12 +160,12 @@ def es_map_start(event_var):
             # Stop timer
             warmupCountDown.stop()
 
-            gamethread.delayed(1, do_warmup, False)
+            gamethread.delayedname(1, "gg_do_warmup", do_warmup, False)
             return
 
     # Start warmup timer. This is delayed to ensure that all addons get to fire
     # es_map_start events before priority addons are set.
-    gamethread.delayed(1, do_warmup)
+    gamethread.delayedname(1, "gg_do_warmup", do_warmup)
 
 def hegrenade_detonate(event_var):
     # Making sure warmup round is running
