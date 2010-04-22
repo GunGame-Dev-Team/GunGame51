@@ -68,6 +68,10 @@ priority_addons_added = []
 random_warmup_weapons = []
 warmup_weapon = None
 
+# If we are in the middle of the overlap from warmup ending to gg_start, give
+# newly spawned players godmode
+giveGodMode = False
+
 # Approximates the number of seconds from round start to play beginning
 GG_WARMUP_EXTRA_TIME = 3
 
@@ -187,22 +191,22 @@ def hegrenade_detonate(event_var):
             Player(userid).give('hegrenade')
 
 def player_spawn(event_var):
+    userid = int(event_var['userid'])
+
+    # If it is the last split second before mp_restartgame fires, protect the
+    # player
+    if giveGodMode:
+        getPlayer(userid).godmode = 1
+
     # Making sure warmup round is running
     warmupCountDown = repeat.find('gungameWarmupTimer')
 
     if not warmupCountDown:
         return
 
-    userid = int(event_var['userid'])
-
     # Is a spectator or dead?
     if int(event_var['es_userteam']) < 2 or getPlayer(userid).isdead:
         return
-
-    # If it is the last split second before mp_restartgame fires, protect the
-    # player
-    if not 'gg_warmup_round' in PriorityAddon():
-        getPlayer(userid).godmode = 1
 
     # Get player object
     ggPlayer = Player(userid)
@@ -400,6 +404,10 @@ def count_down():
         end_warmup('Timer_Ended')
 
 def prepare_game():
+    global giveGodMode
+    # For newly spawning players, give them godMode
+    giveGodMode = True
+
     # Give players godmode so that they can't level up
     for userid in getPlayerList("#alive"):
         getPlayer(userid).godmode = 1
@@ -415,6 +423,10 @@ def remove_godmode():
     '''
     Ran during the first round to make sure no players have godmode.
     '''
+    global giveGodMode
+    # No longer give godMode to newly spawning players
+    giveGodMode = False
+
     for userid in getPlayerList("#alive"):
         getPlayer(userid).godmode = 0
 
