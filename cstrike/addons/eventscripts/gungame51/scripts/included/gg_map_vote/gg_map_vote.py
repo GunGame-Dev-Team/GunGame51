@@ -428,7 +428,7 @@ def voteStart():
 
     # Send it to everyone
     else:
-        ggVote.send(voteUserids)      
+        ggVote.send(voteUserids)
 
     # Start the repeat
     voteRepeat = repeat.create('gg_map_vote', voteCountDown)
@@ -484,11 +484,14 @@ def getMapList():
         raise ValueError('"gg_map_vote_list_source" must be 1-4: current ' +
             'value "%s"' % int(gg_map_vote))
 
+    # Get the map files to check through later to make sure our capitalization
+    # is correct and that all the files exist
+    files = listdir(dict_mapListSource[4])
+    mapFiles = [x[:-4] for x in files if splitext(x)[1] == '.bsp']
+
     # Check the maps directory for a list of all maps (option 4)
     if int(gg_map_vote_list_source) == 4:
-        files = listdir(dict_mapListSource[4])
-        maps = [x[:-4] for x in files if splitext(x)[1] == '.bsp']
-
+        maps = mapFiles
     else:
         # Check a specific file for a list of all maps (options 1-3)
         with open(dict_mapListSource[int(gg_map_vote_list_source)], 'r') as f:
@@ -504,6 +507,16 @@ def getMapList():
                         for x in f.readlines()] if not (y == '' or
                         y.startswith('/'))] if len(z) == 1 or (int(z[1]) if
                         z[1].isdigit() else 0) <= len(getUseridList('#all'))]
+
+    # Make sure the map exists on the server, and that the capitalization is
+    # correct
+    lowerCaseMaps = [x.lower() for x in maps]
+    maps = []
+    for map in mapFiles:
+        if not map.lower() in lowerCaseMaps:
+            continue
+
+        maps.append(map)
 
     # Remove any maps from the list that were voted for previously
     if int(gg_map_vote_dont_show_last_maps):
