@@ -290,7 +290,7 @@ def voteSubmit(userid, choice, popupname):
             # Is not the same choice ?
             if choice != option:
                 mapVoteOptions[option].remove(userid)
-                mapVoteOptions[choice].append(userid)           
+                mapVoteOptions[choice].append(userid)
                 break
 
             # Same choice, stop here
@@ -308,7 +308,7 @@ def voteSubmit(userid, choice, popupname):
 
     # Everyone voted ?
     if isVoteDone():
-        voteEnd()             
+        voteEnd()
 
 def voteEnd():
     global winningMap
@@ -454,10 +454,14 @@ def voteCountDown():
     voteInfo = ""
     mapsAdded = 0
     # For the map with the most votes to the least
-    for map in sorted(mapVoteOptions.items(), key=itemgetter(1), reverse=True):
+    sortItems = []
+    for map in mapVoteOptions.items():
+        sortItems.append((map[0], len(map[1])))
+
+    for map in sorted(sortItems, key=itemgetter(1), reverse=True):
         # Add up to three maps
         voteInfo += langstring('MapVotes', tokens={'map': map[0],
-                                                        'votes': len(map[1])})
+                                                        'votes': map[1]})
         mapsAdded += 1
         if mapsAdded >= 3:
             break
