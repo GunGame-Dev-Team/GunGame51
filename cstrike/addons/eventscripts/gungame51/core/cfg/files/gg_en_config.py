@@ -72,6 +72,26 @@ def load():
     config.cvar('gg_weapon_order_random', 0, 'Randomly select a new weapon ' +
                 'order file each map.').addFlag('notify')
 
+    # Random Weapon Order Excluded Files
+    config.text('')
+    config.text('='*76)
+    config.text('>> RANDOM WEAPON ORDER EXCLUDED FILES')
+    config.text('='*76)
+    config.text('Options:')
+    config.text('   "" = (Disabled) No weapon orders are excluding when ' +
+                'choosing a random')
+    config.text('         weapon order with gg_weapon_order_random enabled ' +
+                'above.')
+    config.text('   "name1,name2" = (Enabled) Exclude these orders when ' +
+                'choosing a random')
+    config.text('         weapon order with gg_weapon_order_random enabled ' +
+                'above.')
+    config.text('Default Value: "weapon_short,nade_bonus_order"')
+    config.cvar('gg_weapon_order_random_excluded',
+                "weapon_short,nade_bonus_order", 'Excluded orders when ' +
+                'choosing a random order with gg_weapon_order_random.') \
+                                                            .addFlag('notify')
+
     # Weapon Order Sort Type
     config.text('')
     config.text('='*76)

@@ -36,6 +36,8 @@ info.version = '0.1'
 # ============================================================================
 # Get the es.ServerVar() instance of "gg_weapon_order_random"
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
+gg_weapon_order_random_excluded = \
+                                es.ServerVar("gg_weapon_order_random_excluded")
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -60,6 +62,12 @@ def es_map_start(event_var):
 
     # Remove the current weapon order's file name
     files.remove('%s' %currentFile)
+
+    # Do not choose from excluded weapon orders
+    for excluded_file in str(gg_weapon_order_random_excluded).split(","):
+        excluded_file = excluded_file.strip()
+        if excluded_file in files:
+            files.remove(excluded_file)
 
     # If the current weapon order is the only weapon order, return
     if not len(files):
