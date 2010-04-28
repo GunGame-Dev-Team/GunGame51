@@ -323,7 +323,6 @@ def check_priority():
         EventManager().gg_start()
 
 def round_start(event_var):
-
     # Retrieve a random userid
     userid = es.getuserid()
 
@@ -334,7 +333,7 @@ def round_start(event_var):
     list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
                     'weapon_%s' % x.strip()) for x in \
                     str(gg_map_strip_exceptions).split(',') if x.strip() != \
-                    ''] + ['weapon_knife']
+                    '']
 
     for weapon in getWeaponList('#all'):
         # Make sure that the admin doesn't want the weapon left on the map
@@ -547,7 +546,8 @@ def gg_win(event_var):
         # MAP WIN
         # ====================================================
         # End game
-        es.server.queuecmd("es_xgive %s game_end" % userid)
+        #es.server.queuecmd("es_xgive %s game_end" % userid)
+        spe.giveNamedItem(userid, "game_end")
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
         
         # Tell the world
