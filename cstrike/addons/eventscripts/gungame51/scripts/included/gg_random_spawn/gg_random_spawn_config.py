@@ -37,6 +37,9 @@ def load():
     config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
                 'current map has')
     config.text('    been created.')
+    config.text('Note:')
+    config.text('   Create spawnpoint files with the gg_spawnpoints ' +
+                'included addon.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_random_spawn.')
     config.text('   1 = (Enabled) Load gg_random_spawn.')

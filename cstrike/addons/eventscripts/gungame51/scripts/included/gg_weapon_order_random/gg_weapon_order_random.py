@@ -50,14 +50,16 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
-    # Get a list of files in the weapon_orders directory
-    files = get_game_dir('cfg/gungame51/weapon_orders').files("*.txt")
+    # Get a list of files names ([:-4] to remove .txt extensions) in the
+    # weapon_orders directory
+    files = [x.name[:-4] for x in get_game_dir('cfg/gungame51/weapon_orders') \
+                                                            .files("*.txt")]
 
     # Get the current weapon order's file name
     currentFile = get_weapon_order().file
 
     # Remove the current weapon order's file name
-    files.remove('%s.txt' %currentFile)
+    files.remove('%s' %currentFile)
 
     # If the current weapon order is the only weapon order, return
     if not len(files):
