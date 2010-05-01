@@ -311,7 +311,6 @@ def voteSubmit(userid, choice, popupname):
         voteEnd()
 
 def voteEnd():
-    global winningMap
     # Stop repeat ?
     ggRepeat = repeat.find('gg_map_vote')
     if ggRepeat:
@@ -326,6 +325,16 @@ def voteEnd():
 
     if not total_votes:
         msg('#human', 'NotEnoughVotes', {}, True)
+        
+        # Choose a random map
+        winner = random.choice(mapVoteOptions.keys())
+
+        # Set the server up for map change 
+        set_nextmap(winner)
+
+        # Win message for the map that we randomely chose
+        msg('#human', 'WinningMap', {'map': winner.lower(), 'totalVotes': 0,
+                                                            'votes': 0}, True)
         cleanVote()
         return    
 
@@ -363,28 +372,33 @@ def voteEnd():
     # Random winner
     winner = random.choice(winner)
 
-    winningMap = winner
-
     # Win message
     msg('#human', 'WinningMap', {'map': winner.lower(),
-     'totalVotes': total_votes, 'votes': win_votes}, True)
+                        'totalVotes': total_votes, 'votes': win_votes}, True)
 
-    # Set eventscripts_nextmapoverride to the winning map
-    es.ServerVar('eventscripts_nextmapoverride').set(winner)
-
-    # Set Mani 'nextmap' if Mani is loaded
-    if str(es.ServerVar('mani_admin_plugin_version')) != '0':
-        es.server.queuecmd('ma_setnextmap %s' % winner)
-
-    # Set SourceMod 'nextmap' if SourceMod is loaded
-    if str(es.ServerVar('sourcemod_version')) != '0':
-        es.server.queuecmd('sm_nextmap %s' % winner)
+    # Set the server up for map change 
+    set_nextmap(winner)
 
     # Play sound
     for userid in getUseridList('#human'):
         Player(userid).playsound('endofvote')
 
     cleanVote()
+
+def set_nextmap(mapName):
+    global winningMap
+    winningMap = mapName
+
+    # Set eventscripts_nextmapoverride to the winning map
+    es.ServerVar('eventscripts_nextmapoverride').set(mapName)
+
+    # Set Mani 'nextmap' if Mani is loaded
+    if str(es.ServerVar('mani_admin_plugin_version')) != '0':
+        es.server.queuecmd('ma_setnextmap %s' % mapName)
+
+    # Set SourceMod 'nextmap' if SourceMod is loaded
+    if str(es.ServerVar('sourcemod_version')) != '0':
+        es.server.queuecmd('sm_nextmap %s' % mapName)
 
 def voteSendcmd():
     # Is map vote running ?

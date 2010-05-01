@@ -160,12 +160,6 @@ def load():
     es.ServerVar('eventscripts_gg5').makepublic()
 
 def unload():
-    # Remove all player instances
-    PlayerManager().clear()
-    
-    # Unload translations
-    unloadTranslation('gungame', 'gungame')
-    
     # Remove the public variables
     es.ServerVar('eventscripts_gg').removeFlag('notify')
     es.ServerVar('eventscripts_gg').removeFlag('replicated')
@@ -197,6 +191,12 @@ def unload():
             continue
 
         AddonManager().unload(addon, True)
+
+    # Unload translations
+    unloadTranslation('gungame', 'gungame')
+
+    # Remove all player instances
+    PlayerManager().clear()
 
     # Close the database
     Database().close()
