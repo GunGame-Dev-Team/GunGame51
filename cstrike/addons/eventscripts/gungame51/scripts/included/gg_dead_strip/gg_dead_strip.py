@@ -24,6 +24,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import PriorityAddon
 from gungame51.core.players.shortcuts import Player
 from gungame51.scripts.included.gg_warmup_round.gg_warmup_round import get_warmup_weapon
+from gungame51.scripts.included.gg_nade_bonus.gg_nade_bonus import get_weapon
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -140,8 +141,12 @@ def remove_weapon(userid, item):
 
 def drop_filter(userid, args):
     # If command not drop, continue
-    if args[0].lower() != 'drop':
+    if len(args) and args[0].lower() != 'drop':
         return 1
+
+    # If the player is no longer on the server, stop here
+    if not es.exists("userid", userid):
+        return 0
 
     # Get player's GunGame weapon
     weapon = Player(userid).weapon
@@ -160,6 +165,10 @@ def drop_filter(userid, args):
 
     # NADE BONUS CHECK
     if str(gg_nade_bonus) in ('', '0'):
+        return 0
+
+    # Do not let them drop their nade bonus weapon
+    if curWeapon.replace("weapon_", "") in get_weapon(userid):
         return 0
 
     # Allow them to drop it

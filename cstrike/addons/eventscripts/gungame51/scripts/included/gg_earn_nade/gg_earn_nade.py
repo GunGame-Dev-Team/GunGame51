@@ -33,8 +33,8 @@ recentlyOnHegrenade = []
 # ============================================================================
 info = AddonInfo()
 info.name = 'gg_earn_nade'
-info.title = 'GG Earn Grenade' 
-info.author = 'GG Dev Team' 
+info.title = 'GG Earn Grenade'
+info.author = 'GG Dev Team'
 info.version = '0.1'
 
 # ============================================================================
@@ -83,7 +83,7 @@ def player_death(event_var):
 
     # Only give a nade to a player on nade level
     if Player(attacker).weapon == 'hegrenade':
-        gamethread.delayed(0.11, give_nade, attacker)
+        give_nade(attacker)
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS

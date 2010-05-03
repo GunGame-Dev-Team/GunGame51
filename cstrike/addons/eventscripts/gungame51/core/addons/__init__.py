@@ -26,6 +26,10 @@ from gungame51.core.messaging import MessageManager
 # >> GLOBAL VARIABLES
 # ============================================================================
 ggVersion = None
+
+_gg_info_quiet = False
+# Before it gets set
+_gg_info = None
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -699,7 +703,7 @@ def gungame_info(info, _info=None):
     Updates es.AddonInfo instance for gungame51
     '''
     if info == 'update':
-        if _gg_info_quiet:
+        if _gg_info_quiet or not _gg_info:
             return
         _gg_info.Included_Addons = gungame_info('included')
         _gg_info.Custom_Addons = gungame_info('custom')
