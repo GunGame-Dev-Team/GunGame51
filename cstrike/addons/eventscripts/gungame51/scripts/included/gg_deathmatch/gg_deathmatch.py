@@ -74,6 +74,9 @@ def load():
         repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))
     
+    # Register the joinclass command to trigger the first spawn.
+    es.addons.registerClientCommandFilter(joinclass_filter)
+    
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     
@@ -85,7 +88,10 @@ def unload():
     for userid in getUseridList('#all'):
         if repeat.find('gungameRespawnPlayer%s' % userid):
             repeat.delete('gungameRespawnPlayer%s' % userid)
-    
+
+    # Unregister the joinclass command
+    es.addons.unregisterClientCommandFilter(joinclass_filter)
+
 # ============================================================================
 # >> GAME EVENTS
 # ============================================================================
@@ -105,29 +111,27 @@ def round_end(event_var):
     respawnAllowed = False
 
 def gg_win(event_var):
-    #Cancel pending respawns
+    # Cancel pending respawns
     for userid in getUseridList('#all'):
         if repeat.find('gungameRespawnPlayer%s' % userid):
             repeat.delete('gungameRespawnPlayer%s' % userid)
 
-def player_team(event_var):
-    if int(event_var['disconnect']):
-        return
-    
-    # Get the userid
-    userid = int(event_var['userid'])
-    
+def joinclass_filter(userid, args):
+    # If the command is not joinclass, stop here
+    if len(args) and args[0].lower() != 'joinclass':
+        return 1
+
     # If the player does not have a respawn repeat, create one
     respawnPlayer = repeat.find('gungameRespawnPlayer%s' % userid)
     if not respawnPlayer:
         repeat.create('gungameRespawnPlayer%s' % userid,
                                                 respawn_count_down, userid)
     # Don't allow spectators or players that are unassigned to respawn
-    if int(event_var['team']) < 2:
+    if es.getplayerteam(userid) < 2:
         if repeat.status('gungameRespawnPlayer%s' % userid) != 1:
             repeat.stop('gungameRespawnPlayer%s' % userid)
             hudhint(userid, 'RespawnCountdown_CancelTeam')
-        return
+        return 1
     # Respawn the player
     repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))

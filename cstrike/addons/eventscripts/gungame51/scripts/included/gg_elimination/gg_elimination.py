@@ -69,8 +69,14 @@ def load():
     # Get userids of all connected players
     setAttribute('#all', 'eliminated', [])
 
+    # Register the joinclass command to trigger the first spawn.
+    es.addons.registerClientCommandFilter(joinclass_filter)
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
+    # Unregister the joinclass command
+    es.addons.unregisterClientCommandFilter(joinclass_filter)
 
 # ============================================================================
 # >> GAME EVENTS
@@ -123,8 +129,11 @@ def player_spawn(event_var):
     
     roundSpawned.append(steamid)
 
-def player_team(event_var):
-    userid = int(event_var['userid'])
+def joinclass_filter(userid, args):
+    # If the command is not joinclass, stop here
+    if len(args) and args[0].lower() != 'joinclass':
+        return 1
+
     steamid = es.getplayersteamid(userid)
 
     # If gg_elimination_spawn isn't loaded, stop here
@@ -132,7 +141,7 @@ def player_team(event_var):
         return
     
     # If the player didn't join an active team, stop here
-    if not event_var['team'] in ['2', '3']:
+    if es.getplayerteam(userid) < 2:
         return
     
     # If the player already has spawned this round, stop here
