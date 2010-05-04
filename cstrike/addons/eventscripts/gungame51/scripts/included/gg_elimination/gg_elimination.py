@@ -138,15 +138,15 @@ def joinclass_filter(userid, args):
 
     # If gg_elimination_spawn isn't loaded, stop here
     if not int(gg_elimination_spawn):
-        return
+        return 1
     
     # If the player didn't join an active team, stop here
     if es.getplayerteam(userid) < 2:
-        return
+        return 1
     
     # If the player already has spawned this round, stop here
     if steamid in roundSpawned:
-        return
+        return 1
     
     # Spawn the player in 4 seconds
     gamethread.delayed(4, respawnPlayer, (userid, roundInfo.round))
