@@ -118,7 +118,7 @@ def gg_win(event_var):
 
 def joinclass_filter(userid, args):
     # If the command is not joinclass, stop here
-    if len(args) and args[0].lower() != 'joinclass':
+    if (not len(args)) or args[0].lower() != 'joinclass':
         return 1
 
     # If the player does not have a respawn repeat, create one
@@ -135,6 +135,7 @@ def joinclass_filter(userid, args):
     # Respawn the player
     repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))
+    return 1
 
 def player_disconnect(event_var):
     # Get userid

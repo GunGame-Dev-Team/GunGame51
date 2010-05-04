@@ -131,7 +131,7 @@ def player_spawn(event_var):
 
 def joinclass_filter(userid, args):
     # If the command is not joinclass, stop here
-    if len(args) and args[0].lower() != 'joinclass':
+    if (not len(args)) or args[0].lower() != 'joinclass':
         return 1
 
     steamid = es.getplayersteamid(userid)
@@ -150,6 +150,7 @@ def joinclass_filter(userid, args):
     
     # Spawn the player in 4 seconds
     gamethread.delayed(4, respawnPlayer, (userid, roundInfo.round))
+    return 1
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
