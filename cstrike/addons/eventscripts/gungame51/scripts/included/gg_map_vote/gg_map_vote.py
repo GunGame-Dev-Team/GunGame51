@@ -288,7 +288,7 @@ def rtv_cmd(userid, args):
     # The user has already voted
     if userid in rtvList:
         if not len(rtvList) >= votesRequired:
-            msg("#human", "RTVVote", {"name":es.getplayername(userid) , "votes":len(rtvList) , "required":votesRequired})
+            saytext2("#human", Player(userid).index, "RTVVote", {"name":es.getplayername(userid) , "votes":len(rtvList) , "required":votesRequired})
             return
     else:
         rtvList.append(userid)
@@ -299,7 +299,7 @@ def rtv_cmd(userid, args):
         voteStart()
         voteRocked = True
     else:
-        msg("#human", "RTVVote", {"name":es.getplayername(userid) , "votes":len(rtvList) , "required":votesRequired})
+        saytext2("#human", Player(userid).index, "RTVVote", {"name":es.getplayername(userid) , "votes":len(rtvList) , "required":votesRequired})
 
 def nominate_cmd(userid, args):
     # The nominations list is full
