@@ -546,8 +546,7 @@ def gg_win(event_var):
         # MAP WIN
         # ====================================================
         # End game
-        #es.server.queuecmd("es_xgive %s game_end" % userid)
-        spe.giveNamedItem(userid, "game_end")
+        es.server.queuecmd("es_xgive %s game_end" % userid)
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
         
         # Tell the world
