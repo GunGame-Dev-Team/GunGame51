@@ -133,17 +133,17 @@ def load():
         # Create player vote command
         registerPlayerCmd()
 
+        # Register RTV and nomination commands
+        registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, 'RTV command.')
+        registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
+                                                            'Nominate command.')
+
         # Store the current map in the list of recently played maps
         if int(gg_map_vote_dont_show_last_maps):
             list_lastMaps.append(str(eventscripts_currentmap))
 
         # Check file location if using list_source = 3
         mapFileClean(True)
-
-    # Register RTV and nomination commands
-    registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, 'RTV command.')
-    registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
-                                                        'Nominate command.')
 
     # Loaded message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -152,14 +152,14 @@ def unload():
     # Unregister player command ?
     if int(es.exists('saycommand', '%s' % gg_map_vote_player_command)):        
         es.unregsaycmd('%s' % gg_map_vote_player_command)
+    if int(es.exists('saycommand', '%s' % gg_map_vote_rtv_command)):
+        unregisterSayCommand(str(gg_map_vote_rtv_command))
+    if int(es.exists('saycommand', '%s' % gg_map_vote_nominate_command)):
+        unregisterSayCommand(str(gg_map_vote_nominate_command))
 
     eventscripts_maphandler.set(eventscripts_maphandler_backup)
 
     cleanVote()
-
-    # Unregister RTV and nomination commands
-    unregisterSayCommand(str(gg_map_vote_rtv_command))
-    unregisterSayCommand(str(gg_map_vote_nominate_command))
 
     # Unloaded message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
