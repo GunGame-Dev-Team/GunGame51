@@ -701,6 +701,10 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
     # Add nominated maps
     if not excludeNominations:
         for map_name in nominations:
+            # If the nominated map is already in the vote, skip it
+            if map_name in maps:
+                continue
+
             maps.pop(0)
             maps.append(map_name)
         # Remove saved nominations
