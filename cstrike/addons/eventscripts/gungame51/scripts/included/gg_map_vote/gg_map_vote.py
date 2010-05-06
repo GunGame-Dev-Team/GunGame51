@@ -511,6 +511,7 @@ def voteEnd():
     # If this was a RTV, end the map
     if voteRocked:
         userid = es.getuserid()
+        es.ServerVar("mp_chattime").set(5)
         es.server.queuecmd("es_xgive %s game_end" % userid)
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
 

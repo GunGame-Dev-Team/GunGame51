@@ -94,6 +94,10 @@ def item_pickup(event_var):
     if item == "knife":
         return
 
+    # Don't strip the c4 if bomb objectives are allowed
+    if item == "c4" and not int(es.ServerVar("gg_map_obj")) in [1,2]:
+        return
+
     # Check to see if the weapon is in the player's strip exceptions
     if item in Player(userid).stripexceptions + ['flashbang', 'smokegrenade']:
         # Make sure this weapon can't be picked up
