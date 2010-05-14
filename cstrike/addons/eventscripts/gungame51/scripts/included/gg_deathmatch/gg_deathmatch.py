@@ -153,7 +153,7 @@ def player_death(event_var):
     if respawnAllowed:
         # No respawn delay ?
         if int(gg_dm_respawn_delay) == 0:
-            gamethead.delayed(0.50, Player(userid).respawn)
+            gamethread.delayed(0.50, Player(userid).respawn)
         else:
             # If the player does not have a respawn repeat, create one
             respawnPlayer = repeat.find('gungameRespawnPlayer%s' % userid)
@@ -205,5 +205,5 @@ def respawn_count_down(userid):
         if float(gg_dm_respawn_delay) % 1 == 0:
             Player(userid).respawn()
         else:
-            gamethead.delayed((float(gg_dm_respawn_delay) % 1),
+            gamethread.delayed((float(gg_dm_respawn_delay) % 1),
                                                         Player(userid).respawn)

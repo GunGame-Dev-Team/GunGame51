@@ -214,6 +214,11 @@ def initialize():
     # Load all configs
     loadConfig(get_config_list())
 
+    # Pause 1 second for the configs to be loaded (OrangeBox engline requires
+    # this)
+    gamethread.delayed(0, completeInitialize)
+
+def completeInitialize():
     # Print load started
     es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
 
@@ -636,6 +641,11 @@ def gg_addon_unloaded(event_var):
 
 def server_cvar(event_var):
     cvarName = event_var['cvarname']
+    
+    # Make sure we have both set before setting the weapon order
+    if cvarName == 'gg_weapon_order_file' and str(gg_weapon_order_sort_type) \
+                == "0":
+        return
 
     if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type', 
                                                     'gg_multikill_override']:
