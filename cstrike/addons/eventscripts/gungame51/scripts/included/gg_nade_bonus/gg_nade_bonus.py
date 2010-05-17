@@ -25,6 +25,7 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core.players.shortcuts import setAttribute
+from gungame51.core.messaging.shortcuts import saytext2
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -34,6 +35,7 @@ info.name = 'gg_nade_bonus'
 info.title = 'GG Grenade Bonus' 
 info.author = 'GG Dev Team' 
 info.version = '0.1'
+info.translations = ['gg_nade_bonus']
 
 # ============================================================================
 # >> GLOBAL VARIABLES
@@ -281,6 +283,9 @@ def give_bonus(userid, sound=False, turboCheck=False):
             ggPlayer.strip_weapons([get_level_weapon(get_total_levels(
                                     str(gg_nade_bonus)), str(gg_nade_bonus))])
 
+            # Display message
+            ggPlayer.msg('Levelup', {}, True)
+            
             return
 
     # Play sound ?

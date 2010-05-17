@@ -41,10 +41,20 @@ credits = {
 
     'Developers':
         ['cagemonkey',
+        'llamaelite',
         'RideGuy'],
 
     'Beta Testers':
-        [],
+        ['Sir_Die',
+        'pyro',
+        'tnarocks',
+        'D3X',
+        'nad',
+        'Knight',
+        'Evil_SNipE',
+        'k@rma',
+        'tnarocks',
+        'Warbucks',],
 
     'Special Thanks':
         ['gameservers.pro',
@@ -60,7 +70,8 @@ credits = {
 # ============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    registerSayCommand('!thanks', thanks, 'Displays a list of those involved with development and testing of GunGame.')
+    registerSayCommand('!thanks', thanks, 'Displays a list of those involved' +
+                       'with development and testing of GunGame.')
 
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
@@ -74,7 +85,7 @@ def thanks(userid, args):
     
     es.cexec(userid, 'echo [GG Thanks] ')
     # Loop through the credits
-    for x in ('Project Leaders', 'Developers', 'Beta Testers', 'Special Thanks'):
+    for x in credits.keys():
         # Print category
         es.cexec(userid, 'echo [GG Thanks] %s:' % (x))
         
@@ -83,3 +94,9 @@ def thanks(userid, args):
             es.cexec(userid, 'echo [GG Thanks]    %s' % y)
         
         es.cexec(userid, 'echo [GG Thanks] ')
+        
+def player_activate(event_var):
+    if event_var['es_steamid'] in ('STEAM_0:1:5021657', 'STEAM_0:1:5244720', 
+      'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):
+        es.msg('#multi', '#green[GG Thanks] #defaultProject Leader ' +
+                '%s has joined the server.' % event_var['es_username'])
