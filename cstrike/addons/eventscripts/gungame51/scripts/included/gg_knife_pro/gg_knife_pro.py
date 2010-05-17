@@ -40,6 +40,7 @@ gg_knife_pro_limit = es.ServerVar('gg_knife_pro_limit')
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife  = es.ServerVar('gg_allow_afk_levels_knife')
 gg_knife_pro_always_level = es.ServerVar('gg_knife_pro_always_level')
+gg_knife_pro_skip_nade = es.ServerVar('gg_knife_pro_skip_nade')
 
 # players level up internally before our player_death, so we added a callback
 # and store the userid who just got off of knife to check on in player_death
@@ -125,7 +126,7 @@ def player_death(event_var):
         return
 
     # Never skip hegrenade level
-    if attackerWeapon == 'hegrenade':
+    if attackerWeapon == 'hegrenade' and not int(gg_knife_pro_skip_nade):
         # If gg_knife_pro_always_level is enabled, level down the victim
         if int(gg_knife_pro_always_level):
             level_down_victim(attacker, victim)

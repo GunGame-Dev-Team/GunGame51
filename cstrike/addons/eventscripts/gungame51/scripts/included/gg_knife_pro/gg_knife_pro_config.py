@@ -90,7 +90,23 @@ def load():
     config.cvar('gg_knife_pro_always_level', 0, 'Enables/Disables always ' +
                 'stealing levels.')
 
+    # Allow Skip Nade
+    config.text('')
+    config.text('='*76)
+    config.text('>> KNIFE PRO ALLOW SKIP NADE')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('    The attacker may skip grenade level with a knife kill.')
+    config.text('Note:')
+    config.text('    gg_knife_pro_limit still prevents leveling if enabled.')
+    config.text('Options:')
+    config.text('    0 = (Disabled) Conform to logical gg_knife_pro ruling')
+    config.text('    1 = (Enabled) Allow players to knife past nade level.')
+    config.text('Default Value: 0')
+    config.cvar('gg_knife_pro_skip_nade', 0, 'Enables/Disables always ' +
+                'skipping nade.')
     config.write()
+    
     es.dbgmsg(0, '\tgg_knife_pro.cfg')
 
 def unload():
