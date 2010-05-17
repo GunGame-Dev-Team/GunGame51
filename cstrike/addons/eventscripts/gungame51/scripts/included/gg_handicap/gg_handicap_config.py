@@ -35,14 +35,34 @@ def load():
     config.text('='*76)
     config.text('Description:')
     config.text('   Helps newly connected players by adjusting their level.')
+    config.text('   Basically "catching them up".')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_handicap.')
     config.text('   1 = Set player to the lowest level of all the other ' +
                 'players.')
-    config.text('       Basically "catching them up".')
+    config.text('   2 = Set player to the average level of all the other ' +
+                'players.')                
     config.text('Default Value: 0')
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
                 'adjusting their level.').addFlag('notify')
+
+    # Handicap
+    config.text('')
+    config.text('='*76)
+    config.text('>> HANDICAP MAXIMUM FIRST LEVEL')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   The highest level a player may recieve when first joinin' +
+                'g the game.')
+    config.text('Notes:')
+    config.text('   * If you are running handicap update, this setting is ' +
+                'pointless.')
+    config.text('Options:')
+    config.text('   0 = (Disabled)')
+    config.text('   # = Max. level a player may join in on.')
+    config.text('Default Value: 0')
+    config.cvar('gg_handicap_max', 0, 'Helps newly connected players by ' +
+                'adjusting their level. (max)').addFlag('notify')
 
     # Handicap Update
     config.text('')

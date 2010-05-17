@@ -33,6 +33,8 @@ info.translations = ['gg_handicap']
 # >> GLOBAL VARIABLES
 # ============================================================================
 gg_handicap_update = es.ServerVar('gg_handicap_update')
+gg_handicap_max = es.ServerVar('gg_handicap_max')
+gg_handicap = es.ServerVar('gg_handicap')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -58,8 +60,18 @@ def unload():
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
-    # Get the level of the lowest level player other than themself
-    handicapLevel = getLevelAboveUser(userid)
+    # Get the level of the lowest level player other than himself?
+    if gg_handicap == 1:
+        handicapLevel = getLevelAboveUser(userid)
+    
+    # Get the average level of the players other than himself?
+    elif gg_handicap == 2:
+        handicapLevel = getAverageLevel(userid)
+        
+    # Max level for joining for the first time?
+    if handicapLevel > int(gg_handicap_max) > 1:
+        handicapLevel = int(gg_handicap_max)        
+    
     # Get the player
     ggPlayer = Player(userid)
 
@@ -145,10 +157,9 @@ def getLowestLevelUsers():
 
     # Loop through the users
     for userid in es.getUseridList():
-        # If the player is not on an active team, skip them
         if int(es.getplayerteam(userid)) <= 1:
             continue
-
+            
         # Get the player's level
         playerLevel = Player(userid).level
 
@@ -170,10 +181,9 @@ def getLevelAboveLowest():
 
     # Loop through the users
     for userid in es.getUseridList():
-        # If the player is not on an active team, skip them
         if int(es.getplayerteam(userid)) <= 1:
             continue
-
+            
         # Get the player's level
         playerLevel = Player(userid).level
 
@@ -198,10 +208,9 @@ def getLevelAboveUser(uid):
 
     # Loop through the users
     for userid in es.getUseridList():
-        # If the player is not on an active team, skip them
         if int(es.getplayerteam(userid)) <= 1:
             continue
-
+            
         # If the player is the one we are checking for, skip them
         if userid == uid:
             continue
@@ -220,3 +229,33 @@ def getLevelAboveUser(uid):
     # Sort levels, and return the level above lowest
     levels.sort()
     return levels[0]
+    
+def getAverageLevel(uid):
+    levels = [] 
+    # Loop through the players
+    for userid in es.getUseridList():
+        if int(es.getplayerteam(userid)) <= 1:
+            continue
+
+        # If the player is the one we are checking for, skip them
+        if userid == uid:
+            continue
+            
+        # Add level to the list
+        levels.append(Player(userid).level)
+
+    # Is the list empty?
+    if len(levels) == 0:
+        es.msg('wtf...')
+        return 1
+
+    # Get the average
+    average = sum(levels)/len(levels)
+    
+    if average <= 1:
+        return 1
+    
+    return average
+        
+
+                
