@@ -393,7 +393,7 @@ class BasePlayer(object):
             victim = Player(victim)
 
         # Use the EventManager to call the gg_levelup event
-        EventManager().gg_levelup(self, levelsAwarded, victim, reason)
+        return EventManager().gg_levelup(self, levelsAwarded, victim, reason)
 
     def leveldown(self, levelsTaken, attacker=0, reason=''):
         '''
@@ -416,7 +416,7 @@ class BasePlayer(object):
             attacker = Player(attacker)
 
         # Use the EventManager to call the gg_leveldown event
-        EventManager().gg_leveldown(self, levelsTaken, attacker, reason)
+        return EventManager().gg_leveldown(self, levelsTaken, attacker, reason)
 
     # =========================================================================
     # >> BasePlayer() MESSAGING CLASS METHODS
