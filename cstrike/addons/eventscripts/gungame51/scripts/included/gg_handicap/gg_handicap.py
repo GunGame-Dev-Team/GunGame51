@@ -231,7 +231,12 @@ def getLevelAboveUser(uid):
     return levels[0]
     
 def getAverageLevel(uid):
+    # Everyone on level 1?
+    if get_leader_level() == 1:
+        return 1
+    
     levels = [] 
+    
     # Loop through the players
     for userid in es.getUseridList():
         if int(es.getplayerteam(userid)) <= 1:
@@ -244,14 +249,10 @@ def getAverageLevel(uid):
         # Add level to the list
         levels.append(Player(userid).level)
 
-    # Is the list empty?
-    if len(levels) == 0:
-        es.msg('wtf...')
-        return 1
-
     # Get the average
     average = sum(levels)/len(levels)
     
+    # Is the average 1 or less?
     if average <= 1:
         return 1
     
