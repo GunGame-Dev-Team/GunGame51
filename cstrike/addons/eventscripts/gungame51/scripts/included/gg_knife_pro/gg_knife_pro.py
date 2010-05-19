@@ -125,7 +125,7 @@ def player_death(event_var):
             {'limit': int(gg_knife_pro_limit)}, prefix=True)
         return
 
-    # Never skip hegrenade level
+    # Don't skip hegrenade level unless gg_knife_pro_skip_nade is allowed
     if attackerWeapon == 'hegrenade' and not int(gg_knife_pro_skip_nade):
         # If gg_knife_pro_always_level is enabled, level down the victim
         if int(gg_knife_pro_always_level):

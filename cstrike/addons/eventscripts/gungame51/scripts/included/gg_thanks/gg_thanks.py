@@ -47,14 +47,13 @@ credits = {
     'Beta Testers':
         ['Sir_Die',
         'pyro',
-        'tnarocks',
         'D3X',
         'nad',
         'Knight',
         'Evil_SNipE',
         'k@rma',
         'tnarocks',
-        'Warbucks',],
+        'Warbucks'],
 
     'Special Thanks':
         ['gameservers.pro',

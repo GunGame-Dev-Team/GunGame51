@@ -163,6 +163,10 @@ def drop_filter(userid, args):
     # Get the player's current weapon
     curWeapon = getPlayer(userid).attributes['weapon']
 
+    # If playerlib didn't find a current weapon, stop here
+    if not curWeapon:
+        return
+
     # Check to see if their current weapon is their level weapon
     if weapon != 'hegrenade':
         return int(curWeapon != 'weapon_%s' % weapon)
