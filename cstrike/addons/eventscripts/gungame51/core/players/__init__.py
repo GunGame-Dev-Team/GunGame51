@@ -711,8 +711,8 @@ class BasePlayer(object):
         if not es.exists('userid', self.userid):
             return
 
-        # Player in spec ?
-        if self.team == 1:
+        # Player in spec or unassigned ?
+        if self.team < 2:
             return
 
         # Player alive? (require force)
