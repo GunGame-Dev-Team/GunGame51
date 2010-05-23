@@ -97,8 +97,8 @@ def player_team(event_var):
 # ============================================================================
 def buildPopups():
     # Get the custom text for the popup
-    customFile = open(es.ServerVar('eventscripts_gamedir') +
-    '/cfg/gungame51/included_addon_configs/gg_welcome_msg.txt', 'r')
+    customFile = open(es.ServerVar('eventscripts_gamedir') + '/cfg/gungame51' +
+        '/included_addon_configs/gg_welcome_msg.txt', 'r')
     customText = customFile.readlines()
     customFile.close()
 
@@ -157,13 +157,15 @@ def welcome_handler(userid, choice, popupname):
         if popuplib.exists('gg_welcome_include'):
             popuplib.delete('gg_welcome_include')
         # Create an easylist instance
-        menu = popuplib.easylist('gg_welcome_include', get_loaded_addon_list('included'))
+        menu = popuplib.easylist('gg_welcome_include', 
+                                        get_loaded_addon_list('included'))
     elif choice == 2:
         # If the menu exists, delete it
         if popuplib.exists('gg_welcome_custom'):
             popuplib.delete('gg_welcome_custom')
         # Create an easylist instance
-        menu = popuplib.easylist('gg_welcome_custom', get_loaded_addon_list('custom'))
+        menu = popuplib.easylist('gg_welcome_custom', 
+                                            get_loaded_addon_list('custom'))
 
     # Set the menu's title
     menu.settitle(title)

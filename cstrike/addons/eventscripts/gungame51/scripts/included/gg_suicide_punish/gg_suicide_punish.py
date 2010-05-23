@@ -104,7 +104,8 @@ def player_death(event_var):
     ggVictim.leveldown(int(gg_suicide_punish), userid, 'suicide')
 
     # Message
-    ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level}, prefix='gg_suicide_punish')
+    ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level}, 
+                    prefix='gg_suicide_punish')
 
     # Play the leveldown sound
     ggVictim.playsound('leveldown')

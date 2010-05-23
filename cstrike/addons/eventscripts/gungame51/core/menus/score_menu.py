@@ -45,7 +45,8 @@ def score_menu_cmd(userid, args):
         scoreList.append('[%s] %s' % (Player(player).level,
                                                     es.getplayername(player)))
     # Sort from highest to lowest
-    scoreList.sort(lambda a,b: cmp(int(b[1:].split("]")[0]), int(a[1:].split("]")[0])))
+    scoreList.sort(lambda a,b: cmp(int(b[1:].split("]")[0]), 
+        int(a[1:].split("]")[0])))
 
     # Is the list empty ?
     if not scoreList:

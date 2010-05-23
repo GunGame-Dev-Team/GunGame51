@@ -13,10 +13,6 @@ $LastChangedDate$
 import es
 import gamethread
 from playerlib import getPlayer
-from weaponlib import getWeaponNameList
-
-# SPE Imports
-import spe
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo

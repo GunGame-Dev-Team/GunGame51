@@ -260,22 +260,28 @@ def cmd_spawn_show(args=None):
         playerView = getPlayer(userid).get("viewangle")
         es.server.cmd("es_xprop_dynamic_create %s %s" % (userid, propModel))
         es.server.cmd("es_xentsetname %s gg_sp_prop%i" % (userid, count))
-        es.server.cmd("es_xsetang %i %f %f" % (userid, playerView[0], playerView[1]))
+        es.server.cmd("es_xsetang %i %f %f" % (userid, playerView[0], 
+                                                playerView[1]))
 
         # Get index
         propIndex = int(es.ServerVar("eventscripts_lastgive"))
 
         # Set position and collision group
         es.setindexprop(propIndex, "CBaseEntity.m_CollisionGroup", 2)
-        es.setindexprop(propIndex, "CBaseEntity.m_vecOrigin", "%s, %s, %s" % (location[0],
-                                                                              location[1],
-                                                                              location[2]))
-        es.setindexprop(propIndex, "CBaseEntity.m_angRotation", "0, %s, 0" % angle[1])
+        es.setindexprop(propIndex, "CBaseEntity.m_vecOrigin", 
+                                                "%s, %s, %s" % (location[0],
+                                                                location[1],
+                                                                location[2]))
+        es.setindexprop(propIndex, "CBaseEntity.m_angRotation", 
+                                                "0, %s, 0" % angle[1])
 
         # Set aestetics
-        es.server.cmd('es_xfire %s prop_dynamic SetAnimation "walk_lower"' % userid)
-        es.server.cmd('es_xfire %s prop_dynamic SetDefaultAnimation  "walk_lower"' % userid)
-        es.server.cmd('es_xfire %s prop_dynamic AddOutput "rendermode 1"' % userid)
+        es.server.cmd('es_xfire %s ' % userid + 
+            'prop_dynamic SetAnimation "walk_lower"')
+        es.server.cmd('es_xfire %s ' % userid + 
+            'prop_dynamic SetDefaultAnimation  "walk_lower"')
+        es.server.cmd('es_xfire %s ' % userid + 
+            'prop_dynamic AddOutput "rendermode 1"')
         es.server.cmd('es_xfire %s prop_dynamic alpha "160"' % userid)
 
         # Add to prop index points

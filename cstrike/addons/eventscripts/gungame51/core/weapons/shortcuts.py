@@ -28,10 +28,11 @@ def get_weapon_order(name=None):
     '''
     if name:
         return WeaponManager().load(name)
-    else:
-        if WeaponManager().gungameorder:
-            return WeaponManager().__weaponorders__[WeaponManager().gungameorder]
-        return None
+    
+    elif WeaponManager().gungameorder:
+        return WeaponManager().__weaponorders__[WeaponManager().gungameorder]
+    
+    return None
 
 def set_weapon_order(name, type='#default'):
     '''

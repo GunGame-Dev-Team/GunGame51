@@ -145,6 +145,8 @@ class BasePlayer(object):
     
     def __init__(self, userid):
         self.preventlevel = PreventLevel()
+        self.preventlevelup = PreventLevel()
+        self.preventleveldown = PreventLevel() 
         self.level = 1
         self.multikill = 0
         self.stripexceptions = []
@@ -170,6 +172,15 @@ class BasePlayer(object):
         if name == 'level':
             # Return if preventlevel is set
             if not self.preventlevel:
+                
+                # Prevent player from leveling up?
+                if self.preventlevelup and value > self.level:
+                    return
+                
+                # Prevent player from leveling down?
+                if self.preventleveldown and value < self.level:
+                    return
+                
                 # Set the attribute value
                 object.__setattr__(self, name, value)
                 LeaderManager().check(self)
@@ -304,6 +315,7 @@ class BasePlayer(object):
                 return
 
             value = int(value)
+            
             # Has won before
             if self.wins:
                 update_winner('wins', value, uniqueid=self.steamid)
@@ -344,7 +356,7 @@ class BasePlayer(object):
         # Make sure we don't try to delete required GunGame attributes
         if name in ('userid', 'level', 'preventlevel', 'steamid', 'soundpack',
           'stripexceptions', 'multikill', 'wins', 'team', 'name', 'index',
-                                                                        'afk'):
+                                'preventleveldown', 'preventlevelup', 'afk'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
 
@@ -385,7 +397,7 @@ class BasePlayer(object):
                 The string reason for leveling up the attacker.
         '''
         # Return false if we can't level up
-        if len(self.preventlevel):
+        if self.preventlevel or self.preventlevelup:
             return False
 
         # Get the victim's Player() instance
@@ -408,7 +420,7 @@ class BasePlayer(object):
                 The string reason for leveling down the victim.
         '''
         # Return false if we can't level down
-        if len(self.preventlevel):
+        if self.preventlevel or self.preventleveldown:
             return False
 
         # Get the attacker's Player() instance
@@ -625,7 +637,8 @@ class BasePlayer(object):
                     spe.dropWeapon(self.userid, stripWeapon)
 
                     # Remove the weapon
-                    spe.removeEntityByInstance(playerWeapons[stripWeapon]["instance"])
+                    spe.removeEntityByInstance(playerWeapons[stripWeapon]["i" +
+                                                                    "nstance"])
 
         # Give the player the weapon
         spe.giveNamedItem(self.userid, weapon)

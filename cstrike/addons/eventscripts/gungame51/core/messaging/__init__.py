@@ -196,7 +196,8 @@ class MessageManager(object):
         string = __strings__(string, tokens, language)
 
         # Format it
-        string = string.replace('#lightgreen', '\3').replace('#green', '\4').replace('#default', '\1')
+        string = string.replace('#lightgreen', '\3').replace('#green', 
+            '\4').replace('#default', '\1')
 
         '''
         # Not sure what this does, so I will leave it commented out for now:
@@ -394,7 +395,8 @@ class MessageManager(object):
             # Console or Userid
             if isinstance(filter, int):
                 # Get clean string
-                string = self.__clean_string(self.__format_string(string, tokens, filter))
+                string = self.__clean_string(self.__format_string(string, 
+                                                            tokens, filter))
 
                 # Send message
                 return usermsg.echo(filter, '%s%s' %(prefix, string))
@@ -403,12 +405,13 @@ class MessageManager(object):
             for userid in getUseridList(filter):
                 # Send message
                 usermsg.echo(userid, '%s%s' %(prefix,
-                    self.__clean_string(self.__format_string(string, tokens, userid))))
+                    self.__clean_string(self.__format_string(string, 
+                                                            tokens, userid))))
 
     def langstring(self, string='', tokens={}, userid=0, prefix=False):
         # Format the message with the prefix if needed
         prefix = self.__format_prefix(prefix, string)
 
         # Return the formatted language string
-        return '%s%s' %(prefix, self.__clean_string(self.__format_string(string,
-            tokens, userid)))
+        return '%s%s' % (prefix, 
+            self.__clean_string(self.__format_string(string, tokens, userid)))

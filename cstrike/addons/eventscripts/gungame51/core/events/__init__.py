@@ -33,13 +33,15 @@ class EventManager(object):
     # =========================================================================
     # >> LEVELING EVENTS
     # =========================================================================
-    def gg_levelup(self, playerInstance, levelsAwarded, victimInstance, reason):
+    def gg_levelup(self, playerInstance, levelsAwarded, victimInstance, 
+      reason):
         '''
         Adds a declared number of levels to the attacker.
 
         Arguments:
             * playerInstance: (required)
-                The stored BasePlayer instance contained within the PlayerManager.
+                The stored BasePlayer instance contained within the 
+                PlayerManager.
                     - AKA "player[userid]"
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.
@@ -76,7 +78,8 @@ class EventManager(object):
 
             # Fire the event "gg_win" and set the round
             from gungame51.gungame51 import RoundInfo
-            self.gg_win(playerInstance, victimInstance, round=int(RoundInfo().remaining))
+            self.gg_win(playerInstance, victimInstance, 
+                round=int(RoundInfo().remaining))
             return True
             
         playerInstance.level = newLevel
@@ -97,13 +100,15 @@ class EventManager(object):
 
         return True
 
-    def gg_leveldown(self, playerInstance, levelsTaken, attackerInstance, reason):
+    def gg_leveldown(self, playerInstance, levelsTaken, attackerInstance, 
+      reason):
         '''
         Removes a declared number of levels from the victim.
 
         Arguments:
             * playerInstance: (required)
-                The stored BasePlayer instance contained within the PlayerManager.
+                The stored BasePlayer instance contained within the 
+                PlayerManager.
                     - AKA "player[userid]"
             * levelsAwarded: (required)
                 The number of levels to award to the attacker.

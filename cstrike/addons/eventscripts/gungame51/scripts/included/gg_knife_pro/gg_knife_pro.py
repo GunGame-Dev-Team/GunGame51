@@ -157,7 +157,7 @@ def player_death(event_var):
     # Attacker Levelup
     # ===================
     # Can the attacker level up ?
-    if not ggAttacker.preventlevel:
+    if not ggAttacker.preventlevel and not ggAttacker.preventlevelup:
 
         # If the victim gets stopped by one of our checks before leveling down,
         # still fire the steal event here because there was still a knife pro
@@ -178,7 +178,7 @@ def level_down_victim(attacker, victim):
         return False
 
     # Send message to attacker if victim cannot level down?
-    if ggVictim.preventlevel:
+    if ggVictim.preventlevel or ggVictim.preventleveldown:
 
         # Always level mode (do not bother the attacker)?
         if not int(gg_knife_pro_always_level):
@@ -187,11 +187,14 @@ def level_down_victim(attacker, victim):
             # The steal event didn't get fired
             return False
 
-    # Play sound & send message
-    ggVictim.playsound('leveldown')
-    ggVictim.leveldown(1, attacker, 'steal')
+    # Player can level down
+    else:
+        # Play sound & send message
+        ggVictim.playsound('leveldown')
+        ggVictim.leveldown(1, attacker, 'steal')
 
     fire_gg_knife_steal(attacker, victim)
+    
     # The steal event got fired
     return True
 

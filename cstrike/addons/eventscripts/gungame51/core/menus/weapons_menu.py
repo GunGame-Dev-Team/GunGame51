@@ -27,7 +27,8 @@ from gungame51.core.weapons.shortcuts import get_total_levels
 # ============================================================================
 def load():
     # Register command
-    registerSayCommand('!weapons', weapons_menu_cmd, 'Displays a !weapons menu.')
+    registerSayCommand('!weapons', weapons_menu_cmd, 'Displays a ' +
+        '!weapons menu.')
 
 def unload():
     # Unregister commands
@@ -46,7 +47,8 @@ def weapons_menu_cmd(userid, args):
     totalLevels = get_total_levels()
 
     while level <= totalLevels:
-        weaponOrder.append("[%s] %s" % (get_level_multikill(level), get_level_weapon(level)))
+        weaponOrder.append("[%s] %s" % (get_level_multikill(level), 
+            get_level_weapon(level)))
         level += 1
 
     # Get the level the player is on

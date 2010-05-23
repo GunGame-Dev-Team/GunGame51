@@ -49,7 +49,7 @@ mani_admin_plugin_version = es.ServerVar('mani_admin_plugin_version')
 est_version = es.ServerVar('est_version')
 
 file_name = (get_game_dir('cfg/gungame51/logs') +
-                    '/GunGame%s_Log.txt' % gungame_info('version').replace('.','_'))
+               '/GunGame%s_Log.txt' % gungame_info('version').replace('.','_'))
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -141,8 +141,8 @@ def gungame_except_hook(tb_type, value, trace_back):
             log_file.write(log_contents[:(find_error_index - 241)] + 
             log_contents[(find_error_index + len(tb) + 2):] + '-='*39 + '-\n' +
             (('LAST EVENT: ' + '%s' % strftime('[%m/%d/%Y @ %H:%M:%S]')) +
-            ' '*9 + ' TOTAL OCCURENCES: [%04i]' % error_count).center(79) + '\n' + '-='*39 +
-            '-\n\n' + tb + '\n\n')
+            ' '*9 + ' TOTAL OCCURENCES: [%04i]' % error_count).center(79) + 
+            '\n' + '-='*39 + '-\n\n' + tb + '\n\n')
             
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -196,7 +196,8 @@ def make_log_file():
         while True:
             n += 1
             new_file_name = (get_game_dir('cfg/gungame51/logs') +
-                                    '/GunGame%s_Log_Old[%01i].txt' % (gungame_info('version').replace('.','_'), n))
+                '/GunGame%s' % gungame_info('version').replace('.','_') +
+                '_Log_Old[%01i].txt' % n)            
             if not path.isfile(new_file_name):
                 break
 

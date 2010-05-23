@@ -83,7 +83,8 @@ def player_death(event_var):
         ggAttacker.leveldown(int(gg_tk_punish), userid, 'tk')
 
         # Message
-        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level}, prefix='gg_tk_punish')
+        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level}, 
+                        prefix='gg_tk_punish')
 
         # Play the leveldown sound
         ggAttacker.playsound('leveldown')

@@ -72,4 +72,5 @@ def get_file_list(top=get_game_dir('addons/eventscripts')):
         if not "gungame51" in name:
             continue
 
-        yield [str(name).replace('\\', '/'), [str(x.name) for x in name.files('*.py')]]
+        yield [str(name).replace('\\', '/'), 
+            [str(x.name) for x in name.files('*.py')]]

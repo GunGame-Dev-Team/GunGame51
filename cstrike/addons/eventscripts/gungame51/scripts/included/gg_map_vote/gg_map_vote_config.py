@@ -298,7 +298,8 @@ def load():
                 'the vote gets')
     config.text('   rocked.')
     config.text('Examples:')
-    config.text('   60 = 60% of players (rounded down) on the server need to RTV.')
+    config.text('   60 = 60% of players (rounded down) on the server need ' +
+                'to RTV.')
     config.text('Default Value: 60')
     config.cvar('gg_map_vote_rtv_percent', 60, 
                             'Player say command for GunGame\'s rtv.')

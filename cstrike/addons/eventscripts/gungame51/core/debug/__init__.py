@@ -31,9 +31,12 @@ There are four levels of debugging:
         Default output channels: logfile
         
         
-There is also a decorator for methods to log the environment should a method fail. 
-WARNING: This does not seem to work with cmdlib command functions due to CMDArgs
-failing to coerce to string! Therefore the logging is done with try...except.
+There is also a decorator for methods to log the environment should a method 
+fail. 
+
+WARNING: This does not seem to work with cmdlib command functions due to 
+CMDArgs failing to coerce to string! Therefore the logging is done with 
+try...except.
 
 This decorator is called 'trace' and can be used like this:
 
@@ -43,9 +46,9 @@ from gungame51.core.debug import trace
 def myfunction(...):
     ...
     
-Now should your function be called and fail, the error and the environment under
-which the error happened (arguments to the method, global variables, platform...)
-will be logged.
+Now should your function be called and fail, the error and the environment 
+under which the error happened (arguments to the method, global variables, 
+platform...) will be logged.
 """
 import es
 from hashlib import md5
@@ -55,7 +58,8 @@ from inspect import getargspec, ismethod, isclass, isfunction
 from gungame51.core import get_game_dir, platform
 
 def _write_to_log(message):
-    #TODO: add a file to write to! Awaiting decision on using path over get_game_dir
+    #TODO: add a file to write to! Awaiting decision on using path 
+    #over get_game_dir
     pass
 
 def _write_to_console(message, level=0):
@@ -88,11 +92,13 @@ class MethodTracer(object):
     def __init__(self, method):
         self.method = method
         
-    def _handle_exception(self, arguments, kwargs, extype, exvalue, extraceback):
+    def _handle_exception(self, arguments, kwargs, extype, 
+      exvalue, extraceback):
         """
-        Get the hashsum of the traceback. This will become the filename to prevent
-        one error to fill the folder in seconds (in the worst case). Having hashed
-        filenames means that every (unique) traceback will only be logged once!
+        Get the hashsum of the traceback. This will become the filename to 
+        prevent one error to fill the folder in seconds (in the worst case). 
+        Having hashed filenames means that every (unique) traceback will only 
+        be logged once!
         """
         traceback_lines = format_exception(extype, exvalue, extraceback)
         filename = md5(''.join(traceback_lines)).hexdigest() + '.txt'
@@ -101,7 +107,8 @@ class MethodTracer(object):
     def _write_dump(self, arguments, kwargs, traceback_lines, filename):
         lines = []
         # Affected method and module
-        lines.append("An error occured in %s.%s" % (self.method.__module__, self.method.__name__))
+        lines.append("An error occured in %s.%s" % (self.method.__module__, 
+                        self.method.__name__))
         # Original traceback
         lines.append("Traceback:")
         for line in traceback_lines:
@@ -114,19 +121,22 @@ class MethodTracer(object):
             argdict[name] = {'value': default, 'default': default}
         for name, value in zip(arg_names, arguments):
             if not name in argdict:
-                argdict[name] = {'value': value, 'default': 'NO_DEFAULT_PROVIDED'}
+                argdict[name] = {'value': value, 
+                    'default': 'NO_DEFAULT_PROVIDED'}
             else:
                 argdict[name]['value'] = value
         for key, value in kwargs.iteritems():
             if not name in argdict:
-                argdict[key] = {'value': value, 'default': 'NO_DEFAULT_PROVIDED'}
+                argdict[key] = {'value': value, 
+                    'default': 'NO_DEFAULT_PROVIDED'}
             else:
                 argdict[key]['value'] = value
         arglist = []
         for name in arg_names:
             value = argdict[name]['value']
             default = argdict[name]['default']
-            # Try...Except here because of things like CMDArgs messing up the logging.
+            # Try...Except here because of things like CMDArgs 
+            # messing up the logging.
             things = [name, value, type(value), default, type(default)]
             stringed = []
             for thing in things:
@@ -145,7 +155,7 @@ class MethodTracer(object):
         lines.append('Server environment:')
         lines.append('  platform: %s' % platform)
         lines.append('  gg version: %s' % '5.1') # TODO: Detect real version
-        lines.append('  es version: %s' % str(es.ServerVar('eventscripts_ver')))
+        lines.append('  es version: %s' %str(es.ServerVar('eventscripts_ver')))
         lines.append('')
         # The global variables
         lines.append('Global variables:')

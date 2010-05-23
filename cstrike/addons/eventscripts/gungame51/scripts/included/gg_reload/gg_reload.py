@@ -116,8 +116,9 @@ def player_death(event_var):
     playerHandle = es.getplayerhandle(attacker)
 
     for index in weaponObject.indexlist:
-        # When the attacker's handle matches the index handle we have found the attacker's weapon index
-        if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') == playerHandle:
+        # When the attacker's handle matches the index handle we have found 
+        # the attacker's weapon index
+        if es.getindexprop(index,'CBaseEntity.m_hOwnerEntity') == playerHandle:
             # Set the clip to the maximum ammo allowed
             getPlayer(attacker)['clip'][weaponObject] = weaponObject.clip
             break

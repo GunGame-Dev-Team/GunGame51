@@ -84,7 +84,8 @@ def round_end(event_var):
     if int(event_var['reason']) in [10, 16]:
         return
     
-    # Now, we will loop through the userid list and run the AFK Punishment Checks on them
+    # Now, we will loop through the userid list and run the AFK Punishment 
+    #   checks on them
     for userid in getUseridList('#alive,#human'):
         # See if the player was AFK
         if Player(userid).afk():

@@ -604,8 +604,8 @@ class AddonManager(object):
                 % name)
 
         # Get addon type
-        if os.path.isfile(get_game_dir('addons/eventscripts/gungame51/scripts/' +
-            'included/%s/%s.py' %(name, name))):
+        if os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
+            'scripts/included/%s/%s.py' %(name, name))):
             return 'included'
         elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/custom/%s/%s.py' %(name, name))):
@@ -616,8 +616,8 @@ class AddonManager(object):
         '''
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
-        return int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/included/%s/%s.py' %(name, name)))) or \
+        return int(os.path.isfile(get_game_dir('addons/eventscripts/' +
+            'gungame51/scripts/included/%s/%s.py' %(name, name)))) or \
             int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/custom/%s/%s.py' %(name, name))))
 
@@ -676,7 +676,7 @@ def gungame_info(info, _info=None):
             return
         AM = AddonManager()
         addonlist = [AM.get_addon_info()[addon] for addon in
-                    AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
+                AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
         if not addonlist:
             return 'None\n'
 

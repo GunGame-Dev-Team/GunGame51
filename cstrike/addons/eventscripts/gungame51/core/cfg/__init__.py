@@ -189,7 +189,8 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if cfgExecuting and cvarName in dependencies.keys():
-                if str(ConfigManager().__cvardefaults__[cvarName]) == str(cvarValue):
+                if str(ConfigManager().__cvardefaults__[cvarName]) == \
+                  str(cvarValue):
                     return
 
             gamethread.delayed(0, unload, (cvarName))
@@ -234,7 +235,8 @@ class ConfigManager(object):
 
 
 # Register the ConfigManager instance for the "server_cvar" event
-es.addons.registerForEvent(ConfigManager(), 'server_cvar', ConfigManager().server_cvar)
+es.addons.registerForEvent(ConfigManager(), 'server_cvar', 
+                                                   ConfigManager().server_cvar)
 
 dict_config_types = {
     "main":get_game_dir("/addons/eventscripts/gungame51/core/cfg/files"),

@@ -66,7 +66,8 @@ gg_map_vote_after_death = es.ServerVar('gg_map_vote_after_death')
 
 gg_map_vote_rtv = es.ServerVar('gg_map_vote_rtv')
 gg_map_vote_rtv_command = es.ServerVar('gg_map_vote_rtv_command')
-gg_map_vote_rtv_levels_required = es.ServerVar('gg_map_vote_rtv_levels_required')
+gg_map_vote_rtv_levels_required = es.ServerVar('' +
+    'gg_map_vote_rtv_levels_required')
 gg_map_vote_rtv_percent = es.ServerVar('gg_map_vote_rtv_percent')
 gg_map_vote_nominate = es.ServerVar('gg_map_vote_nominate')
 gg_map_vote_nominate = es.ServerVar('gg_map_vote_nominate')
@@ -134,9 +135,10 @@ def load():
         registerPlayerCmd()
 
         # Register RTV and nomination commands
-        registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, 'RTV command.')
+        registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, '' + 
+                                                            'RTV command.')
         registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
-                                                            'Nominate command.')
+                                                        'Nominate command.')
 
         # Store the current map in the list of recently played maps
         if int(gg_map_vote_dont_show_last_maps):
@@ -173,7 +175,8 @@ def server_cvar(event_var):
     # If the weapon order changed, get the new rtv_DisableLevel
     if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
         global rtv_DisableLevel
-        rtv_DisableLevel = get_total_levels() * gg_map_vote_rtv_levels_required / 100
+        rtv_DisableLevel = (get_total_levels() * 
+            gg_map_vote_rtv_levels_required / 100)
 
 def gg_win(event_var):
     if winningMap:
@@ -284,11 +287,14 @@ def rtv_cmd(userid, args):
             rtvList.remove(uid)
 
     # The number of total votes required to RTV
-    votesRequired = int((len(getUseridList("#human")) * gg_map_vote_rtv_percent /100.0) + 0.999)
+    votesRequired = int((len(getUseridList("#human")) * 
+                                gg_map_vote_rtv_percent /100.0) + 0.999)
     # The user has already voted
     if userid in rtvList:
         if not len(rtvList) >= votesRequired:
-            saytext2("#human", Player(userid).index, "RTVVote", {"name":es.getplayername(userid) , "votes":len(rtvList) , "required":votesRequired})
+            saytext2("#human", Player(userid).index, "RTVVote", 
+                {"name":es.getplayername(userid) , "votes":len(rtvList) , 
+                "required":votesRequired})
             return
     else:
         rtvList.append(userid)
@@ -299,7 +305,9 @@ def rtv_cmd(userid, args):
         voteStart()
         voteRocked = True
     else:
-        saytext2("#human", Player(userid).index, "RTVVote", {"name":es.getplayername(userid) , "votes":len(rtvList) , "required":votesRequired})
+        saytext2("#human", Player(userid).index, "RTVVote", 
+            {"name":es.getplayername(userid) , "votes":len(rtvList) , 
+            "required":votesRequired})
 
 def nominate_cmd(userid, args):
     # The nominations list is full
@@ -340,7 +348,9 @@ def nominateSubmit(userid, choice, popupname):
 
     # Add the chosen nomination
     nominations.append(choice)
-    saytext2("#human", Player(userid).index, "Nominated", {"pName":es.getplayername(userid), "map":choice, "cmd":str(gg_map_vote_nominate_command)}, True)
+    saytext2("#human", Player(userid).index, "Nominated", 
+        {"pName":es.getplayername(userid), "map":choice, 
+        "cmd":str(gg_map_vote_nominate_command)}, True)
 
 def mapFileClean(fromLoad=False):    
     # Using a custom list ?
@@ -350,7 +360,7 @@ def mapFileClean(fromLoad=False):
     # Skip this part on initial load
     if not fromLoad:
         # Current source file
-        current_file =  get_game_dir('%s.txt' % str(gg_map_vote_file) if not \
+        current_file = get_game_dir('%s.txt' % str(gg_map_vote_file) if not \
                     '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
 
         # Did it change ?                            
@@ -363,15 +373,15 @@ def mapFileClean(fromLoad=False):
 
     # Look for file in other common folders
     for folder in ('cfg/', 'cfg/gungame51/'):
-        possible_path = get_game_dir(folder + '%s.txt' % str(gg_map_vote_file) \
+        possible_path =get_game_dir(folder + '%s.txt' % str(gg_map_vote_file) \
              if not '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
 
         # File exists in the other location ?
         if exists(possible_path):                   
             dict_mapListSource[3] = possible_path
             es.dbgmsg(0,'>>>> GunGame has found "%s" ' % gg_map_vote_file +
-                        'in (%s) Please change your config file to ' % folder + 
-                        'reflect the location! (I.E. cfg/gungame51/myfile.txt)')
+                    'in (%s) Please change your config file to ' % folder + 
+                    'reflect the location! (I.E. cfg/gungame51/myfile.txt)')
             return
 
     # File couldn't be found, raising error

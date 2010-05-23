@@ -90,7 +90,8 @@ def objectiveToggle(mode):
     # Set up the command to format
     cmd = None
 
-    # If both the BOMB and HOSTAGE objectives are enabled, we don't do anything else
+    # If both the BOMB and HOSTAGE objectives are enabled, we do not do
+    #   anything else.
     if mapObjectives in range(1, 4):
         # Remove all objectives
         if mapObjectives == 1:

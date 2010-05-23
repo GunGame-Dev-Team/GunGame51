@@ -23,7 +23,8 @@ import spe
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import PriorityAddon
 from gungame51.core.players.shortcuts import Player
-from gungame51.scripts.included.gg_warmup_round.gg_warmup_round import get_warmup_weapon
+from gungame51.scripts.included.gg_warmup_round.gg_warmup_round import \
+    get_warmup_weapon
 from gungame51.scripts.included.gg_nade_bonus.gg_nade_bonus import get_weapon
 
 # ============================================================================
@@ -133,7 +134,8 @@ def item_pickup(event_var):
 # ============================================================================
 def set_spawn_flags(userid, weapon, flag):
     # Adjusts the ability for weapons to be picked up
-    es.server.queuecmd('es_xfire %s weapon_%s addoutput \"spawnflags %s\"' % (userid, weapon, flag))
+    es.server.queuecmd('es_xfire %s weapon_%s ' % (userid, weapon) + 
+        'addoutput \"spawnflags %s\"' % flag)
 
 def remove_weapon(userid, item):
     # Remove weapon

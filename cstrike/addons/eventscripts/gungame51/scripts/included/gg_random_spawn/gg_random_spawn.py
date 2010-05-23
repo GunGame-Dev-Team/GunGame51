@@ -96,7 +96,8 @@ def loadSpawnFile(mapName):
     pointsLoaded = False
 
     # Get spawnpoint file
-    spawnFile = '%s/cfg/gungame51/spawnpoints/%s.txt' % (str(es_gamedir).replace('\\', '/'), mapName)
+    spawnFile = ('%s' % str(es_gamedir).replace('\\', '/') + 
+                 '/cfg/gungame51/spawnpoints/%s.txt' % mapName)
 
     # Does the file exist?
     if not os.path.isfile(spawnFile):
@@ -124,5 +125,7 @@ def loadRandomPoints(userid):
             index = spe.getIndexOfEntity(spe.giveNamedItem(userid, team))
 
             # Set the spawnpoint position and rotation
-            es.setindexprop(index, 'CBaseEntity.m_vecOrigin', '%s,%s,%s' % (spawn[0], spawn[1], spawn[2]))
-            es.setindexprop(index, 'CBaseEntity.m_angRotation', '0,%s,0' % spawn[4])
+            es.setindexprop(index, 'CBaseEntity.m_vecOrigin', 
+                '%s,%s,%s' % (spawn[0], spawn[1], spawn[2]))
+            es.setindexprop(index, 'CBaseEntity.m_angRotation', 
+                '0,%s,0' % spawn[4])

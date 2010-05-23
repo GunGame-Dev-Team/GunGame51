@@ -78,7 +78,8 @@ def level_menu_cmd(userid, args):
 
         # If the search failed, tell them and return
         if not checkUserid:
-            msg(userid, 'LevelInfo_PlayerSearchFailed', {'player': searchInput})
+            msg(userid, 'LevelInfo_PlayerSearchFailed', 
+                {'player': searchInput})
             return
 
         # Get the player instance
@@ -86,7 +87,8 @@ def level_menu_cmd(userid, args):
 
         # Send the results
         saytext2(userid, ggPlayer.index, 'LevelInfo_PlayerSearch',
-                            {'player': es.getplayername(checkUserid), 'level': ggPlayer.level,
+                            {'player': es.getplayername(checkUserid), 
+                            'level': ggPlayer.level,
                             'weapon': ggPlayer.weapon})
     else:
         # Send menu

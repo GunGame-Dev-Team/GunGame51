@@ -36,7 +36,8 @@ class BaseWeaponOrders(object):
     # =========================================================================
     def __init__(self, name):
         self.file = name
-        self.filepath = get_game_dir('cfg/gungame51/weapon_orders/%s.txt' %self.file)
+        self.filepath = get_game_dir('cfg/gungame51/weapon_orders/' + 
+            '%s.txt' % self.file)
         self.title = 'Untitled Weapon Order'
         self.type = '#default'
         self.order = {}
@@ -82,7 +83,8 @@ class BaseWeaponOrders(object):
         try:
             weaponOrderFile = open(self.filepath, 'r')
         except IOError, e:
-            raise IOError('Cannot parse weapon order file (%s): IOError: %s' % (self.filepath, e))
+            raise IOError('Cannot parse weapon order file ' +
+                '(%s): IOError: %s' % (self.filepath, e))
 
         # Clean and format the lines
         lines = [x.strip() for x in weaponOrderFile.readlines()]
@@ -239,7 +241,8 @@ class BaseWeaponOrders(object):
         # Loop through the weapon order dictionary
         for level in self.order:
             # Set multikill if its not a knife or a hegrenade
-            if self.order[level][0] != 'knife' and self.order[level][0] != 'hegrenade':
+            if self.order[level][0] != 'knife' and \
+              self.order[level][0] != 'hegrenade':
                 self.order[level][1] = value
 
         # When the weapon order changes, we create/cancel a delayed name so
@@ -278,7 +281,8 @@ class BaseWeaponOrders(object):
         for level in self.order:
             weapon = self.order[level][0]
             multikill = self.order[level][1]
-            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level, multikill, weapon))
+            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level, 
+                                                            multikill, weapon))
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
 
     def get_weapon(self, level):
@@ -360,7 +364,8 @@ class WeaponManager(object):
             return object.__getattr__(self, item)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
+                raise AttributeError('There is no weapon order set! ' + 
+                        'Use set_order(order_name) first!')
 
             # Return the item from the WeaponOrdersDict instance
             return WeaponOrdersDict()[self.currentorder][item]
@@ -370,7 +375,8 @@ class WeaponManager(object):
             object.__setattr__(self, item, value)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
+                raise AttributeError('There is no weapon order set! ' +
+                        'Use set_order(order_name) first!')
 
             # We only directly allow the attribute "userid" to be set
             WeaponOrdersDict()[self.currentorder][item] = value
@@ -381,7 +387,8 @@ class WeaponManager(object):
             object.__getattr__(self, name)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
+                raise AttributeError('There is no weapon order set! ' + 
+                        'Use set_order(order_name) first!')
             # Redirect to the WeaponOrdersDict instance
             return WeaponOrdersDict()[self.currentorder][name]
 
@@ -391,7 +398,8 @@ class WeaponManager(object):
             object.__setattr__(self, name, value)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! Use set_order(order_name) first!')
+                raise AttributeError('There is no weapon order set! ' + 
+                        'Use set_order(order_name) first!')
 
             # Redirect to the WeaponOrdersDict instance
             WeaponOrdersDict()[self.currentorder][name] = value

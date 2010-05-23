@@ -55,8 +55,8 @@ class SoundPack(object):
         if self.__pack__.has_key(name):
             # See if this is a random sound file
             if self._is_random(self.__pack__[name]):
-                # If we are looking for a random winner sound, return the random winner
-                # sound chosen for the current round
+                # If we are looking for a random winner sound, return the 
+                # random winner sound chosen for the current round
                 if name == "winner":
                     return winnerSounds[0]
 
@@ -72,8 +72,8 @@ class SoundPack(object):
         if self.__pack__.has_key(name):
             # See if this is a random sound file
             if self._is_random(self.__pack__[name]):
-                # If we are looking for a random winner sound, return the random winner
-                # sound chosen for the current round
+                # If we are looking for a random winner sound, return the 
+                # random winner sound chosen for the current round
                 if name == "winner":
                     return winnerSounds[0]
 

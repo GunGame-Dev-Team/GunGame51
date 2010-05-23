@@ -62,12 +62,14 @@ def bomb_defused(event_var):
     levels = 1
 
     # If they shouldn't be skipping their current level, stop here
-    if (not int(gg_bomb_defused_skip_nade) and ggPlayer.weapon == 'hegrenade') \
-        or (not int(gg_bomb_defused_skip_knife) and ggPlayer.weapon == 'knife'):
+    if (not int(gg_bomb_defused_skip_nade) and ggPlayer.weapon == '' +
+            'hegrenade') \
+      or (not int(gg_bomb_defused_skip_knife) and ggPlayer.weapon == 'knife'):
         return
     
     # Loop through weapons of the levels we plan to level the player up past
-    for weapon in getLevelupList(ggPlayer.level, ggPlayer.level + int(gg_bomb_defused_levels)):
+    for weapon in getLevelupList(ggPlayer.level, 
+      ggPlayer.level + int(gg_bomb_defused_levels)):
         # If gg_bomb_defused_skip_knife or gg_bomb_defused_skip_nade are
         # disabled, make sure the player will not skip that level
         if (not int(gg_bomb_defused_skip_knife) and weapon == 'knife') or \

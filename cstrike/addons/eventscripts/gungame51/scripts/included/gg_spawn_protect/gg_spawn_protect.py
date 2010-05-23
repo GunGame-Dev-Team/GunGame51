@@ -32,18 +32,25 @@ info.version = '0.1'
 # ============================================================================
 # Get the es.ServerVar() instance of "gg_spawn_protect"
 gg_spawn_protect = es.ServerVar('gg_spawn_protect')
+
 # Get the es.ServerVar() instance of "gg_spawn_protect_cancelonfire"
 gg_spawn_protect_cancelonfire = es.ServerVar('gg_spawn_protect_cancelonfire')
+
 # Get the es.ServerVar() instance of "gg_spawn_protect_can_level_up"
 gg_spawn_protect_can_level_up = es.ServerVar('gg_spawn_protect_can_level_up')
+
 # Get the es.ServerVar() instance of "gg_spawn_protect_red"
 gg_spawn_protect_red = es.ServerVar('gg_spawn_protect_red')
+
 # Get the es.ServerVar() instance of "gg_spawn_protect_green"
 gg_spawn_protect_green = es.ServerVar('gg_spawn_protect_green')
+
 # Get the es.ServerVar() instance of "gg_spawn_protect_blue"
 gg_spawn_protect_blue = es.ServerVar('gg_spawn_protect_blue')
+
 # Get the es.ServerVar() instance of "gg_spawn_protect_alpha"
 gg_spawn_protect_alpha = es.ServerVar('gg_spawn_protect_alpha')
+
 # Get the es.ServerVar() instance of "eventscripts_noisy"
 eventscripts_noisy = es.ServerVar('eventscripts_noisy')
 
@@ -153,7 +160,8 @@ def startProtect(userid):
             ggPlayer.preventlevel.append('gg_spawn_protect')
 
     # Start the delay to cancel spawn protection
-    gamethread.delayedname(int(gg_spawn_protect), 'ggSpawnProtect%s' % userid, endProtect, (userid))
+    gamethread.delayedname(int(gg_spawn_protect), 
+        'ggSpawnProtect%s' % userid, endProtect, (userid))
 
 def endProtect(userid):
     # Are they even protected?

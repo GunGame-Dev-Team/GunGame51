@@ -665,7 +665,8 @@ def server_cvar(event_var):
 def player_changename(event_var):
     # Update the player's name in the winners database if they are in it
     if Player(int(event_var['userid'])).wins:
-        update_winner('name', event_var['newname'], uniqueid=event_var['es_steamid'])
+        update_winner('name', event_var['newname'], 
+            uniqueid=event_var['es_steamid'])
 
 def player_activate(event_var):
     # Update the player in the database

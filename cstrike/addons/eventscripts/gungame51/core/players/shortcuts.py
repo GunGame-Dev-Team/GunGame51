@@ -46,8 +46,8 @@ def setAttribute(filter, attribute, value):
         setAttribute('#all', 'myattribute', 0)
 
         # Call this attribute (from some event that provides a userid)
-        es.msg('myattribute for %s = %s'
-            %(event_var['es_username'], Player(event_var['userid']).myattribute))
+        es.msg('myattribute for %s = %s' % (event_var['es_username'], 
+            Player(event_var['userid']).myattribute))
     '''
     if isinstance(filter, int):
         filter = str(filter)
