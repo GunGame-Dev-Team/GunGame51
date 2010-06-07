@@ -75,7 +75,7 @@ def load():
     config.text('\t0 = The first level weapon')
     config.text('\tweapon1,weapon2,weapon3 = For each warmup, one of these ' +
                 'weapons is chosen')
-    config.text('\t#random = For each warmup, a random weaopn is chosen.')
+    config.text('\t#random = For each warmup, a random weapon is chosen.')
     config.text('Default Value: "hegrenade"')
     config.cvar('gg_warmup_weapon', 'hegrenade', 'The weapon that players ' +
                 'will use during the warmup round.')

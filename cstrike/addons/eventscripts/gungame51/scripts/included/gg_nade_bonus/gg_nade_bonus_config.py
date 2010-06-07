@@ -79,8 +79,8 @@ def load():
                 'order is given and,')
     config.text('   the player makes it through the entire order.')               
     config.text('Note:')
-    config.text('   * Not nessesary to change unless you are using a weapon' +
-                'order above.')
+    config.text('   * Not necessary to change unless you are using a weapon' +
+                ' order above.')
     config.text('Options:')
     config.text('   0 = (Enabled) Keep the player on the last gun.')
     config.text('   1 = (Enabled) Go through the list again (start over).')
@@ -101,11 +101,11 @@ def load():
                 'they will')
     config.text('   start over on the first weapon in the order.')               
     config.text('Note:')
-    config.text('   * Not nessesary to change unless you are using a weapon' +
-                'order above.')
+    config.text('   * Not necessary to change unless you are using a weapon' +
+                ' order above.')
     config.text('Options:')
     config.text('   0 = (Disabled) Players will resume where they left off.')
-    config.text('   1 = (Enabled) Players will go back to the first weapon' + 
+    config.text('   1 = (Enabled) Players will go back to the first weapon ' + 
                 'every spawn.')
     config.text('Default Value: 0')
     config.cvar('gg_nade_bonus_reset', 0, 'Enables/Disables ' +

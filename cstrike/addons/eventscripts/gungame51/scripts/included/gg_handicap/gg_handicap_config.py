@@ -46,14 +46,14 @@ def load():
     config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
                 'adjusting their level.').addFlag('notify')
 
-    # Handicap
+    # Handicap max join level
     config.text('')
     config.text('='*76)
     config.text('>> HANDICAP MAXIMUM FIRST LEVEL')
     config.text('='*76)
     config.text('Description:')
-    config.text('   The highest level a player may recieve when first joinin' +
-                'g the game.')
+    config.text('   The highest level a player may receive when first joinin' +
+                'g the server.')
     config.text('Notes:')
     config.text('   * If you are running handicap update, this setting is ' +
                 'pointless.')
@@ -63,6 +63,27 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_handicap_max', 0, 'Helps newly connected players by ' +
                 'adjusting their level. (max)').addFlag('notify')
+
+    # No Reconnect
+    config.text('')
+    config.text('='*76)
+    config.text('>> HANDICAP NO RECONNECT')
+    config.text('='*76)
+    config.text('Description:')
+    config.text('   gg_handicap will only process a handicap level for the ' +
+                'first time')
+    config.text('   a player joins the server.  This prevents players from ' +
+                'abusing the')
+    config.text('   handicap system. (reconnecting to level up)')
+    config.text('Notes:')
+    config.text('   * If you are running handicap update, this setting is ' +
+                'pointless.')
+    config.text('Options:')
+    config.text('   0 = (Disabled)')
+    config.text('   1 = (Enabled)')
+    config.text('Default Value: 0')
+    config.cvar('gg_handicap_no_reconnect', 0, 'Prevents abuse from reconne ' +
+                'cting').addFlag('notify')
 
     # Handicap Update
     config.text('')

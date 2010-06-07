@@ -18,6 +18,7 @@ import repeat
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
+from gungame51.core.players.shortcuts import setAttribute
 
 # ============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -35,6 +36,8 @@ info.translations = ['gg_handicap']
 gg_handicap_update = es.ServerVar('gg_handicap_update')
 gg_handicap_max = es.ServerVar('gg_handicap_max')
 gg_handicap = es.ServerVar('gg_handicap')
+gg_handicap_no_reconnect = es.ServerVar('gg_handicap_no_reconnect')
+eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -60,6 +63,25 @@ def unload():
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
+    # Get the player
+    ggPlayer = Player(userid)
+
+    # Check for rejoining players ?
+    if int(gg_handicap_no_reconnect):    
+        
+        # Is the player joining this map for the first time?
+        if not hasattr(ggPlayer, 'current_map'):  
+            setAttribute(userid, 'current_map', str(eventscripts_currentmap))
+        
+        # Player's current_map attr needs updated?
+        elif ggPlayer.current_map != str(eventscripts_currentmap):
+            ggPlayer.current_map = str(eventscripts_currentmap) 
+                    
+        # If the player's attr matches the current map, then the player has
+        # rejoined during the same map.  No new weapon is given!
+        else:
+            return
+    
     # Get the level of the lowest level player other than himself?
     if gg_handicap == 1:
         handicapLevel = getLevelAboveUser(userid)
@@ -71,9 +93,6 @@ def player_activate(event_var):
     # Max level for joining for the first time?
     if handicapLevel > int(gg_handicap_max) > 1:
         handicapLevel = int(gg_handicap_max)        
-    
-    # Get the player
-    ggPlayer = Player(userid)
 
     # If their level is below the handicap level, set them to it
     if ggPlayer.level < handicapLevel:
@@ -249,6 +268,10 @@ def getAverageLevel(uid):
         # Add level to the list
         levels.append(Player(userid).level)
 
+    # Make sure the levels list is not empty (can't divide by 0)
+    if len(levels) == 0:
+        return 1 
+    
     # Get the average
     average = sum(levels)/len(levels)
     
