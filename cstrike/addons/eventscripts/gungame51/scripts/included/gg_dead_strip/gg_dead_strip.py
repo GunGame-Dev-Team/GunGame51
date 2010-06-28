@@ -15,6 +15,7 @@ import es
 import gamethread
 from playerlib import getPlayer
 from weaponlib import getWeaponNameList
+from weaponlib import getWeaponList
 
 # SPE Imports
 import spe
@@ -45,12 +46,17 @@ gg_nade_bonus = es.ServerVar('gg_nade_bonus')
 # Retrieve a list of all available weapon names
 list_weaponNameList = getWeaponNameList()
 
+gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
+
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
     # Register the drop command to prevent it from being used.
     es.addons.registerClientCommandFilter(drop_filter)
+    
+    #Start the idle weapon removal loop
+    gamethread.delayedname(5, "gg_removeIdleLoop", removeIdleLoop)
 
     # Make sure that all owned weapons can NOT be picked up
     for userid in es.getUseridList():
@@ -62,6 +68,9 @@ def load():
 def unload():
     # Unregister the drop command
     es.addons.unregisterClientCommandFilter(drop_filter)
+    
+    #Stop the idle weapon removal loop
+    gamethread.cancelDelayed('gg_removeIdleLoop')
     
     # Make sure that all weapons can be picked up
     for userid in es.getUseridList():
@@ -132,6 +141,27 @@ def item_pickup(event_var):
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def removeIdleLoop():
+    list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
+                    'weapon_%s' % x.strip()) for x in \
+                    str(gg_map_strip_exceptions).split(',') if x.strip() != \
+                    '']
+
+    for weapon in getWeaponList('#all'):
+        # Make sure that the admin doesn't want the weapon left on the map
+        if weapon in list_noStrip:
+            continue
+
+        # Remove all weapons of this type from the map
+        for index in weapon.indexlist:
+            # If the weapon has an owner, stop here
+            if es.getindexprop(index,'CBaseEntity.m_hOwnerEntity') != -1:
+                continue
+
+            spe.removeEntityByIndex(index)
+
+    gamethread.delayedname(5, "gg_removeIdleLoop", removeIdleLoop)
+
 def set_spawn_flags(userid, weapon, flag):
     # Adjusts the ability for weapons to be picked up
     es.server.queuecmd('es_xfire %s weapon_%s ' % (userid, weapon) + 

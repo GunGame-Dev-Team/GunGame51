@@ -23,13 +23,33 @@ gg_multi_round = es.ServerVar('gg_multi_round')
 recentWinner = False
 
 # ============================================================================
+# >> GLOBAL Functions
+# ============================================================================
+def fireEvent(eventName, eventValues={}):
+        """
+        Fires a custom event. Ensures that we can delay this by 1 tick to
+            prevent crashing.
+
+        Thanks to Freddukes for this example.
+
+        @param str eventName The name of the event to fire
+        @param dict|mixed eventValues A dictionary containing the event
+            variables to fire with the event
+        """
+        es.event("initialize", eventName)
+        for event_var, event_values in eventValues.iteritems():
+            es.event("set" + event_values[0], eventName, event_var,
+                                                            event_values[1])
+        es.event("fire", eventName)
+
+# ============================================================================
 # >> CLASSES
 # ============================================================================
 class EventManager(object):
     # =========================================================================
     # >> EventManager() CUSTOM CLASS METHODS
     # =========================================================================
-    
+
     # =========================================================================
     # >> LEVELING EVENTS
     # =========================================================================
@@ -53,17 +73,17 @@ class EventManager(object):
         # Do not allow levelup if the player's preventlevel list is not empty
         if playerInstance.preventlevel:
             return False
-        
+
         # Set old level and the new level
         oldLevel = playerInstance.level
         newLevel = playerInstance.level + int(levelsAwarded)
-        
+
         # Check to see if the player just won
         if newLevel > get_total_levels():
             # If there was a recentWinner, stop here
             if recentWinner:
                 return False
-            
+
             global recentWinner
             # Set recentWinner to True
             recentWinner = True
@@ -81,22 +101,22 @@ class EventManager(object):
             self.gg_win(playerInstance, victimInstance, 
                 round=int(RoundInfo().remaining))
             return True
-            
+
         playerInstance.level = newLevel
 
         # Reset multikill
         playerInstance.multikill = 0
-        
+
         # Fire the event
-        es.event('initialize', 'gg_levelup')
-        es.event('setint', 'gg_levelup', 'attacker', playerInstance.userid)
-        es.event('setint', 'gg_levelup', 'leveler', playerInstance.userid)
-        es.event('setint', 'gg_levelup', 'old_level', oldLevel)
-        es.event('setint', 'gg_levelup', 'new_level', newLevel)
-        es.event('setint', 'gg_levelup', 'userid',
-                 '0' if not victimInstance else victimInstance.userid)
-        es.event('setstring', 'gg_levelup', 'reason', reason)
-        es.event('fire', 'gg_levelup')
+        event_values = {}
+        event_values["attacker"] = ("int", playerInstance.userid)
+        event_values["leveler"] = ("int", playerInstance.userid)
+        event_values["old_level"] = ("int", oldLevel)
+        event_values["new_level"] = ("int", newLevel)
+        event_values["userid"] = ("int",
+                            0 if not victimInstance else victimInstance.userid)
+        event_values["reason"] = ("string", reason)
+        gamethread.delayed(0, fireEvent, ("gg_levelup", event_values))
 
         return True
 
@@ -120,7 +140,7 @@ class EventManager(object):
         # Do not allow leveldown if the player's preventlevel list is not empty
         if playerInstance.preventlevel:
             return False
-        
+
         # Set old level and the new level
         oldLevel = playerInstance.level
         if (oldLevel - int(levelsTaken)) > 0:
@@ -132,109 +152,104 @@ class EventManager(object):
         playerInstance.multikill = 0
 
         # Fire the event
-        es.event('initialize', 'gg_leveldown')
-        es.event('setint', 'gg_leveldown', 'userid', playerInstance.userid)
-        es.event('setint', 'gg_leveldown', 'leveler', playerInstance.userid)
-        es.event('setint', 'gg_leveldown', 'old_level', oldLevel)
-        es.event('setint', 'gg_leveldown', 'new_level', playerInstance.level)
-        es.event('setint', 'gg_leveldown', 'attacker',
-                 '0' if not attackerInstance else attackerInstance.userid)
-        es.event('setstring', 'gg_leveldown', 'reason', reason)
-        es.event('fire', 'gg_leveldown')
+        event_values = {}
+        event_values["userid"] = ("int", playerInstance.userid)
+        event_values["leveler"] = ("int", playerInstance.userid)
+        event_values["old_level"] = ("int", oldLevel)
+        event_values["new_level"] = ("int", playerInstance.level)
+        event_values["attacker"] = ("int",
+                        0 if not attackerInstance else attackerInstance.userid)
+        event_values["reason"] = ("string", reason)
+        gamethread.delayed(0, fireEvent, ("gg_leveldown", event_values))
 
         return True
-        
+
     def gg_win(self, attackerInstance, victimInstance, round):
-        es.event('initialize', 'gg_win')
-        es.event('setint', 'gg_win', 'attacker', attackerInstance.userid)
-        es.event('setint', 'gg_win', 'winner', attackerInstance.userid)
-        es.event('setint', 'gg_win', 'userid',
-                 '0' if not victimInstance else victimInstance.userid)
-        es.event('setint', 'gg_win', 'loser',
-                 '0' if not victimInstance else victimInstance.userid)
-        es.event('setint', 'gg_win', 'round',
-                 int(round) if int(round) > 0 else '0')
-        es.event('fire', 'gg_win')
+        event_values = {}
+        event_values["attacker"] = ("int", attackerInstance.userid)
+        event_values["winner"] = ("int", attackerInstance.userid)
+        event_values["userid"] = ("int",
+                            0 if not victimInstance else victimInstance.userid)
+        event_values["loser"] = ("int",
+                            0 if not victimInstance else victimInstance.userid)
+        event_values["round"] = ("int",
+                                        int(round) if int(round) > 0 else 0)
+        gamethread.delayed(0, fireEvent, ("gg_win", event_values))
 
     # =========================================================================
     # >> LEADER EVENTS
     # =========================================================================
     def gg_new_leader(self, userid):
         from gungame51.core.leaders.shortcuts import LeaderManager
-        es.event('initialize', 'gg_new_leader')
-        es.event('setint', 'gg_new_leader', 'userid', userid)
-        es.event('setint', 'gg_new_leader', 'leveler', userid)
-        es.event('setstring', 'gg_new_leader', 'leaders',
-                 ','.join([str(x) for x in LeaderManager().current[:]]))
-        es.event('setstring', 'gg_new_leader', 'old_leaders',
-                 ','.join([str(x) for x in LeaderManager().previous[:]]))
-        es.event('setint', 'gg_new_leader', 'leader_level',
-                 LeaderManager().leaderlevel)
-        es.event('fire', 'gg_new_leader')
-        
+        event_values = {}
+        event_values["userid"] = ("int", userid)
+        event_values["leveler"] = ("int", userid)
+        event_values["leaders"] = ("int",
+                        ",".join([str(x) for x in LeaderManager().current[:]]))
+        event_values["old_leaders"] = ("int",
+                    ",".join([str(x) for x in LeaderManager().previous[:]]))
+        event_values["leader_level"] = ("int",
+                                                LeaderManager().leaderlevel)
+        gamethread.delayed(0, fireEvent, ("gg_new_leader", event_values))
+
     def gg_tied_leader(self, userid):
         from gungame51.core.leaders.shortcuts import LeaderManager
-        es.event('initialize', 'gg_tied_leader')
-        es.event('setint', 'gg_tied_leader', 'userid', userid)
-        es.event('setint', 'gg_tied_leader', 'leveler', userid)
-        es.event('setstring', 'gg_tied_leader', 'leaders',
-                 ','.join([str(x) for x in LeaderManager().current[:]]))
-        es.event('setstring', 'gg_tied_leader', 'old_leaders',
-                 ','.join([str(x) for x in LeaderManager().previous[:]]))
-        es.event('setint', 'gg_tied_leader', 'leader_level',
-                 LeaderManager().leaderlevel)
-        es.event('fire', 'gg_tied_leader')
-        
+        event_values = {}
+        event_values["userid"] = ("int", userid)
+        event_values["leveler"] = ("int", userid)
+        event_values["leaders"] = ("int",
+                        ",".join([str(x) for x in LeaderManager().current[:]]))
+        event_values["old_leaders"] = ("int",
+                    ",".join([str(x) for x in LeaderManager().previous[:]]))
+        event_values["leader_level"] = ("int",
+                                                LeaderManager().leaderlevel)
+        gamethread.delayed(0, fireEvent, ("gg_tied_leader", event_values))
+
     def gg_leader_lostlevel(self, userid):
         from gungame51.core.leaders.shortcuts import LeaderManager
-        es.event('initialize', 'gg_leader_lostlevel')
-        es.event('setint', 'gg_leader_lostlevel', 'userid', userid)
-        es.event('setint', 'gg_leader_lostlevel', 'leveler', userid)
-        es.event('setstring', 'gg_leader_lostlevel', 'leaders',
-                 ','.join([str(x) for x in LeaderManager().current[:]]))
-        es.event('setstring', 'gg_leader_lostlevel', 'old_leaders',
-                 ','.join([str(x) for x in LeaderManager().previous[:]]))
-        es.event('setint', 'gg_leader_lostlevel', 'leader_level',
-                 LeaderManager().leaderlevel)
-        es.event('fire', 'gg_leader_lostlevel')
+        event_values = {}
+        event_values["userid"] = ("int", userid)
+        event_values["leveler"] = ("int", userid)
+        event_values["leaders"] = ("int",
+                        ",".join([str(x) for x in LeaderManager().current[:]]))
+        event_values["old_leaders"] = ("int",
+                    ",".join([str(x) for x in LeaderManager().previous[:]]))
+        event_values["leader_level"] = ("int",
+                                                LeaderManager().leaderlevel)
+        gamethread.delayed(0, fireEvent, ("gg_leader_lostlevel", event_values))
         
     # =========================================================================
     # >> LOAD/UNLOAD, START/END EVENTS
     # =========================================================================
     def gg_load(self):
-        es.event('initialize', 'gg_load')
-        es.event('fire', 'gg_load')
+        gamethread.delayed(0, fireEvent, ("gg_load"))
         
     def gg_unload(self):
-        es.event('initialize', 'gg_unload')
-        es.event('fire', 'gg_unload')
+        gamethread.delayed(0, fireEvent, ("gg_unload"))
         
     def gg_start(self):
-        es.event('initialize', 'gg_start')
-        es.event('fire', 'gg_start')
+        gamethread.delayed(0, fireEvent, ("gg_start"))
         
     def gg_map_end(self):
-        es.event('initialize', 'gg_map_end')
-        es.event('fire', 'gg_map_end')
+        gamethread.delayed(0, fireEvent, ("gg_map_end"))
     
     # =========================================================================
     # >> ADDON EVENTS
     # =========================================================================
     def gg_addon_loaded(self, addon, type):
-        es.event('initialize', 'gg_addon_loaded')
-        es.event('setstring', 'gg_addon_loaded', 'addon', addon)
-        es.event('setstring', 'gg_addon_loaded', 'type', type)
-        es.event('fire', 'gg_addon_loaded')
+        event_values = {}
+        event_values["addon"] = ("string", addon)
+        event_values["type"] = ("string", type)
+        gamethread.delayed(0, fireEvent, ("gg_addon_loaded", event_values))
         
     def gg_addon_unloaded(self, addon, type):
-        es.event('initialize', 'gg_addon_unloaded')
-        es.event('setstring', 'gg_addon_unloaded', 'addon', addon)
-        es.event('setstring', 'gg_addon_unloaded', 'type', type)
-        es.event('fire', 'gg_addon_unloaded')
+        event_values = {}
+        event_values["addon"] = ("string", addon)
+        event_values["type"] = ("string", type)
+        gamethread.delayed(0, fireEvent, ("gg_addon_unloaded", event_values))
         
     def gg_vote(self):
-        es.event('initialize', 'gg_vote')
-        es.event('fire', 'gg_vote')
+        gamethread.delayed(0, fireEvent, ("gg_vote"))
         
     def gg_knife_steal(self, attackerInstance, victimInstance):
         '''
@@ -256,50 +271,18 @@ class EventManager(object):
                 # Trigger the event "gg_knife_steal"
                 EventManager().gg_knife_steal(aInstance, vInstance)
         '''
-        es.event('initialize', 'gg_knife_steal')
-        es.event('setint', 'gg_knife_steal', 'attacker',
-                 attackerInstance.userid)
-        es.event('setint', 'gg_knife_steal', 'attacker_level',
-                 attackerInstance.level)
-        es.event('setint', 'gg_knife_steal', 'userid', victimInstance.userid)
-        es.event('setint', 'gg_knife_steal', 'userid_level',
-                 victimInstance.level)
-        es.event('fire', 'gg_knife_steal')
+        event_values = {}
+        event_values["attacker"] = ("int", attackerInstance.userid)
+        event_values["attacker_level"] = ("int", attackerInstance.level)
+        event_values["userid"] = ("int", victimInstance.userid)
+        event_values["userid_level"] = ("int", victimInstance.level)
+        gamethread.delayed(0, fireEvent, ("gg_knife_steal", event_values))
         
-    def gg_multi_level(self, attackerInstance, victimInstance):
-        '''
-        Usage:
-            import es
-            from gungame.core.players.shortcuts import Player
-            from gungame.core.events import EventManager
-            
-            def gg_levelup(event_var):
-                # Get the attacker's Player() instance
-                aInstance = Player(event_var['attacker'])
-                
-                # Get the victim's Player() instance
-                vInstance = Player(event_var['userid'])
-                
-                # Set the attacker's multilevel
-                aInstance.multilevel += 1
-                
-                # Get the attacker's multilevel
-                aMultiLevel = aInstance.multilevel
-                
-                # Get what multilevel the player needs to achieve
-                neededMultiLevel = int(es.ServerVar('gg_multi_level'))
-                
-                # See if the attacker has achieved multilevel. If not, return.
-                if aInstance.multilevel != int(es.ServerVar('gg_multi_level')):
-                    return
-                
-                # Trigger the event "gg_knife_steal"
-                EventManager().gg_multi_level(aInstance, vInstance)
-        '''
-        es.event('initialize', 'gg_multi_level')
-        es.event('setint', 'gg_multi_level', 'userid', attacker)
-        es.event('setint', 'gg_multi_level', 'leveler', attacker)
-        es.event('fire', 'gg_multi_level')
+    def gg_multi_level(self, userid):
+        event_values = {}
+        event_values["userid"] = ("int", userid)
+        event_values["leveler"] = ("int", userid)
+        gamethread.delayed(0, fireEvent, ("gg_multi_level", event_values))
     
     def remove_recent_winner(self):
         global recentWinner

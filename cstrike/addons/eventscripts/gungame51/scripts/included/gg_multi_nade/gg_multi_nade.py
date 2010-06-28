@@ -51,18 +51,15 @@ def unload():
 # ============================================================================
 
 def player_spawn(event_var):
-
     # Set the grenades_detonated counter for the spawning player to 0
     Player(int(event_var['userid'])).grenades_detonated = 0
 
 
 def gg_levelup(event_var):
-
     # If someone levels up, from nade to nade level, do this
     Player(int(event_var['leveler'])).grenades_detonated = 0
 
 def hegrenade_detonate(event_var):
-
     # Get the userid as int
     userid = int(event_var['userid'])
     
