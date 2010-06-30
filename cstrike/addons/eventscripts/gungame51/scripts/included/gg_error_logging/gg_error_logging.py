@@ -94,14 +94,26 @@ def gungame_except_hook(tb_type, value, trace_back):
     # turn tb into a string
     tb = reduce((lambda a, b: a + b), tb)
 
+    # Is the length under 255 chars?
+    if len(tb) < 255:
+        db_tb = [tb]
+        
+    # Length over 255 chars
+    else:
+        db_tb = [x.strip() for x in tb.split('\n') if x != '']  
+    
     # Print traceback to console
-    es.dbgmsg(0, '\n')
+    es.dbgmsg(0, ' \n')
     es.dbgmsg(0, '# ' + '='*48)
     es.dbgmsg(0, '# >>' + 'GunGame 5.1 Exception Caught!'.rjust(50))
     es.dbgmsg(0, '# ' + '='*48)
-    es.dbgmsg(0, tb)
+    
+    # Divide up for 255 line limit
+    for db_line in db_tb:
+        es.dbgmsg(0, db_line)
+    
     es.dbgmsg(0, '# ' + '='*48)
-    es.dbgmsg(0, '\n')
+    es.dbgmsg(0, ' \n')
 
     # Use Log File
     with open(file_name, 'r+') as log_file:

@@ -272,9 +272,9 @@ class BaseWeaponOrders(object):
         '''
         Echos (prints) the current weapon order to console.
         '''
-        es.dbgmsg(0, '')
+        es.dbgmsg(0, ' ')
         es.dbgmsg(0, '[GunGame] Weapon Order: %s' %self.file)
-        es.dbgmsg(0, '')
+        es.dbgmsg(0, ' ')
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
         es.dbgmsg(0, '[GunGame] | Level | Multikill |    Weapon     |')
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')

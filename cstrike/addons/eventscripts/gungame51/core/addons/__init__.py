@@ -26,10 +26,9 @@ from gungame51.core.messaging import MessageManager
 # >> GLOBAL VARIABLES
 # ============================================================================
 ggVersion = None
-
 _gg_info_quiet = False
-# Before it gets set
 _gg_info = None
+
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -697,7 +696,7 @@ def gungame_info(info, _info=None):
         global _gg_info_quiet
         _gg_info = _info
         _gg_info_quiet = True
-        gamethread.delayed(0.25, gungame_info, 'listen')
+        gamethread.delayed(1, gungame_info, 'listen')
         
     '''
     Updates es.AddonInfo instance for gungame51
@@ -709,7 +708,7 @@ def gungame_info(info, _info=None):
         _gg_info.Custom_Addons = gungame_info('custom')
         
     if info == 'listen':
-        global _gg_info_reset
+        global _gg_info_quiet
         _gg_info_quiet = False
         gungame_info('update')
         

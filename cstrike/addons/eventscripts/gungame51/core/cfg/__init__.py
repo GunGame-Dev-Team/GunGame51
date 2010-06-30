@@ -74,14 +74,34 @@ class ConfigManager(object):
         for item in config.__dict__:
             if isinstance(config.__dict__[item], AddonCFG):
                 cfg = config.__dict__[item]
+                
+                # List to store addons that are defaulted to "on"
+                revisit = []
+               
                 # Loop through the CVARs in the configlib.AddonCFG instance
                 for cvar, value, description in cfg.getCvars().values():
                     # Add the CVAR and default value to the dictionary
                     self.__cvardefaults__[cvar] = value
+                    
+                    # Search for CVARs defaulted to "on"
+                    if bool(str(value)) and False in \
+                        [x == '0' for x in str(value).split('.')]:
+                            revisit.append(cvar)
+                
                 global cfgExecuting
                 cfgExecuting = True
                 gamethread.delayed(0, self._reset_config_execution, ())
                 cfg.execute()
+                
+                # Load addons that were defaulted to "on"
+                revisit = [x for x in revisit if x in get_valid_addons()]
+                for cvar in revisit:
+                    # Force their values to 0
+                    es.forcevalue(cvar, 0)
+                    
+                    # Change back to their defaults to trigger server_cvar
+                    gamethread.delayed(0, es.server.queuecmd, ("%s %s" % (cvar, 
+                                                self.__cvardefaults__[cvar])))
 
     def unload(self, name):
         '''
@@ -101,6 +121,8 @@ class ConfigManager(object):
                 cfg = config.__dict__[item]
                 # Loop through the CVARs in the configlib.AddonCFG instance
                 for cvar, value, description in cfg.getCvars().values():
+                    # Return values to their original state
+                    es.ServerVar(cvar).set(value)
                     # Remove the CVAR and default value from the dictionary
                     del self.__cvardefaults__[cvar]
                     # Remove the "notify" flag for the CVAR
@@ -174,8 +196,7 @@ class ConfigManager(object):
             # was executed by a config
             if cfgExecuting and cvarName in conflicts.keys():
                 if str(ConfigManager().__cvardefaults__[cvarName]) == \
-                    str(cvarValue):
-                    
+                  str(cvarValue):                    
                     return
 
             gamethread.delayed(0, load, (cvarName))

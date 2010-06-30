@@ -129,7 +129,12 @@ info.About = ('\n' +
 # ============================================================================
 # >> LOAD & UNLOAD
 # ============================================================================
-def load():
+def load():    
+    # This will prevent crashes with SourceMod
+    if es.ServerVar('sm_nextmap'):
+        es.flags('remove', 'notify', 'sm_nextmap')
+        gamethread.delayed(1, es.flags, ('remove', 'notify', 'sm_nextmap'))
+
     # Load translations
     loadTranslation('gungame', 'gungame')
     
@@ -214,9 +219,8 @@ def initialize():
     # Load all configs
     loadConfig(get_config_list())
 
-    # Pause 1 second for the configs to be loaded (OrangeBox engline requires
-    # this)
-    gamethread.delayed(0, completeInitialize)
+    # Pause a moment for the configs to be loaded (OB engine requires this)
+    gamethread.delayed(0.016, completeInitialize)
 
 def completeInitialize():
     # Print load started
@@ -262,7 +266,7 @@ def completeInitialize():
     prune_winners_db()
 
     # Set es.AddonInfo()
-    gungame_info('addoninfo', info)
+    gamethread.delayed(3, gungame_info, ('addoninfo', info))
 
     # Load menus
     MenuManager().load('#all')
@@ -278,6 +282,11 @@ def completeInitialize():
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
+    # This will prevent crashes with SourceMod
+    if es.ServerVar('sm_nextmap'):
+        es.flags('remove', 'notify', 'sm_nextmap')
+        gamethread.delayed(1, es.flags, ('remove', 'notify', 'sm_nextmap'))
+        
     '''
     I believe this may not be our responsibility to track, or should it?
     # Check for priority addons
