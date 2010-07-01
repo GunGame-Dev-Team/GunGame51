@@ -181,41 +181,59 @@ class EventManager(object):
     # =========================================================================
     def gg_new_leader(self, userid):
         from gungame51.core.leaders.shortcuts import LeaderManager
+        # Set up leaders strings
+        new_leaders = ",".join([str(x) for x in LeaderManager().current[:]])
+        old_leaders = ",".join([str(x) for x in LeaderManager().previous[:]])
+
+        # Set up event values
         event_values = {}
         event_values["userid"] = ("int", userid)
         event_values["leveler"] = ("int", userid)
-        event_values["leaders"] = ("int",
-                        ",".join([str(x) for x in LeaderManager().current[:]]))
-        event_values["old_leaders"] = ("int",
-                    ",".join([str(x) for x in LeaderManager().previous[:]]))
-        event_values["leader_level"] = ("int",
-                                                LeaderManager().leaderlevel)
+        event_values["leaders"] = ("string",
+            new_leaders if new_leaders else "None")
+        event_values["old_leaders"] = ("string",
+            old_leaders if old_leaders else "None")
+        event_values["leader_level"] = ("int", LeaderManager().leaderlevel)
+
+        # Fire the event
         gamethread.delayed(0, fireEvent, ("gg_new_leader", event_values))
 
     def gg_tied_leader(self, userid):
         from gungame51.core.leaders.shortcuts import LeaderManager
+        # Set up leaders strings
+        new_leaders = ",".join([str(x) for x in LeaderManager().current[:]])
+        old_leaders = ",".join([str(x) for x in LeaderManager().previous[:]])
+
+        # Set up event values
         event_values = {}
         event_values["userid"] = ("int", userid)
         event_values["leveler"] = ("int", userid)
-        event_values["leaders"] = ("int",
-                        ",".join([str(x) for x in LeaderManager().current[:]]))
-        event_values["old_leaders"] = ("int",
-                    ",".join([str(x) for x in LeaderManager().previous[:]]))
-        event_values["leader_level"] = ("int",
-                                                LeaderManager().leaderlevel)
+        event_values["leaders"] = ("string",
+            new_leaders if new_leaders else "None")
+        event_values["old_leaders"] = ("string",
+            old_leaders if old_leaders else "None")
+        event_values["leader_level"] = ("int", LeaderManager().leaderlevel)
+
+        # Fire the event
         gamethread.delayed(0, fireEvent, ("gg_tied_leader", event_values))
 
     def gg_leader_lostlevel(self, userid):
         from gungame51.core.leaders.shortcuts import LeaderManager
+        # Set up leaders strings
+        new_leaders = ",".join([str(x) for x in LeaderManager().current[:]])
+        old_leaders = ",".join([str(x) for x in LeaderManager().previous[:]])
+
+        # Set up event values
         event_values = {}
         event_values["userid"] = ("int", userid)
         event_values["leveler"] = ("int", userid)
-        event_values["leaders"] = ("int",
-                        ",".join([str(x) for x in LeaderManager().current[:]]))
-        event_values["old_leaders"] = ("int",
-                    ",".join([str(x) for x in LeaderManager().previous[:]]))
-        event_values["leader_level"] = ("int",
-                                                LeaderManager().leaderlevel)
+        event_values["leaders"] = ("string",
+            new_leaders if new_leaders else "None")
+        event_values["old_leaders"] = ("string",
+            old_leaders if old_leaders else "None")
+        event_values["leader_level"] = ("string", LeaderManager().leaderlevel)
+
+        # Fire the event
         gamethread.delayed(0, fireEvent, ("gg_leader_lostlevel", event_values))
         
     # =========================================================================

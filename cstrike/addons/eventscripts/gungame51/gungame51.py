@@ -559,6 +559,10 @@ def gg_win(event_var):
         # ====================================================
         # MAP WIN
         # ====================================================
+        # Temporary crash fix (crashes due to game_end firing at
+        # the same time changing server_cvar)
+        es.flags('remove', 'notify', 'nextlevel')
+
         # End game
         es.server.queuecmd("es_xgive %s game_end" % userid)
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
