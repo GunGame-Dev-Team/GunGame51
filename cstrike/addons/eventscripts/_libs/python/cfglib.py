@@ -103,10 +103,15 @@ class AddonCFG(object):
 
    def execute(self, queuecmd=False):
       """ Executes the config """
-      if queuecmd:
+      if self.cfgpath.startswith('%s/cfg/' % self.gamedir):  
+         if queuecmd:
+            es.server.queuecmd('exec ' + self.cfgpath.replace('%s/cfg/' %self.gamedir, '', 1))
+            return
+         es.server.cmd('exec ' + self.cfgpath.replace('%s/cfg/' %self.gamedir, '', 1))            
+      elif queuecmd:
          es.server.queuecmd('es_xmexec ..' + self.cfgpath.replace(self.gamedir, '', 1))
       else:
-         es.server.cmd('es_xmexec ..' + self.cfgpath.replace(self.gamedir, '', 1))
+         es.server.cmd('es_xmexec ..' + self.cfgpath.replace(self.gamedir, '', 1))        
 
    def getCvars(self):
       """ Returns the cvars dictionary """

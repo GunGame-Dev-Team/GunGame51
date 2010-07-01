@@ -91,7 +91,7 @@ class ConfigManager(object):
                 global cfgExecuting
                 cfgExecuting = True
                 gamethread.delayed(0, self._reset_config_execution, ())
-                cfg.execute()
+                cfg.execute(True)
                 
                 # Load addons that were defaulted to "on"
                 revisit = [x for x in revisit if x in get_valid_addons()]
