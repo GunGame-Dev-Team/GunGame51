@@ -635,18 +635,25 @@ def gungame_info(info, _info=None):
     '''
     Fetches the head revision number from all of gungame's files
     '''
+    global ggVersion
+    global _gg_info_quiet
+    global _gg_info
+    
     if info == 'version':
         if ggVersion:
             return ggVersion
+        
         rev = int(__doc__.split('$Rev: ')[1].split()[0])
         gen = get_file_list()
+        
         while True:
             try:
                 files = gen.next()
+            
             except:
-                global ggVersion
                 ggVersion = '5.1.%s' % rev
                 return ggVersion
+            
             base_name = files[0]
 
             if 'gungame51/scripts/custom' in base_name:
@@ -663,6 +670,7 @@ def gungame_info(info, _info=None):
                     ver = int(file.read().split('$Rev: ')[1].split()[0])
                     if ver > rev:
                         rev = ver
+                
                 except:
                     continue
 
@@ -673,15 +681,18 @@ def gungame_info(info, _info=None):
     if info in ('included', 'custom'):
         if _gg_info_quiet:
             return
+        
         AM = AddonManager()
         addonlist = [AM.get_addon_info()[addon] for addon in
                 AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
+        
         if not addonlist:
             return 'None\n'
 
         i = 0
+        
         for addon in addonlist:
-            addonlist[i] = ' '*25 + '%s (v%s)\n' % (addon.name, addon.version)
+            addonlist[i] = '\t'*4 + '%s (v%s)\n' % (addon.name, addon.version)
             i += 1
 
         addonlist.insert(0, '\n')
@@ -692,8 +703,6 @@ def gungame_info(info, _info=None):
     so we can update it. (stored as _gg_info global)
     '''
     if info == 'addoninfo':
-        global _gg_info
-        global _gg_info_quiet
         _gg_info = _info
         _gg_info_quiet = True
         gamethread.delayed(1, gungame_info, 'listen')
@@ -704,11 +713,11 @@ def gungame_info(info, _info=None):
     if info == 'update':
         if _gg_info_quiet or not _gg_info:
             return
+        
         _gg_info.Included_Addons = gungame_info('included')
         _gg_info.Custom_Addons = gungame_info('custom')
-        
+                    
     if info == 'listen':
-        global _gg_info_quiet
         _gg_info_quiet = False
         gungame_info('update')
         

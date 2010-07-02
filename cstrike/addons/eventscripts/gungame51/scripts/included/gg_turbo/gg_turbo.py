@@ -65,7 +65,7 @@ def level_call_back(name, value, ggPlayer):
     gamethread.delayed(0.005, give_weapon, (ggPlayer.userid, previousLevel))
 
 def give_weapon(userid, previousLevel):
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Get playerlib object

@@ -116,15 +116,18 @@ class RoundInfo(object):
 # ============================================================================
 info = es.AddonInfo()
 del info['keylist'][:]
-info.About = ('\n' +
-             ' '*25 + '\tGunGame 5.1 (v%s)\n\n' % gungame_info('version') +
-             ' '*25 + 'Authors:\n' +
-             ' '*25 + '\tMichael Barr (XE_ManUp)\n' +
-             ' '*25 + '\tLuke Robinson (Monday)\n' +
-             ' '*25 + '\tWarren Alpert\n' +
-             ' '*25 + '\tPaul Smith (RideGuy)\n' +
-             ' '*25 + '\tDeniz Sezen (your-name-here)\n\n' +
-             ' '*25 + 'Website: http://www.gungame5.com/\n')
+
+info.About = ('\n' + 
+                    '\t'*4 + 'GunGame 5.1 (v%s)\n\n' % gungame_info('version')) 
+
+info.Authors = ('\n' +
+             '\t'*4 + 'Michael Barr (XE_ManUp)\n' +
+             '\t'*4 + 'Luke Robinson (Monday)\n' +
+             '\t'*4 + 'Warren Alpert\n' +
+             '\t'*4 + 'Paul Smith (RideGuy)\n' +
+             '\t'*4 + 'Deniz Sezen (your-name-here)\n\n')
+
+info.Website = ('\n' + '\t'*4 + 'http://www.gungame5.com/\n')
 
 # ============================================================================
 # >> LOAD & UNLOAD
@@ -366,13 +369,14 @@ def round_start(event_var):
     equip_player()
 
 def player_spawn(event_var):
+    global firstPlayerSpawned
+    
     if not firstPlayerSpawned:
         # Replace this with whatever PlayerManager() uses to remove
         # non-existant players
         PlayerManager().remove_old()
 
         # The first player has spawned
-        global firstPlayerSpawned
         firstPlayerSpawned = True
 
     # Check for priority addons

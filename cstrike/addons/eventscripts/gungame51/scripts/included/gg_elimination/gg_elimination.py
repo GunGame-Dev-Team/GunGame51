@@ -214,7 +214,7 @@ def respawnPlayer(userid, respawnRound):
         return
 
     # See if the player suicided due to disconnect
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Retrieve the playerlib player object

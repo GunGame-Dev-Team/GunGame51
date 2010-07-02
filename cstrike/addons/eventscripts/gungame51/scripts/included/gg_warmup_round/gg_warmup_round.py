@@ -182,7 +182,7 @@ def hegrenade_detonate(event_var):
     userid = int(event_var['userid'])
 
     # Is the client on the server?
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Give user a hegrenade, if eligable

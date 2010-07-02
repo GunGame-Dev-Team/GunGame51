@@ -153,7 +153,7 @@ def cmd_spawn_remove(args):
         return
 
     # The userid does not exist
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         es.dbgmsg(0, langstring("OperationFailed:InvalidUserid",
                                                             {"userid":userid}))
         return

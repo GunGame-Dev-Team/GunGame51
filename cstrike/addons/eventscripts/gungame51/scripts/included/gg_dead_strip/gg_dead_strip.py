@@ -97,7 +97,7 @@ def item_pickup(event_var):
         return
 
     # Client exists?
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Don't strip the knife

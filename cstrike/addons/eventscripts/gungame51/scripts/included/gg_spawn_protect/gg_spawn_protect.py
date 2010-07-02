@@ -169,7 +169,7 @@ def endProtect(userid):
         return
 
     # Check the client hasn't left during the protection period
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         # Fix potential memory leak:
         protectedList.remove(userid)
         return

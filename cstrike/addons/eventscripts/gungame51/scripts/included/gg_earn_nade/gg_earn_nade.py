@@ -13,6 +13,7 @@ $LastChangedDate$
 import es
 import gamethread
 from playerlib import getPlayer
+from playerlib import getUseridList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -89,10 +90,6 @@ def player_death(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
 def give_nade(userid):
-    # Is the player dead ?
-    if getPlayer(userid).isdead:
-        return
-        
     # Is the player on a team ?
     if es.getplayerteam(userid) < 2:
         return
@@ -100,10 +97,25 @@ def give_nade(userid):
     # If the player just got the kill to get to hegrenade level, stop here
     if userid in recentlyOnHegrenade:
         return
+        
+    # Was this the last kill in the round? (CT)
+    if not getUseridList('#alive,#ct'):
+        return
+    
+    # Was this the last kill in the round? (T)    
+    if not getUseridList('#alive,#t'):
+        return 
+
+    pPlayer = getPlayer(userid)
+    
+    # Is the player dead ?
+    if pPlayer.isdead:
+        return
 
     # Only give a nade if this player does not have one.
-    if int(getPlayer(userid).get('he')) == 0:
+    if int(pPlayer.get('he')) == 0:
         es.server.queuecmd('es_xgive %s weapon_hegrenade' % userid)
+    
     # If the player had a grenade, and gg_multi_nade is enabled
     elif int(es.ServerVar("gg_multi_nade")):
         ggPlayer = Player(userid)
@@ -114,6 +126,7 @@ def give_nade(userid):
         if int(ggPlayer.grenades_detonated) == \
                                 int(es.ServerVar("gg_multi_nade_max_nades")):
             ggPlayer.grenades_detonated -= 2
+        
         # If the player has yet to use up their multi-nades, subtract one
         # from the number of detonations
         else:

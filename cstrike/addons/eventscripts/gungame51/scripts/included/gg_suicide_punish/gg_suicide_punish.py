@@ -85,7 +85,7 @@ def player_death(event_var):
     attacker = int(event_var['attacker'])
 
     # Is the victim on the server?
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # If the attacker is not "world or the userid of the victim, it is not a

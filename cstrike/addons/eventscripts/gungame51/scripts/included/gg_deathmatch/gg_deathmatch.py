@@ -181,7 +181,7 @@ def respawn_count_down(userid):
         return
 
     # Player on server ?
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         respawnRepeat.stop()
         respawnRepeat.delete()
         return

@@ -53,8 +53,10 @@ def unload():
 # >> MENU FUNCTIONS
 # ============================================================================
 def leader_menu_cmd(userid, args):
+    global leaderList
+
     # Make sure player exists
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Get menu contents
@@ -104,7 +106,6 @@ def leader_menu_cmd(userid, args):
         ggLeaderMenu.addline(line)
         
     # Save current popup
-    global leaderList
     leaderList = newLeaderList
     
     # Send it

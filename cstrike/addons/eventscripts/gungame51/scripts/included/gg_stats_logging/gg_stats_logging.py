@@ -85,7 +85,7 @@ def logEvent(event_var):
         userid = event_var['attacker']
 
     # Make sure the player exists
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Get player data

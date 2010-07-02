@@ -36,7 +36,7 @@ def unload():
 # ============================================================================
 def score_menu_cmd(userid, args):
     # Make sure player exists
-    if not es.exists('userid', userid):
+    if not es.exists('userid', userid) and userid != 0:
         return
 
     # Get list of levels
