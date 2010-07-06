@@ -81,6 +81,11 @@ GG_WARMUP_EXTRA_TIME = 3
 def load():
     global warmupWeaponSetOnLoad
 
+    # This will prevent crashes with gg_warmup_round (TEMPORARY)
+    if es.exists('variable', 'mp_freezetime'):
+        es.flags('remove', 'notify', 'mp_freezetime')
+        gamethread.delayed(1, es.flags, ('remove', 'notify', 'mp_freezetime'))
+
     # Set the warmup weapon
     set_warmup_weapon()
 
