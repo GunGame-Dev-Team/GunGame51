@@ -24,6 +24,9 @@ import spe
 
 # GunGame Imports
 
+#    Error Logging
+from core.logs import make_log_file
+
 #    Weapon Function Imports
 from core.weapons.shortcuts import set_weapon_order
 from core.weapons.shortcuts import get_level_multikill
@@ -266,6 +269,9 @@ def completeInitialize():
     # Set es.AddonInfo()
     gamethread.delayed(3, gungame_info, ('addoninfo', info))
 
+    # Load error logging
+    gamethread.delayed(3.50, make_log_file)
+    
     # Load menus
     MenuManager().load('#all')
 
