@@ -48,6 +48,16 @@ mpRoundtimeBackup = int(mp_roundtime)
 # >> LOAD & UNLOAD
 # ============================================================================
 def load():
+    # This will prevent crashes with gg_deathmatch (TEMPORARY)
+    if es.exists('variable', 'mp_freezetime'):
+        es.flags('remove', 'notify', 'mp_freezetime')
+        gamethread.delayed(1, es.flags, ('remove', 'notify', 'mp_freezetime'))
+
+    # This will prevent crashes with gg_deathmatch (TEMPORARY)
+    if es.exists('variable', 'mp_roundtime'):
+        es.flags('remove', 'notify', 'mp_roundtime')
+        gamethread.delayed(1, es.flags, ('remove', 'notify', 'mp_roundtime'))
+
     # Don't allow respawn
     global respawnAllowed
     respawnAllowed = False
