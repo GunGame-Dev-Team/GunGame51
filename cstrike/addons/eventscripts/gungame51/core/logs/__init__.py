@@ -1,9 +1,9 @@
-# ../addons/eventscripts/gungame51/core/logs/gg_error_logging/__init__.py
+# ../addons/eventscripts/gungame51/core/logs/__init__.py
 
 '''
-$Rev: $
-$LastChangedBy: $
-$LastChangedDate: $
+$Rev$
+$LastChangedBy$
+$LastChangedDate$
 '''
 
 # ============================================================================
