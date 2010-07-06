@@ -270,21 +270,24 @@ class MessageManager(object):
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.saytext2(filter, index, '\1%s%s'
-                    %(prefix, string))
+                    %(prefix, string), 0, 0, 0, 0)
 
             # Playerlib filter
             for userid in getUseridList(filter):
-                usermsg.saytext2(userid, index, '\1%s%s' %(prefix, string))
+                usermsg.saytext2(userid, index, '\1%s%s' %(prefix, string), 0,
+                    0, 0, 0)
         else:
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.saytext2(filter, index, '\1%s%s'
-                    %(prefix, self.__format_string(string, tokens, filter)))
+                    %(prefix, self.__format_string(string, tokens, filter)), 0,
+                        0, 0, 0)
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 usermsg.saytext2(userid, index, '\1%s%s'
-                    %(prefix, self.__format_string(string, tokens, userid)))
+                    %(prefix, self.__format_string(string, tokens, userid)), 0,
+                        0, 0, 0)
 
         # Show in console
         '''
