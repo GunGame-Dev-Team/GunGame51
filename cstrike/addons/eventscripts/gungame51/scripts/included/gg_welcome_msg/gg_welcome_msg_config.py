@@ -39,8 +39,8 @@ def load():
     config.text('information.')
     config.text('   Players can type !welcome to bring this menu back up.')
     config.text('Note:')
-    config.text('   The configureable message is available in' +
-                '"gg_stats_logging.txt".')
+    config.text('   The configureable message is available in ' +
+                '"gg_welcome_msg.txt".')
     config.text('Options:')
     config.text('   0 = (Disabled)')
     config.text('   1 = (Enabled)')
