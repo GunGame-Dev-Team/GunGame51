@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/logs/__init__.py
+# ../addons/eventscripts/gungame51/core/logs/gg_error_logging/__init__.py
 
 '''
 $Rev$
@@ -13,7 +13,6 @@ $LastChangedDate$
 from __future__ import with_statement
 from time import strftime
 from os import path
-from os import remove
 from os import name as OS
 import sys
 import traceback
@@ -215,29 +214,6 @@ def make_log_file():
 
 # Trackback hook
 sys.excepthook = gungame_except_hook
-
-'''
-    This section deletes the old error_logging files which may have been left 
-    behind after an update.
-    
-    /cstrike/cfg/gungame51/included_addon_configs/gg_error_logging.cfg
-    /cstrike/addons/eventscripts/gungame51/scripts/included/gg_error_logging
-
-'''
-old_error_cfg = (get_game_dir('cfg/gungame51/included_addon_configs') + 
-                                                    '/gg_error_logging.cfg')
-                                                    
-if path.isfile(old_error_cfg):
-    remove(old_error_cfg)
-    
-del old_error_cfg
-
-old_error_dir = get_game_dir('addons/eventscripts/gungame51/scripts/included' +
-                                '/gg_error_logging')
-if old_error_dir.isdir():
-    old_error_dir.rmtree()
-
-del old_error_dir
 
 
 

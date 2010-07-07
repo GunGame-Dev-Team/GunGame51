@@ -11,6 +11,8 @@ $LastChangedDate$
 # ============================================================================
 # Python imports
 import sys
+from os import path
+from os import remove
 
 # EventScripts Imports
 import es
@@ -18,13 +20,18 @@ import gamethread
 from playerlib import getPlayer
 from playerlib import getUseridList
 from weaponlib import getWeaponList
+from cmdlib import registerSayCommand
+from cmdlib import unregisterSayCommand
 
 # SPE Imports
 import spe
 
 # GunGame Imports
 
-#    Error Logging
+#   Core Function Imports
+from core import get_game_dir
+
+#    Error Logging Function Imports
 from core.logs import make_log_file
 
 #    Weapon Function Imports
@@ -97,6 +104,50 @@ gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 firstPlayerSpawned = False
 
+# Credits used for the !thanks command
+credits = {
+    'Project Leaders':
+        ['XE_ManUp',
+        'Warren Alpert',
+        'your-name-here',
+        'Monday'],
+
+    'Developers':
+        ['cagemonkey',
+        'llamaelite',
+        'RideGuy'],
+
+    'Beta Testers':
+        ['Sir_Die',
+        'pyro',
+        'D3X',
+        'nad',
+        'Knight',
+        'Evil_SNipE',
+        'k@rma',
+        'tnarocks',
+        'Warbucks'],
+
+    'Special Thanks':
+        ['gameservers.pro',
+        'Predator',
+        'tnb=[porsche]911',
+        'RG3 Community',
+        'counter-strike.com',
+        'The Cheebs']
+}
+
+# List of old files no longer in use.
+old_files = [get_game_dir('addons/eventscripts/gungame51/scripts/included' +
+                                '/gg_error_logging'),
+             get_game_dir('addons/eventscripts/gungame51/scripts/included' +
+                                '/gg_thanks'),
+             (get_game_dir('cfg/gungame51/included_addon_configs') + 
+                                                    '/gg_error_logging.cfg'),
+             (get_game_dir('cfg/gungame51/included_addon_configs') + 
+                                                    '/gg_thanks.cfg')
+]
+
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -143,6 +194,10 @@ def load():
     # this is needed so that the correct values are stored.
     es.server.cmd('exec server.cfg')
     
+    # Delete any out of date files
+    for old_file_name in old_files:
+        delete_old_file(old_file_name)        
+    
     try:
         initialize()
     except:
@@ -164,6 +219,10 @@ def load():
     es.ServerVar('eventscripts_gg').makepublic()
     es.ServerVar('eventscripts_gg5').set(gungame_info('version'))
     es.ServerVar('eventscripts_gg5').makepublic()
+
+    # Register !thanks command
+    registerSayCommand('!thanks', thanks, 'Displays a list of those involved' +
+                       'with development and testing of GunGame.')
 
 def unload():
     # Remove the public variables
@@ -215,6 +274,9 @@ def unload():
 
     # Fire gg_unload event
     EventManager().gg_unload
+    
+    # Unregister !thanks command
+    unregisterSayCommand('!thanks')
     
 def initialize():
     # Load all configs
@@ -695,10 +757,44 @@ def player_activate(event_var):
     # Update the player in the database
     userid = int(event_var['userid'])
     Player(userid).database_update()
+    
+    if event_var['es_steamid'] in ('STEAM_0:1:5021657', 'STEAM_0:1:5244720', 
+      'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):   
+        msg('#human', 'GGThanks', {'name': event_var['es_username']})
 
 # ============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # ============================================================================
+def thanks(userid, args):
+    msg(userid, 'CheckConsole')    
+    es.cexec(userid, 'echo [GG Thanks] ')
+    
+    # Loop through the credits
+    for x in credits.keys():
+        # Print category
+        es.cexec(userid, 'echo [GG Thanks] %s:' % (x))
+        
+        # Show all in this category
+        for y in credits[x]:
+            es.cexec(userid, 'echo [GG Thanks]    %s' % y)
+        
+        es.cexec(userid, 'echo [GG Thanks] ')
+
+def delete_old_file(old_file):                                                    
+    # Delete single file?
+    if path.isfile(old_file):
+        remove(old_file)
+    
+    # Delete entire directory?
+    elif old_file.isdir():
+        old_file.rmtree()
+        
+    else:
+        return
+        
+    # Send console message
+    es.server.queuecmd('echo [GunGame] Deleted: %s' % str(old_file))
+
 def equip_player():
     userid = es.getuserid()
     cmd = 'es_xremove game_player_equip;' + \
