@@ -25,7 +25,7 @@ info = AddonInfo()
 info.name = 'gg_hostage_objective'
 info.title = 'GG Hostage Objective' 
 info.author = 'GG Dev Team' 
-info.version = '0.1'
+info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 
 # ============================================================================
 # >> GLOBAL VARIABLES

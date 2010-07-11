@@ -44,7 +44,7 @@ info = AddonInfo()
 info.name = 'gg_map_vote'
 info.title = 'GG Map Vote' 
 info.author = 'GG Dev Team' 
-info.version = '0.1'
+info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_map_vote']
 
 # =============================================================================

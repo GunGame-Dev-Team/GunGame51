@@ -30,7 +30,7 @@ info = AddonInfo()
 info.name = 'gg_knife_pro'
 info.title = 'GG Knife Pro' 
 info.author = 'GG Dev Team' 
-info.version = '0.2'
+info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_knife_pro']
 
 # ============================================================================
