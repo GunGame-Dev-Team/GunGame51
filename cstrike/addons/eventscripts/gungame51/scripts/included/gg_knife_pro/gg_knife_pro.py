@@ -15,7 +15,6 @@ import gamethread
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.events import fireEvent
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import add_attribute_callback
 from gungame51.core.players.shortcuts import remove_callbacks_for_addon
@@ -205,12 +204,12 @@ def fire_gg_knife_steal(attacker, victim):
     # ===================
     # Fire the event
     # ===================
-    event_values = {}
-    event_values["attacker"] = ("int", attacker)
-    event_values["attacker_level"] = ("int", ggAttacker.level)
-    event_values["userid"] = ("int", victim)
-    event_values["userid_level"] = ("int", Player(victim).level)
-    gamethread.delayed(0, fireEvent, ("gg_knife_steal", event_values))
+    es.event('initialize', 'gg_knife_steal')
+    es.event('setint', 'gg_knife_steal', 'attacker', attacker)
+    es.event('setint', 'gg_knife_steal', 'attacker_level', ggAttacker.level)
+    es.event('setint', 'gg_knife_steal', 'userid_level', Player(victim).level)
+    es.event('setint', 'gg_knife_steal', 'userid', victim)
+    es.event('fire', 'gg_knife_steal')
 
     # Announce the level steal
     saytext2('#human', ggAttacker.index, 'StoleLevel', 

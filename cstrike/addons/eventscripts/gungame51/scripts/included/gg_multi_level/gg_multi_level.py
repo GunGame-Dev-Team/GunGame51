@@ -19,7 +19,6 @@ import spe
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.events import fireEvent
 from gungame51.core.players import Player
 from gungame51.core.players.shortcuts import setAttribute
 from gungame51.core.players.shortcuts import deleteAttribute
@@ -281,8 +280,10 @@ def gg_levelup(event_var):
     # Increment multi-kills for attacker
     ggPlayer = Player(attacker)
     ggPlayer.multiLevels += 1
+
     # Is it greater than or equal to our threshold?
     if ggPlayer.multiLevels >= int(gg_multi_level):
+        
         # If they currently have the bonus
         if attacker in currentMultiLevel:
             
@@ -369,10 +370,10 @@ def do_multi_level(userid):
             Player(userid).multiLevelEntities.append(spark_index)
 
         # Fire gg_multi_level
-        event_values = {}
-        event_values["userid"] = ("int", userid)
-        event_values["leveler"] = ("int", userid)
-        gamethread.delayed(0, fireEvent, ("gg_multi_level", event_values))
+        es.event('initialize', 'gg_multi_level')
+        es.event('setint', 'gg_multi_level', 'userid', userid)
+        es.event('setint', 'gg_multi_level', 'leveler', userid)
+        es.event('fire', 'gg_multi_level')
 
 def remove_multi_level(userid):
     # Check validity
