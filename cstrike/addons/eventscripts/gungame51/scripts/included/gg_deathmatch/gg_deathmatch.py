@@ -14,6 +14,7 @@ import es
 from playerlib import getPlayer
 from playerlib import getUseridList
 import repeat
+import gamethread
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
