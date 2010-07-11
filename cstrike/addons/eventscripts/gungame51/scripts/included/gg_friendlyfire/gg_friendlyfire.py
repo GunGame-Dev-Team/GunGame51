@@ -47,12 +47,6 @@ oldFriendlyFire = int(mp_friendlyfire)
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
-    # This will prevent crashes with gg_friendlyfire (TEMPORARY)
-    import gamethread
-    if es.exists('variable', 'mp_friendlyfire'):
-        es.flags('remove', 'notify', 'mp_friendlyfire')
-        gamethread.delayed(1, es.flags, ('remove', 'notify', 'mp_friendlyfire'))
-    
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     

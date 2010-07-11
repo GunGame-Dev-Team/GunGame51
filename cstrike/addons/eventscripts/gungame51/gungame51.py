@@ -348,16 +348,6 @@ def completeInitialize():
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
-    # This will prevent crashes with SourceMod (TEMPORARY)
-    if es.exists('variable', 'sm_nextmap'):
-        es.flags('remove', 'notify', 'sm_nextmap')
-        gamethread.delayed(1, es.flags, ('remove', 'notify', 'sm_nextmap'))
-
-    # This will prevent crashes with Mani (TEMPORARY)
-    if es.exists('variable', 'mani_nextmap'):
-        es.flags('remove', 'notify', 'mani_nextmap')
-        gamethread.delayed(1, es.flags, ('remove', 'notify', 'mani_nextmap'))
-        
     '''
     I believe this may not be our responsibility to track, or should it?
     # Check for priority addons
