@@ -10,6 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python Imports
+from __future__ import with_statement
 import os
 
 # Eventscripts Imports
@@ -26,7 +27,7 @@ from gungame51.core.messaging import MessageManager
 # >> GLOBAL VARIABLES
 # ============================================================================
 ggVersion = None
-_gg_info_quiet = False
+_gg_info_quiet = True
 _gg_info = None
 
 # ============================================================================
@@ -89,13 +90,6 @@ class AddonInfo(dict):
         '''
         Setting an attribute is equivalent to setting an item
         '''
-        if name == 'version':
-            if AddonManager().get_addon_type('%s' % self.name) == 'included':
-                dict.__setattr__(self, 'version', '5.1.%s' % AddonManager(
-                ).get_addon_by_name('%s' % self.name).__doc__.split(
-                '$Rev: ')[1].split()[0])
-                return
-
         self[name] = value
 
     def __getattr__(self, name):
@@ -640,37 +634,56 @@ def gungame_info(info, _info=None):
     global _gg_info
     
     if info == 'version':
+        # Stop here if we already have done this, and return the version.
         if ggVersion:
             return ggVersion
         
+        # This files revision is our starting point
         rev = int(__doc__.split('$Rev: ')[1].split()[0])
+        
+        # Our generator which walks through the files
         gen = get_file_list()
         
+        # Loop until an exception is raised
         while True:
+            # See if we can get the next file
             try:
                 files = gen.next()
             
+            # Exception raised, we are out of files. Return the version.
             except:
                 ggVersion = '5.1.%s' % rev
                 return ggVersion
             
+            # Folder name
             base_name = files[0]
 
+            # Don't look for the GG version in custom scripts
             if 'gungame51/scripts/custom' in base_name:
                 continue
+            
+            # Don't look for the GG version in the .res file
             if 'gungame51/core/events/data' in base_name:
                 continue
 
+            # Look through all the files in the folder
             for fileName in files[1]:
+                # Skip everything but .py files
                 if not fileName.endswith(".py"):
                     continue
 
+                # Try to open the file, then grab it's version
                 try:
-                    file = open(base_name + "/" + fileName, 'r')
-                    ver = int(file.read().split('$Rev: ')[1].split()[0])
+                    with open(base_name + "/" + fileName, 'r') as pyfile:
+                        ver = int(pyfile.read().split('$Rev: ')[1].split()[0])
+                    
+                    # Is this the new high version?
                     if ver > rev:
                         rev = ver
+                    
+                    continue
                 
+                # File could not be read for version, continue..
                 except:
                     continue
 
@@ -679,23 +692,26 @@ def gungame_info(info, _info=None):
     es.AddonInfo()
     '''
     if info in ('included', 'custom'):
+        # Stop here if this is the initial load
         if _gg_info_quiet:
             return
-        
+
+        # Retrieve the AddonManager
         AM = AddonManager()
-        addonlist = [AM.get_addon_info()[addon] for addon in
-                AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
-        
+
+        # Format our output
+        addonlist = ['\t'*4 + '%s (v%s)\n' %(AM.get_addon_info()[addon].name,
+            AM.get_addon_info()[addon].version) for addon in
+            AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
+
+        # If no addons, output is None
         if not addonlist:
             return 'None\n'
 
-        i = 0
-        
-        for addon in addonlist:
-            addonlist[i] = '\t'*4 + '%s (v%s)\n' % (addon.name, addon.version)
-            i += 1
-
+        # Add a line return to the beginning of our output
         addonlist.insert(0, '\n')
+
+        # Return the list as one string
         return ' '.join(addonlist)
 
     '''
@@ -704,22 +720,23 @@ def gungame_info(info, _info=None):
     '''
     if info == 'addoninfo':
         _gg_info = _info
-        _gg_info_quiet = True
-        gamethread.delayed(1, gungame_info, 'listen')
+        _gg_info_quiet = False
+        gungame_info('update')
         
     '''
     Updates es.AddonInfo instance for gungame51
     '''
     if info == 'update':
+        # If this is the inital load, or we don't have a es.AddonInfo()
+        # instance then stop here.
         if _gg_info_quiet or not _gg_info:
             return
         
+        # Collect included addons w/ versions
         _gg_info.Included_Addons = gungame_info('included')
+
+        # Collect custom addons w/ versions
         _gg_info.Custom_Addons = gungame_info('custom')
-                    
-    if info == 'listen':
-        _gg_info_quiet = False
-        gungame_info('update')
         
 '''
 This wrapper makes it possible to use key addon functions

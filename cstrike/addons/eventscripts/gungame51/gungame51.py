@@ -287,7 +287,7 @@ def initialize():
 
 def completeInitialize():
     # Print load started
-    es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
+    es.dbgmsg(0, '[GunGame]' + '=' * 79)
 
     # Make the sounds downloadable
     make_downloadable()
@@ -329,7 +329,7 @@ def completeInitialize():
     prune_winners_db()
 
     # Set es.AddonInfo()
-    gamethread.delayed(3, gungame_info, ('addoninfo', info))
+    gungame_info('addoninfo', info)
 
     # Load error logging
     gamethread.delayed(3.50, make_log_file)
