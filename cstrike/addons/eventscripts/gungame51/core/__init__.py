@@ -14,12 +14,12 @@ from os import name as platform
 from path import path
 
 # Eventscripts Imports
-from es import ServerVar
+import es
 
 # ============================================================================
 # >> GLOBALS
 # ============================================================================
-gamePath = str(ServerVar('eventscripts_gamedir')).replace('\\', '/')
+gamePath = str(es.ServerVar('eventscripts_gamedir')).replace('\\', '/')
 
 # ============================================================================
 # >> CLASSES
@@ -51,7 +51,7 @@ def inMap():
 
     @retval True The server is in a map.
     @retval False The server is not in a map.'''
-    return (str(ServerVar('eventscripts_currentmap')) != '')
+    return (str(es.ServerVar('eventscripts_currentmap')) != '')
     
 def removeReturnChars(text):
     text = text.replace('\\r', '')
@@ -74,3 +74,30 @@ def get_file_list(top=get_game_dir('addons/eventscripts')):
 
         yield [str(name).replace('\\', '/'), 
             [str(x.name) for x in name.files('*.py')]]
+
+# ============================================================================
+# >> OLD FILE REMOVAL
+# ============================================================================
+# List of old files no longer in use.
+old_files = [get_game_dir('addons/eventscripts/gungame51/scripts/included' +
+                '/gg_error_logging'),
+             get_game_dir('addons/eventscripts/gungame51/scripts/included' +
+                '/gg_thanks'),
+             get_game_dir('cfg/gungame51/included_addon_configs' + 
+                '/gg_error_logging.cfg'),
+             get_game_dir('cfg/gungame51/included_addon_configs' + 
+                '/gg_thanks.cfg')]
+
+# Delete any out of date files
+for old_file in old_files:
+    if old_file.isfile():
+        old_file.remove()
+
+    # Delete entire directory?
+    elif old_file.isdir():
+        old_file.rmtree()
+    else:
+        pass
+
+    # Send console message
+    es.server.queuecmd('echo [GunGame] Deleted %s' % str(old_file))

@@ -20,6 +20,7 @@ import repeat
 import gamethread
 from playerlib import getPlayer
 from playerlib import getPlayerList
+from playerlib import getUseridList
 from weaponlib import getWeaponNameList
 
 # GunGame Imports
@@ -409,8 +410,8 @@ def prepare_game():
     giveGodMode = True
 
     # Give players godmode so that they can't level up
-    for userid in getPlayerList("#alive"):
-        getPlayer(userid).godmode = 1
+    for player in getPlayerList("#alive"):
+        player.godmode = 1
 
     # Remove addons added to priority_addons
     for addedAddon in priority_addons_added:
@@ -427,8 +428,8 @@ def remove_godmode():
     # No longer give godMode to newly spawning players
     giveGodMode = False
 
-    for userid in getPlayerList("#alive"):
-        getPlayer(userid).godmode = 0
+    for player in getPlayerList("#alive"):
+        player.godmode = 0
 
 def end_warmup(message):
     # Send hint
@@ -444,7 +445,7 @@ def end_warmup(message):
     reset_server_vars()
 
 def play_beep():
-    for userid in getPlayerList('#human'):
+    for userid in getUseridList('#human'):
         Player(userid).playsound('countDownBeep')
 
 def reset_server_vars():

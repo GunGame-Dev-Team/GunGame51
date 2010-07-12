@@ -11,8 +11,6 @@ $LastChangedDate$
 # ============================================================================
 # Python imports
 import sys
-from os import path
-from os import remove
 
 # EventScripts Imports
 import es
@@ -137,17 +135,6 @@ credits = {
         'The Cheebs']
 }
 
-# List of old files no longer in use.
-old_files = [get_game_dir('addons/eventscripts/gungame51/scripts/included' +
-                                '/gg_error_logging'),
-             get_game_dir('addons/eventscripts/gungame51/scripts/included' +
-                                '/gg_thanks'),
-             (get_game_dir('cfg/gungame51/included_addon_configs') + 
-                                                    '/gg_error_logging.cfg'),
-             (get_game_dir('cfg/gungame51/included_addon_configs') + 
-                                                    '/gg_thanks.cfg')
-]
-
 # ============================================================================
 # >> CLASSES
 # ============================================================================
@@ -192,12 +179,8 @@ def load():
     
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
-    es.server.cmd('exec server.cfg')
-    
-    # Delete any out of date files
-    for old_file_name in old_files:
-        delete_old_file(old_file_name)        
-    
+    es.server.cmd('exec server.cfg')       
+
     try:
         initialize()
     except:
@@ -765,21 +748,6 @@ def thanks(userid, args):
             es.cexec(userid, 'echo [GG Thanks]    %s' % y)
         
         es.cexec(userid, 'echo [GG Thanks] ')
-
-def delete_old_file(old_file):                                                    
-    # Delete single file?
-    if path.isfile(old_file):
-        remove(old_file)
-    
-    # Delete entire directory?
-    elif old_file.isdir():
-        old_file.rmtree()
-        
-    else:
-        return
-        
-    # Send console message
-    es.server.queuecmd('echo [GunGame] Deleted: %s' % str(old_file))
 
 def equip_player():
     userid = es.getuserid()

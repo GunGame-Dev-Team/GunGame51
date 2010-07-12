@@ -11,7 +11,7 @@ $LastChangedDate$
 # ============================================================================
 # Eventscripts Imports
 import es
-from playerlib import getPlayerList
+from playerlib import getUseridList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -79,5 +79,5 @@ def gg_levelup(event_var):
             msg('#human', 'WatchYourFire', prefix=True)
 
             # Playing sound
-            for userid in getPlayerList('#human'):
+            for userid in getUseridList('#human'):
                 Player(userid).playsound('friendlyfire')

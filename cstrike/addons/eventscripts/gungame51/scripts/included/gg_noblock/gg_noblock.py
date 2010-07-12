@@ -33,15 +33,15 @@ def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
     # Enable noblock for every player that is alive and on a team
-    for userid in getPlayerList('#alive'):
-        getPlayer(userid).noblock = 1
+    for player in getPlayerList('#alive'):
+        player.noblock = 1
 
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
     # Disable noblock for every player that is alive and on a team
-    for userid in getPlayerList('#alive'):
-        getPlayer(userid).noblock = 0
+    for player in getPlayerList('#alive'):
+        player.noblock = 0
 
 # ============================================================================
 # >> GAME EVENTS
