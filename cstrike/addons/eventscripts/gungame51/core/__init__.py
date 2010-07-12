@@ -90,6 +90,7 @@ old_files = [get_game_dir('addons/eventscripts/gungame51/scripts/included' +
 
 # Delete any out of date files
 for old_file in old_files:
+    
     if old_file.isfile():
         old_file.remove()
 
@@ -97,7 +98,7 @@ for old_file in old_files:
     elif old_file.isdir():
         old_file.rmtree()
     else:
-        pass
+        continue
 
     # Send console message
     es.server.queuecmd('echo [GunGame] Deleted %s' % str(old_file))

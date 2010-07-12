@@ -632,57 +632,49 @@ def gungame_info(info, _info=None):
     global ggVersion
     global _gg_info_quiet
     global _gg_info
-    
+
     if info == 'version':
         # Stop here if we already have done this, and return the version.
         if ggVersion:
             return ggVersion
-        
+
         # This files revision is our starting point
         rev = int(__doc__.split('$Rev: ')[1].split()[0])
-        
+
         # Our generator which walks through the files
         gen = get_file_list()
-        
+
         # Loop until an exception is raised
         while True:
             # See if we can get the next file
             try:
                 files = gen.next()
-            
+
             # Exception raised, we are out of files. Return the version.
             except:
                 ggVersion = '5.1.%s' % rev
                 return ggVersion
-            
+
             # Folder name
             base_name = files[0]
 
             # Don't look for the GG version in custom scripts
             if 'gungame51/scripts/custom' in base_name:
                 continue
-            
-            # Don't look for the GG version in the .res file
-            if 'gungame51/core/events/data' in base_name:
-                continue
 
             # Look through all the files in the folder
             for fileName in files[1]:
-                # Skip everything but .py files
-                if not fileName.endswith(".py"):
-                    continue
-
                 # Try to open the file, then grab it's version
                 try:
                     with open(base_name + "/" + fileName, 'r') as pyfile:
                         ver = int(pyfile.read().split('$Rev: ')[1].split()[0])
-                    
+
                     # Is this the new high version?
                     if ver > rev:
                         rev = ver
-                    
+
                     continue
-                
+
                 # File could not be read for version, continue..
                 except:
                     continue
@@ -722,7 +714,7 @@ def gungame_info(info, _info=None):
         _gg_info = _info
         _gg_info_quiet = False
         gungame_info('update')
-        
+
     '''
     Updates es.AddonInfo instance for gungame51
     '''
@@ -731,13 +723,13 @@ def gungame_info(info, _info=None):
         # instance then stop here.
         if _gg_info_quiet or not _gg_info:
             return
-        
+
         # Collect included addons w/ versions
         _gg_info.Included_Addons = gungame_info('included')
 
         # Collect custom addons w/ versions
         _gg_info.Custom_Addons = gungame_info('custom')
-        
+
 '''
 This wrapper makes it possible to use key addon functions
 without interacting with the AddonManager directly
@@ -745,7 +737,6 @@ without interacting with the AddonManager directly
 def load(*a, **kw):
    AddonManager().load(*a, **kw)
 load.__doc__ = AddonManager.load.__doc__
-
 
 def unload(*a, **kw):
    AddonManager().unload(*a, **kw)
