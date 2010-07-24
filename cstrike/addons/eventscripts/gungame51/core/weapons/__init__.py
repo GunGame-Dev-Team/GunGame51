@@ -10,7 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python imports
-import os.path
+from __future__ import with_statement
 import random
 
 # EventScripts Imports
@@ -81,19 +81,16 @@ class BaseWeaponOrders(object):
         '''
         # Try to open the file
         try:
-            weaponOrderFile = open(self.filepath, 'r')
+            with open(self.filepath, 'r') as weaponOrderFile:
+                # Clean and format the lines
+                lines = [x.strip() for x in weaponOrderFile.readlines()]
+                lines = filter(lambda x: x and (not x.startswith('//')), lines)
+                lines = [x.split('//')[0] for x in lines]
+                lines = [' '.join(x.split()) for x in lines]
+
         except IOError, e:
             raise IOError('Cannot parse weapon order file ' +
                 '(%s): IOError: %s' % (self.filepath, e))
-
-        # Clean and format the lines
-        lines = [x.strip() for x in weaponOrderFile.readlines()]
-        lines = filter(lambda x: x and (not x.startswith('//')), lines)
-        lines = [x.split('//')[0] for x in lines]
-        lines = [' '.join(x.split()) for x in lines]
-
-        # Close the file, we have the lines
-        weaponOrderFile.close()
 
         # Set a variable to keep track of the levels for each weapon as we
         # parse the file
@@ -458,11 +455,7 @@ def load_weapon_orders():
     '''
     weaponOrderPath = get_game_dir('cfg/gungame51/weapon_orders')
 
-    for item in os.listdir(weaponOrderPath):
-        # Ignore subfolders
-        if os.path.isdir(os.path.join(weaponOrderPath, item)):
-            continue
-
-        WeaponManager().load(item)
+    for item in weaponOrderPath.files("*.txt"):
+        WeaponManager().load(item.name)
 
 load_weapon_orders()

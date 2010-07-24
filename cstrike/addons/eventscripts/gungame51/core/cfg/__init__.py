@@ -10,7 +10,6 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python Imports
-import os.path
 from path import path
 
 # EventScripts Imports
@@ -259,15 +258,40 @@ class ConfigManager(object):
 es.addons.registerForEvent(ConfigManager(), 'server_cvar', 
                                                    ConfigManager().server_cvar)
 
-dict_config_types = {
-    "main":get_game_dir("/addons/eventscripts/gungame51/core/cfg/files"),
-    "included":get_game_dir("/addons/eventscripts/gungame51/scripts/included"),
-    "custom":get_game_dir("/addons/eventscripts/gungame51/scripts/custom")
-    }
-
 # ============================================================================
 # >> FUNCTIONS
 # ============================================================================
+list_config_types = [
+    ("main", get_game_dir("/addons/eventscripts/gungame51/core/cfg/files")),
+    ("included",
+        get_game_dir("/addons/eventscripts/gungame51/scripts/included")),
+    ("custom", get_game_dir("/addons/eventscripts/gungame51/scripts/custom"))
+    ]
+
+# Dictionary used to cache configs, optmizing having to read from disk
+dict_configs_cache = {"main":[],"included":[],"custom":[]}
+
+def __cache_configs():
+    # Loop through each config path
+    for cfgpath in [x[1] for x in list_config_types]:
+        # Walk through all files in the path
+        for file in cfgpath.walkfiles('*.py'):
+            # We require the configs to end with "_config.py"
+            if not file.name.endswith("_config.py"):
+                continue
+
+            # Check for "main"
+            if cfgpath == list_config_types[0][1]:
+                dict_configs_cache["main"].append(file.namebase)
+            # Check for "included"
+            elif cfgpath == list_config_types[1][1]:
+                dict_configs_cache["included"].append(file.namebase)
+            else:
+                dict_configs_cache["custom"].append(file.namebase)
+
+# Cache the configs
+__cache_configs()
+
 def get_config_list(type=None):
     '''
     Retrieves a list of cfglib configs of the following types:
@@ -279,41 +303,23 @@ def get_config_list(type=None):
         If no argument is provided, all possible configs will be returned 
         in the list.
     '''
-    # Initialize a blank list to store the config names
-    list_configs = []
-
     # Did they supply us with a type?
     if type:
         # Make sure they provided us with a valid argument value
-        if type not in dict_config_types.keys():
+        if type not in [x[0] for x in list_config_types]:
             raise ValueError('Invalid argument type: "%s". Use only: "%s"'
-                %(type, '", "'.join(dict_config_types.keys())) + ', or None.')
+                %(type, '", "'.join([x[0] for x in list_config_types])) +
+                ', or None.')
 
-        # Only search for the specific type
-        searchList = [dict_config_types[type]]
+        # Return the specific type
+        return dict_configs_cache[type]
 
-    # No type argument
-    else:
-        # Search all possible configs
-        searchList = [x for x in dict_config_types.values()]
-
-        # Reverse the search list to execute "main" configs first
-        searchList.reverse()
-
-    # Loop through each config path
-    for cfgpath in searchList:
-        # Walk through all files in the path
-        for file in cfgpath.walkfiles('*.py'):
-            # We require the configs to end with "_config.py"
-            if not file.name.endswith("_config.py"):
-                continue
-
-            # Append the config to our list of configs
-            list_configs.append(file.namebase)
+    # Search all possible configs
+    searchList = [dict_configs_cache[x[0]] for x in list_config_types]
 
     # Return the list of config names (no ".py" extension)
-    return list_configs
-    
+    return [item for sublist in searchList for item in sublist]
+
 def generate_header(config):
     '''
     Generates a generic header based off of the addon name.

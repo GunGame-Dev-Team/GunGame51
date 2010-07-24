@@ -9,9 +9,6 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
-import os.path
-
 # Eventscripts Imports
 import es
 from langlib import Strings

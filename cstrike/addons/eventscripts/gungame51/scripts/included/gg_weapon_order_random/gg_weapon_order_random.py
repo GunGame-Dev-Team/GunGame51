@@ -10,7 +10,6 @@ $LastChangedDate$
 # >> IMPORTS
 # ============================================================================
 # Python imports
-import os.path
 import random
 
 # Eventscripts Imports
@@ -54,8 +53,8 @@ def unload():
 def es_map_start(event_var):
     # Get a list of files names ([:-4] to remove .txt extensions) in the
     # weapon_orders directory
-    files = [x.name[:-4] for x in get_game_dir('cfg/gungame51/weapon_orders') \
-                                                            .files("*.txt")]
+    files = [x.namebase for x in
+        get_game_dir('cfg/gungame51/weapon_orders').files("*.txt")]
 
     # Get the current weapon order's file name
     currentFile = get_weapon_order().file

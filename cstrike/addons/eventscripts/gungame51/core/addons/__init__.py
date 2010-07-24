@@ -11,7 +11,6 @@ $LastChangedDate$
 # ============================================================================
 # Python Imports
 from __future__ import with_statement
-import os
 
 # Eventscripts Imports
 import es
@@ -597,22 +596,17 @@ class AddonManager(object):
                 % name)
 
         # Get addon type
-        if os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/included/%s/%s.py' %(name, name))):
+        if name in included_addons_cache:
             return 'included'
-        elif os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/custom/%s/%s.py' %(name, name))):
+        elif name in custom_addons_cache:
             return 'custom'
 
     @staticmethod
     def addon_exists(name):
         '''
-        Returns an int (bool) value depending on a GunGame addon's existance.
+        Returns a bool value depending on a GunGame addon's existance.
         '''
-        return int(os.path.isfile(get_game_dir('addons/eventscripts/' +
-            'gungame51/scripts/included/%s/%s.py' %(name, name)))) or \
-            int(os.path.isfile(get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/custom/%s/%s.py' %(name, name))))
+        return (name in get_valid_addons())
 
     @staticmethod
     def call_block(addon, blockname, *a, **kw):
@@ -742,23 +736,36 @@ def unload(*a, **kw):
    AddonManager().unload(*a, **kw)
 unload.__doc__ = AddonManager.unload.__doc__
 
+# Variable to cache the results of get_valid_addons() - saves overhead from
+# reading the disk each time get_valid_addons() is called
+valid_addons_cache = []
+# Variable to cache valid included addons (same concept as valid_addons_cache)
+included_addons_cache = []
+# Variable to cache valid included addons (same concept as valid_addons_cache)
+custom_addons_cache = []
 def get_valid_addons():
     '''
     Returns a list of valid addon names from the included and custom addons
     directory.
     '''
+    # If we have cached a list of valid addons, return the cached list
+    if valid_addons_cache:
+        return valid_addons_cache
+
+    # Create directory references to loop through
     included = get_game_dir('addons/eventscripts/gungame51/scripts/included')
     custom = get_game_dir('addons/eventscripts/gungame51/scripts/custom')
 
-    list_addons = []
-
-    for path in [included, custom]:
-        for item in os.listdir(path):
-            # Ignore subfolders
-            if not os.path.isdir(os.path.join(path, item)):
-                continue
-
-            list_addons.append(item)
-    return list_addons
+    # Loop through each path name
+    for pathName in [included, custom]:
+        # Loop through directories in the given paths
+        for item in pathName.dirs():
+            # Append basename of the directory (addon name) to the cached list
+            if item.parent == included:
+                included_addons_cache.append(item.namebase)
+            else:
+                custom_addons_cache.append(item.namebase)
+            valid_addons_cache.append(item.namebase)
+    return valid_addons_cache
 
 from gungame51.core.players.shortcuts import Player
