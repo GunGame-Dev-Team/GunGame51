@@ -47,5 +47,9 @@ def unload():
 # >> GAME EVENTS
 # ============================================================================
 def player_spawn(event_var):
+    # Is the player on a team
+    if not int(event_var['es_userteam']) > 1:
+        return
+
     # Enable noblock for this player
     getPlayer(event_var['userid']).noblock = 1
