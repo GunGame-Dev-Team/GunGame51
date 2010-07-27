@@ -89,9 +89,13 @@ class ConfigManager(object):
                 
                 global cfgExecuting
                 cfgExecuting = True
-                gamethread.delayed(0, self._reset_config_execution, ())
-                cfg.execute(True)
-                
+                gamethread.delayed(0.01, self._reset_config_execution, ())
+                # "Some" Linux servers were executing the config before or at
+                # the same time as setting the notify flag on the "trigger"
+                # CVARs. Therefore, a slight delay is needed here to guarantee
+                # that the notify flag is set before the config executes.
+                gamethread.delayed(0, cfg.execute, (True))
+
                 # Load addons that were defaulted to "on"
                 revisit = [x for x in revisit if x in get_valid_addons()]
                 for cvar in revisit:
