@@ -262,6 +262,7 @@ class BaseWeaponOrders(object):
         for userid in getUseridList("#alive"):
             getPlayer(userid).godmode = 1
 
+        self.echo()
         es.server.queuecmd('mp_restartgame 2')
         es.msg('Weapon Order Changed! Restarting in 2 seconds!')
 

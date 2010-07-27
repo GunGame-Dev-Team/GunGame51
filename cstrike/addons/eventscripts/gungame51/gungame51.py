@@ -262,15 +262,17 @@ def unload():
     unregisterSayCommand('!thanks')
     
 def initialize():
+    es.dbgmsg(0, langstring("Load_Start"))
+    es.dbgmsg(0, langstring("Load_Configs"))
     # Load all configs
     loadConfig(get_config_list())
 
     # Pause a moment for the configs to be loaded (OB engine requires this)
-    gamethread.delayed(0.016, completeInitialize)
+    gamethread.delayed(0.1, completeInitialize)
 
 def completeInitialize():
     # Print load started
-    es.dbgmsg(0, '[GunGame]' + '=' * 79)
+    #es.dbgmsg(0, '[GunGame]' + '=' * 79)
 
     # Make the sounds downloadable
     make_downloadable()
@@ -282,20 +284,6 @@ def completeInitialize():
     # Fire the gg_server.cfg
     es.server.cmd('exec gungame51/gg_server.cfg')
 
-    # Get weapon order file
-    # Set this as the weapon order and set the weapon order type
-    currentOrder = set_weapon_order(str(gg_weapon_order_file), 
-                                  str(gg_weapon_order_sort_type))
-
-    # Set multikill override
-    if int(gg_multikill_override) > 1:
-        currentOrder.set_multikill_override(int(gg_multikill_override))
-
-    # Echo the weapon order to console
-    es.dbgmsg(0, '[GunGame]')
-    currentOrder.echo()
-    es.dbgmsg(0, '[GunGame]')
-
     # Clear out the GunGame system
     resetPlayers()
 
@@ -306,7 +294,7 @@ def completeInitialize():
     EventManager().gg_load()
 
     # Print load completed
-    es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
+    #es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
 
     # Prune the DB
     prune_winners_db()
@@ -331,12 +319,6 @@ def completeInitialize():
 # >> GAME EVENTS
 # ============================================================================
 def es_map_start(event_var):
-    '''
-    I believe this may not be our responsibility to track, or should it?
-    # Check for priority addons
-    if PriorityAddon():
-        del PriorityAddon()[:]
-    '''
     # Set firstPlayerSpawned to False, so player_spawn will know when the first
     # spawn is
     firstPlayerSpawned = False
@@ -715,7 +697,7 @@ def server_cvar(event_var):
         if int(gg_multikill_override):
             # Set multikill override
             currentOrder.set_multikill_override(int(gg_multikill_override))
-
+        
 def player_changename(event_var):
     # Update the player's name in the winners database if they are in it
     if Player(int(event_var['userid'])).wins:
