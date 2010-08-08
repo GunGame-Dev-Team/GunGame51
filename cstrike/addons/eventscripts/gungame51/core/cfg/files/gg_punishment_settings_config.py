@@ -106,6 +106,31 @@ def load():
     config.cvar('gg_retry_punish', 0, 'The number of levels a player will ' +
                 'lose if they reconnect in the same round.').addFlag('notify')
 
+    # Hostage Killed Punishment
+    config.text('')
+    config.text('='*76)
+    config.text('>> HOSTAGE KILLED PUNISHMENT')
+    config.text('='*76)
+    config.text('Options:')
+    config.text('   0 = No punishment.')
+    config.text('   # = The number of levels a player will lose if they ' +
+                'kill hostages')
+    config.text('Default Value: 0')
+    config.cvar('gg_hostage_killed_punish', 0, 'The number of levels a player will ' +
+                'lose if they kill hostages.').addFlag('notify')
+
+    # Hostage Killed Required Kills
+    config.text('')
+    config.text('='*76)
+    config.text('>> HOSTAGE KILLED REQUIRED KILLS')
+    config.text('='*76)
+    config.text('Options:')
+    config.text('   # = The number of hostages killed required to ' +
+                'level the player down')
+    config.text('Default Value: 0')
+    config.cvar('gg_hostage_killed_kills', 0, 'The number of levels a player will ' +
+                'lose if they kill hostages.')
+
     # This line creates/updates the .cfg file
     config.write()
 
