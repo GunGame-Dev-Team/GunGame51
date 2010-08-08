@@ -109,7 +109,7 @@ def player_spawn(event_var):
     userid = int(event_var['userid'])
 
     # Is player alive?
-    if getPlayer(userid).isdead or int(event_var['es_userteam']) < 2:
+    if int(event_var['es_userdead']) or int(event_var['es_userteam']) < 2:
         return
 
     if userid in protectedList:
