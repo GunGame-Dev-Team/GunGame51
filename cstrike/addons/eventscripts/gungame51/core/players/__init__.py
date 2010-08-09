@@ -664,7 +664,7 @@ class BasePlayer(object):
 
         for weapon in pWeapons:
             if (self.weapon == weapon[7:] and not levelStrip) or \
-              weapon == 'weapon_knife' or weapon[7:] in exceptions:
+              weapon in ('weapon_knife', 'weapon_c4') or weapon[7:] in exceptions:
 
                 continue
 
