@@ -767,7 +767,9 @@ def send_level_info_hudhint(ggPlayer):
 
     text += langstring('LevelInfo_CurrentWeapon', tokens={
                             'weapon': ggPlayer.weapon})
-    text += langstring('LevelInfo_RequiredKills', tokens={
+    multiKill = get_level_multikill(level)
+    if multiKill > 1:
+        text += langstring('LevelInfo_RequiredKills', tokens={
                             'kills': ggPlayer.multikill,
                             'total': get_level_multikill(level)})
 
