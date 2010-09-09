@@ -60,11 +60,12 @@ class EventManager(object):
         
         # Check to see if the player just won
         if newLevel > get_total_levels():
+            global recentWinner
+            
             # If there was a recentWinner, stop here
             if recentWinner:
                 return False
-            
-            global recentWinner
+        
             # Set recentWinner to True
             recentWinner = True
             # In 1 second, remove the recentWinner
