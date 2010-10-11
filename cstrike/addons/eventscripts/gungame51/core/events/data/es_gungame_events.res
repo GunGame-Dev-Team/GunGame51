@@ -45,7 +45,7 @@
 	}
     "gg_multi_level"
     {
-        "userid"    "short" // The userid of the leader that lost a level
+        "userid"    "short" // The userid of the player that multi leveled
         "leveler"   "short" // The userid of the player that is leveling
     }
     "gg_new_leader"
