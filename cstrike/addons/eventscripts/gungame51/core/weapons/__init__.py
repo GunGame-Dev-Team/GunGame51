@@ -138,21 +138,21 @@ class BaseWeaponOrders(object):
             weapons = self.order.values()
 
             # Setup variables
-            knifeData = None
-            nadeData = None
+            knifeData = []
+            nadeData = []
 
             # Get knife and grenade data
             for weapon in weapons[:]:
                 if weapon[0] == 'knife':
                     # Get data
-                    knifeData = weapon
+                    knifeData.append(weapon)
 
                     # Remove
                     weapons.remove(weapon)
 
                 elif weapon[0] == 'hegrenade':
                     # Get data
-                    nadeData = weapon
+                    nadeData.append(weapon)
 
                     # Remove
                     weapons.remove(weapon)
@@ -164,11 +164,11 @@ class BaseWeaponOrders(object):
             self.order = dict(zip(range(1, len(weapons)+1), weapons))
 
             # Re-add knife and grenade to the end
-            if nadeData != None:
-                self.order[len(self.order)+1] = nadeData
+            for weapon in nadeData:
+                self.order[len(self.order)+1] = weapon
 
-            if knifeData != None:
-                self.order[len(self.order)+1] = knifeData
+            for weapon in knifeData:
+                self.order[len(self.order)+1] = weapon
 
         # =====================================================================
         # DEFAULT WEAPON ORDER
@@ -185,21 +185,21 @@ class BaseWeaponOrders(object):
             weapons = self.order.values()
 
             # Setup variables
-            knifeData = None
-            nadeData = None
+            knifeData = []
+            nadeData = []
 
             # Get knife and grenade data
             for weapon in weapons[:]:
                 if weapon[0] == 'knife':
                     # Get data
-                    knifeData = weapon
+                    knifeData.append(weapon)
 
                     # Remove
                     weapons.remove(weapon)
 
                 elif weapon[0] == 'hegrenade':
                     # Get data
-                    nadeData = weapon
+                    nadeData.append(weapon)
 
                     # Remove
                     weapons.remove(weapon)
@@ -211,11 +211,11 @@ class BaseWeaponOrders(object):
             self.order = dict(zip(range(1, len(weapons)+1), weapons))
 
             # Re-add knife and grenade to the end
-            if nadeData != None:
-                self.order[len(self.order)+1] = nadeData
+            for weapon in nadeData:
+                self.order[len(self.order)+1] = weapon
 
-            if knifeData != None:
-                self.order[len(self.order)+1] = knifeData
+            for weapon in knifeData:
+                self.order[len(self.order)+1] = weapon
 
         # When the weapon order changes, we create/cancel a delayed name so
         # that we do not restart the round multiple times due to one weapon
