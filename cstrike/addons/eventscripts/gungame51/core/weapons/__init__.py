@@ -358,7 +358,7 @@ class WeaponManager(object):
     # >> WeaponManager() CLASS ATTRIBUTE METHODS
     # =========================================================================
     def __getitem__(self, item):
-        if name in ['currentorder', '__weaponorders__', 'gungameorder']:
+        if item in ['currentorder', '__weaponorders__', 'gungameorder']:
             return object.__getattr__(self, item)
         else:
             if not self.currentorder:
@@ -417,7 +417,7 @@ class WeaponManager(object):
         self.currentorder = name
         return self.__weaponorders__[name]
 
-    def unload(self, order):
+    def unload(self, name):
         '''
         Unload a weapon order by name.
         
