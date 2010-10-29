@@ -350,6 +350,11 @@ def es_map_start(event_var):
     if int(gg_multi_round):
         RoundInfo().round = 1
 
+    # Make sure gungameorder is set as the "current" order
+    # This fixes an issue that caused gg_nade_bonus order to be
+    # re-randomized instead of the gungame weapon_order
+    WeaponManager().currentorder = WeaponManager().gungameorder
+
     # If gg_weapon_order_sort_type is #random, re-randomize it
     if str(gg_weapon_order_sort_type) == "#random":
         WeaponManager().type = "#random"
