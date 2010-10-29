@@ -102,6 +102,9 @@ class SoundPack(object):
         # Select a random sound from the list
         randomSounds = [x.strip('\\n').strip() for x in randomFile.readlines()]
 
+        # Filter out all commented lines
+        randomSounds = filter(lambda x: not x.startswith('//'), randomSounds)
+
         # Close the random file
         randomFile.close()
 
