@@ -768,15 +768,18 @@ def send_level_info_hudhint(ggPlayer):
     # Create a string for the hudhint
     text = langstring('LevelInfo_CurrentLevel', tokens={
                             'level': level,
-                            'total': totalLevels})
+                            'total': totalLevels},
+                            userid=ggPlayer.userid)
 
     text += langstring('LevelInfo_CurrentWeapon', tokens={
-                            'weapon': ggPlayer.weapon})
+                            'weapon': ggPlayer.weapon},
+                            userid=ggPlayer.userid)
     multiKill = get_level_multikill(level)
     if multiKill > 1:
         text += langstring('LevelInfo_RequiredKills', tokens={
                             'kills': ggPlayer.multikill,
-                            'total': get_level_multikill(level)})
+                            'total': get_level_multikill(level)},
+                            userid=ggPlayer.userid)
 
     leaderTokens = {}
     # Choose the leaderString based on the player's leadership status
@@ -792,7 +795,7 @@ def send_level_info_hudhint(ggPlayer):
                     'total': totalLevels,
                     'weapon': get_level_weapon(leaderLevel)}
 
-    text += langstring(leaderString, tokens=leaderTokens)
+    text += langstring(leaderString, tokens=leaderTokens, userid=ggPlayer.userid)
 
     # Send the level information hudhint
     ggPlayer.hudhint(text)
