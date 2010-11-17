@@ -102,6 +102,8 @@ gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 firstPlayerSpawned = False
 
+sv_tags = es.ServerVar('sv_tags')
+
 # Credits used for the !thanks command
 credits = {
     'Project Leaders':
@@ -207,7 +209,19 @@ def load():
     registerSayCommand('!thanks', thanks, 'Displays a list of those involved' +
                        'with development and testing of GunGame.')
 
+    # Add gungame to sv_tags
+    tags = str(sv_tags)
+    if tags:
+        tags += ','
+    tags += 'gungame'
+    sv_tags.set(tags)
+
 def unload():
+    # Remove gungame from sv_tags
+    tags = str(sv_tags)
+    tags = tags.replace('gungame', '').replace(',,', ',').rstrip(',')
+    sv_tags.set(tags)
+
     # Remove the public variables
     es.ServerVar('eventscripts_gg').removeFlag('notify')
     es.ServerVar('eventscripts_gg').removeFlag('replicated')

@@ -25,6 +25,7 @@ from weaponlib import getWeaponNameList
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.addons import AddonManager
 from gungame51.core.addons import PriorityAddon
 from gungame51.core.addons import load as addon_load
 from gungame51.core.addons import unload as addon_unload
@@ -328,13 +329,13 @@ def do_warmup(useBackupVars=True):
         # If we have no warmup deathmatch, we need to unload deathmatch
         if not int(gg_warmup_deathmatch) and int(gg_deathmatch):
             gg_deathmatch.set(0)
-            addon_unload("gg_deathmatch")
+            check_unload("gg_deathmatch")
     # Otherwise, if elimination is on the server
     elif int(gg_elimination_backup):
         # If we have no warmup elimination, we need to unload elimination
         if not int(gg_warmup_elimination) and int(gg_elimination):
             gg_elimination.set(0)
-            addon_unload("gg_elimination")
+            check_unload("gg_elimination")
 
     # If only one warmup mode is selected, proceed
     if not (int(gg_warmup_deathmatch) and int(gg_warmup_elimination)):
@@ -457,14 +458,14 @@ def reset_server_vars():
             # now
             if not int(gg_deathmatch_backup) and int(gg_deathmatch):
                 gg_deathmatch.set(0)
-                addon_unload("gg_deathmatch")
+                check_unload("gg_deathmatch")
         # If warmup elimination was enabled
         elif int(gg_warmup_elimination):
             # Unload gg_elimination if we are not going into elimination
             # gameplay now
             if not int(gg_elimination_backup) and int(gg_elimination):
                 gg_elimination.set(0)
-                addon_unload("gg_elimination")
+                check_unload("gg_elimination")
 
     # If we are going into deathmatch gameplay
     if int(gg_deathmatch_backup):
@@ -482,8 +483,12 @@ def reset_server_vars():
     # If gg_dead_strip disabled before warmup, disable it again
     if not gg_dead_strip_backup and int(gg_dead_strip):
         gg_dead_strip.set(0)
-        addon_unload("gg_dead_strip")
+        check_unload("gg_dead_strip")
 
     # Changing mp_freezetime back
     if int(mp_freezetime) != mp_freezetime_backup:
         mp_freezetime.set(mp_freezetime_backup)
+
+def check_unload(addon):
+    if addon in AddonManager().__loaded__:
+        addon_unload(addon)
