@@ -210,17 +210,15 @@ def load():
                        'with development and testing of GunGame.')
 
     # Add gungame to sv_tags
-    tags = str(sv_tags)
-    if tags:
-        tags += ','
-    tags += 'gungame'
-    sv_tags.set(tags)
+    tags = set(str(sv_tags).split(','))
+    tags.add('gungame')
+    sv_tags.set(','.join(tags))
 
 def unload():
     # Remove gungame from sv_tags
-    tags = str(sv_tags)
-    tags = tags.replace('gungame', '').replace(',,', ',').rstrip(',')
-    sv_tags.set(tags)
+    tags = set(str(sv_tags).split(','))
+    tags.discard('gungame')
+    sv_tags.set(','.join(tags))
 
     # Remove the public variables
     es.ServerVar('eventscripts_gg').removeFlag('notify')
