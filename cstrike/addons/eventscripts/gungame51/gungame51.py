@@ -274,7 +274,7 @@ def unload():
     unregisterSayCommand('!thanks')
     
 def initialize():
-    es.dbgmsg(0, langstring("Load_Start"))
+    es.dbgmsg(0, langstring("Load_Start", {'version': gungame_info('version')}))
     es.dbgmsg(0, langstring("Load_Configs"))
     # Load all configs
     loadConfig(get_config_list())

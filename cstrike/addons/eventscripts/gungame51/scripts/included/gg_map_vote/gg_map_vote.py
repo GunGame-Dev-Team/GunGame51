@@ -21,6 +21,7 @@ from operator import itemgetter
 import es
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
+import gamethread
 import repeat
 import popuplib
 from playerlib import getUseridList
