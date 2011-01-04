@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 import gamethread
@@ -25,9 +25,9 @@ from gungame51.core.players.shortcuts import deleteAttribute
 from gungame51.core.messaging.shortcuts import centermsg
 from gungame51.core.messaging.shortcuts import saytext2
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_multi_level'
 info.title = 'GG Multi Level' 
@@ -35,9 +35,9 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_multi_level']
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 gg_multi_level = es.ServerVar("gg_multi_level")
 gg_multi_level_tk_reset = es.ServerVar("gg_multi_level_tk_reset")
 gg_multi_level_speed = es.ServerVar("gg_multi_level_speed")
@@ -47,9 +47,9 @@ gg_multi_level_gravity = es.ServerVar("gg_multi_level_gravity")
 # for them
 currentMultiLevel = {}
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================
+# =============================================================================
 
 # Manages and maintains Gravity when it is reset by touching specific entities
 # Thanks to Freddukes for creating the original
@@ -162,9 +162,9 @@ class GravityManager(object):
 
 gravity = GravityManager()
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Set each player's multilevel attributes
     setAttribute('#all', 'multiLevels', 0)
@@ -190,9 +190,9 @@ def unload():
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def player_activate(event_var):
     ggPlayer = Player(event_var['userid'])
 
@@ -303,9 +303,9 @@ def gg_levelup(event_var):
         gamethread.delayedname(10, "%i_multilevel" % attacker, 
                                remove_multi_level, attacker)
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def stop_multi_levelers():
     # For all players
     for userid in es.getUseridList():

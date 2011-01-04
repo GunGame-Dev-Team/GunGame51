@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menu/weapons_menu.py
+# ../addons/eventscripts/gungame51/core/menus/weapons_menu.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 from cmdlib import registerSayCommand
@@ -22,11 +22,12 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.weapons.shortcuts import get_total_levels
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Register command
+    es.dbgmsg(0, '\t!weapons')
     registerSayCommand('!weapons', weapons_menu_cmd, 'Displays a ' +
         '!weapons menu.')
 
@@ -34,9 +35,9 @@ def unload():
     # Unregister commands
     unregisterSayCommand('!weapons')
 
-# ============================================================================
+# =============================================================================
 # >> MENU FUNCTIONS
-# ============================================================================
+# =============================================================================
 def weapons_menu_cmd(userid, args):
     # Make sure player exists
     if not es.exists('userid', userid) and userid != 0:

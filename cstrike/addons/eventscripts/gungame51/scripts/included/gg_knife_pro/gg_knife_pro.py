@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 import gamethread
@@ -23,9 +23,9 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_knife_pro'
 info.title = 'GG Knife Pro' 
@@ -33,9 +33,9 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_knife_pro']
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 gg_knife_pro_limit = es.ServerVar('gg_knife_pro_limit')
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife  = es.ServerVar('gg_allow_afk_levels_knife')
@@ -46,9 +46,9 @@ gg_knife_pro_skip_nade = es.ServerVar('gg_knife_pro_skip_nade')
 # and store the userid who just got off of knife to check on in player_death
 recentlyOffKnife = []
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     add_attribute_callback('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
@@ -57,9 +57,9 @@ def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     remove_callbacks_for_addon(info.name)
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def level_call_back(name, value, ggPlayer):
     # If the player is getting their level attribute set for the first time, we
     # can't get it yet

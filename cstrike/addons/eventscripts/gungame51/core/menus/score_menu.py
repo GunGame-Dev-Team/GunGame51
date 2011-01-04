@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menu/score_menu.py
+# ../addons/eventscripts/gungame51/core/menus/score_menu.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 from playerlib import getUseridList
@@ -20,20 +20,21 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Register command
+    es.dbgmsg(0, '\t!score')
     registerSayCommand('!score', score_menu_cmd, 'Displays a !score menu.')
 
 def unload():
     # Unregister commands
     unregisterSayCommand('!score')
 
-# ============================================================================
+# =============================================================================
 # >> MENU FUNCTIONS
-# ============================================================================
+# =============================================================================
 def score_menu_cmd(userid, args):
     # Make sure player exists
     if not es.exists('userid', userid) and userid != 0:

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menu/level_menu.py
+# ../addons/eventscripts/gungame51/core/menus/leader_menu.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 import popuplib
@@ -21,14 +21,14 @@ from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.leaders.shortcuts import get_leader_names
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
-# ============================================================================
+# =============================================================================
 # >> GLOBALS
-# ============================================================================
+# =============================================================================
 leaderList = []
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Delete the popup if it exists
     if popuplib.exists('ggLeaderMenu'):
@@ -36,7 +36,9 @@ def load():
         popuplib.delete('ggLeaderMenu')
 
     # Register commands
+    es.dbgmsg(0, '\t!leader')
     registerSayCommand('!leader', leader_menu_cmd, 'Displays a !leader menu.')
+    es.dbgmsg(0, '\t!leaders')
     registerSayCommand('!leaders', leader_menu_cmd, 'Displays a !leaders menu.')
     
 def unload():
@@ -49,9 +51,9 @@ def unload():
     unregisterSayCommand('!leader')
     unregisterSayCommand('!leaders')
     
-# ============================================================================
+# =============================================================================
 # >> MENU FUNCTIONS
-# ============================================================================
+# =============================================================================
 def leader_menu_cmd(userid, args):
     global leaderList
 

@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 from playerlib import getUseridList
@@ -20,9 +20,9 @@ from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.players.shortcuts import Player
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_friendlyfire'
 info.title = 'GG Friendly Fire' 
@@ -30,9 +30,9 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_friendlyfire']
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 # Get the es.ServerVar() instance of "gg_friendlyfire"
 gg_friendlyfire = es.ServerVar('gg_friendlyfire')
 # Get the es.ServerVar() instance of "mp_friendlyfire"
@@ -41,9 +41,9 @@ mp_friendlyfire = es.ServerVar('mp_friendlyfire')
 # Backup the value of "mp_friendlyfire"
 oldFriendlyFire = int(mp_friendlyfire)
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
@@ -53,9 +53,9 @@ def unload():
     # Set friendlyfire back to what it was before gg_friendlyfire loaded
     mp_friendlyfire.set(oldFriendlyFire)
     
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def es_map_start(event_var):
     # Set mp_friendlyfire to 0
     mp_friendlyfire.set(0)

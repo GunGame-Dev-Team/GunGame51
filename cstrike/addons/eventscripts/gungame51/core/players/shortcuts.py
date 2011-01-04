@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 from copy import copy
 
@@ -20,9 +20,9 @@ from gungame51.core.players import Player
 from gungame51.core.players import PlayerManager
 from gungame51.core.leaders.shortcuts import reset_leaders
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def add_attribute_callback(attribute, function, addon):
     Player.add_attribute_callback(attribute, function, addon)
     
@@ -99,9 +99,9 @@ def resetPlayers():
     reset_leaders()
     
     
-# ============================================================================
+# =============================================================================
 # >> DOCTSTRING REDIRECTS
-# ============================================================================
+# =============================================================================
 # Declare the docstring for add_attribute_callback
 add_attribute_callback.__doc__ = Player.add_attribute_callback.__doc__
 # Declare the docstring for remove_attribute_callback

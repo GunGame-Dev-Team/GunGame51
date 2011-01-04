@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python imports
 from __future__ import with_statement
 import random
@@ -24,9 +24,9 @@ from playerlib import getUseridList
 # GunGame Imports
 from gungame51.core import get_game_dir
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================           
+# =============================================================================
 class BaseWeaponOrders(object):
     '''
     Class designed for storing individual weapon orders.
@@ -446,9 +446,9 @@ class WeaponManager(object):
         cancelDelayed('gg_mp_restartgame')
         delayedname(1, 'gg_mp_restartgame', self.restart_round, ())
 
-# ============================================================================
+# =============================================================================
 # >> FUNCTIONS
-# ============================================================================
+# =============================================================================
 def load_weapon_orders():
     '''
     Loads all weapon orders in the "../<MOD>/cfg/gungame51/weapon_orders"
@@ -457,6 +457,5 @@ def load_weapon_orders():
     weaponOrderPath = get_game_dir('cfg/gungame51/weapon_orders')
 
     for item in weaponOrderPath.files("*.txt"):
+        es.dbgmsg(0, '\t' + item.name)
         WeaponManager().load(item.name)
-
-load_weapon_orders()

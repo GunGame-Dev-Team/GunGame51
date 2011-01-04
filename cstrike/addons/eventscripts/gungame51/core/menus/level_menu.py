@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menu/level_menu.py
+# ../addons/eventscripts/gungame51/core/menus/level_menu.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 import popuplib
@@ -26,9 +26,9 @@ from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.messaging.shortcuts import msg
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Delete the popup if it exists
     if popuplib.exists('ggLevelMenu'):
@@ -52,6 +52,7 @@ def load():
     ggLevelMenu.timeout('view', 10)
 
     # Register command
+    es.dbgmsg(0, '\t!level')
     registerSayCommand('!level', level_menu_cmd, 'Displays a !level menu.')
 
 def unload():
@@ -63,9 +64,9 @@ def unload():
     # Unregister commands
     unregisterSayCommand('!level')
 
-# ============================================================================
+# =============================================================================
 # >> MENU FUNCTIONS
-# ============================================================================
+# =============================================================================
 def level_menu_cmd(userid, args):
     # Make sure player exists
     if not es.exists('userid', userid) and userid != 0:

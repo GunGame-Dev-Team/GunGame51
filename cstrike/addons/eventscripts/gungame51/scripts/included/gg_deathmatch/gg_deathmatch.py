@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 from playerlib import getPlayer
@@ -21,9 +21,9 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.players.shortcuts import Player
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_deathmatch'
 info.title = 'GG Deathmatch' 
@@ -33,9 +33,9 @@ info.requires = ['gg_dead_strip', 'gg_dissolver']
 info.conflicts= ['gg_elimination']
 info.translations = ['gg_deathmatch']
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 # Server Vars
 gg_dm_respawn_delay = es.ServerVar('gg_dm_respawn_delay')
 mp_freezetime = es.ServerVar('mp_freezetime')
@@ -45,9 +45,9 @@ mp_roundtime = es.ServerVar('mp_roundtime')
 mpFreezetimeBackup = int(mp_freezetime)
 mpRoundtimeBackup = int(mp_roundtime)
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Don't allow respawn
     global respawnAllowed
@@ -93,9 +93,9 @@ def unload():
     # Unregister the joinclass command
     es.addons.unregisterClientCommandFilter(joinclass_filter)
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def es_map_start(event_var):
     # Don't allow respawn
     global respawnAllowed
@@ -172,9 +172,9 @@ def player_death(event_var):
             repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def respawn_count_down(userid):
     # Make sure that the repeat exists
     respawnRepeat = repeat.find('gungameRespawnPlayer%s' % userid)

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menu/winners_menu.py
+# ../addons/eventscripts/gungame51/core/menus/winners_menu.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 from cmdlib import registerSayCommand
@@ -19,13 +19,16 @@ from gungame51.core.sql.shortcuts import get_winners_list
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Register command
+    es.dbgmsg(0, '\t!top10')
     registerSayCommand('!top10', winner_menu_cmd, 'Displays a !top10 menu.')
+    es.dbgmsg(0, '\t!winners')
     registerSayCommand('!winners', winner_menu_cmd, 'Displays a !top10 menu.')
+    es.dbgmsg(0, '\t!top')
     registerSayCommand('!top', winner_menu_cmd, 'Displays a !top10 menu.')
 
 def unload():
@@ -34,9 +37,9 @@ def unload():
     unregisterSayCommand('!top')
     unregisterSayCommand('!winners')
 
-# ============================================================================
+# =============================================================================
 # >> MENU FUNCTIONS
-# ============================================================================
+# =============================================================================
 def winner_menu_cmd(userid, args):
     # Make sure player exists
     if not es.exists('userid', userid) and userid != 0:

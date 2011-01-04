@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 from os import name as platform
 from random import shuffle
@@ -35,9 +35,9 @@ from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_warmup_round'
 info.title = 'GG Warmup Round' 
@@ -45,9 +45,9 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_warmup_round']
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 mp_freezetime = es.ServerVar('mp_freezetime')
 gg_warmup_round = es.ServerVar('gg_warmup_round')
 gg_warmup_timer = es.ServerVar('gg_warmup_timer')
@@ -77,9 +77,9 @@ giveGodMode = False
 # Approximates the number of seconds from round start to play beginning
 GG_WARMUP_EXTRA_TIME = 3
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     global warmupWeaponSetOnLoad
 
@@ -120,9 +120,9 @@ def unload():
     # Unregister the server command that cancels an in-progress warmup round
     cmdlib.unregisterServerCommand('gg_end_warmup')
 
-# ============================================================================
+# =============================================================================
 # >> COMMAND CALLBACKS
-# ============================================================================
+# =============================================================================
 def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
     # Get the timer/repeat instance
     warmupCountDown = repeat.find('gungameWarmupTimer')
@@ -149,9 +149,9 @@ def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
     # Display a chat message with the same message
     msg("#human", 'Warmup_End_Forced', prefix=True)
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def es_map_start(event_var):
     # Cancel any do_warmup delays
     gamethread.cancelDelayed("gg_do_warmup")
@@ -231,9 +231,9 @@ def player_spawn(event_var):
     gamethread.delayed((delay), ggPlayer.give, (warmup_weapon,
                                                                 True, True))
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def get_warmup_weapon():
     '''
     Used to get the warmup weapon from other addons.

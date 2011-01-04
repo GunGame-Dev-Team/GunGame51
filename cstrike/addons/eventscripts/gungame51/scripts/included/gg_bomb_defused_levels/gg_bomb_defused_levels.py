@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 
 
@@ -16,44 +16,49 @@ $LastChangedDate$
 import es
 
 # GunGame Imports
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+#   Messaging
+from gungame51.core.messaging.shortcuts import msg
+#   Players
 from gungame51.core.players.shortcuts import Player
+#   Weapons
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_total_levels
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_bomb_defused_levels'
 info.title = 'GG Welcome Message' 
 info.author = 'GG Dev Team' 
 info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 gg_bomb_defused_levels = es.ServerVar('gg_bomb_defused_levels')
 gg_bomb_defused_skip_knife = es.ServerVar('gg_bomb_defused_skip_knife')
 gg_bomb_defused_skip_nade = es.ServerVar('gg_bomb_defused_skip_nade')
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================
+# =============================================================================
 
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def bomb_defused(event_var):
     # Get the player instance
     ggPlayer = Player(event_var['userid'])
@@ -65,6 +70,8 @@ def bomb_defused(event_var):
     if (not int(gg_bomb_defused_skip_nade) and ggPlayer.weapon == '' +
             'hegrenade') \
       or (not int(gg_bomb_defused_skip_knife) and ggPlayer.weapon == 'knife'):
+        msg(ggPlayer.userid, 'CannotSkipLevel_ByDefusing',
+            {'level':weapon})
         return
     
     # Loop through weapons of the levels we plan to level the player up past
@@ -74,6 +81,8 @@ def bomb_defused(event_var):
         # disabled, make sure the player will not skip that level
         if (not int(gg_bomb_defused_skip_knife) and weapon == 'knife') or \
             (not int(gg_bomb_defused_skip_nade) and weapon == 'hegrenade'):
+            msg(ggPlayer.userid, 'CannotSkipLevel_ByDefusing',
+                {'level':weapon})
             break
 
         # Add to the number of levels they will gain
@@ -82,9 +91,9 @@ def bomb_defused(event_var):
     # Level up the player
     ggPlayer.levelup(levels, 0, 'bomb_defused')
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def getLevelupList(currentLevel, levelupLevel):
     levelupList = []
 

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/logs/gg_error_logging/__init__.py
+# ../addons/eventscripts/gungame51/core/logs/__init__.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 from __future__ import with_statement
 from time import strftime
@@ -26,9 +26,9 @@ from gungame51.core import get_game_dir
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import gungame_info
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 # Server Vars
 spe_version_var = es.ServerVar('spe_version')
 eventscripts_ver = es.ServerVar('eventscripts_ver')
@@ -46,9 +46,9 @@ file_name = (get_game_dir('cfg/gungame51/logs') +
                
 file_created = False
 
-# ============================================================================
+# =============================================================================
 # >> TRACEBACK EVENT
-# ============================================================================
+# =============================================================================
 def gungame_except_hook(tb_type, value, trace_back, mute_console=False):
     # If this error was called to stop an attribute from being set, do not log
     # it.
@@ -143,9 +143,9 @@ def gungame_except_hook(tb_type, value, trace_back, mute_console=False):
             ' '*9 + ' TOTAL OCCURENCES: [%04i]' % error_count).center(79) + 
             '\n' + '-='*39 + '-\n\n' + tb + '\n\n')
             
-# ============================================================================
+# =============================================================================
 # >> CREATE THE LOG FILE
-# ============================================================================
+# =============================================================================
 def make_log_file():
     # Log file header
     header = ['*'*79 + '\n', '*' + ' '*77 + '*\n',

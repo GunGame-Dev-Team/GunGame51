@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 from configobj import ConfigObj
 from path import path
@@ -21,9 +21,9 @@ from wave import open as wave_open
 import es
 import gamethread
 
-# ============================================================================
+# =============================================================================
 # >> GLOBALS
-# ============================================================================
+# =============================================================================
 # Get the es.ServerVar() instance of "eventscripts_gamedir"
 eventscripts_gamedir = es.ServerVar('eventscripts_gamedir')
 # Get the es.ServerVar() instance of "eventscripts_currentmap"
@@ -44,9 +44,9 @@ winnerSounds = []
 # if it cannot check the length of the winner sound
 defaultChatTime = -1
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================
+# =============================================================================
 class SoundPack(object):    
     def __init__(self, name):
         self.__pack__ = ConfigObj('%s/%s.ini' %(iniDir, name))
@@ -111,7 +111,7 @@ class SoundPack(object):
         # Return the randomly selected sound if the list is not empty
         return choice(randomSounds) if randomSounds else None
 
-def make_downloadable():
+def make_downloadable(gg_loading=False):
     # Make the global variable winnerSounds global to this function in case we
     # use it below
     global winnerSounds
@@ -128,6 +128,9 @@ def make_downloadable():
 
         # Grab the ConfigObj for the INI
         config = ConfigObj('%s/%s' %(iniDir, f.name))
+
+        if gg_loading:
+            es.dbgmsg(0, '\t' + f.name)
 
         # Loop through all names (keys) in the INI
         for name in config:
@@ -149,6 +152,9 @@ def make_downloadable():
                 # Open the random sound file
                 randomFile = open(iniDir.joinpath('random_sound_files/%s'
                     %config[name]))
+
+                if gg_loading:
+                    es.dbgmsg(0, '\trandom_sound_files/' + config[name])
 
                 # If we are on a random winner sound, and we have more sounds
                 # in the current list of random sounds, choose one and make it

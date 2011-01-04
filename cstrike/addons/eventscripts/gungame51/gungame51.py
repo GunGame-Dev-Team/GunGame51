@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python imports
 import sys
 
@@ -38,6 +38,7 @@ from core.weapons.shortcuts import get_level_multikill
 from core.weapons.shortcuts import get_level_weapon
 from core.weapons.shortcuts import get_total_levels
 from core.weapons import WeaponManager
+from core.weapons import load_weapon_orders
 
 #    Config Function Imports
 from core.cfg.shortcuts import loadConfig
@@ -84,9 +85,9 @@ from core.sql.shortcuts import Database
 #   Menus
 from core.menus import MenuManager
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
@@ -137,9 +138,9 @@ credits = {
         'The Cheebs']
 }
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================
+# =============================================================================
 class RoundInfo(object):
     def __new__(cls, *p, **k):
         if not '_the_instance' in cls.__dict__:
@@ -154,9 +155,9 @@ class RoundInfo(object):
         return total if total > 0 else 0
 
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION
-# ============================================================================
+# =============================================================================
 info = es.AddonInfo()
 del info['keylist'][:]
 
@@ -170,11 +171,11 @@ info.Authors = ('\n' +
              '\t'*4 + 'Paul Smith (RideGuy)\n' +
              '\t'*4 + 'Deniz Sezen (your-name-here)\n\n')
 
-info.Website = ('\n' + '\t'*4 + 'http://www.gungame5.com/\n')
+info.Website = ('\n' + '\t'*4 + 'http://forums.gungame.net/\n')
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Load translations
     loadTranslation('gungame', 'gungame')
@@ -275,9 +276,26 @@ def unload():
     
 def initialize():
     es.dbgmsg(0, langstring("Load_Start", {'version': gungame_info('version')}))
+
+    # Load all main configs
     es.dbgmsg(0, langstring("Load_Configs"))
-    # Load all configs
-    loadConfig(get_config_list())
+    loadConfig(get_config_list("main"))
+
+    # Load all included addon configs
+    loadConfig(get_config_list("included"))
+
+    es.dbgmsg(0, langstring("Load_CustomConfigs"))
+
+    # Are there any custom addon configs?
+    configs = get_config_list("custom")
+    if configs:
+
+        # Load all custom addon configs
+        loadConfig(configs)
+
+    # Parse Weapon Order Files
+    es.dbgmsg(0, langstring("Load_WeaponOrders"))
+    load_weapon_orders()
 
     # Pause a moment for the configs to be loaded (OB engine requires this)
     gamethread.delayed(0.1, completeInitialize)
@@ -285,9 +303,6 @@ def initialize():
 def completeInitialize():
     # Print load started
     #es.dbgmsg(0, '[GunGame]' + '=' * 79)
-
-    # Make the sounds downloadable
-    make_downloadable()
 
     # Load custom events
     es.loadevents('declare', 
@@ -318,18 +333,28 @@ def completeInitialize():
     gamethread.delayed(3.50, make_log_file)
     
     # Load menus
+    es.dbgmsg(0, langstring("Load_Commands"))
     MenuManager().load('#all')
+
+    # Make the sounds downloadable
+    es.dbgmsg(0, langstring("Load_SoundSystem"))
+    make_downloadable(True)
 
     # Set up "gg_multi_round"
     if int(gg_multi_round):
         RoundInfo().round = 1
 
+    es.dbgmsg(0, langstring("Load_Completed"))
+
+    # Make sure we print out Weapon Order
+    set_weapon_order(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
+
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def es_map_start(event_var):
     # Set firstPlayerSpawned to False, so player_spawn will know when the first
     # spawn is
@@ -600,9 +625,9 @@ def gg_win(event_var):
         Player(userid).wins += 1
 
     if event_var['round'] == '0':
-        # ====================================================
+        # =====================================================================
         # MAP WIN
-        # ====================================================
+        # =====================================================================
         # End game
         es.server.queuecmd("es_xgive %s game_end" % userid)
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
@@ -730,9 +755,9 @@ def player_activate(event_var):
       'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):   
         msg('#human', 'GGThanks', {'name': event_var['es_username']})
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def thanks(userid, args):
     msg(userid, 'CheckConsole')    
     es.cexec(userid, 'echo [GG Thanks] ')

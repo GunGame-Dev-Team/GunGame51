@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menu/rank_menu.py
+# ../addons/eventscripts/gungame51/core/menus/rank_menu.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Eventscripts Imports
 import es
 from cmdlib import registerSayCommand
@@ -19,20 +19,21 @@ from gungame51.core.sql.shortcuts import get_winners_list
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     # Register command
+    es.dbgmsg(0, '\t!rank')
     registerSayCommand('!rank', rank_menu_cmd, 'Displays a !rank menu.')
 
 def unload():
     # Unregister commands
     unregisterSayCommand('!rank')
 
-# ============================================================================
+# =============================================================================
 # >> MENU FUNCTIONS
-# ============================================================================
+# =============================================================================
 def rank_menu_cmd(userid, args):
     # Make sure player exists
     if not es.exists('userid', userid) and userid != 0:

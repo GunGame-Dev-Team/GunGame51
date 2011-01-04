@@ -82,9 +82,9 @@ class AddonStrings(object):
                     self.__denied__.append(string)
                 es.dbgmsg(0, '%s: %s' %(self.addon, e))
 
-    # ========================================================================
+    # =========================================================================
     # AddonStrings() STATIC CLASS METHODS
-    # ========================================================================
+    # =========================================================================
     @staticmethod
     def get_addon_ini(addon):
         # If the INI is the main GunGame INI, return the path to the INI
@@ -239,20 +239,20 @@ class MessageManager(object):
         if not str(string) in __strings__:
             if isinstance(filter, int):
                 # Send message to the userid
-                return es.tell(filter, '#multi', '%s%s' %(prefix, string))
+                return es.tell(filter, '#multi', '#default%s%s' %(prefix, string))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
-                es.tell(userid, '#multi', '%s%s' %(prefix, string))
+                es.tell(userid, '#multi', '#default%s%s' %(prefix, string))
         else:
             if isinstance(filter, int):
                 # Send message to the userid
-                return es.tell(filter, '#multi', '%s%s'
+                return es.tell(filter, '#multi', '#default%s%s'
                     %(prefix, self.__format_string(string, tokens, filter)))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
-                es.tell(userid, '#multi', '%s%s'
+                es.tell(userid, '#multi', '#default%s%s'
                     %(prefix, self.__format_string(string, tokens, userid)))
 
     def saytext2(self, filter, index, string, tokens={}, prefix=False):

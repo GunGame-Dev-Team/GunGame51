@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_welcom_msg/gg_welcome_msg.py
+# ../addons/eventscripts/gungame51/scripts/included/gg_welcome_msg/gg_welcome_msg.py
 
 '''
 $Rev$
@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 import time
 
@@ -23,18 +23,18 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import gungame_info
 from gungame51.core.addons.shortcuts import get_loaded_addon_list
 
-# ============================================================================
+# =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
-# ============================================================================
+# =============================================================================
 info = AddonInfo()
 info.name = 'gg_welcome_msg'
 info.title = 'GG Welcome Message'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 
-# ============================================================================
+# =============================================================================
 # >> GLOBAL VARIABLES
-# ============================================================================
+# =============================================================================
 # Store the title of the menu
 title = 'GunGame%s -- Welcome Message' % gungame_info('version')
 gg_welcome_msg_timeout = es.ServerVar('gg_welcome_msg_timeout')
@@ -42,9 +42,9 @@ gg_welcome_msg_timeout = es.ServerVar('gg_welcome_msg_timeout')
 # Create an empty list for detecting if a player just joined the server
 messageQueue = []
 
-# ============================================================================
+# =============================================================================
 # >> LOAD & UNLOAD
-# ============================================================================
+# =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
@@ -68,9 +68,9 @@ def unload():
     if popuplib.exists('gg_welcome_custom'):
         popuplib.delete('gg_welcome_custom')
 
-# ============================================================================
+# =============================================================================
 # >> GAME EVENTS
-# ============================================================================
+# =============================================================================
 def player_activate(event_var):
     userid = event_var['userid']
 
@@ -92,9 +92,9 @@ def player_team(event_var):
         # Remove them from the queue
         messageQueue.remove(userid)
 
-# ============================================================================
+# =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
-# ============================================================================
+# =============================================================================
 def buildPopups():
     # Get the custom text for the popup
     customFile = open(es.ServerVar('eventscripts_gamedir') + '/cfg/gungame51' +

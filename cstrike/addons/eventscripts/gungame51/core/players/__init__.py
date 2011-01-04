@@ -6,9 +6,9 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-# ============================================================================
+# =============================================================================
 # >> IMPORTS
-# ============================================================================
+# =============================================================================
 # Python Imports
 from random import choice
 from random import randint
@@ -42,17 +42,17 @@ from gungame51.core.sql.shortcuts import insert_winner
 from gungame51.core.sql.shortcuts import update_winner
 from afk import AFK
 
-# ============================================================================
+# =============================================================================
 # >> GLOBALS
-# ============================================================================
+# =============================================================================
 list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 list_allWeapons = getWeaponNameList()
 gg_soundpack = es.ServerVar('gg_soundpack')
 
-# ============================================================================
+# =============================================================================
 # >> CLASSES
-# ============================================================================
+# =============================================================================
 class CustomAttributeCallbacks(dict):
     '''
     This class is designed to store callback functions for custom attributes
@@ -769,14 +769,14 @@ class BasePlayer(object):
 
     def stopsound(self, sound):
         '''
-        Plays the declared sound to the player.
+        Stops the sound from being played for the player.
         '''
         # Format the sound
         sound = self._format_sound(sound)
 
         # Make sure the sound exists
         if sound:
-            # Play the sound
+            # Stop the sound
             es.stopsound(self.userid, sound)
 
         # Return the sound used
