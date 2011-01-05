@@ -72,7 +72,7 @@ def bomb_exploded(event_var):
       or (not int(gg_bomb_exploded_skip_knife) and ggPlayer.weapon == '' +
         'knife'):
         msg(ggPlayer.userid, 'CannotSkipLevel_ByPlanting',
-            {'level':weapon})
+            {'level':ggPlayer.weapon})
         return
     
     # Loop through weapons of the levels we plan to level the player up past

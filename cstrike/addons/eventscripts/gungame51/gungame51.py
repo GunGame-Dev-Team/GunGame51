@@ -275,6 +275,10 @@ def unload():
     unregisterSayCommand('!thanks')
     
 def initialize():
+    # Load custom events
+    es.loadevents('declare', 
+        'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+
     es.dbgmsg(0, langstring("Load_Start", {'version': gungame_info('version')}))
 
     # Load all main configs
@@ -303,10 +307,6 @@ def initialize():
 def completeInitialize():
     # Print load started
     #es.dbgmsg(0, '[GunGame]' + '=' * 79)
-
-    # Load custom events
-    es.loadevents('declare', 
-        'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
 
     # Fire the gg_server.cfg
     es.server.cmd('exec gungame51/gg_server.cfg')

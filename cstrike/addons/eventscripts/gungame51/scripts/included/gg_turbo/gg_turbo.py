@@ -68,6 +68,10 @@ def give_weapon(userid, previousLevel):
     if not es.exists('userid', userid) and userid != 0:
         return
 
+    # Added to prevent "Player has left server" from causing error on map change
+    if not es.createplayerlist(userid):
+        return
+
     # Get playerlib object
     pPlayer = getPlayer(userid)
 

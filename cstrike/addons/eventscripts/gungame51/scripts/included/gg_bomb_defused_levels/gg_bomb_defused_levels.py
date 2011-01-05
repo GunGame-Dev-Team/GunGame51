@@ -71,7 +71,7 @@ def bomb_defused(event_var):
             'hegrenade') \
       or (not int(gg_bomb_defused_skip_knife) and ggPlayer.weapon == 'knife'):
         msg(ggPlayer.userid, 'CannotSkipLevel_ByDefusing',
-            {'level':weapon})
+            {'level':ggPlayer.weapon})
         return
     
     # Loop through weapons of the levels we plan to level the player up past

@@ -111,7 +111,7 @@ def player_death(event_var):
         if (not int(gg_hostage_stopped_skip_nade) and ggPlayer.weapon == 'hegrenade') \
           or (not int(gg_hostage_stopped_skip_knife) and ggPlayer.weapon == 'knife'):
             msg(ggPlayer.userid, 'CannotSkipLevel_ByStopping',
-                {'level':weapon})
+                {'level':ggPlayer.weapon})
             return
 
         # Loop through weapons of the levels we plan to level the player up past
