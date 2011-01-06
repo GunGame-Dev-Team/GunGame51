@@ -346,11 +346,17 @@ def completeInitialize():
 
     es.dbgmsg(0, langstring("Load_Completed"))
 
-    # Make sure we print out Weapon Order
-    set_weapon_order(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
+    # Small delay added for printing out Weapon Order when re-loading GunGame
+    # gg_weapon_order_file and gg_weapon_order_sort_type are still
+    #    0 at this point when GunGame is first loaded
+    gamethread.queue(printWeaponOrder)
 
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
+
+def printWeaponOrder():
+    # Print out Weapon Order when GunGame is "re-loaded" on a server
+    set_weapon_order(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
 
 # =============================================================================
 # >> GAME EVENTS
