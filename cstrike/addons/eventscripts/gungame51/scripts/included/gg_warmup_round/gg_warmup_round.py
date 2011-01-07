@@ -339,24 +339,10 @@ def do_warmup(useBackupVars=True):
 
     # If only one warmup mode is selected, proceed
     if not (int(gg_warmup_deathmatch) and int(gg_warmup_elimination)):
-        # If warmup deathmatch is enabled, add it to priority addons
-        if int(gg_warmup_deathmatch):
-            add_priority_addon('gg_deathmatch')
-            # If deathmatch is not enabled, we need to load it now
-            if not int(gg_deathmatch_backup) and not int(gg_deathmatch):
-                gg_deathmatch.set(1)
-                addon_load("gg_deathmatch")
-        # Otherwise, if warmup elimination is enabled, add it to priority
-        # addons
-        elif int(gg_warmup_elimination):
-            add_priority_addon('gg_elimination')
-            # If elimination is not enabled, or deathmatch is enabled due to
-            # both dm and elim set to 1 and dm overruling elim, we need to load
-            # it now.
-            if (not int(gg_elimination_backup) or (int(gg_deathmatch_backup) \
-                and int(gg_elimination_backup))) and not int(gg_elimination):
-                gg_elimination.set(1)
-                addon_load("gg_elimination")
+
+        # Added a delay, so we don't encounter an error when loading
+        # one right after unloading the other (due to dependencies)
+        gamethread.delayed(0, load_warmup_addons)
 
     # Start it up if it exists
     if warmupCountDown:
@@ -367,6 +353,26 @@ def do_warmup(useBackupVars=True):
     # Create a timer
     warmupCountDown = repeat.create('gungameWarmupTimer', count_down)
     warmupCountDown.start(1, int(gg_warmup_timer) + GG_WARMUP_EXTRA_TIME)
+
+def load_warmup_addons():
+    # If warmup deathmatch is enabled, add it to priority addons
+    if int(gg_warmup_deathmatch):
+        add_priority_addon('gg_deathmatch')
+        # If deathmatch is not enabled, we need to load it now
+        if not int(gg_deathmatch_backup) and not int(gg_deathmatch):
+            gg_deathmatch.set(1)
+            addon_load("gg_deathmatch")
+    # Otherwise, if warmup elimination is enabled, add it to priority
+    # addons
+    elif int(gg_warmup_elimination):
+        add_priority_addon('gg_elimination')
+        # If elimination is not enabled, or deathmatch is enabled due to
+        # both dm and elim set to 1 and dm overruling elim, we need to load
+        # it now.
+        if (not int(gg_elimination_backup) or (int(gg_deathmatch_backup) \
+            and int(gg_elimination_backup))) and not int(gg_elimination):
+            gg_elimination.set(1)
+            addon_load("gg_elimination")
 
 def count_down():
     warmupCountDown = repeat.find('gungameWarmupTimer')
@@ -467,6 +473,22 @@ def reset_server_vars():
                 gg_elimination.set(0)
                 check_unload("gg_elimination")
 
+    # Check if deathmatch or elimination needs loaded
+    if int(gg_deathmatch_backup) or int(gg_elimination_backup):
+
+        # Added delay due to sharing dependency errors
+        gamethread.delayed(0, load_gg_addons)
+
+    # If gg_dead_strip disabled before warmup, disable it again
+    if not gg_dead_strip_backup and int(gg_dead_strip):
+        gg_dead_strip.set(0)
+        check_unload("gg_dead_strip")
+
+    # Changing mp_freezetime back
+    if int(mp_freezetime) != mp_freezetime_backup:
+        mp_freezetime.set(mp_freezetime_backup)
+
+def load_gg_addons():
     # If we are going into deathmatch gameplay
     if int(gg_deathmatch_backup):
         # If we didn't already choose to leave deathmatch on above, load it
@@ -479,15 +501,6 @@ def reset_server_vars():
         if not int(gg_warmup_elimination) and not int(gg_elimination):
             gg_elimination.set(1)
             addon_load("gg_elimination")
-
-    # If gg_dead_strip disabled before warmup, disable it again
-    if not gg_dead_strip_backup and int(gg_dead_strip):
-        gg_dead_strip.set(0)
-        check_unload("gg_dead_strip")
-
-    # Changing mp_freezetime back
-    if int(mp_freezetime) != mp_freezetime_backup:
-        mp_freezetime.set(mp_freezetime_backup)
 
 def check_unload(addon):
     if addon in AddonManager().__loaded__:

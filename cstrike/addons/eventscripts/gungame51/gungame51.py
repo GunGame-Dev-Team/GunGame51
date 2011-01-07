@@ -269,7 +269,7 @@ def unload():
     es.server.queuecmd('es_xfire %s func_buyzone Enable' % es.getuserid())
 
     # Fire gg_unload event
-    EventManager().gg_unload
+    EventManager().gg_unload()
     
     # Unregister !thanks command
     unregisterSayCommand('!thanks')
