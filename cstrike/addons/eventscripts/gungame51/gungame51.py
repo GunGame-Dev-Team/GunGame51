@@ -114,7 +114,8 @@ credits = {
         'Monday'],
 
     'Developers':
-        ['cagemonkey',
+        ['satoon101',
+        'cagemonkey',
         'llamaelite',
         'RideGuy'],
 
