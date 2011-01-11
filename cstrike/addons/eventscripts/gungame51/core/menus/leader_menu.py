@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menus/leader_menu.py
+# ../core/menus/leader_menu.py
 
 '''
 $Rev$
@@ -26,6 +26,7 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 # =============================================================================
 leaderList = []
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -39,8 +40,10 @@ def load():
     es.dbgmsg(0, '\t!leader')
     registerSayCommand('!leader', leader_menu_cmd, 'Displays a !leader menu.')
     es.dbgmsg(0, '\t!leaders')
-    registerSayCommand('!leaders', leader_menu_cmd, 'Displays a !leaders menu.')
-    
+    registerSayCommand('!leaders', leader_menu_cmd,
+        'Displays a !leaders menu.')
+
+
 def unload():
     # Delete the popup if it exists
     if popuplib.exists('ggLeaderMenu'):
@@ -50,7 +53,8 @@ def unload():
     # Unregister commands
     unregisterSayCommand('!leader')
     unregisterSayCommand('!leaders')
-    
+
+
 # =============================================================================
 # >> MENU FUNCTIONS
 # =============================================================================
@@ -73,18 +77,18 @@ def leader_menu_cmd(userid, args):
                                 get_level_weapon(leaderLevel)))
 
         # Divider
-        newLeaderList.append('-'*26)
+        newLeaderList.append('-' * 26)
 
         # Add player names
         for player_name in leaderNames:
             newLeaderList.append('   * %s' % player_name)
-        
+
     # No leader
     else:
-        newLeaderList.extend(('-'*26, '   * There currently is no leader'))
+        newLeaderList.extend(('-' * 26, '   * There currently is no leader'))
 
     # Finish popup with divider and exit
-    newLeaderList.extend(('-'*26, '0. Exit'))
+    newLeaderList.extend(('-' * 26, '0. Exit'))
 
     # Does the popup exists ?
     if popuplib.exists('ggLeaderMenu'):
@@ -93,11 +97,11 @@ def leader_menu_cmd(userid, args):
         if newLeaderList == leaderList:
             popuplib.send('ggLeaderMenu', userid)
             return
-        
+
         # Delete the popup
         popuplib.unsendname('ggLeaderMenu', getUseridList('#human'))
         popuplib.delete('ggLeaderMenu')
-        
+
     # Build new popup
     ggLeaderMenu = popuplib.create('ggLeaderMenu')
     ggLeaderMenu.timeout('send', 10)
@@ -106,9 +110,9 @@ def leader_menu_cmd(userid, args):
     # Add lines to new popup
     for line in newLeaderList:
         ggLeaderMenu.addline(line)
-        
+
     # Save current popup
     leaderList = newLeaderList
-    
+
     # Send it
     popuplib.send('ggLeaderMenu', userid)

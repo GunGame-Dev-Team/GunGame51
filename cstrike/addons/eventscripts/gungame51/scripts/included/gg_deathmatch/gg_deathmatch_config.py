@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_deathmatch/gg_deathmatch_config.py
+# ../scripts/included/gg_deathmatch/gg_deathmatch_config.py
 
 '''
 $Rev$
@@ -19,20 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_deathmatch.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # Deathmatch
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> DEATHMATCH')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Emulates a team-deathmatch mode, and players will ' +
                 'respawn when they die.')
@@ -51,9 +52,9 @@ def load():
 
     # Deathmatch Respawn Delay
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> DEATHMATCH RESPAWN DELAY')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   The amount of time (in seconds) to wait before ' +
                 'respawning a player after')
@@ -71,12 +72,13 @@ def load():
     config.write()
     es.dbgmsg(0, '\tgg_deathmatch.cfg')
 
+
 def unload():
     global config
 
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

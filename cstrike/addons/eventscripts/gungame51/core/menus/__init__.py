@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menus/__init__.py
+# ../core/menus/__init__.py
 
 '''
 $Rev$
@@ -21,6 +21,7 @@ from playerlib import getUseridList
 # GunGame Imports
 from gungame51.core import get_file_list
 from gungame51.core import get_game_dir
+
 
 # =============================================================================
 # >> CLASSES
@@ -117,13 +118,14 @@ class MenuManager(object):
         if blockname in menu_globals and callable(menu_globals[blockname]):
             menu_globals[blockname](*a, **kw)
 
+
 class OrderedMenu(object):
     '''
     Creates an ordered menu with continuous numbering throughout pages.
     This class only creates single page popups, for the page the player has
       requested. This way, it only makes a popup for requested pages. It stores
       all of the data for the menu in the list "items".
-    
+
     Note: highlightIndex will highlight the item at it's number in the menu.
             Menu numbering starts at 1.
     '''
@@ -151,7 +153,7 @@ class OrderedMenu(object):
         # Get the index of the first item on the current page
         startIndex = (page - 1) * self.options
         # Add the title
-        popup.addline("%s%s(%s/%s)" % (self.title, " " * 5, page, 
+        popup.addline("%s%s(%s/%s)" % (self.title, " " * 5, page,
                                                             self.totalPages))
         popup.addline("-----------------------------")
 
@@ -161,7 +163,7 @@ class OrderedMenu(object):
             if index >= len(self.items):
                 popup.addline(" ")
                 continue
-            
+
             # If the current index is the highlightIndex, add -> in front
             highlight = "->" if index + 1 == self.highlightIndex else ""
             # Add the line to the popup
@@ -195,7 +197,7 @@ class OrderedMenu(object):
     def menuselect(self, userid, choice, popupName):
         # Get the page number from the popup name
         currentPage = int(popupName.replace("OrderedMenu_p", ""))
-        
+
         # Close the menu
         if choice == 10:
             return

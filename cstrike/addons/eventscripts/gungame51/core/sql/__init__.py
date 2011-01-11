@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/sql/__init__.py
+# ../core/sql/__init__.py
 
 '''
 $Rev$
@@ -19,6 +19,7 @@ from gungame51.core import get_game_dir
 # >> GLOBALS
 # =============================================================================
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -31,7 +32,7 @@ class Database(object):
             x = Database()
             x.select('tbl_name', ('name', 'age'), 'where city="dallas"')
             x._query('create table zomg_i_has_table')
-        
+
         returnDict will return the information back in dictionary form:
             [{'name': 'luke', 'age': 24}, {name: 'michael', 'age': 90}]
     '''
@@ -60,7 +61,7 @@ class Database(object):
                 pass
         except:
             self.connect()
-            
+
         if conditions:
             table = '%s %s' % (str(table), conditions)
         if limit:

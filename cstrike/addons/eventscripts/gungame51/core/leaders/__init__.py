@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/leaders/__init__.py
+# ../core/leaders/__init__.py
 
 '''
 $Rev$
@@ -18,6 +18,7 @@ import es
 from gungame51.core.events.shortcuts import EventManager
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.messaging.shortcuts import msg
+
 
 # =============================================================================
 # >> CLASSES
@@ -66,7 +67,7 @@ class LeaderManager(object):
         status.
 
         """
-        
+
         userid = ggPlayer.userid
         level = ggPlayer.level
 
@@ -133,7 +134,7 @@ class LeaderManager(object):
         """Resets the LeaderManager for a clean start of GunGame."""
         # Call the __init__ to reset the LeaderManager instance
         self.__init__()
-    
+
     def is_leader(self, userid):
         return (userid in self.current)
 
@@ -173,7 +174,7 @@ class LeaderManager(object):
         if event:
             # Fire gg_tied_leader
             EventManager().gg_tied_leader(ggPlayer.userid)
-    
+
     def lost_leader(self, ggPlayer, event=True):
         """Removes a player from the current leaders list.
 
@@ -186,7 +187,7 @@ class LeaderManager(object):
         # Make sure the player is a leader
         if not self.is_leader(ggPlayer.userid):
             raise ValueError('Unable to remove "%s" from the current leaders. '
-                %userid + 'The userid "%s" is not a current leader.' %userid)
+                % userid + 'The userid "%s" is not a current leader.' % userid)
 
         # Set previous leaders
         self.previous = self.current[:]
@@ -251,7 +252,7 @@ class LeaderManager(object):
 
         # Remove the userid
         self.__remove_userid(userid)
-        
+
         # Trigger new leader messaging if a single leader is found
         if not newLeader:
             return
@@ -265,7 +266,7 @@ class LeaderManager(object):
         # One new leader?
         elif leaderCount == 1:
             leader = self.current[0]
-            # Message about new leader 
+            # Message about new leader
             saytext2('#human', Player(leader).index, 'NewLeader',
                 {'player': es.getplayername(leader),
                 'level': self.leaderlevel}, False)

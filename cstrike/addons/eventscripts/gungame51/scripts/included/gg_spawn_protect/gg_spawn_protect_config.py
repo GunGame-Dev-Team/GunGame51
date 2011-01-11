@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_spawn_protect/gg_spawn_protect_config.py
+# ../scripts/included/gg_spawn_protect/gg_spawn_protect_config.py
 
 '''
 $Rev$
@@ -19,9 +19,10 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_spawn_protect.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -30,9 +31,9 @@ def load():
 
     # Spawn Protection
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> SPAWN PROTECTION')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   The number of seconds to allow spawn protection, in ' +
                 'which they will be')
@@ -48,9 +49,9 @@ def load():
 
     # Spawn Protection Colors
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> SPAWN PROTECTION COLORS')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   The player\'s color while under spawn protection.')
     config.text('Notes:')
@@ -80,9 +81,9 @@ def load():
 
     # Spawn Protection "Cancel On Fire"
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> SPAWN PROTECTION "CANCEL-ON-FIRE"')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Cancels the spawn protection timer when the player ' +
                 'fires their weapon and')
@@ -99,9 +100,9 @@ def load():
 
     # Allow Leveling Whilst Protected
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> ALLOW LEVELING WHILST PROTECTED')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Players can level up while spawn protected.')
     config.text('Options:')
@@ -112,9 +113,10 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_spawn_protect_can_level_up', 1, 'Allow players ' +
                 'to level up while spawn protected')
-    
+
     config.write()
     es.dbgmsg(0, '\tgg_spawn_protect.cfg')
+
 
 def unload():
     global config
@@ -122,6 +124,6 @@ def unload():
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

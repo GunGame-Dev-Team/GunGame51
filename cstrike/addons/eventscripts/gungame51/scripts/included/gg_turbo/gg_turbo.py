@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_turbo/gg_turbo.py
+# ../scripts/included/gg_turbo/gg_turbo.py
 
 '''
 $Rev$
@@ -33,9 +33,10 @@ gg_nade_bonus = es.ServerVar("gg_nade_bonus")
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_turbo'
-info.title = 'GG Turbo' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Turbo'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -44,9 +45,11 @@ def load():
     add_attribute_callback('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     remove_callbacks_for_addon(info.name)
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -64,11 +67,12 @@ def level_call_back(name, value, ggPlayer):
     # Delay to give them a new weapon (callbacks are too fast)
     gamethread.delayed(0.005, give_weapon, (ggPlayer.userid, previousLevel))
 
+
 def give_weapon(userid, previousLevel):
     if not es.exists('userid', userid) and userid != 0:
         return
 
-    # Added to prevent "Player has left server" from causing error on map change
+    # Added to prevent "Player has left server" error on map change
     if not es.createplayerlist(userid):
         return
 
@@ -82,7 +86,7 @@ def give_weapon(userid, previousLevel):
     # Give them their next weapon
     ggPlayer = Player(userid)
     ggPlayer.give_weapon()
-    
+
     # If previousLevel is not in the order due to weapon orders changing,
     # stop here
     if previousLevel > get_total_levels():

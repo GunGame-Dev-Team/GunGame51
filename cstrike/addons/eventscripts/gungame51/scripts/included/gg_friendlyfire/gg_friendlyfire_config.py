@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_friendlyfire/gg_friendlyfire_config.py
+# ../scripts/included/gg_friendlyfire/gg_friendlyfire_config.py
 
 '''
 $Rev$
@@ -19,20 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_friendlyfire.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # Friendly Fire
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> FRIENDLY FIRE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Automatically turn on friendly fire when a player ' +
                 'reaches "x" levels')
@@ -54,9 +55,10 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_friendlyfire', 0, 'The number (+1) of levels below the ' +
                 'last level to enable friendly fire.').addFlag('notify')
-    
+
     config.write()
     es.dbgmsg(0, '\tgg_friendlyfire.cfg')
+
 
 def unload():
     global config
@@ -64,6 +66,6 @@ def unload():
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

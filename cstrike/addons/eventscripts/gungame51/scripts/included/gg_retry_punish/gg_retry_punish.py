@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_retry_punish/gg_retry_punish.py
+# ../scripts/included/gg_retry_punish/gg_retry_punish.py
 
 '''
 $Rev$
@@ -21,9 +21,9 @@ from gungame51.core.players.shortcuts import Player
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_retry_punish'
-info.title = 'GG Retry Punish' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Retry Punish'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -33,11 +33,13 @@ dict_savedLevels = {}
 # Get the es.ServerVar() instance of "gg_retry_punish"
 gg_retry_punish = es.ServerVar('gg_retry_punish')
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
+
 
 def unload():
     # Clear out the dictionary on unload
@@ -45,12 +47,14 @@ def unload():
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
+
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
 def es_map_start(event_var):
     # Clear our the dictionary on es_map_start
     dict_savedLevels.clear()
+
 
 def player_activate(event_var):
     # Get the Player() object
@@ -72,6 +76,7 @@ def player_activate(event_var):
 
     # Delete the saved level
     del dict_savedLevels[steamid]
+
 
 def player_disconnect(event_var):
     # Get the Player() object
@@ -99,6 +104,7 @@ def player_disconnect(event_var):
         dict_savedLevels[steamid] = reconnectLevel
     else:
         dict_savedLevels[steamid] = 1
+
 
 def gg_win(event_var):
     # Clear our the dictionary on gg_win

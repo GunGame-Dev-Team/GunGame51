@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_warmup_round/gg_warmup_round_config.py
+# ../scripts/included/gg_warmup_round/gg_warmup_round_config.py
 
 '''
 $Rev$
@@ -19,20 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_warmup_round.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # Warmup Round
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WARMUP ROUND')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Players cannot level up during the warmup round.')
     config.text('   * Warmup round is triggered at the start of each map ' +
@@ -46,9 +47,9 @@ def load():
 
     # Warmup Round Timer
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WARMUP ROUND TIMER')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Options:')
     config.text('   # = The amount of time (in seconds) that the warmup ' +
                 'round will last.')
@@ -58,9 +59,9 @@ def load():
 
     # Warmup Round Weapon
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WARMUP ROUND WEAPON')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Only supports "weapon_*" entities.')
     config.text('   * Warmup round is triggered at the start of each map ' +
@@ -82,9 +83,9 @@ def load():
 
     # Warmup Round Deathmatch Mode
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WARMUP ROUND DEATHMATCH MODE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Please check the gg_deathmatch.cfg for information' +
                 ' regarding')
@@ -99,9 +100,9 @@ def load():
 
     # Warmup Round Elimination Mode
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WARMUP ROUND ELIMINATION MODE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Please check the gg_elimination.cfg for information' +
                 ' regarding')
@@ -112,10 +113,11 @@ def load():
     config.text('   1 = Enabled.')
     config.text('Default Value: 0')
     config.cvar('gg_warmup_elimination', 0, 'Enable elimination during ' +
-                'warmup round only.')    
-    
+                'warmup round only.')
+
     config.write()
     es.dbgmsg(0, '\tgg_warmup_round.cfg')
+
 
 def unload():
     global config
@@ -123,6 +125,6 @@ def unload():
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

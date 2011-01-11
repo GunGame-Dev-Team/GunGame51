@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/players/shortcuts.py
+# ../core/players/shortcuts.py
 
 '''
 $Rev$
@@ -20,17 +20,21 @@ from gungame51.core.players import Player
 from gungame51.core.players import PlayerManager
 from gungame51.core.leaders.shortcuts import reset_leaders
 
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
 def add_attribute_callback(attribute, function, addon):
     Player.add_attribute_callback(attribute, function, addon)
-    
+
+
 def remove_attribute_callback(attribute):
     Player.remove_attribute_callback(attribute)
-    
+
+
 def remove_callbacks_for_addon(addon):
     Player.remove_callbacks_for_addon(addon)
+
 
 def setAttribute(filter, attribute, value):
     '''
@@ -46,7 +50,7 @@ def setAttribute(filter, attribute, value):
         setAttribute('#all', 'myattribute', 0)
 
         # Call this attribute (from some event that provides a userid)
-        es.msg('myattribute for %s = %s' % (event_var['es_username'], 
+        es.msg('myattribute for %s = %s' % (event_var['es_username'],
             Player(event_var['userid']).myattribute))
     '''
     if isinstance(filter, int):
@@ -57,6 +61,7 @@ def setAttribute(filter, attribute, value):
             Player(userid)[attribute] = copy(value)
         return
     Player(filter)[attribute] = value
+
 
 def deleteAttribute(filter, attribute):
     '''
@@ -84,10 +89,11 @@ def deleteAttribute(filter, attribute):
         return
     del Player(filter)[attribute]
 
+
 def resetPlayers():
     '''
     Resets the BasePlayer instances, setting their attributes back to default.
-    
+
     Notes:
         * All custom attributes will have to be re-declared after this
           command has been issued.
@@ -97,8 +103,7 @@ def resetPlayers():
     '''
     PlayerManager().reset()
     reset_leaders()
-    
-    
+
 # =============================================================================
 # >> DOCTSTRING REDIRECTS
 # =============================================================================

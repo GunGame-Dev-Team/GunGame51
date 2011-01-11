@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/messaging/__init__.py
+# ../core/messaging/__init__.py
 
 '''
 $Rev$
@@ -35,10 +35,10 @@ class MessageStrings(Strings):
     # =========================================================================
     def __setitem__(self, item, value):
         # Do not allow duplicate message strings to be added
-        if self.has_key(item):
+        if item in self:
             raise ValueError('Unable to add message translation string "%s". '
-                %item + 'The message string "%s" already exists from another '
-                %item + 'translation file.')
+                % item + 'The message string "%s" already exists from another '
+                % item + 'translation file.')
 
         super(MessageStrings, self).__setitem__(item, value)
 
@@ -80,7 +80,7 @@ class AddonStrings(object):
             except ValueError, e:
                 if not string in self.__denied__:
                     self.__denied__.append(string)
-                es.dbgmsg(0, '%s: %s' %(self.addon, e))
+                es.dbgmsg(0, '%s: %s' % (self.addon, e))
 
     # =========================================================================
     # AddonStrings() STATIC CLASS METHODS
@@ -99,7 +99,7 @@ class AddonStrings(object):
 
         # Return the path to the addon INI
         return get_game_dir("addons/eventscripts/gungame51/scripts/" + \
-            "%s/%s/%s.ini" %(addon_type, addon, addon))
+            "%s/%s/%s.ini" % (addon_type, addon, addon))
 
 
 class MessageManager(object):
@@ -141,12 +141,12 @@ class MessageManager(object):
         # If the translation file is not loaded we cannot unload it
         if name not in self.__loaded__:
             raise NameError('GunGame translation file "%s" is not loaded.'
-                %name)
+                % name)
 
         # If the translation file is not loaded via an addon, we cannot unload
         if addon not in self.__addontranslations__[name]:
             raise NameError('GunGame translation file "%s" is not loaded '
-                %name + 'for addon "%s"' %addon)
+                % name + 'for addon "%s"' % addon)
 
         # Remove the addon from the addon translations list
         self.__addontranslations__[name].remove(addon)
@@ -193,7 +193,7 @@ class MessageManager(object):
         string = __strings__(string, tokens, language)
 
         # Format it
-        string = string.replace('#lightgreen', '\3').replace('#green', 
+        string = string.replace('#lightgreen', '\3').replace('#green',
             '\4').replace('#default', '\1')
 
         '''
@@ -216,7 +216,7 @@ class MessageManager(object):
                     if not addon in AddonManager().__loaded__:
                         continue
 
-                    return '\4[%s]\1 ' %get_addon_info(addon).title
+                    return '\4[%s]\1 ' % get_addon_info(addon).title
 
                 return ''
             else:
@@ -224,7 +224,7 @@ class MessageManager(object):
                     return ''
 
                 # Get the addon title that we were given
-                return '\4[%s]\1 ' %get_addon_info(prefix).title
+                return '\4[%s]\1 ' % get_addon_info(prefix).title
         else:
             return ''
 
@@ -239,21 +239,22 @@ class MessageManager(object):
         if not str(string) in __strings__:
             if isinstance(filter, int):
                 # Send message to the userid
-                return es.tell(filter, '#multi', '#default%s%s' %(prefix, string))
+                return es.tell(
+                    filter, '#multi', '#default%s%s' % (prefix, string))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
-                es.tell(userid, '#multi', '#default%s%s' %(prefix, string))
+                es.tell(userid, '#multi', '#default%s%s' % (prefix, string))
         else:
             if isinstance(filter, int):
                 # Send message to the userid
                 return es.tell(filter, '#multi', '#default%s%s'
-                    %(prefix, self.__format_string(string, tokens, filter)))
+                    % (prefix, self.__format_string(string, tokens, filter)))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 es.tell(userid, '#multi', '#default%s%s'
-                    %(prefix, self.__format_string(string, tokens, userid)))
+                    % (prefix, self.__format_string(string, tokens, userid)))
 
     def saytext2(self, filter, index, string, tokens={}, prefix=False):
         # Setup filter
@@ -267,24 +268,24 @@ class MessageManager(object):
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.saytext2(filter, index, '\1%s%s'
-                    %(prefix, string), 0, 0, 0, 0)
+                    % (prefix, string), 0, 0, 0, 0)
 
             # Playerlib filter
             for userid in getUseridList(filter):
-                usermsg.saytext2(userid, index, '\1%s%s' %(prefix, string), 0,
+                usermsg.saytext2(userid, index, '\1%s%s' % (prefix, string), 0,
                     0, 0, 0)
         else:
             # Send message to the userid
             if isinstance(filter, int):
                 return usermsg.saytext2(filter, index, '\1%s%s'
-                    %(prefix, self.__format_string(string, tokens, filter)), 0,
-                        0, 0, 0)
+                    % (prefix, self.__format_string(string, tokens, filter)),
+                        0, 0, 0, 0)
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 usermsg.saytext2(userid, index, '\1%s%s'
-                    %(prefix, self.__format_string(string, tokens, userid)), 0,
-                        0, 0, 0)
+                    % (prefix, self.__format_string(string, tokens, userid)),
+                        0, 0, 0, 0)
 
         # Show in console
         '''
@@ -395,17 +396,17 @@ class MessageManager(object):
             # Console or Userid
             if isinstance(filter, int):
                 # Get clean string
-                string = self.__clean_string(self.__format_string(string, 
+                string = self.__clean_string(self.__format_string(string,
                                                             tokens, filter))
 
                 # Send message
-                return usermsg.echo(filter, '%s%s' %(prefix, string))
+                return usermsg.echo(filter, '%s%s' % (prefix, string))
 
             # Send message to the userids from the playerlib filter
             for userid in getUseridList(filter):
                 # Send message
-                usermsg.echo(userid, '%s%s' %(prefix,
-                    self.__clean_string(self.__format_string(string, 
+                usermsg.echo(userid, '%s%s' % (prefix,
+                    self.__clean_string(self.__format_string(string,
                                                             tokens, userid))))
 
     def langstring(self, string='', tokens={}, userid=0, prefix=False):
@@ -413,5 +414,5 @@ class MessageManager(object):
         prefix = self.__format_prefix(prefix, string)
 
         # Return the formatted language string
-        return '%s%s' % (prefix, 
+        return '%s%s' % (prefix,
             self.__clean_string(self.__format_string(string, tokens, userid)))

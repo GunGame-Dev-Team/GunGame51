@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_leaderweapon_warning/gg_leaderweapon_warning.py
+# ../scripts/included/gg_leaderweapon_warning/gg_leaderweapon_warning.py
 
 '''
 $Rev$
@@ -30,9 +30,10 @@ playedNade = False
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_leaderweapon_warning'
-info.title = 'GG Leader Weapon Warning' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Leader Weapon Warning'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -40,8 +41,10 @@ info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -51,6 +54,7 @@ def es_map_start(event_var):
     playedKnife = False
     global playedNade
     playedNade = False
+
 
 def round_start(event_var):
     # Get leader weapon
@@ -72,21 +76,23 @@ def round_start(event_var):
     for userid in getUseridList('#human'):
         Player(userid).playsound(sound)
 
+
 def gg_levelup(event_var):
+    global playedKnife
+    global playedNade
+
     attacker = int(event_var['attacker'])
-    
+
     # Play nade warning ? (One time during a round per map)
     if Player(attacker).weapon == 'hegrenade' and not playedNade:
         sound = 'nadelevel'
-        global playedNade
         playedNade = True
-            
+
     # Play knife warning ? (One time during a round per map)
     elif Player(attacker).weapon == 'knife' and not playedKnife:
         sound = 'knifelevel'
-        global playedKnife
         playedKnife = True
-        
+
     # Don't play any sounds
     else:
         return
@@ -98,4 +104,3 @@ def gg_levelup(event_var):
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
-

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_nade_bonus/gg_nade_bonus_config.py
+# ../scripts/included/gg_nade_bonus/gg_nade_bonus_config.py
 
 '''
 $Rev$
@@ -19,21 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_nade_bonus.cfg')
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
-
 def load():
     generate_header(config)
 
     # gg_nade_bonus
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> GRENADE BONUS')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Players on grenade level will receive weapons along ' +
                 'with the')
@@ -49,8 +49,8 @@ def load():
                 'will')
     config.text('     progress through while remaining on hegrenade level.')
     config.text('   * /cfg/gungame51/weapon_orders/nade_bonus_order.txt has ' +
-                'examples') 
-    config.text('       and more information on this feature.')    
+                'examples')
+    config.text('       and more information on this feature.')
     config.text('Examples:')
     config.text('   * gg_nade_bonus aug')
     config.text('   * gg_nade_bonus glock,aug')
@@ -68,16 +68,16 @@ def load():
                 'level bonus weapon.').addFlag('notify')
     config.text('')
     config.text('')
-    
+
     # gg_nade_bonus_mode
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> NADE BONUS MODE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Defines how gg_nade_bonus will function when a weapon ' +
                 'order is given and,')
-    config.text('   the player makes it through the entire order.')               
+    config.text('   the player makes it through the entire order.')
     config.text('Note:')
     config.text('   * Not necessary to change unless you are using a weapon' +
                 ' order above.')
@@ -90,37 +90,38 @@ def load():
                 'the order is handled.')
     config.text('')
     config.text('')
-    
+
     # gg_nade_bonus_reset
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> NADE BONUS DEATH RESET')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   When enabled, every time a player spawns on nade level ' +
                 'they will')
-    config.text('   start over on the first weapon in the order.')               
+    config.text('   start over on the first weapon in the order.')
     config.text('Note:')
     config.text('   * Not necessary to change unless you are using a weapon' +
                 ' order above.')
     config.text('Options:')
     config.text('   0 = (Disabled) Players will resume where they left off.')
-    config.text('   1 = (Enabled) Players will go back to the first weapon ' + 
+    config.text('   1 = (Enabled) Players will go back to the first weapon ' +
                 'every spawn.')
     config.text('Default Value: 0')
     config.cvar('gg_nade_bonus_reset', 0, 'Enables/Disables ' +
                 'gg_nade_bonus_reset.')
-                
+
     # Write
     config.write()
     es.dbgmsg(0, '\tgg_nade_bonus.cfg')
-       
+
+
 def unload():
     global config
-    
+
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

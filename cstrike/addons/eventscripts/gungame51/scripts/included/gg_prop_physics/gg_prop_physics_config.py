@@ -1,4 +1,4 @@
-# ../scripts/included/gg_welcome_msg/gg_welcome_msg_config.py
+# ../scripts/included/gg_prop_physics/gg_prop_physics_config.py
 
 '''
 $Rev$
@@ -20,7 +20,7 @@ from gungame51.core.cfg import generate_header
 # >> GLOBAL VARIABLES
 # =============================================================================
 config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_welcome_msg.cfg')
+    'gungame51/included_addon_configs/gg_prop_physics.cfg')
 
 
 # =============================================================================
@@ -29,45 +29,46 @@ config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
 def load():
     generate_header(config)
 
-    # gg_welcome_msg
+    # Prop Physics
     config.text('')
     config.text('=' * 76)
-    config.text('>> GUNGAME WELCOME MESSAGE')
+    config.text('>> PROP PHYSICS')
     config.text('=' * 76)
     config.text('Description:')
-    config.text('   A menu displayed to newly connected players displaying ' +
-                'server and addon')
-    config.text('information.')
-    config.text('   Players can type !welcome to bring this menu back up.')
-    config.text('Note:')
-    config.text('   The configureable message is available in ' +
-                '"gg_welcome_msg.txt".')
+    config.text('   Earn Levels/Multikills with prop_physics kills.')
     config.text('Options:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
+    config.text('   0 = (Disabled) Do not load gg_prop_physics.')
+    config.text('   1 = (Enabled) Load gg_prop_physics.')
     config.text('Default Value: 0')
-    config.cvar('gg_welcome_msg', 0, 'Enables/Disables ' +
-                'gg_welcome_msg.').addFlag('notify')
-    config.text('')
+    config.cvar('gg_prop_physics', 0, 'Enables/Disables ' +
+                'gg_prop_physics.').addFlag('notify')
 
-    # gg_welcome_msg_timeout
+    # Increment Nade
     config.text('')
     config.text('=' * 76)
-    config.text('>> GUNGAME WELCOME MESSAGE TIMEOUT')
+    config.text('>> INCREMENT NADE')
     config.text('=' * 76)
-    config.text('Description:')
-    config.text('   The number (in seconds) it takes for the welcome message' +
-                ' to dissappear.')
     config.text('Options:')
-    config.text('   (#) = (#) seconds')
-    config.text('   10 = 10 seconds')
-    config.text('Default Value: 10')
-    config.cvar('gg_welcome_msg_timeout', 10, 'Sets the number of seconds ' +
-                'for gg_welcome_msg_timeout.')
+    config.text('   0 = Do not increment or levelup on Nade level')
+    config.text('   1 = Increment or Levelup on Nade level')
+    config.text('Default Value: 0')
+    config.cvar('gg_prop_physics_increment_nade', 0, 'Increment or Levelup ' +
+                                                        'when on Nade level.')
+
+    # Increment Knife
     config.text('')
+    config.text('=' * 76)
+    config.text('>> INCREMENT KNIFE')
+    config.text('=' * 76)
+    config.text('Options:')
+    config.text('   0 = Do not increment or levelup on Knife level')
+    config.text('   1 = Increment or Levelup on Knife level')
+    config.text('Default Value: 0')
+    config.cvar('gg_prop_physics_increment_knife', 0, 'Increment or Levelup ' +
+                                                        'when on Knife level.')
 
     config.write()
-    es.dbgmsg(0, '\tgg_welcome_msg.cfg')
+    es.dbgmsg(0, '\tgg_prop_physics.cfg')
 
 
 def unload():

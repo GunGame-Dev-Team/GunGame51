@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menus/weapons_menu.py
+# ../core/menus/weapons_menu.py
 
 '''
 $Rev$
@@ -22,6 +22,7 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.weapons.shortcuts import get_total_levels
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -31,9 +32,11 @@ def load():
     registerSayCommand('!weapons', weapons_menu_cmd, 'Displays a ' +
         '!weapons menu.')
 
+
 def unload():
     # Unregister commands
     unregisterSayCommand('!weapons')
+
 
 # =============================================================================
 # >> MENU FUNCTIONS
@@ -48,7 +51,7 @@ def weapons_menu_cmd(userid, args):
     totalLevels = get_total_levels()
 
     while level <= totalLevels:
-        weaponOrder.append("[%s] %s" % (get_level_multikill(level), 
+        weaponOrder.append("[%s] %s" % (get_level_multikill(level),
             get_level_weapon(level)))
         level += 1
 

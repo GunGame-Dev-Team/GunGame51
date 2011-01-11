@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_handicap/gg_handicap.py
+# ../scripts/included/gg_handicap/gg_handicap.py
 
 '''
 $Rev$
@@ -25,9 +25,9 @@ from gungame51.core.players.shortcuts import setAttribute
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_handicap'
-info.title = 'GG Handicap' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Handicap'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_handicap']
 
 # =============================================================================
@@ -39,6 +39,7 @@ gg_handicap = es.ServerVar('gg_handicap')
 gg_handicap_no_reconnect = es.ServerVar('gg_handicap_no_reconnect')
 eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -49,13 +50,15 @@ def load():
     # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     # Delete the repeat loop
-    if repeat.status('gungameHandicapLoop'):       
+    if repeat.status('gungameHandicapLoop'):
         repeat.delete('gungameHandicapLoop')
 
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -67,47 +70,50 @@ def player_activate(event_var):
     ggPlayer = Player(userid)
 
     # Check for rejoining players ?
-    if int(gg_handicap_no_reconnect):    
-        
+    if int(gg_handicap_no_reconnect):
+
         # Is the player joining this map for the first time?
-        if not hasattr(ggPlayer, 'current_map'):  
+        if not hasattr(ggPlayer, 'current_map'):
             setAttribute(userid, 'current_map', str(eventscripts_currentmap))
-        
+
         # Player's current_map attr needs updated?
         elif ggPlayer.current_map != str(eventscripts_currentmap):
-            ggPlayer.current_map = str(eventscripts_currentmap) 
-                    
+            ggPlayer.current_map = str(eventscripts_currentmap)
+
         # If the player's attr matches the current map, then the player has
         # rejoined during the same map.  No new weapon is given!
         else:
             return
-    
+
     # Get the level of the lowest level player other than himself?
     if gg_handicap == 1:
         handicapLevel = getLevelAboveUser(userid)
-    
+
     # Get the average level of the players other than himself?
     elif gg_handicap == 2:
         handicapLevel = getAverageLevel(userid)
-        
+
     # Max level for joining for the first time?
     if handicapLevel > int(gg_handicap_max) > 1:
-        handicapLevel = int(gg_handicap_max)        
+        handicapLevel = int(gg_handicap_max)
 
     # If their level is below the handicap level, set them to it
     if ggPlayer.level < handicapLevel:
         ggPlayer.level = handicapLevel
 
         # Tell the player that their level was adjusted
-        ggPlayer.msg('LevelLowest', {'level':handicapLevel}, prefix=True)
+        ggPlayer.msg('LevelLowest', {'level': handicapLevel}, prefix=True)
+
 
 def round_start(event_var):
     # Start loop
     loopStart()
 
+
 def gg_win(event_var):
     # Stop loop
     loopStop()
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -144,17 +150,19 @@ def loopStart():
         # Start loop
         myRepeat.start(int(gg_handicap_update), 0)
 
+
 def loopStop():
     # Loop running ?
     if repeat.status('gungameHandicapLoop'):
         # Stop loop
         repeat.stop('gungameHandicapLoop')
 
+
 def handicapUpdate():
     # Get the handicap level
     handicapLevel = getLevelAboveLowest()
 
-    # Updating players    
+    # Updating players
     for userid in getLowestLevelUsers():
         # Get the player
         ggPlayer = Player(userid)
@@ -165,10 +173,11 @@ def handicapUpdate():
             ggPlayer.level = handicapLevel
 
             # Tell the player that their level was adjusted
-            ggPlayer.msg('LevelLowest', {'level':handicapLevel}, prefix=True)
+            ggPlayer.msg('LevelLowest', {'level': handicapLevel}, prefix=True)
 
             # Play the update sound
-            ggPlayer.playsound('handicap') 
+            ggPlayer.playsound('handicap')
+
 
 def getLowestLevelUsers():
     lowestLevel = get_leader_level()
@@ -178,7 +187,7 @@ def getLowestLevelUsers():
     for userid in es.getUseridList():
         if int(es.getplayerteam(userid)) <= 1:
             continue
-            
+
         # Get the player's level
         playerLevel = Player(userid).level
 
@@ -195,6 +204,7 @@ def getLowestLevelUsers():
 
     return userList
 
+
 def getLevelAboveLowest():
     levels = []
 
@@ -202,7 +212,7 @@ def getLevelAboveLowest():
     for userid in es.getUseridList():
         if int(es.getplayerteam(userid)) <= 1:
             continue
-            
+
         # Get the player's level
         playerLevel = Player(userid).level
 
@@ -222,6 +232,7 @@ def getLevelAboveLowest():
     levels.sort()
     return levels[1]
 
+
 def getLevelAboveUser(uid):
     levels = []
 
@@ -229,7 +240,7 @@ def getLevelAboveUser(uid):
     for userid in es.getUseridList():
         if int(es.getplayerteam(userid)) <= 1:
             continue
-            
+
         # If the player is the one we are checking for, skip them
         if userid == uid:
             continue
@@ -248,14 +259,15 @@ def getLevelAboveUser(uid):
     # Sort levels, and return the level above lowest
     levels.sort()
     return levels[0]
-    
+
+
 def getAverageLevel(uid):
     # Everyone on level 1?
     if get_leader_level() == 1:
         return 1
-    
-    levels = [] 
-    
+
+    levels = []
+
     # Loop through the players
     for userid in es.getUseridList():
         if int(es.getplayerteam(userid)) <= 1:
@@ -264,22 +276,19 @@ def getAverageLevel(uid):
         # If the player is the one we are checking for, skip them
         if userid == uid:
             continue
-            
+
         # Add level to the list
         levels.append(Player(userid).level)
 
     # Make sure the levels list is not empty (can't divide by 0)
     if len(levels) == 0:
-        return 1 
-    
+        return 1
+
     # Get the average
-    average = sum(levels)/len(levels)
-    
+    average = sum(levels) / len(levels)
+
     # Is the average 1 or less?
     if average <= 1:
         return 1
-    
-    return average
-        
 
-                
+    return average

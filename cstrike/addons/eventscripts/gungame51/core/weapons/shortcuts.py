@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/weapons/shortcuts.py
+# ../core/weapons/shortcuts.py
 
 '''
 $Rev$
@@ -16,6 +16,7 @@ from weaponlib import getWeaponList
 # GunGame Imports
 from gungame51.core.weapons import WeaponManager
 
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
@@ -28,16 +29,17 @@ def get_weapon_order(name=None):
     '''
     if name:
         return WeaponManager().load(name)
-    
+
     elif WeaponManager().gungameorder:
         return WeaponManager().__weaponorders__[WeaponManager().gungameorder]
-    
+
     return None
+
 
 def set_weapon_order(name, type='#default'):
     '''
     Sets the weapon order to be used by GunGame.
-    
+
     Notes:
         * name: (required)
             The name of the weapon order file as found in
@@ -55,13 +57,13 @@ def set_weapon_order(name, type='#default'):
                     file, but randomizes the order of the weapons.
     Usage:
         from gungame.core.weapons.shortcuts import set_weapon_order
-        
+
         # Use the default weapon order
         set_weapon_order('default_weapon_order')
-        
+
         # Use the default weapon order, but randomize the order
         set_weapon_order('default_weapon_order', '#random')
-        
+
         # Use the default weapon order, but reverse the order
         set_weapon_order('default_weapon_order', '#reversed')
     '''
@@ -69,18 +71,21 @@ def set_weapon_order(name, type='#default'):
     WeaponManager().set_order(name)
     WeaponManager().type = type
     return get_weapon_order()
-    
+
+
 def get_level_weapon(level, weaponOrderName=None):
     '''
     Returns the name of the level's weapon set in GunGame's weapon order.
     '''
     return get_weapon_order(weaponOrderName).get_weapon(level)
-    
+
+
 def get_level_multikill(level, weaponOrderName=None):
     '''
     Returns the multikill value of the level set in GunGame's weapon order.
     '''
     return get_weapon_order(weaponOrderName).get_multikill(level)
-    
+
+
 def get_total_levels(weaponOrderName=None):
     return get_weapon_order(weaponOrderName).get_total_levels()

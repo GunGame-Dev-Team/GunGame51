@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/sound/__init__.py
+# ../core/sound/__init__.py
 
 '''
 $Rev$
@@ -33,9 +33,9 @@ gg_dynamic_chattime = es.ServerVar("gg_dynamic_chattime")
 # Get the es.ServerVar() instance of "mp_chattime"
 mp_chattime = es.ServerVar("mp_chattime")
 
-soundDir = path('%s/sound' %str(eventscripts_gamedir).replace('\\', '/'))
+soundDir = path('%s/sound' % str(eventscripts_gamedir).replace('\\', '/'))
 iniDir = path('%s/cfg/gungame51/sound_packs'
-    %str(eventscripts_gamedir).replace('\\', '/'))
+    % str(eventscripts_gamedir).replace('\\', '/'))
 
 # winnerSounds stores a shuffled list of winner sounds to come if random winner
 # sounds is enabled
@@ -44,18 +44,19 @@ winnerSounds = []
 # if it cannot check the length of the winner sound
 defaultChatTime = -1
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class SoundPack(object):    
+class SoundPack(object):
     def __init__(self, name):
-        self.__pack__ = ConfigObj('%s/%s.ini' %(iniDir, name))
+        self.__pack__ = ConfigObj('%s/%s.ini' % (iniDir, name))
 
     def __getitem__(self, name):
-        if self.__pack__.has_key(name):
+        if name in self.__pack__:
             # See if this is a random sound file
             if self._is_random(self.__pack__[name]):
-                # If we are looking for a random winner sound, return the 
+                # If we are looking for a random winner sound, return the
                 # random winner sound chosen for the current round
                 if name == "winner":
                     return winnerSounds[0]
@@ -69,10 +70,10 @@ class SoundPack(object):
             return None
 
     def __getattr__(self, name):
-        if self.__pack__.has_key(name):
+        if name in self.__pack__:
             # See if this is a random sound file
             if self._is_random(self.__pack__[name]):
-                # If we are looking for a random winner sound, return the 
+                # If we are looking for a random winner sound, return the
                 # random winner sound chosen for the current round
                 if name == "winner":
                     return winnerSounds[0]
@@ -111,6 +112,7 @@ class SoundPack(object):
         # Return the randomly selected sound if the list is not empty
         return choice(randomSounds) if randomSounds else None
 
+
 def make_downloadable(gg_loading=False):
     # Make the global variable winnerSounds global to this function in case we
     # use it below
@@ -127,7 +129,7 @@ def make_downloadable(gg_loading=False):
             continue
 
         # Grab the ConfigObj for the INI
-        config = ConfigObj('%s/%s' %(iniDir, f.name))
+        config = ConfigObj('%s/%s' % (iniDir, f.name))
 
         if gg_loading:
             es.dbgmsg(0, '\t' + f.name)
@@ -141,17 +143,17 @@ def make_downloadable(gg_loading=False):
             # Make sure that the sound file exists at the given path
             if sound_exists(config[name]):
                 # Make the sound downloadable
-                es.stringtable('downloadables', 'sound/%s' %config[name])
+                es.stringtable('downloadables', 'sound/%s' % config[name])
             else:
                 # See if the file is a random sound text file
                 if not path.isfile(iniDir.joinpath('random_sound_files/%s'
-                    %config[name])):
+                    % config[name])):
 
                     continue
 
                 # Open the random sound file
                 randomFile = open(iniDir.joinpath('random_sound_files/%s'
-                    %config[name]))
+                    % config[name]))
 
                 if gg_loading:
                     es.dbgmsg(0, '\trandom_sound_files/' + config[name])
@@ -216,6 +218,7 @@ def make_downloadable(gg_loading=False):
                 # Close the random sound file
                 randomFile.close()
 
+
 def set_chattime():
     # Make the global variable defaultChatTime global to this function in case
     # we need to modify it
@@ -224,18 +227,18 @@ def set_chattime():
     # If this is the first time setting the chattime, store the default time
     if defaultChatTime == -1:
         defaultChatTime = int(mp_chattime)
-    
+
     # If the sound does not exist on the server, use the defaultChatTime
     if not sound_exists(winnerSounds[0]):
         mp_chattime.set(defaultChatTime)
         return
-    
+
     # Get the path and extension of the sound file
     soundPath = soundDir.joinpath(winnerSounds[0])
     extension = winnerSounds[0].split(".")[-1]
-    
+
     duration = defaultChatTime
-    
+
     # If the sound file is an mp3, use mp3info to find its duration
     if extension == 'mp3':
         try:
@@ -243,7 +246,7 @@ def set_chattime():
             duration = info['MM'] * 60 + info['SS']
         except:
             pass
-    
+
     # If the sound file is a wav, use the wave module to find its duration
     elif extension == 'wav':
         try:
@@ -260,6 +263,7 @@ def set_chattime():
 
     # Set the new mp_chattime
     gamethread.delayed(5, mp_chattime.set, duration)
+
 
 def sound_exists(sound):
     return (path.isfile(soundDir.joinpath(sound)))

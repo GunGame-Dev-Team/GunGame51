@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_knife_pro/gg_knife_pro_config.py
+# ../scripts/included/gg_knife_pro/gg_knife_pro_config.py
 
 '''
 $Rev$
@@ -19,8 +19,9 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_knife_pro.cfg')
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -32,12 +33,12 @@ def load():
     # GG_KNIFE_PRO CVARS
     # =========================================================================
     # Knife Pro
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> KNIFE PRO')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
-    config.text('    When you kill a player with a knife, you will level up, ' +
-                'and the victim')
+    config.text('    When you kill a player with a knife, you will level up,' +
+                ' and the victim')
     config.text('   will level down.')
     config.text('    The attacker will not steal a level if they are on ' +
                 'hegrenade or knife')
@@ -46,14 +47,14 @@ def load():
     config.text('    0 = (Disabled) Do not load gg_knife_pro.')
     config.text('    1 = (Enabled) Load gg_knife_pro.')
     config.text('Default Value: 0')
-    config.cvar('gg_knife_pro', 0, 'Enables/Disables ' + 
+    config.cvar('gg_knife_pro', 0, 'Enables/Disables ' +
         'gg_knife_pro').addFlag('notify')
 
     # Knife Pro Limit
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> KNIFE PRO LIMIT')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('    Limits level stealing to players close to your own ' +
                 'level.')
@@ -72,9 +73,9 @@ def load():
 
     # Knife Pro Always Level
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> KNIFE PRO ALWAYS LEVEL')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('    The attacker will always level up unless they are on ' +
                 'hegrenade level.')
@@ -83,8 +84,8 @@ def load():
     config.text('    gg_knife_pro_limit still prevents leveling if enabled.')
     config.text('Options:')
     config.text('    0 = (Disabled) Conform to logical gg_knife_pro ruling')
-    config.text('    1 = (Enabled) Always affect levels with exception to the' +
-                ' situations in')
+    config.text('    1 = (Enabled) Always affect levels with exception to ' +
+                'the situations in')
     config.text('                   the description above.')
     config.text('Default Value: 0')
     config.cvar('gg_knife_pro_always_level', 0, 'Enables/Disables always ' +
@@ -92,9 +93,9 @@ def load():
 
     # Allow Skip Nade
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> KNIFE PRO ALLOW SKIP NADE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('    The attacker may skip grenade level with a knife kill.')
     config.text('Note:')
@@ -106,8 +107,9 @@ def load():
     config.cvar('gg_knife_pro_skip_nade', 0, 'Enables/Disables always ' +
                 'skipping nade.')
     config.write()
-    
+
     es.dbgmsg(0, '\tgg_knife_pro.cfg')
+
 
 def unload():
     global config

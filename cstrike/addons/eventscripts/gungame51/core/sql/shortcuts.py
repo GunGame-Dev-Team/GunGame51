@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/sql/shortcuts.py
+# ../core/sql/shortcuts.py
 
 '''
 $Rev$
@@ -20,6 +20,7 @@ from gungame51.core.sql import Database
 # =============================================================================
 gg_prune_database = ServerVar('gg_prune_database')
 
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
@@ -29,15 +30,16 @@ def insert_winner(name, uniqueid, wins, timestamp='strftime("%s","now")'):
     '''
     # Send to be queried
     ggDB = Database()
-    ggDB._query("INSERT INTO gg_wins (name, uniqueid, wins, timestamp) VALUES" +
-                "(?, ?, ?, ?)", values=(name, uniqueid, wins, timestamp))
+    ggDB._query("INSERT INTO gg_wins (name, uniqueid, wins, timestamp) " +
+        "VALUES(?, ?, ?, ?)", values=(name, uniqueid, wins, timestamp))
     ggDB.commit()
+
 
 def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
             timestamp=None):
     '''
     Updates the database for the columns in columnTuple with the values in
-    valueTuple of the same index. 
+    valueTuple of the same index.
     '''
     # Valid columnTuple entries
     validEntries = ("name", "wins", "timestamp")
@@ -56,7 +58,7 @@ def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
     # valueError
     if len(columnTuple) != len(valueTuple):
         raise ValueError("columnTuple and valueTuple must be the same length")
-    
+
     # Check columnTuple for valid entries
     for column in columnTuple:
         if column in validEntries:
@@ -64,10 +66,10 @@ def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
 
         raise NameError("Valid columnTuple entries are %s, %s, and %s" %
                 validEntries)
-    
-    conditionParams = {'name':name, 'uniqueid':uniqueid, 'wins':wins,
-                        'timestamp':timestamp}
-    
+
+    conditionParams = {'name': name, 'uniqueid': uniqueid, 'wins': wins,
+                        'timestamp': timestamp}
+
     conditions = ""
     conditionValues = []
     # Create the WHERE conditions
@@ -79,12 +81,12 @@ def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
                 conditions = "WHERE"
             else:
                 conditions += " AND"
-            
+
             # Add the condition
             conditions += " %s=?" % condition
-            
+
             conditionValues.append(conditionParams[condition])
-    
+
     updateString = ""
     # Create the SET statement
     for column in columnTuple:
@@ -92,17 +94,18 @@ def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
             updateString += ", "
 
         updateString += "%s=?" % column
-    
+
     # Add the updateString and conditions to queryString
     queryString = "UPDATE gg_wins SET %s %s" % (updateString, conditions)
-    
+
     # Include the values for the conditions in the valueTuple
     valueTuple += tuple(conditionValues)
-    
+
     # Send to be queried
     ggDB = Database()
     ggDB._query(queryString, values=valueTuple)
     ggDB.commit()
+
 
 def get_rank(uniqueid):
     ggDB = Database()
@@ -118,8 +121,10 @@ def get_rank(uniqueid):
     return ggDB.select("gg_wins", ("COUNT(*)"), "WHERE ABS(wins) > %s" % \
                                                             currentWins) + 1
 
+
 def get_winner_count():
     return Database().select("gg_wins", ("COUNT(*)"))
+
 
 def get_winners_list(n=10):
     '''
@@ -135,6 +140,7 @@ def get_winners_list(n=10):
     if winner_list:
         return winner_list
     return []
+
 
 def prune_winners_db(days=None):
     '''

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_dead_strip/gg_dead_strip.py
+# ../scripts/included/gg_dead_strip/gg_dead_strip.py
 
 '''
 $Rev$
@@ -35,7 +35,7 @@ info = AddonInfo()
 info.name = 'gg_dead_strip'
 info.title = 'GG Dead Strip'
 info.author = 'GG Dev Team'
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -48,13 +48,14 @@ list_weaponNameList = getWeaponNameList()
 
 gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     # Register the drop command to prevent it from being used.
     es.addons.registerClientCommandFilter(drop_filter)
-    
+
     #Start the idle weapon removal loop
     gamethread.delayedname(5, "gg_removeIdleLoop", removeIdleLoop)
 
@@ -65,19 +66,21 @@ def load():
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     # Unregister the drop command
     es.addons.unregisterClientCommandFilter(drop_filter)
-    
+
     #Stop the idle weapon removal loop
     gamethread.cancelDelayed('gg_removeIdleLoop')
-    
+
     # Make sure that all weapons can be picked up
     for userid in es.getUseridList():
         for weapon in spe.getWeaponDict(userid):
             set_spawn_flags(userid, weapon[7:], 0)
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -86,6 +89,7 @@ def round_start(event_var):
     # Remove all idle weapons that exist on the map.
     es.server.queuecmd('es_xfire %s game_weapon_manager ' % es.getuserid() +
                         'AddOutput "maxpieces 0"')
+
 
 def item_pickup(event_var):
     # Get variables
@@ -105,7 +109,7 @@ def item_pickup(event_var):
         return
 
     # Don't strip the c4 if bomb objectives are allowed
-    if item == "c4" and not int(es.ServerVar("gg_map_obj")) in [1,2]:
+    if item == "c4" and not int(es.ServerVar("gg_map_obj")) in [1, 2]:
         return
 
     # Check to see if the weapon is in the player's strip exceptions
@@ -138,6 +142,7 @@ def item_pickup(event_var):
     es.server.queuecmd('es_xsexec %s "use weapon_%s"' % (userid, currentWeapon)
                                                                             )
 
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
@@ -155,17 +160,19 @@ def removeIdleLoop():
         # Remove all weapons of this type from the map
         for index in weapon.indexlist:
             # If the weapon has an owner, stop here
-            if es.getindexprop(index,'CBaseEntity.m_hOwnerEntity') != -1:
+            if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') != -1:
                 continue
 
             spe.removeEntityByIndex(index)
 
     gamethread.delayedname(5, "gg_removeIdleLoop", removeIdleLoop)
 
+
 def set_spawn_flags(userid, weapon, flag):
     # Adjusts the ability for weapons to be picked up
-    es.server.queuecmd('es_xfire %s weapon_%s ' % (userid, weapon) + 
+    es.server.queuecmd('es_xfire %s weapon_%s ' % (userid, weapon) +
         'addoutput \"spawnflags %s\"' % flag)
+
 
 def remove_weapon(userid, item):
     # Remove weapon
@@ -174,6 +181,7 @@ def remove_weapon(userid, item):
     if theWeapon:
         spe.dropWeapon(userid, weaponName)
         spe.removeEntityByInstance(theWeapon)
+
 
 def drop_filter(userid, args):
     # If command not drop, continue

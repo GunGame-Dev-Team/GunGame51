@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_spawn_protect/gg_spawn_protect.py
+# ../scripts/included/gg_spawn_protect/gg_spawn_protect.py
 
 '''
 $Rev$
@@ -23,9 +23,9 @@ from gungame51.core.players.shortcuts import Player
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_spawn_protect'
-info.title = 'GG Spawn Protection' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Spawn Protection'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -57,6 +57,7 @@ eventscripts_noisy = es.ServerVar('eventscripts_noisy')
 noisySave = 0
 protectedList = []
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -69,10 +70,12 @@ def load():
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     eventscripts_noisy.set(noisySave)
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -91,6 +94,7 @@ def server_cvar(event_var):
             # Set noisy back
             eventscripts_noisy.set(noisySave)
 
+
 def weapon_fire(event_var):
     if not int(gg_spawn_protect_cancelonfire):
         return
@@ -103,6 +107,7 @@ def weapon_fire(event_var):
 
         # End the protection
         endProtect(userid)
+
 
 def player_spawn(event_var):
     # Get userid
@@ -118,12 +123,14 @@ def player_spawn(event_var):
     # Start protecting the player
     startProtect(userid)
 
+
 def player_death(event_var):
     userid = int(event_var['userid'])
 
     if userid in protectedList:
         gamethread.cancelDelayed('ggSpawnProtect%s' % userid)
         protectedList.remove(userid)
+
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
@@ -132,6 +139,7 @@ def player_disconnect(event_var):
     if userid in protectedList:
         gamethread.cancelDelayed('ggSpawnProtect%s' % userid)
         protectedList.remove(userid)
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -160,8 +168,9 @@ def startProtect(userid):
             ggPlayer.preventlevel.append('gg_spawn_protect')
 
     # Start the delay to cancel spawn protection
-    gamethread.delayedname(int(gg_spawn_protect), 
+    gamethread.delayedname(int(gg_spawn_protect),
         'ggSpawnProtect%s' % userid, endProtect, (userid))
+
 
 def endProtect(userid):
     # Are they even protected?

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_earn_nade/gg_earn_nade.py
+# ../scripts/included/gg_earn_nade/gg_earn_nade.py
 
 '''
 $Rev$
@@ -36,7 +36,8 @@ info = AddonInfo()
 info.name = 'gg_earn_nade'
 info.title = 'GG Earn Grenade'
 info.author = 'GG Dev Team'
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -45,9 +46,11 @@ def load():
     add_attribute_callback('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     remove_callbacks_for_addon(info.name)
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -66,6 +69,7 @@ def level_call_back(name, value, ggPlayer):
     # know in player_death that they just leveled up to hegrenade level
     recentlyOnHegrenade.append(ggPlayer.userid)
     gamethread.delayed(0.2, recentlyOnHegrenade.remove, ggPlayer.userid)
+
 
 def player_death(event_var):
     attacker = int(event_var['attacker'])
@@ -86,6 +90,7 @@ def player_death(event_var):
     if Player(attacker).weapon == 'hegrenade':
         give_nade(attacker)
 
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
@@ -97,17 +102,17 @@ def give_nade(userid):
     # If the player just got the kill to get to hegrenade level, stop here
     if userid in recentlyOnHegrenade:
         return
-        
+
     # Was this the last kill in the round? (CT)
     if not getUseridList('#alive,#ct'):
         return
-    
-    # Was this the last kill in the round? (T)    
+
+    # Was this the last kill in the round? (T)
     if not getUseridList('#alive,#t'):
-        return 
+        return
 
     pPlayer = getPlayer(userid)
-    
+
     # Is the player dead ?
     if pPlayer.isdead:
         return
@@ -115,18 +120,18 @@ def give_nade(userid):
     # Only give a nade if this player does not have one.
     if int(pPlayer.get('he')) == 0:
         es.server.queuecmd('es_xgive %s weapon_hegrenade' % userid)
-    
+
     # If the player had a grenade, and gg_multi_nade is enabled
     elif int(es.ServerVar("gg_multi_nade")):
         ggPlayer = Player(userid)
-        
+
         # If the player has already used up their multi-nades, subtract two
         # from the number of detonations because gg_earn_nade gave them a
         # grenade to detonate which gg_multi_nade didn't account for
         if int(ggPlayer.grenades_detonated) == \
                                 int(es.ServerVar("gg_multi_nade_max_nades")):
             ggPlayer.grenades_detonated -= 2
-        
+
         # If the player has yet to use up their multi-nades, subtract one
         # from the number of detonations
         else:

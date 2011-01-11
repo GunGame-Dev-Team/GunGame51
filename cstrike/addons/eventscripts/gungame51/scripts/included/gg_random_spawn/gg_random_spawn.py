@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_random_spawn/gg_random_spawn.py
+# ../scripts/included/gg_random_spawn/gg_random_spawn.py
 
 '''
 $Rev$
@@ -26,9 +26,9 @@ from gungame51.core.addons.shortcuts import AddonInfo
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_random_spawn'
-info.title = 'GG Random Spawn' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Random Spawn'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -37,6 +37,7 @@ info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
 spawnPoints = []
 pointsLoaded = False
 es_gamedir = es.ServerVar('eventscripts_gamedir')
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -58,18 +59,20 @@ def load():
 
     loadRandomPoints(userid)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GUNGAME EVENTS
 # =============================================================================
-
 def es_map_start(event_var):
     global pointsLoaded
 
     pointsLoaded = False
     loadSpawnFile(event_var['mapname'])
+
 
 def player_activate(event_var):
     global pointsLoaded
@@ -84,10 +87,10 @@ def player_activate(event_var):
 
     loadRandomPoints(event_var['userid'])
 
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
-
 def loadSpawnFile(mapName):
     global spawnPoints
     global pointsLoaded
@@ -96,7 +99,7 @@ def loadSpawnFile(mapName):
     pointsLoaded = False
 
     # Get spawnpoint file
-    spawnFile = ('%s' % str(es_gamedir).replace('\\', '/') + 
+    spawnFile = ('%s' % str(es_gamedir).replace('\\', '/') +
                  '/cfg/gungame51/spawnpoints/%s.txt' % mapName)
 
     # Does the file exist?
@@ -110,6 +113,7 @@ def loadSpawnFile(mapName):
 
     # Set up spawnpoints
     spawnPoints = [x.split(' ', 6) for x in fileLines]
+
 
 def loadRandomPoints(userid):
     # Remove existing spawnpoints
@@ -125,7 +129,7 @@ def loadRandomPoints(userid):
             index = spe.getIndexOfEntity(spe.giveNamedItem(userid, team))
 
             # Set the spawnpoint position and rotation
-            es.setindexprop(index, 'CBaseEntity.m_vecOrigin', 
+            es.setindexprop(index, 'CBaseEntity.m_vecOrigin',
                 '%s,%s,%s' % (spawn[0], spawn[1], spawn[2]))
-            es.setindexprop(index, 'CBaseEntity.m_angRotation', 
+            es.setindexprop(index, 'CBaseEntity.m_angRotation',
                 '0,%s,0' % spawn[4])

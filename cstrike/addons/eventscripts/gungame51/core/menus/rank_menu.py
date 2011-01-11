@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menus/rank_menu.py
+# ../core/menus/rank_menu.py
 
 '''
 $Rev$
@@ -19,6 +19,7 @@ from gungame51.core.sql.shortcuts import get_winners_list
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -27,9 +28,11 @@ def load():
     es.dbgmsg(0, '\t!rank')
     registerSayCommand('!rank', rank_menu_cmd, 'Displays a !rank menu.')
 
+
 def unload():
     # Unregister commands
     unregisterSayCommand('!rank')
+
 
 # =============================================================================
 # >> MENU FUNCTIONS
@@ -66,8 +69,8 @@ def rank_menu_cmd(userid, args):
         for player in currentWinners:
             count += 1
 
-            # Check to see if the player requesting the menu is the player being
-            # listed
+            # Check to see if the player requesting the menu is the player
+            # being listed
             if player["uniqueid"] == es.getplayersteamid(userid):
                 rank = count
 

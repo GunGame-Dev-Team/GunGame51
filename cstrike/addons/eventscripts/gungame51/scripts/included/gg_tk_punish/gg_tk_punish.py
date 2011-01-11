@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_tk_punish/gg_tk_punish.py
+# ../scripts/included/gg_tk_punish/gg_tk_punish.py
 
 '''
 $Rev$
@@ -21,9 +21,9 @@ from gungame51.core.players.shortcuts import Player
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_tk_punish'
-info.title = 'GG TK Punish' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG TK Punish'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_tk_punish']
 
 # =============================================================================
@@ -35,15 +35,18 @@ gg_tk_punish = es.ServerVar('gg_tk_punish')
 # Is the round live?
 liveRound = True
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-    
+
+
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
@@ -51,9 +54,11 @@ def round_start(event_var):
     global liveRound
     liveRound = True
 
+
 def round_end(event_var):
     global liveRound
     liveRound = False
+
 
 def player_death(event_var):
     # Has the round ended?
@@ -83,7 +88,7 @@ def player_death(event_var):
         ggAttacker.leveldown(int(gg_tk_punish), userid, 'tk')
 
         # Message
-        ggAttacker.msg('TeamKill_LevelDown', {'newlevel':ggAttacker.level}, 
+        ggAttacker.msg('TeamKill_LevelDown', {'newlevel': ggAttacker.level},
                         prefix='gg_tk_punish')
 
         # Play the leveldown sound

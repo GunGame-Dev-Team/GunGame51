@@ -1,4 +1,5 @@
-# ../addons/eventscripts/gungame51/core/debug/__init__.py
+# ../core/debug/__init__.py
+
 '''
 $Rev$
 $LastChangedBy$
@@ -12,30 +13,30 @@ There are four levels of debugging:
     warn:
         Something went bad or doesn't seem right, but it's not necessary to
         raise an Exception.
-          
+
         Default output channels: es.dbgmsg (0) and logfile
-          
+
     debug:
         Information which might be useful for debugging purposes.
-    
+
         Default output channels: es.dbgmsg (1)
-        
+
     notify:
         Information to be printed to server console but not logged
-        
+
         Default output channels: es.dbgmsg (0)
-        
+
     log:
         Information to be logged but not printed to server console
-        
-        Default output channels: logfile
-        
-        
-There is also a decorator for methods to log the environment should a method 
-fail. 
 
-WARNING: This does not seem to work with cmdlib command functions due to 
-CMDArgs failing to coerce to string! Therefore the logging is done with 
+        Default output channels: logfile
+
+
+There is also a decorator for methods to log the environment should a method
+fail.
+
+WARNING: This does not seem to work with cmdlib command functions due to
+CMDArgs failing to coerce to string! Therefore the logging is done with
 try...except.
 
 This decorator is called 'trace' and can be used like this:
@@ -45,9 +46,9 @@ from gungame51.core.debug import trace
 @trace
 def myfunction(...):
     ...
-    
-Now should your function be called and fail, the error and the environment 
-under which the error happened (arguments to the method, global variables, 
+
+Now should your function be called and fail, the error and the environment
+under which the error happened (arguments to the method, global variables,
 platform...) will be logged.
 """
 import es
@@ -57,28 +58,33 @@ from traceback import format_exception
 from inspect import getargspec, ismethod, isclass, isfunction
 from gungame51.core import get_game_dir, platform
 
+
 def _write_to_log(message):
-    #TODO: add a file to write to! Awaiting decision on using path 
+    #TODO: add a file to write to! Awaiting decision on using path
     #over get_game_dir
     pass
+
 
 def _write_to_console(message, level=0):
     #TODO: Do we want a nice prefix?
     es.dbgmsg(level, message)
+
 
 def warn(message):
     #TODO: make settings to fine tune output channels
     _write_to_console(message)
     _write_to_log(message)
 
+
 def debug(message):
     #TODO: make settings to fine tune output channels
     _write_to_console(message, 1)
-    
+
 
 def notify(message):
     #TODO: make settings to fine tune output channels
     _write_to_console(message)
+
 
 def log(message):
     #TODO: make settings to fine tune output channels
@@ -91,23 +97,23 @@ class MethodTracer(object):
     """
     def __init__(self, method):
         self.method = method
-        
-    def _handle_exception(self, arguments, kwargs, extype, 
+
+    def _handle_exception(self, arguments, kwargs, extype,
       exvalue, extraceback):
         """
-        Get the hashsum of the traceback. This will become the filename to 
-        prevent one error to fill the folder in seconds (in the worst case). 
-        Having hashed filenames means that every (unique) traceback will only 
+        Get the hashsum of the traceback. This will become the filename to
+        prevent one error to fill the folder in seconds (in the worst case).
+        Having hashed filenames means that every (unique) traceback will only
         be logged once!
         """
         traceback_lines = format_exception(extype, exvalue, extraceback)
         filename = md5(''.join(traceback_lines)).hexdigest() + '.txt'
         self._write_dump(arguments, kwargs, traceback_lines, filename)
-        
+
     def _write_dump(self, arguments, kwargs, traceback_lines, filename):
         lines = []
         # Affected method and module
-        lines.append("An error occured in %s.%s" % (self.method.__module__, 
+        lines.append("An error occured in %s.%s" % (self.method.__module__,
                         self.method.__name__))
         # Original traceback
         lines.append("Traceback:")
@@ -121,13 +127,13 @@ class MethodTracer(object):
             argdict[name] = {'value': default, 'default': default}
         for name, value in zip(arg_names, arguments):
             if not name in argdict:
-                argdict[name] = {'value': value, 
+                argdict[name] = {'value': value,
                     'default': 'NO_DEFAULT_PROVIDED'}
             else:
                 argdict[name]['value'] = value
         for key, value in kwargs.iteritems():
             if not name in argdict:
-                argdict[key] = {'value': value, 
+                argdict[key] = {'value': value,
                     'default': 'NO_DEFAULT_PROVIDED'}
             else:
                 argdict[key]['value'] = value
@@ -135,7 +141,7 @@ class MethodTracer(object):
         for name in arg_names:
             value = argdict[name]['value']
             default = argdict[name]['default']
-            # Try...Except here because of things like CMDArgs 
+            # Try...Except here because of things like CMDArgs
             # messing up the logging.
             things = [name, value, type(value), default, type(default)]
             stringed = []
@@ -145,7 +151,7 @@ class MethodTracer(object):
                 except:
                     stringed.append('???')
             arglist.append(tuple(stringed))
-        # Add the arguments to the 
+        # Add the arguments to the
         lines.append('The function was called with following arguments:')
         for arg in arglist:
             lines.append('  %s: %s (%s) [Default: %s (%s)]' % arg)
@@ -154,22 +160,23 @@ class MethodTracer(object):
         #TODO: Does this need more information?
         lines.append('Server environment:')
         lines.append('  platform: %s' % platform)
-        lines.append('  gg version: %s' % '5.1') # TODO: Detect real version
-        lines.append('  es version: %s' %str(es.ServerVar('eventscripts_ver')))
+        lines.append('  gg version: %s' % '5.1')  # TODO: Detect real version
+        lines.append('  es version: %s' %
+            str(es.ServerVar('eventscripts_ver')))
         lines.append('')
         # The global variables
         lines.append('Global variables:')
         for key, value in dict(globals()).iteritems():
             lines.append('  %s: %s (%s)' % (key, value, type(value)))
         #TODO: What other information do we need? Time? Players?
-        
+
         #TODO: real path! Should be a standalone file (timestamped)
         #logdir.joinpath(filename).write_lines(lines)
-        
+
     def __call__(self, *arguments, **kwargs):
         """
         When the decorated method gets called try to call the method.
-        
+
         If it fails, handle the exception and re-raise the initial exception.
         """
         try:
@@ -178,27 +185,29 @@ class MethodTracer(object):
             self._handle_exception(arguments, kwargs, *exc_info())
             # Re-raise the excepted exception.
             raise
-        
-        
+
+
 class NoTracer(object):
     def __init__(self, method):
         self.method = method
-        
+
     def __call__(self, *args, **kwargs):
         return self.method(*args, **kwargs)
-        
-        
+
+
 def trace(method):
     """
     Decorates a method to be traced by a MethodTracer
     """
     return MethodTracer(method)
 
+
 def notrace(method):
     """
     Decorate a method not to be traced by autotrace
     """
     return NoTracer(method)
+
 
 def autotrace(obj):
     """
@@ -215,4 +224,4 @@ def autotrace(obj):
                 continue
             if isinstance(attr, NoTracer):
                 continue
-            autotrace(attr) 
+            autotrace(attr)

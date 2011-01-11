@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/cfg/files/gg_en_config.py
+# ../core/cfg/files/gg_en_config.py
 
 '''
 $Rev$
@@ -17,36 +17,37 @@ import cfglib
 # >> GLOBAL VARIABLES
 # =============================================================================
 config = cfglib.AddonCFG('%s/cfg/gungame51/gg_en_config.cfg'
-        %es.ServerVar('eventscripts_gamedir'))
-        
+        % es.ServerVar('eventscripts_gamedir'))
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    config.text('*'*76)
-    config.text('*' + ' '*13 + 'gg_en_config.cfg -- English Server' +
-                ' Configuration' + ' '*13 + '*')
-    config.text('*' + ' '*74 + '*')
-    config.text('*' + ' '*19 + 'This file controls GunGame settings.' +
-                ' '*19 + '*')
-    config.text('*' + ' '*74 + '*')
+    config.text('*' * 76)
+    config.text('*' + ' ' * 13 + 'gg_en_config.cfg -- English Server' +
+                ' Configuration' + ' ' * 13 + '*')
+    config.text('*' + ' ' * 74 + '*')
+    config.text('*' + ' ' * 19 + 'This file controls GunGame settings.' +
+                ' ' * 19 + '*')
+    config.text('*' + ' ' * 74 + '*')
     config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' '*8 + '*')
-    config.text('*' + ' '*11 + 'reload of GunGame.' + ' '*45 + '*')
-    config.text('*'*76)
+                'restart or a' + ' ' * 8 + '*')
+    config.text('*' + ' ' * 11 + 'reload of GunGame.' + ' ' * 45 + '*')
+    config.text('*' * 76)
     config.text('')
     config.text('')
 
-    config.text('+'*76)
-    config.text('|' + ' '*29 + 'WEAPON SETTINGS' + ' '*30 + '|')
-    config.text('+'*76)
+    config.text('+' * 76)
+    config.text('|' + ' ' * 29 + 'WEAPON SETTINGS' + ' ' * 30 + '|')
+    config.text('+' * 76)
 
     # Weapon Order File
     config.text('')
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WEAPON ORDER FILE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * The file must be located under ' +
                 '"cfg/gungame5/weapon_orders/".')
@@ -61,9 +62,9 @@ def load():
 
     # Random Weapon Order File
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> RANDOM WEAPON ORDER FILE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Options:')
     config.text('   0 = (Disabled) use gg_weapon_order for a static weapon ' +
                 'order.')
@@ -74,9 +75,9 @@ def load():
 
     # Random Weapon Order Excluded Files
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> RANDOM WEAPON ORDER EXCLUDED FILES')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Options:')
     config.text('   "" = (Disabled) No weapon orders are excluding when ' +
                 'choosing a random')
@@ -94,9 +95,9 @@ def load():
 
     # Weapon Order Sort Type
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WEAPON ORDER SORT TYPE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Options:')
     config.text('   #default  = Order will go Top -> Bottom.')
     config.text('   #reversed = Order will go Bottom -> Top.')
@@ -111,9 +112,9 @@ def load():
 
     # Multikill Override
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTIKILL OVERRIDE')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Keep this variable set to 0 unless you want to ' +
                 'override the')
@@ -126,9 +127,9 @@ def load():
 
     # Weapon Removal
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> WEAPON REMOVAL')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Note:')
     config.text('   * Only weapon_* entities are supported.')
     config.text('Default Value: "hegrenade,flashbang,smokegrenade"')
@@ -138,15 +139,15 @@ def load():
 
     config.text('')
     config.text('')
-    config.text('+'*76)
-    config.text('|' + ' '*31 + 'MAP SETTINGS' + ' '*31 + '|')
-    config.text('+'*76)
+    config.text('+' * 76)
+    config.text('|' + ' ' * 31 + 'MAP SETTINGS' + ' ' * 31 + '|')
+    config.text('+' * 76)
 
     # Multi-Round
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTI-ROUND')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Only set this variable if you want more than one ' +
                 'round per map')
@@ -163,9 +164,9 @@ def load():
 
     # Multi-Round Intermission
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTI-ROUND INTERMISSION')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * This option is only valid if "gg_multi_round" is set ' +
                 'to a value')
@@ -184,9 +185,9 @@ def load():
 
     # Dynamic End of Map Chat Time
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> DYNAMIC END OF MAP CHAT TIME')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Dynamic chat time is based on the end of round winner ' +
                 'music.')
@@ -204,18 +205,16 @@ def load():
     config.text('')
     config.text('')
 
-
-    config.text('+'*76)
-    config.text('|' + ' '*29 + 'PLAYER SETTINGS' + ' '*30 + '|')
-    config.text('+'*76)
-
+    config.text('+' * 76)
+    config.text('|' + ' ' * 29 + 'PLAYER SETTINGS' + ' ' * 30 + '|')
+    config.text('+' * 76)
 
     # Defusers
     config.text('')
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> DEFUSERS')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Options:')
     config.text('   0 = Disabled')
     config.text('   1 = Enabled')
@@ -226,9 +225,9 @@ def load():
 
     # Armor
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> ARMOR')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Options:')
     config.text('   0 = No armor')
     config.text('   1 = Kevlar only')
@@ -239,18 +238,16 @@ def load():
     config.text('')
     config.text('')
 
-
-    config.text('+'*76)
-    config.text('|' + ' '*30 + 'SOUND SETTINGS' + ' '*30 + '|')
-    config.text('+'*76)
-
+    config.text('+' * 76)
+    config.text('|' + ' ' * 30 + 'SOUND SETTINGS' + ' ' * 30 + '|')
+    config.text('+' * 76)
 
     # Sound Pack
     config.text('')
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> SOUND PACK')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Notes:')
     config.text('   * Sound packs are located in "../cstrike/cfg/gungame5/' +
                 'sound_packs".')
@@ -269,13 +266,14 @@ def load():
 
     # Print to console to show successfule loading of the config
     es.dbgmsg(0, '\tgg_en_config.cfg')
-    
+
+
 def unload():
     global config
-    
+
     # Remove the "notify" and "replicated" flags as set by makepublic()
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

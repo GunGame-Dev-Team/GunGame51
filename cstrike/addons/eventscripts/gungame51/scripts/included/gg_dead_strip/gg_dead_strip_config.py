@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_dead_strip/gg_dead_strip_config.py
+# ../scripts/included/gg_dead_strip/gg_dead_strip_config.py
 
 '''
 $Rev$
@@ -19,20 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_dead_strip.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # Dead Strip
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> DEAD STRIP')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Removes a player\'s weapons when they die.')
     config.text('Note:')
@@ -43,9 +44,10 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_dead_strip', 0, 'Enables/Disables ' +
                 'gg_dead_strip.').addFlag('notify')
-    
+
     config.write()
     es.dbgmsg(0, '\tgg_dead_strip.cfg')
+
 
 def unload():
     global config
@@ -53,6 +55,6 @@ def unload():
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

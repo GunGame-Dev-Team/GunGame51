@@ -1,10 +1,11 @@
-# ../addons/eventscripts/gungame51/core/players/options.py
+# ../core/players/options.py
 
 '''
 $Rev$
 $LastChangedBy$
 $LastChangedDate$
 '''
+
 
 # =============================================================================
 # >> CLASSES
@@ -36,7 +37,7 @@ class PlayerOptions(object):
 class Options(object):
     '''
     Class used for custom individual player options.
-    
+
     Example:
         ggPlayer = Player(userid)
         ggPlayer.options.sound = Options()

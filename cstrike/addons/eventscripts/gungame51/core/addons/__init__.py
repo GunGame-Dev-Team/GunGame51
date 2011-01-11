@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/addons/__init__.py
+# ../core/addons/__init__.py
 
 '''
 $Rev$
@@ -28,6 +28,7 @@ from gungame51.core.messaging import MessageManager
 ggVersion = None
 _gg_info_quiet = True
 _gg_info = None
+
 
 # =============================================================================
 # >> CLASSES
@@ -104,7 +105,7 @@ class AddonInfo(dict):
         if name not in self._getKeyList():
             raise KeyError('AddonInfo instance has no key: "%s". \
                             Use only "%s".'
-                                %(name, '", "'.join(self._getKeyList())))
+                                % (name, '", "'.join(self._getKeyList())))
 
         dict.__setitem__(self, name, value)
 
@@ -112,7 +113,7 @@ class AddonInfo(dict):
         if name not in self._getKeyList():
             raise KeyError('AddonInfo instance has no key: "%s". \
                             Use only "%s".'
-                                %(name, '", "'.join(self._getKeyList())))
+                                % (name, '", "'.join(self._getKeyList())))
 
         return dict.__getitem__(self, name)
 
@@ -258,6 +259,7 @@ class PriorityAddon(list):
     def clear(self):
         del self[:]
 
+
 class AddonManager(object):
     def __new__(cls, *p, **k):
         if not '_the_instance' in cls.__dict__:
@@ -277,7 +279,7 @@ class AddonManager(object):
         '''
         # If the addon is loaded we cannot load it again
         if name in self.__loaded__:
-            raise NameError, 'GunGame sub-addon "%s" is already loaded' % name
+            raise NameError('GunGame sub-addon "%s" is already loaded' % name)
 
         # Retrieve the addon
         addon = self.get_addon_by_name(name)
@@ -314,7 +316,7 @@ class AddonManager(object):
         '''
         # If the addon is not loaded we cannot unload it
         if name not in self.__loaded__:
-            raise NameError, "GunGame sub-addon '%s' is not loaded" % name
+            raise NameError("GunGame sub-addon '%s' is not loaded" % name)
 
         # Retrieve the addon
         addon = self.get_addon_by_name(name)
@@ -442,15 +444,15 @@ class AddonManager(object):
 
         if conflicting:
             raise DependencyError('Sub-addon "%s" depends on and also '
-                %name + 'conflicts with sub-addon(s) "%s"'
-                    %('", "'.join(conflicting)))
+                % name + 'conflicts with sub-addon(s) "%s"'
+                    % ('", "'.join(conflicting)))
 
         # Ensure this addon does not conflict with a loaded addon
         if name in conflicts:
             es.set(name, 0)
             raise DependencyError('Loaded sub-addon(s) "%s" conflict with '
-                    %('", "'.join(conflicts[name])) +
-                    'sub-addon "%s"' %(name))
+                    % ('", "'.join(conflicts[name])) +
+                    'sub-addon "%s"' % (name))
 
         # Ensure loaded addons do not conflict with this addon
         conflicting = set(self.__loaded__).intersection(addon_conflict)
@@ -458,7 +460,7 @@ class AddonManager(object):
         if conflicting:
             es.set(name, 0)
             raise DependencyError('Sub-addon "%s" conflicts with loaded'
-                %name + ' sub-addon(s) "%s"' % ('", "'.join(conflicting)))
+                % name + ' sub-addon(s) "%s"' % ('", "'.join(conflicting)))
 
         # Ensure addons depended on by this sub-addon are loaded
         conflicting = set(addon_depend).difference(self.__loaded__)
@@ -482,7 +484,7 @@ class AddonManager(object):
         if name in dependencies:
             es.set(name, 1)
             raise DependencyError('Loaded sub-addon(s) "%s" depend on '
-                %('", "'.join(dependencies[name])) + 'sub-addon "%s"' %name)
+                % ('", "'.join(dependencies[name])) + 'sub-addon "%s"' % name)
 
         # Remove the sub-addon's dependencies and conflicts
         dependencies.remove(name)
@@ -535,7 +537,7 @@ class AddonManager(object):
 
         # If the addon is not loaded we need to import it
         addonType = self.get_addon_type(name)
-        modulePath = 'gungame51.scripts.%s.%s.%s' %(addonType, name, name)
+        modulePath = 'gungame51.scripts.%s.%s.%s' % (addonType, name, name)
         mod = __import__(modulePath, globals(), locals(), [''])
 
         # We have to reload the module to re-instantiate the globals
@@ -563,7 +565,7 @@ class AddonManager(object):
                 addon_globals = addon.__dict__
                 for item in addon_globals:
                     if isinstance(addon_globals[item], AddonInfo):
-                        dict_addon[name] =  addon_globals[item]
+                        dict_addon[name] = addon_globals[item]
                         break
 
             return dict_addon
@@ -686,7 +688,8 @@ def gungame_info(info, _info=None):
         AM = AddonManager()
 
         # Format our output
-        addonlist = ['\t'*4 + '%s (v%s)\n' %(AM.get_addon_info()[addon].name,
+        addonlist = ['\t' * 4 + '%s (v%s)\n' % (
+            AM.get_addon_info()[addon].name,
             AM.get_addon_info()[addon].version) for addon in
             AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
 
@@ -728,12 +731,15 @@ def gungame_info(info, _info=None):
 This wrapper makes it possible to use key addon functions
 without interacting with the AddonManager directly
 '''
+
+
 def load(*a, **kw):
-   AddonManager().load(*a, **kw)
+    AddonManager().load(*a, **kw)
 load.__doc__ = AddonManager.load.__doc__
 
+
 def unload(*a, **kw):
-   AddonManager().unload(*a, **kw)
+    AddonManager().unload(*a, **kw)
 unload.__doc__ = AddonManager.unload.__doc__
 
 # Variable to cache the results of get_valid_addons() - saves overhead from
@@ -743,6 +749,8 @@ valid_addons_cache = []
 included_addons_cache = []
 # Variable to cache valid included addons (same concept as valid_addons_cache)
 custom_addons_cache = []
+
+
 def get_valid_addons():
     '''
     Returns a list of valid addon names from the included and custom addons

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_warmup_round/gg_warmup_round.py
+# ../scripts/included/gg_warmup_round/gg_warmup_round.py
 
 '''
 $Rev$
@@ -40,9 +40,9 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_warmup_round'
-info.title = 'GG Warmup Round' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Warmup Round'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_warmup_round']
 
 # =============================================================================
@@ -77,6 +77,7 @@ giveGodMode = False
 # Approximates the number of seconds from round start to play beginning
 GG_WARMUP_EXTRA_TIME = 3
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -97,17 +98,18 @@ def load():
 
     # Register a server command to to cancel an in-progress warmup round
     cmdlib.registerServerCommand('gg_end_warmup', servercmd_end_warmup,
-    	"Immediately ends the warmup round if there is one in progress.")
+        "Immediately ends the warmup round if there is one in progress.")
+
 
 def unload():
     # Cancel any do_warmup delays
     gamethread.cancelDelayed("gg_do_warmup")
 
     # Deleting warmup timer
-    warmupCountDown = repeat.find('gungameWarmupTimer') 
+    warmupCountDown = repeat.find('gungameWarmupTimer')
 
     # If the warmup timer exists, stop and delete it
-    if warmupCountDown:    
+    if warmupCountDown:
         warmupCountDown.stop()
         warmupCountDown.delete()
 
@@ -116,14 +118,15 @@ def unload():
 
     # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
-    
+
     # Unregister the server command that cancels an in-progress warmup round
     cmdlib.unregisterServerCommand('gg_end_warmup')
+
 
 # =============================================================================
 # >> COMMAND CALLBACKS
 # =============================================================================
-def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
+def servercmd_end_warmup(args):  # args are ignored, but needed for server cmd
     # Get the timer/repeat instance
     warmupCountDown = repeat.find('gungameWarmupTimer')
 
@@ -149,6 +152,7 @@ def servercmd_end_warmup(args): # args are ignored, but needed for server cmd
     # Display a chat message with the same message
     msg("#human", 'Warmup_End_Forced', prefix=True)
 
+
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
@@ -173,6 +177,7 @@ def es_map_start(event_var):
     # es_map_start events before priority addons are set.
     gamethread.delayedname(1, "gg_do_warmup", do_warmup)
 
+
 def hegrenade_detonate(event_var):
     # Making sure warmup round is running
     warmupCountDown = repeat.find('gungameWarmupTimer')
@@ -191,6 +196,7 @@ def hegrenade_detonate(event_var):
     if int(event_var['es_userteam']) > 1 and not getPlayer(userid).isdead and \
         warmup_weapon == 'hegrenade':
             Player(userid).give('hegrenade')
+
 
 def player_spawn(event_var):
     userid = int(event_var['userid'])
@@ -228,8 +234,8 @@ def player_spawn(event_var):
 
     # Delay giving the weapon by a split second, because the code in round
     #   start removes all weapons
-    gamethread.delayed((delay), ggPlayer.give, (warmup_weapon,
-                                                                True, True))
+    gamethread.delayed((delay), ggPlayer.give, (warmup_weapon, True, True))
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -239,6 +245,7 @@ def get_warmup_weapon():
     Used to get the warmup weapon from other addons.
     '''
     return warmup_weapon
+
 
 def set_warmup_weapon():
     global warmup_weapon, random_warmup_weapons, warmupWeaponSetOnLoad
@@ -282,9 +289,11 @@ def set_warmup_weapon():
             else:
                 warmup_weapon = str(gg_warmup_weapon)
 
+
 def add_priority_addon(name):
     priority_addons_added.append(name)
     PriorityAddon().append(name)
+
 
 def do_warmup(useBackupVars=True):
     # Set the new warmup weapon
@@ -354,6 +363,7 @@ def do_warmup(useBackupVars=True):
     warmupCountDown = repeat.create('gungameWarmupTimer', count_down)
     warmupCountDown.start(1, int(gg_warmup_timer) + GG_WARMUP_EXTRA_TIME)
 
+
 def load_warmup_addons():
     # If warmup deathmatch is enabled, add it to priority addons
     if int(gg_warmup_deathmatch):
@@ -374,6 +384,7 @@ def load_warmup_addons():
             gg_elimination.set(1)
             addon_load("gg_elimination")
 
+
 def count_down():
     warmupCountDown = repeat.find('gungameWarmupTimer')
 
@@ -385,7 +396,7 @@ def count_down():
     if warmupCountDown['remaining'] >= 1:
         # Send hint
         if warmupCountDown['remaining'] > 1:
-            hudhint('#human', 'Timer_Plural', 
+            hudhint('#human', 'Timer_Plural',
             {'time': warmupCountDown['remaining']})
         else:
             hudhint('#human', 'Timer_Singular')
@@ -403,13 +414,14 @@ def count_down():
             # Before the round ends up restarting, prepare gungame to be ready
             # for the first round of play
             gamethread.delayed(0.7, prepare_game)
-            
+
             # Make sure that during the first round nobody has godmode
             gamethread.delayed(1.4, remove_godmode)
 
     # No time left
     elif warmupCountDown['remaining'] == 0:
         end_warmup('Timer_Ended')
+
 
 def prepare_game():
     global giveGodMode
@@ -427,6 +439,7 @@ def prepare_game():
     # Fire gg_start event
     EventManager().gg_start()
 
+
 def remove_godmode():
     '''
     Ran during the first round to make sure no players have godmode.
@@ -438,6 +451,7 @@ def remove_godmode():
     for player in getPlayerList("#alive"):
         player.godmode = 0
 
+
 def end_warmup(message):
     # Send hint
     hudhint('#human', message)
@@ -446,14 +460,16 @@ def end_warmup(message):
     play_beep()
 
     # Delete the timer
-    repeat.delete('gungameWarmupTimer')             
+    repeat.delete('gungameWarmupTimer')
 
     # Reset server vars back
     reset_server_vars()
 
+
 def play_beep():
     for userid in getUseridList('#human'):
         Player(userid).playsound('countDownBeep')
+
 
 def reset_server_vars():
     # If both warmup addons were loaded, we did no loading, so do no unloading
@@ -488,6 +504,7 @@ def reset_server_vars():
     if int(mp_freezetime) != mp_freezetime_backup:
         mp_freezetime.set(mp_freezetime_backup)
 
+
 def load_gg_addons():
     # If we are going into deathmatch gameplay
     if int(gg_deathmatch_backup):
@@ -501,6 +518,7 @@ def load_gg_addons():
         if not int(gg_warmup_elimination) and not int(gg_elimination):
             gg_elimination.set(1)
             addon_load("gg_elimination")
+
 
 def check_unload(addon):
     if addon in AddonManager().__loaded__:

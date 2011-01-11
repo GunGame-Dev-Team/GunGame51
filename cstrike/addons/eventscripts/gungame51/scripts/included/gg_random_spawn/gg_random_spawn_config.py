@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_random_spawn/gg_random_spawn_config.py
+# ../scripts/included/gg_random_spawn/gg_random_spawn_config.py
 
 '''
 $Rev$
@@ -19,20 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_random_spawn.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # Random Spawnpoints
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> RANDOM SPAWNPOINTS')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
                 'current map has')
@@ -46,9 +47,10 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_random_spawn', 0, 'Enables/Disables random spawn ' +
         'points').addFlag('notify')
-    
+
     config.write()
     es.dbgmsg(0, '\tgg_random_spawn.cfg')
+
 
 def unload():
     global config
@@ -56,6 +58,6 @@ def unload():
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

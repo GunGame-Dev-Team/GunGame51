@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_reload/gg_reload.py
+# ../scripts/included/gg_reload/gg_reload.py
 
 '''
 $Rev$
@@ -28,9 +28,9 @@ from gungame51.scripts.included.gg_nade_bonus.gg_nade_bonus import get_weapon
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_reload'
-info.title = 'GG Reload' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Reload'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -42,6 +42,7 @@ gg_turbo = es.ServerVar('gg_turbo')
 # and store the userid who just leveled up to check on in player_death
 recentlyLeveled = []
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -49,9 +50,11 @@ def load():
     add_attribute_callback('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     remove_callbacks_for_addon(info.name)
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -66,6 +69,7 @@ def level_call_back(name, value, ggPlayer):
     # know in player_death that they just leveled up
     recentlyLeveled.append(ggPlayer.userid)
     gamethread.delayed(0.2, recentlyLeveled.remove, ggPlayer.userid)
+
 
 def player_death(event_var):
     # Get the userids of the attacker and victim
@@ -116,9 +120,10 @@ def player_death(event_var):
     playerHandle = es.getplayerhandle(attacker)
 
     for index in weaponObject.indexlist:
-        # When the attacker's handle matches the index handle we have found 
+        # When the attacker's handle matches the index handle we have found
         # the attacker's weapon index
-        if es.getindexprop(index,'CBaseEntity.m_hOwnerEntity') == playerHandle:
+        if es.getindexprop(index,
+          'CBaseEntity.m_hOwnerEntity') == playerHandle:
             # Set the clip to the maximum ammo allowed
             getPlayer(attacker)['clip'][weaponObject] = weaponObject.clip
             break

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/players/__init__.py
+# ../core/players/__init__.py
 
 '''
 $Rev$
@@ -50,6 +50,7 @@ list_sWeapons = getWeaponNameList('#secondary')
 list_allWeapons = getWeaponNameList()
 gg_soundpack = es.ServerVar('gg_soundpack')
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -73,13 +74,13 @@ class CustomAttributeCallbacks(dict):
         '''
         # Make sure that the function is callable
         if not callable(function):
-            raise AttributeError('Callback "%s" is not callable.' %function)
+            raise AttributeError('Callback "%s" is not callable.' % function)
 
-        if not self.has_key(attribute):
+        if not attribute in self:
             self[attribute] = {}
 
         # Add or update the attribute callback
-        self[attribute].update({addon:function})
+        self[attribute].update({addon: function})
 
     def remove(self, attribute, addon):
         '''
@@ -95,7 +96,7 @@ class CustomAttributeCallbacks(dict):
             return
 
         # Make sure that the addon exists in the attribute
-        if not self[attribute].has_key(addon):
+        if not addon in self[attribute]:
             return
 
         # Delete the attribtue callback
@@ -131,6 +132,7 @@ class PreventLevel(list):
         if name in self:
             list.remove(self, name)
 
+
 class BasePlayer(object):
     # =========================================================================
     # >> BasePlayer() CLASS INITIALIZATION
@@ -142,11 +144,11 @@ class BasePlayer(object):
         self.afk = AFK(self.userid)
         self.index = int(getPlayer(str(self.userid)).index)
         return self
-    
+
     def __init__(self, userid):
         self.preventlevel = PreventLevel()
         self.preventlevelup = PreventLevel()
-        self.preventleveldown = PreventLevel() 
+        self.preventleveldown = PreventLevel()
         self.level = 1
         self.multikill = 0
         self.stripexceptions = []
@@ -164,7 +166,7 @@ class BasePlayer(object):
 
     def __setattr__(self, name, value):
         # First, we execute the custom attribute callbacks
-        if CustomAttributeCallbacks().has_key(name):
+        if name in CustomAttributeCallbacks():
             for function in CustomAttributeCallbacks()[name].values():
                 function(name, value, self)
 
@@ -172,15 +174,15 @@ class BasePlayer(object):
         if name == 'level':
             # Return if preventlevel is set
             if not self.preventlevel:
-                
+
                 # Prevent player from leveling up?
                 if self.preventlevelup and value > self.level:
                     return
-                
+
                 # Prevent player from leveling down?
                 if self.preventleveldown and value < self.level:
                     return
-                
+
                 # Set the attribute value
                 object.__setattr__(self, name, value)
                 LeaderManager().check(self)
@@ -217,7 +219,7 @@ class BasePlayer(object):
                     raise ValueError('"%s" is an invalid team' % value)
 
             # Is the value in range ?
-            elif int(value) not in range(1,4):
+            elif int(value) not in range(1, 4):
                 raise ValueError('"%s" is an invalid teamid' % value)
 
             pPlayer = getPlayer(self.userid)
@@ -237,12 +239,12 @@ class BasePlayer(object):
 
                 # Terrorist ?
                 if value == 2:
-                    iClass = randint(1,4)
+                    iClass = randint(1, 4)
                     menuname = 'class_ter'
 
                 # Counter-Terrorist ?
                 else:
-                    iClass = randint(4,8)
+                    iClass = randint(4, 8)
                     menuname = 'class_ct'
 
                 # Set prop & hide vgui
@@ -271,10 +273,10 @@ class BasePlayer(object):
                         'ic.php?t=29657 and download the latest version!')
 
             # Change the team
-            # With the latest SPE, you no longer have to import 
+            # With the latest SPE, you no longer have to import
             # cstrike manually. Just do spe.<moduleFunction>!
             spe.switchTeam(self.userid, value)
-            
+
             #cstrike.switchTeam(self.userid, value)
 
             # Change the model
@@ -315,7 +317,7 @@ class BasePlayer(object):
                 return
 
             value = int(value)
-            
+
             # Has won before
             if self.wins:
                 update_winner('wins', value, uniqueid=self.steamid)
@@ -511,11 +513,11 @@ class BasePlayer(object):
         else:
             # Player owns this weapon.
             if spe.ownsWeapon(self.userid, "weapon_%s" % self.weapon):
-                # Make them use it. If we don't do this, a very 
-                # strange bug comes up which prevents the player 
+                # Make them use it. If we don't do this, a very
+                # strange bug comes up which prevents the player
                 # from getting their current level's weapon after
                 # being stripped,
-                es.server.queuecmd('es_xsexec %s "use weapon_%s"' 
+                es.server.queuecmd('es_xsexec %s "use weapon_%s"'
                     % (self.userid, self.weapon))
 
                 # Done.
@@ -574,7 +576,7 @@ class BasePlayer(object):
                         self.give_weapon()
                         return
 
-                es.server.queuecmd('es_xsexec %s "use weapon_%s"' 
+                es.server.queuecmd('es_xsexec %s "use weapon_%s"'
                     % (self.userid, self.weapon))
 
     def give(self, weapon, useWeapon=False, strip=False):
@@ -601,7 +603,6 @@ class BasePlayer(object):
 
             # Delay removing the weapon long enough for gg_dead_strip to fire
             gamethread.delayed(0.10, self.stripexceptions.remove, (weapon[7:]))
-
 
         # If the player owns the weapon and the player is not being given a
         # second flashbang, stop here
@@ -663,9 +664,9 @@ class BasePlayer(object):
             return
 
         for weapon in pWeapons:
-            if (self.weapon == weapon[7:] and not levelStrip) or \
-              weapon in ('weapon_knife', 'weapon_c4') or weapon[7:] in exceptions:
-
+            if ((self.weapon == weapon[7:] and not levelStrip) or
+              weapon in ('weapon_knife', 'weapon_c4') or
+              weapon[7:] in exceptions):
                 continue
 
             spe.dropWeapon(self.userid, weapon)
@@ -731,7 +732,7 @@ class BasePlayer(object):
         # Player alive? (require force)
         if not getPlayer(self.userid).isdead and not force:
             return
-            
+
         spe.respawn(self.userid)
 
     # =========================================================================
@@ -798,6 +799,7 @@ class BasePlayer(object):
             update_winner(('name', 'timestamp'), (es.getplayername(
                 self.userid), 'strftime("%s","now")'), uniqueid=self.steamid)
 
+
 class PlayerManager(dict):
     '''
     A class-based dictionary to contain instances of BasePlayer.
@@ -828,7 +830,7 @@ class PlayerManager(dict):
                 # to see if the player has played previously. Nor is there any
                 # reason to create a "junk" instance for this player.
                 raise ValueError('Unable to retrieve or create a player' +
-                    ' instance for userid "%s".' %userid)
+                    ' instance for userid "%s".' % userid)
 
             # Get the uniqueid
             steamid = uniqueid(userid, 1)
@@ -897,6 +899,7 @@ class PlayerManager(dict):
         # Reset all userids
         for userid in self:
             self[userid].__init__(userid)
+
 
 class Player(PlayerManager):
     """Redirects to the PlayerManager instance for ease of use"""
@@ -980,6 +983,5 @@ class Player(PlayerManager):
 
             # Remove the custom attribute callback
             CustomAttributeCallbacks().remove(attribute, addon)
-
 
 from gungame51.core.events.shortcuts import EventManager

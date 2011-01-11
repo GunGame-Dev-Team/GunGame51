@@ -2,7 +2,7 @@
 
 """
 usage: %(progname)s [args]
- 
+
    --cat [files]  -- categorize a bunch of files
 
       mp3info(filename)
@@ -14,9 +14,9 @@ usage: %(progname)s [args]
           SS - number of seconds
           STEREO - 0-mono, 1-stereo
           LAYER - MPEG layer 2 or 3
-          MODE 
+          MODE
           COPYRIGHT
-          BITRATE 
+          BITRATE
           FREQUENCY
 
       get_mp3tag(filename)
@@ -37,7 +37,11 @@ usage: %(progname)s [args]
 
 """
 
-import os, sys, string, time, getopt
+import os
+import sys
+import string
+import time
+import getopt
 
 mp3_genres = ['Blues',
     'Classic Rock',
@@ -120,7 +124,7 @@ mp3_genres = ['Blues',
     'Rock & Roll',
     'Hard Rock', ]
 
-winamp_genres = mp3_genres+ \
+winamp_genres = mp3_genres + \
 ['Folk',
     'Folk-Rock',
     'National Folk',
@@ -270,13 +274,16 @@ frequency_tbl = {
     0: 22050, 1: 24000, 2: 16000, 3: 44100, 4: 48000, 5: 32000, 6: 64000
     }
 
+
 def getword(fp, off):
-    fp.seek (off, 0)
+    fp.seek(off, 0)
     word = fp.read(4)
     return word
 
+
 def get_l4(s):
-    return reduce (lambda a, b: ((a << 8) + b), map (long, map (ord, s)))
+    return reduce(lambda a, b: ((a << 8) + b), map(long, map(ord, s)))
+
 
 def get_xing_header(f):
     where = f.tell()
@@ -284,14 +291,17 @@ def get_xing_header(f):
     try:
         f.seek(0)
         b = f.read(8192)
-        i = string.find (b, 'Xing')
+        i = string.find(b, 'Xing')
 
         if i > 0:
             # 32-bit fields; "Xing", flags, frames, bytes, 100 toc
-            i = i+4
-            flags = get_l4(b[i: i + 4]); i = i+4
-            frames = get_l4(b[i: i + 4]); i = i+4
-            bytes = get_l4(b[i: i + 4]); i = i+4
+            i = i + 4
+            flags = get_l4(b[i: i + 4])
+            i = i + 4
+            frames = get_l4(b[i: i + 4])
+            i = i + 4
+            bytes = get_l4(b[i: i + 4])
+            i = i + 4
             return flags, frames, bytes
 
         else:
@@ -304,6 +314,7 @@ MPG_MD_STEREO = 0
 MPG_MD_JOINT_STEREO = 1
 MPG_MD_DUAL_CHANNEL = 2
 MPG_MD_MONO = 3
+
 
 def get_newhead(word):
     word = get_l4(word)
@@ -322,10 +333,10 @@ def get_newhead(word):
     lay = 4 - ((word >> 17) & 3)
 
     if mpeg25:
-        sampling_frequency = 6+((word >> 10) & 3)
+        sampling_frequency = 6 + ((word >> 10) & 3)
 
     else:
-        sampling_frequency = ((word >> 10) & 3)+(lsf * 3)
+        sampling_frequency = ((word >> 10) & 3) + (lsf * 3)
     error_protection = ((word >> 16) & 1) ^ 1
     bitrate_index = (word >> 12) & 0xf
     padding = ((word >> 9) & 0x1)
@@ -346,10 +357,12 @@ def get_newhead(word):
     import pprint
     pprint.pprint(locals())
 
+
 def get_head(word):
     if len(word) != 4:
         return {}
-    l = ord(word[0]) << 24 | ord(word[1]) << 16 | ord(word[2]) << 8 | ord(word[3])
+    l = (ord(word[0]) << 24 | ord(word[1]) << 16 |
+        ord(word[2]) << 8 | ord(word[3]))
 
     id = (l >> 19) & 1
     layer = (l >> 17) & 3
@@ -383,6 +396,7 @@ def get_head(word):
 
     return vars()
 
+
 def is_mp3(h):
     #if h['bytes'] == -1: return 0
     if not (h['bitrate_index'] == 0 or           \
@@ -393,11 +407,13 @@ def is_mp3(h):
         return 1
     return 0
 
+
 def get_v2head(fp):
-    fp.seek (0, 0)
+    fp.seek(0, 0)
     word = fp.read(3)
 
-    if word != "ID3": return 0
+    if word != "ID3":
+        return 0
 
     bytes = fp.read(2)
     major_version = ord(bytes[0])
@@ -413,13 +429,14 @@ def get_v2head(fp):
     tagsize = 0
 
     for i in range(4):
-        tagsize = tagsize+ord(bytes[3 - i]) * 128 * i
+        tagsize = tagsize + ord(bytes[3 - i]) * 128 * i
 
     if ext_header:
-        ext_header_size = ext_header_size+10
+        ext_header_size = ext_header_size + 10
         bytes = fp.read(4)
 
     return vars()
+
 
 def mp3info(fn):
     off = 0
@@ -432,15 +449,15 @@ def mp3info(fn):
         return {}
 
     fp = open(fn)
-    word = getword (fp, off)
+    word = getword(fp, off)
 
     if off == 0:
         id3v2 = get_v2head(fp)
 
         if id3v2:
-            off = off+id3v2['tagsize']
-            tot = tot+off
-            word = getword (fp, off)
+            off = off + id3v2['tagsize']
+            tot = tot + off
+            word = getword(fp, off)
 
     nh = get_newhead(word)
 
@@ -470,27 +487,30 @@ def mp3info(fn):
                 12000,
                 8000][int(nh['sampling_frequency'])] << nh['lsf'])
 
-            print 'VBR average bit-rate:', int((xing_bytes * 8.) / (tpf * xing_frames * 1000))
+            print 'VBR average bit-rate:', int((xing_bytes * 8.) / (
+                                            tpf * xing_frames * 1000))
 
     while 1:
         h = get_head(word)
 
-        if not h: break
-        off = off+1
-        word = getword (fp, off)
+        if not h:
+            break
+        off = off + 1
+        word = getword(fp, off)
 
         if off > tot:
             print "BAD FILE", fn, os.stat(fn)[6]
             #os.unlink(fn)
             return {}
 
-        if is_mp3(h): break
+        if is_mp3(h):
+            break
 
-    fp.seek (0, 2)
+    fp.seek(0, 2)
     eof = fp.tell()
 
     try:
-        fp.seek (-128, 2)
+        fp.seek(-128, 2)
 
     except IOError, reason:
         return {}
@@ -504,8 +524,9 @@ def mp3info(fn):
     h['layer'] = h['mode']
     h['freq_idx'] = 3 * h['id'] + h['sampling_freq']
 
-    h['length'] = ((1.0 * eof - off) / h['mean_frame_size'])* ((115200. / 2) * (1. + h['id'])) / (1.0 * h['fs'])
-    h['secs'] = int(h['length'] / 100);
+    h['length'] = ((1.0 * eof - off) / h['mean_frame_size']) * (
+                (115200. / 2) * (1. + h['id'])) / (1.0 * h['fs'])
+    h['secs'] = int(h['length'] / 100)
 
     i = {}
     i['VERSION'] = h['id']
@@ -539,6 +560,7 @@ def mp3info(fn):
 
     return i
 
+
 def get_mp3tag(fn):
     if os.stat(fn)[6] == 0:
         return {}
@@ -550,7 +572,7 @@ def get_mp3tag(fn):
         return {}
 
     try:
-        fp.seek (-128, 2)
+        fp.seek(-128, 2)
 
     except IOError, reason:
         return {}
@@ -560,25 +582,32 @@ def get_mp3tag(fn):
     while 1:
         l = fp.readline()
 
-        if not l: break
+        if not l:
+            break
         line = l
 
     id = {}
 
-    if line[: 3] == 'TAG':
+    if line[:3] == 'TAG':
         v1 = 1
-        i = 0; j = i+3
+        i = 0
+        j = i + 3
         #id['d1'] = string.strip(line[i:j])
-        i = j; j = i+30
-        id['TITLE'] = string.strip(line[i: j])
-        i = j; j = i+30
-        id['ARTIST'] = string.strip(line[i: j])
-        i = j; j = i+30
-        id['ALBUM'] = string.strip(line[i: j])
-        i = j; j = i+4
-        id['YEAR'] = string.strip(line[i: j])
-        i = j; j = i+28
-        id['COMMENT'] = string.strip(line[i: j])
+        i = j
+        j = i + 30
+        id['TITLE'] = string.strip(line[i:j])
+        i = j
+        j = i + 30
+        id['ARTIST'] = string.strip(line[i:j])
+        i = j
+        j = i + 30
+        id['ALBUM'] = string.strip(line[i:j])
+        i = j
+        j = i + 4
+        id['YEAR'] = string.strip(line[i:j])
+        i = j
+        j = i + 28
+        id['COMMENT'] = string.strip(line[i:j])
 
         genre = ord(line[-1])
 
@@ -590,20 +619,22 @@ def get_mp3tag(fn):
 
     return id
 
+
 def Categorize(fn):
     i1 = mp3info(fn)
     i2 = get_mp3tag(fn)
 
-    path1 = "cats/GENRE_ARIST/%s/%s" % (i2.get ('GENRE', "Unknown"), i2.get ('ARTIST', "Unknown"))
-    path2 = "cats/GENRE/%s" % (i2.get ('GENRE', "Unknown"), )
-    path3 = "cats/ARIST/%s" % (i2.get ('ARTIST', "Unknown"), )
+    path1 = "cats/GENRE_ARIST/%s/%s" % (i2.get('GENRE', "Unknown"),
+                                        i2.get('ARTIST', "Unknown"))
+    path2 = "cats/GENRE/%s" % (i2.get('GENRE', "Unknown"))
+    path3 = "cats/ARIST/%s" % (i2.get('ARTIST', "Unknown"))
 
-    path1 = string.replace (path1, "\0", "_")
-    path1 = string.replace (path1, " ", "_")
-    path2 = string.replace (path2, "\0", "_")
-    path2 = string.replace (path2, " ", "_")
-    path3 = string.replace (path3, "\0", "_")
-    path3 = string.replace (path3, " ", "_")
+    path1 = string.replace(path1, "\0", "_")
+    path1 = string.replace(path1, " ", "_")
+    path2 = string.replace(path2, "\0", "_")
+    path2 = string.replace(path2, " ", "_")
+    path3 = string.replace(path3, "\0", "_")
+    path3 = string.replace(path3, " ", "_")
 
     if not os.path.isdir(path1):
         os.makedirs(path1)
@@ -615,31 +646,39 @@ def Categorize(fn):
         os.makedirs(path3)
     base, ffn = os.path.split(fn)
 
-    try: os.symlink (fn, os.path.join (path1, ffn))
+    try:
+        os.symlink(fn, os.path.join(path1, ffn))
 
-    except: pass
+    except:
+        pass
 
-    try: os.symlink (fn, os.path.join (path2, ffn))
+    try:
+        os.symlink(fn, os.path.join(path2, ffn))
 
-    except: pass
+    except:
+        pass
 
-    try: os.symlink (fn, os.path.join (path3, ffn))
+    try:
+        os.symlink(fn, os.path.join(path3, ffn))
 
-    except: pass
+    except:
+        pass
+
 
 def usage(progname):
     print __doc__ % vars()
 
+
 def main(argv, stdout, environ):
     progname = argv[0]
-    list, args = getopt.getopt (argv[1: ], "", ["help",
+    list, args = getopt.getopt(argv[1:], "", ["help",
         "cat"])
 
     if len(args) == 0:
         usage(progname)
         return
 
-    for (field, val)in list:
+    for field, val in list:
         if field == "--help":
             usage(progname)
             return
@@ -664,6 +703,7 @@ def main(argv, stdout, environ):
 
 if __name__ == "__main__":
     #main (sys.argv, sys.stdout, os.environ)
-    info = mp3info('E:/Music/LCD Soundsystem - Get Innocuous (Soulwax remix).mp3')
+    info = mp3info(
+        'E:/Music/LCD Soundsystem - Get Innocuous (Soulwax remix).mp3')
     seconds = info['MM'] * 60 + info['SS']
     print seconds

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_noblock/gg_noblock.py
+# ../scripts/included/gg_noblock/gg_noblock.py
 
 '''
 $Rev$
@@ -22,9 +22,10 @@ from gungame51.core.addons.shortcuts import AddonInfo
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_noblock'
-info.title = 'GG No Block' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG No Block'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -36,12 +37,14 @@ def load():
     for player in getPlayerList('#alive'):
         player.noblock = 1
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
     # Disable noblock for every player that is alive and on a team
     for player in getPlayerList('#alive'):
         player.noblock = 0
+
 
 # =============================================================================
 # >> GAME EVENTS

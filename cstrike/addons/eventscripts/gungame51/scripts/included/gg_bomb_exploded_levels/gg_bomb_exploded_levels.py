@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_bomb_exploded_levels/gg_bomb_exploded_levels.py
+# ../scripts/included/gg_bomb_exploded_levels/gg_bomb_exploded_levels.py
 
 '''
 $Rev$
@@ -31,9 +31,9 @@ from gungame51.core.weapons.shortcuts import get_total_levels
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_bomb_exploded_levels'
-info.title = 'GG Welcome Message' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Welcome Message'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -53,8 +53,10 @@ gg_bomb_exploded_skip_nade = es.ServerVar('gg_bomb_exploded_skip_nade')
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -72,18 +74,18 @@ def bomb_exploded(event_var):
       or (not int(gg_bomb_exploded_skip_knife) and ggPlayer.weapon == '' +
         'knife'):
         msg(ggPlayer.userid, 'CannotSkipLevel_ByPlanting',
-            {'level':ggPlayer.weapon})
+            {'level': ggPlayer.weapon})
         return
-    
+
     # Loop through weapons of the levels we plan to level the player up past
-    for weapon in getLevelupList(ggPlayer.level, 
+    for weapon in getLevelupList(ggPlayer.level,
       ggPlayer.level + int(gg_bomb_exploded_levels)):
         # If gg_bomb_exploded_skip_knife or gg_bomb_exploded_skip_nade are
         # disabled, make sure the player will not skip that level
         if (not int(gg_bomb_exploded_skip_knife) and weapon == 'knife') or \
             (not int(gg_bomb_exploded_skip_nade) and weapon == 'hegrenade'):
             msg(ggPlayer.userid, 'CannotSkipLevel_ByPlanting',
-                {'level':weapon})
+                {'level': weapon})
             break
 
         # Add to the number of levels they will gain
@@ -91,6 +93,7 @@ def bomb_exploded(event_var):
 
     # Level up the player
     ggPlayer.levelup(levels, 0, 'bomb_exploded')
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -100,7 +103,7 @@ def getLevelupList(currentLevel, levelupLevel):
 
     # Get the total number of levels
     totalLevels = get_total_levels()
-    
+
     # If the player would exceed the total number of levels, stop at the total
     if levelupLevel > totalLevels:
         levelupLevel = totalLevels

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_suicide_punish/gg_suicide_punish.py
+# ../scripts/included/gg_suicide_punish/gg_suicide_punish.py
 
 '''
 $Rev$
@@ -22,9 +22,9 @@ from gungame51.core.players.shortcuts import Player
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_suicide_punish'
-info.title = 'GG Suicide Punish' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Suicide Punish'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_suicide_punish']
 
 # =============================================================================
@@ -40,14 +40,17 @@ recentTeamChange = []
 # Is the round live?
 liveRound = True
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -56,18 +59,21 @@ def round_start(event_var):
     global liveRound
     liveRound = True
 
+
 def round_end(event_var):
     global liveRound
     liveRound = False
 
+
 def player_team(event_var):
     userid = int(event_var["userid"])
-    
+
     # Store them here so we don't punish them if this team change caused a
     # suicide
     if not userid in recentTeamChange:
         recentTeamChange.append(userid)
         gamethread.delayed(0.2, recentTeamChange.remove, userid)
+
 
 def player_death(event_var):
     '''
@@ -104,7 +110,7 @@ def player_death(event_var):
     ggVictim.leveldown(int(gg_suicide_punish), userid, 'suicide')
 
     # Message
-    ggVictim.msg('Suicide_LevelDown', {'newlevel':ggVictim.level}, 
+    ggVictim.msg('Suicide_LevelDown', {'newlevel': ggVictim.level},
                     prefix='gg_suicide_punish')
 
     # Play the leveldown sound

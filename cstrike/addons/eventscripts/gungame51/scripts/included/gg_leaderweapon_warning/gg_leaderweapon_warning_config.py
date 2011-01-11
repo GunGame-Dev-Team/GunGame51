@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_leaderweapon_warning/gg_leaderweapon_warning_config.py
+# ../scripts/included/gg_leaderweapon_warning/gg_leaderweapon_warning_config.py
 
 '''
 $Rev$
@@ -21,18 +21,19 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_leaderweapon_warning.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # gg_leaderweapon_warning
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> GUNGAME LEADER WEAPON WARNING')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Announces via sound at the beginning of each round ' +
                 'when a player')
@@ -49,12 +50,13 @@ def load():
     config.write()
     es.dbgmsg(0, '\tgg_leaderweapon_warning.cfg')
 
+
 def unload():
     global config
 
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

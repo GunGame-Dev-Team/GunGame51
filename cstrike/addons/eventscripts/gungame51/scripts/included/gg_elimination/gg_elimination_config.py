@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_elimination/gg_elimination_config.py
+# ../scripts/included/gg_elimination/gg_elimination_config.py
 
 '''
 $Rev$
@@ -19,9 +19,10 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_elimination.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -30,9 +31,9 @@ def load():
 
     # Elimination
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> ELIMINATION')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Respawn when your killer is killed.')
     config.text('Notes:')
@@ -50,9 +51,9 @@ def load():
 
     # Elimination Spawn
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> ELIMINATION SPAWN')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Allow players to spawn when they join, if they didn\'t ')
     config.text('   spawn already that round.')
@@ -67,12 +68,13 @@ def load():
     config.write()
     es.dbgmsg(0, '\tgg_elimination.cfg')
 
+
 def unload():
     global config
 
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_convert/gg_convert_config.py
+# ../scripts/included/gg_convert/gg_convert_config.py
 
 '''
 $Rev$
@@ -21,7 +21,8 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_convert.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -30,9 +31,9 @@ def load():
 
     # gg_convert
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> CONVERT')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   A tool used to convert gungame 3, 4 and 5 (prior to 5.1' +
                 ') winner databases')
@@ -66,12 +67,13 @@ def load():
     config.write()
     es.dbgmsg(0, '\tgg_convert.cfg')
 
+
 def unload():
     global config
 
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

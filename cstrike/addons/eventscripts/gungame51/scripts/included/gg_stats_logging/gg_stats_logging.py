@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_stats_logging/gg_stats_logging.py
+# ../scripts/included/gg_stats_logging/gg_stats_logging.py
 
 '''
 $Rev$
@@ -24,14 +24,15 @@ from gungame51.core import get_game_dir
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_stats_logging'
-info.title = 'GG Stats Logging' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Stats Logging'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
 list_events = []
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -61,6 +62,7 @@ def load():
 
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     global list_events
 
@@ -72,6 +74,7 @@ def unload():
         es.addons.unregisterForEvent(this, event)
 
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -94,8 +97,9 @@ def logEvent(event_var):
     teamName = getTeamName(es.getplayerteam(userid))
 
     # Log it
-    es.server.queuecmd('es_xlogq "%s<%s><%s><%s>" triggered "%s"' 
-        %(playerName, userid, steamid, teamName, event))
+    es.server.queuecmd('es_xlogq "%s<%s><%s><%s>" triggered "%s"'
+        % (playerName, userid, steamid, teamName, event))
+
 
 def getTeamName(team):
     if team == 2:

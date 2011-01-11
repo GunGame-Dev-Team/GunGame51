@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_multi_level/gg_multi_level_config.py
+# ../scripts/included/gg_multi_level/gg_multi_level_config.py
 
 '''
 $Rev$
@@ -19,20 +19,21 @@ from gungame51.core.cfg import generate_header
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' %es.ServerVar('eventscripts_gamedir') +
+config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
     'gungame51/included_addon_configs/gg_multi_level.cfg')
-        
+
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     generate_header(config)
-    
+
     # Multi-Level
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTI-LEVEL')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   The number of times a player has to level up without ' +
                 'dying prior to')
@@ -54,9 +55,9 @@ def load():
 
     # Multi-Level Speed
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTI-LEVEL SPEED')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   The percentage of speed that players receieving the ' +
                 'multi-level bonus')
@@ -71,9 +72,9 @@ def load():
 
     # Multi-Level Gravity
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTI-LEVEL GRAVITY')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   The percentage of gravity that players receieving the ' +
                 'multi-level bonus')
@@ -88,9 +89,9 @@ def load():
 
     # Multi-Level TK Victim Reset
     config.text('')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('>> MULTI-LEVEL TK VICTIM RESET')
-    config.text('='*76)
+    config.text('=' * 76)
     config.text('Description:')
     config.text('   Victims of team killings will not have their level-up ' +
                 'count reset.')
@@ -103,10 +104,11 @@ def load():
     config.text('when they die.')
     config.text('Default Value: 0')
     config.cvar('gg_multi_level_tk_reset', 0, 'Continue multi level count ' +
-                'for TK victims.')   
-    
+                'for TK victims.')
+
     config.write()
     es.dbgmsg(0, '\tgg_multi_level.cfg')
+
 
 def unload():
     global config
@@ -114,6 +116,6 @@ def unload():
     # Remove the "notify" flags as set by addFlag('notify')
     for cvar in config.getCvars().keys():
         es.flags('remove', 'notify', cvar)
-    
+
     # Delete the cfglib.AddonCFG instance
     del config

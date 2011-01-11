@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_knife_pro/gg_knife_pro.py
+# ../scripts/included/gg_knife_pro/gg_knife_pro.py
 
 '''
 $Rev$
@@ -28,9 +28,9 @@ from gungame51.core.messaging.shortcuts import saytext2
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_knife_pro'
-info.title = 'GG Knife Pro' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Knife Pro'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_knife_pro']
 
 # =============================================================================
@@ -38,13 +38,14 @@ info.translations = ['gg_knife_pro']
 # =============================================================================
 gg_knife_pro_limit = es.ServerVar('gg_knife_pro_limit')
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
-gg_allow_afk_levels_knife  = es.ServerVar('gg_allow_afk_levels_knife')
+gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_knife_pro_always_level = es.ServerVar('gg_knife_pro_always_level')
 gg_knife_pro_skip_nade = es.ServerVar('gg_knife_pro_skip_nade')
 
 # players level up internally before our player_death, so we added a callback
 # and store the userid who just got off of knife to check on in player_death
 recentlyOffKnife = []
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -53,9 +54,11 @@ def load():
     add_attribute_callback('level', level_call_back, info.name)
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
     remove_callbacks_for_addon(info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -75,6 +78,7 @@ def level_call_back(name, value, ggPlayer):
     recentlyOffKnife.append(ggPlayer.userid)
     gamethread.delayed(0.2, recentlyOffKnife.remove, ggPlayer.userid)
 
+
 def player_death(event_var):
     # ===================
     # Was weapon a knife
@@ -86,7 +90,7 @@ def player_death(event_var):
     # Player Information
     # ===================
     attacker = int(event_var['attacker'])
-    victim   = int(event_var['userid'])
+    victim = int(event_var['userid'])
     userteam = event_var['es_userteam']
     attackerteam = event_var['es_attackerteam']
     # ===================
@@ -117,11 +121,11 @@ def player_death(event_var):
         if not (int(gg_allow_afk_levels) and int(gg_allow_afk_levels_knife)):
             msg(attacker, 'VictimAFK', prefix=True)
             return
-    
+
     # If the level difference is higher than the limit, stop here
     if (attackerLevel - ggVictim.level) > int(gg_knife_pro_limit) and \
                                             int(gg_knife_pro_limit) != 0:
-        msg(attacker, 'LevelDifferenceLimit', 
+        msg(attacker, 'LevelDifferenceLimit',
             {'limit': int(gg_knife_pro_limit)}, prefix=True)
         return
 
@@ -169,6 +173,7 @@ def player_death(event_var):
         ggAttacker.playsound('levelsteal')
         ggAttacker.levelup(1, victim, 'steal')
 
+
 def level_down_victim(attacker, victim):
     ggAttacker = Player(attacker)
     ggVictim = Player(victim)
@@ -194,9 +199,10 @@ def level_down_victim(attacker, victim):
         ggVictim.leveldown(1, attacker, 'steal')
 
     fire_gg_knife_steal(attacker, victim)
-    
+
     # The steal event got fired
     return True
+
 
 def fire_gg_knife_steal(attacker, victim):
     ggAttacker = Player(attacker)
@@ -212,6 +218,6 @@ def fire_gg_knife_steal(attacker, victim):
     es.event('fire', 'gg_knife_steal')
 
     # Announce the level steal
-    saytext2('#human', ggAttacker.index, 'StoleLevel', 
-        {'attacker': es.getplayername(attacker), 
+    saytext2('#human', ggAttacker.index, 'StoleLevel',
+        {'attacker': es.getplayername(attacker),
         'victim': es.getplayername(victim)})

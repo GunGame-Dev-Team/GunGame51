@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/players/afk.py
+# ../core/players/afk.py
 
 '''
 $Rev$
@@ -13,6 +13,7 @@ $LastChangedDate$
 import es
 import gamethread
 from playerlib import getPlayer
+
 
 # =============================================================================
 # >> CLASSES
@@ -44,8 +45,8 @@ class AFK(object):
         x, y, z = es.getplayerlocation(self.userid)
 
         return int(x) + int(y) + int(es.getplayerprop(self.userid,
-                   'CCSPlayer.m_angEyeAngles[0]')) + \
-                    int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[1]'))
+           'CCSPlayer.m_angEyeAngles[0]')) + \
+            int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[1]'))
 
     def isActive(self):
         '''
@@ -57,7 +58,8 @@ class AFK(object):
         '''
         # Make sure player is on a team
         if es.getplayerteam(self.userid) < 2:
-            raise ValueError('Unable to make player active (%s): not on a team.' % self.userid)
+            raise ValueError('Unable to make player active ' +
+                            '(%s): not on a team.' % self.userid)
 
         # Reset player math total
         self.total = 0
@@ -72,19 +74,19 @@ class AFK(object):
         # Make sure player is on a team
         if es.getplayerteam(self.userid) < 2:
             raise ValueError('Unable to teleport player (%s): not on a team.'
-                %self.userid)
+                % self.userid)
 
         # Make sure the player is alive
         if getPlayer(userid).isdead:
             raise ValueError('Unable to teleport player (%s): not alive.'
-                %self.userid)
+                % self.userid)
 
         # Set position
         es.server.queuecmd('es_xsetpos %d %s %s %s' % (self.userid, x, y, z))
 
         # Set eye angles
         if eyeangle0 != 0 or eyeangle1 != 0:
-            es.server.queuecmd('es_xsetang %d %s %s' %(self.userid, eyeangle0,
+            es.server.queuecmd('es_xsetang %d %s %s' % (self.userid, eyeangle0,
                                                        eyeangle1))
 
         # Reset player AFK calculation
@@ -95,15 +97,15 @@ class AFK(object):
         # Make sure player is on a team
         if es.getplayerteam(self.userid) < 2:
             raise ValueError('Unable to set player angles (%s): not on a team'
-                %self.userid)
+                % self.userid)
 
         # Make sure player is alive
         if getPlayer(userid).isdead:
             raise ValueError('Unable to set player angles (%s): not alive.'
-                %self.userid)
+                % self.userid)
 
         # Set angles
-        es.server.queuecmd('es_xsetang %d %s %s' %(self.userid, eyeangle0,
+        es.server.queuecmd('es_xsetang %d %s %s' % (self.userid, eyeangle0,
                                                    eyeangle1))
 
         # Reset player AFK calculation

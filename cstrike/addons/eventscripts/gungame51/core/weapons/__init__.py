@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/weapons/__init__.py
+# ../core/weapons/__init__.py
 
 '''
 $Rev$
@@ -24,6 +24,7 @@ from playerlib import getUseridList
 # GunGame Imports
 from gungame51.core import get_game_dir
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -36,7 +37,7 @@ class BaseWeaponOrders(object):
     # =========================================================================
     def __init__(self, name):
         self.file = name
-        self.filepath = get_game_dir('cfg/gungame51/weapon_orders/' + 
+        self.filepath = get_game_dir('cfg/gungame51/weapon_orders/' +
             '%s.txt' % self.file)
         self.title = 'Untitled Weapon Order'
         self.type = '#default'
@@ -58,7 +59,7 @@ class BaseWeaponOrders(object):
         if name == 'type':
             if value not in ['#default', '#reversed', '#random']:
                 raise AttributeError('Invalid attribute value for type: "%s".'
-                    %value + ' Use only "%s".' %'", "'.join(['#default',
+                    % value + ' Use only "%s".' % '", "'.join(['#default',
                         '#reversed', '#random']))
 
             if not hasattr(self, name):
@@ -118,10 +119,10 @@ class BaseWeaponOrders(object):
             multikill = int(multikill)
 
             # Check the weapon here with
-            if 'weapon_%s' %weapon not in getWeaponList('#primary') \
+            if 'weapon_%s' % weapon not in getWeaponList('#primary') \
                 + getWeaponList('#secondary') + ['weapon_hegrenade',
                 'weapon_knife']:
-                    raise ValueError('"%s" is not a valid weapon!' %weapon)
+                    raise ValueError('"%s" is not a valid weapon!' % weapon)
 
             # Increment the level count
             levelCounter += 1
@@ -161,14 +162,14 @@ class BaseWeaponOrders(object):
             random.shuffle(weapons)
 
             # Set weapon order
-            self.order = dict(zip(range(1, len(weapons)+1), weapons))
+            self.order = dict(zip(range(1, len(weapons) + 1), weapons))
 
             # Re-add knife and grenade to the end
             for weapon in nadeData:
-                self.order[len(self.order)+1] = weapon
+                self.order[len(self.order) + 1] = weapon
 
             for weapon in knifeData:
-                self.order[len(self.order)+1] = weapon
+                self.order[len(self.order) + 1] = weapon
 
         # =====================================================================
         # DEFAULT WEAPON ORDER
@@ -208,14 +209,14 @@ class BaseWeaponOrders(object):
             weapons.reverse()
 
             # Set weapon order
-            self.order = dict(zip(range(1, len(weapons)+1), weapons))
+            self.order = dict(zip(range(1, len(weapons) + 1), weapons))
 
             # Re-add knife and grenade to the end
             for weapon in nadeData:
-                self.order[len(self.order)+1] = weapon
+                self.order[len(self.order) + 1] = weapon
 
             for weapon in knifeData:
-                self.order[len(self.order)+1] = weapon
+                self.order[len(self.order) + 1] = weapon
 
         # When the weapon order changes, we create/cancel a delayed name so
         # that we do not restart the round multiple times due to one weapon
@@ -271,7 +272,7 @@ class BaseWeaponOrders(object):
         Echos (prints) the current weapon order to console.
         '''
         es.dbgmsg(0, ' ')
-        es.dbgmsg(0, '[GunGame] Weapon Order: %s' %self.file)
+        es.dbgmsg(0, '[GunGame] Weapon Order: %s' % self.file)
         es.dbgmsg(0, ' ')
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
         es.dbgmsg(0, '[GunGame] | Level | Multikill |    Weapon     |')
@@ -279,20 +280,20 @@ class BaseWeaponOrders(object):
         for level in self.order:
             weapon = self.order[level][0]
             multikill = self.order[level][1]
-            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level, 
+            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level,
                                                             multikill, weapon))
         es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
 
     def get_weapon(self, level):
         if not level in range(1, len(self.order) + 1):
             raise ValueError('Can not get weapon for level: "%s".'
-                %level + ' Level is out of range (1-%s).' %len(self.order))
+                % level + ' Level is out of range (1-%s).' % len(self.order))
         return self.order[level][0]
 
     def get_multikill(self, level):
         if not level in range(1, len(self.order) + 1):
             raise ValueError('Can not get multikill value for level: "%s".'
-                %level + ' Level is out of range (1-%s).' %len(self.order))
+                % level + ' Level is out of range (1-%s).' % len(self.order))
         return self.order[level][1]
 
     def get_total_levels(self):
@@ -302,7 +303,7 @@ class BaseWeaponOrders(object):
 class WeaponOrdersDict(dict):
     '''
     A class-based dictionary to contain instances of BaseWeapons.
-    
+
     Note:
         This class is meant for private use.
     '''
@@ -314,7 +315,7 @@ class WeaponOrdersDict(dict):
     # =========================================================================
     # >> WeaponOrdersDict() CLASS ATTRIBUTE METHODS
     # =========================================================================
-    def __getitem__(self, name): 
+    def __getitem__(self, name):
         '''
         When we get an item in the dictionary BaseWeapons is instantiated if it
         hasn't been already.
@@ -322,12 +323,12 @@ class WeaponOrdersDict(dict):
         name = str(name).split('.')[0]
 
         if name not in self:
-            self[name] = BaseWeaponOrders(name)            
+            self[name] = BaseWeaponOrders(name)
 
-        # We don't want to call our __getitem__ again 
+        # We don't want to call our __getitem__ again
         return super(WeaponOrdersDict, self).__getitem__(name)
 
-    def __delitem__(self, name): 
+    def __delitem__(self, name):
         '''
         Putting the existence check here makes it easier to delete orders.
         '''
@@ -338,7 +339,7 @@ class WeaponOrdersDict(dict):
     # =========================================================================
     # >> WeaponOrdersDict() CUSTOM CLASS METHODS
     # =========================================================================
-    def clear(self): 
+    def clear(self):
         """ Invariably you will put something here """
         es.dbgmsg(0, 'WeaponOrdersDict cleared!')
         super(WeaponOrdersDict, self).clear()
@@ -362,7 +363,7 @@ class WeaponManager(object):
             return object.__getattr__(self, item)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! ' + 
+                raise AttributeError('There is no weapon order set! ' +
                         'Use set_order(order_name) first!')
 
             # Return the item from the WeaponOrdersDict instance
@@ -385,7 +386,7 @@ class WeaponManager(object):
             object.__getattr__(self, name)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! ' + 
+                raise AttributeError('There is no weapon order set! ' +
                         'Use set_order(order_name) first!')
             # Redirect to the WeaponOrdersDict instance
             return WeaponOrdersDict()[self.currentorder][name]
@@ -396,7 +397,7 @@ class WeaponManager(object):
             object.__setattr__(self, name, value)
         else:
             if not self.currentorder:
-                raise AttributeError('There is no weapon order set! ' + 
+                raise AttributeError('There is no weapon order set! ' +
                         'Use set_order(order_name) first!')
 
             # Redirect to the WeaponOrdersDict instance
@@ -408,7 +409,7 @@ class WeaponManager(object):
     def load(self, name):
         '''
         Load a weapon order by name.
-        
+
         Note:
             This does not set the weapon order to be used by GunGame, it only
             loads and parses the weapon order.
@@ -420,7 +421,7 @@ class WeaponManager(object):
     def unload(self, name):
         '''
         Unload a weapon order by name.
-        
+
         Note:
             This removes the weapon order from stored memory. It is not
             intended to be used
@@ -445,6 +446,7 @@ class WeaponManager(object):
         # order change
         cancelDelayed('gg_mp_restartgame')
         delayedname(1, 'gg_mp_restartgame', self.restart_round, ())
+
 
 # =============================================================================
 # >> FUNCTIONS

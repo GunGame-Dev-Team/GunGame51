@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menus/score_menu.py
+# ../core/menus/score_menu.py
 
 '''
 $Rev$
@@ -20,6 +20,7 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -28,9 +29,11 @@ def load():
     es.dbgmsg(0, '\t!score')
     registerSayCommand('!score', score_menu_cmd, 'Displays a !score menu.')
 
+
 def unload():
     # Unregister commands
     unregisterSayCommand('!score')
+
 
 # =============================================================================
 # >> MENU FUNCTIONS
@@ -46,7 +49,7 @@ def score_menu_cmd(userid, args):
         scoreList.append('[%s] %s' % (Player(player).level,
                                                     es.getplayername(player)))
     # Sort from highest to lowest
-    scoreList.sort(lambda a,b: cmp(int(b[1:].split("]")[0]), 
+    scoreList.sort(lambda a, b: cmp(int(b[1:].split("]")[0]),
         int(a[1:].split("]")[0])))
 
     # Is the list empty ?

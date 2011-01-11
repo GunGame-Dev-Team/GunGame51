@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_deathmatch/gg_deathmatch.py
+# ../scripts/included/gg_deathmatch/gg_deathmatch.py
 
 '''
 $Rev$
@@ -26,11 +26,11 @@ from gungame51.core.players.shortcuts import Player
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_deathmatch'
-info.title = 'GG Deathmatch' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0] 
-info.requires = ['gg_dead_strip', 'gg_dissolver'] 
-info.conflicts= ['gg_elimination']
+info.title = 'GG Deathmatch'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.requires = ['gg_dead_strip', 'gg_dissolver']
+info.conflicts = ['gg_elimination']
 info.translations = ['gg_deathmatch']
 
 # =============================================================================
@@ -44,6 +44,7 @@ mp_roundtime = es.ServerVar('mp_roundtime')
 # Misc
 mpFreezetimeBackup = int(mp_freezetime)
 mpRoundtimeBackup = int(mp_roundtime)
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -78,6 +79,7 @@ def load():
     # Register the joinclass command to trigger the first spawn.
     es.addons.registerClientCommandFilter(joinclass_filter)
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
@@ -93,6 +95,7 @@ def unload():
     # Unregister the joinclass command
     es.addons.unregisterClientCommandFilter(joinclass_filter)
 
+
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
@@ -101,21 +104,25 @@ def es_map_start(event_var):
     global respawnAllowed
     respawnAllowed = False
 
+
 def round_start(event_var):
     # Allow respawn
     global respawnAllowed
     respawnAllowed = True
+
 
 def round_end(event_var):
     # Don't allow respawn
     global respawnAllowed
     respawnAllowed = False
 
+
 def gg_win(event_var):
     # Cancel pending respawns
     for userid in getUseridList('#all'):
         if repeat.find('gungameRespawnPlayer%s' % userid):
             repeat.delete('gungameRespawnPlayer%s' % userid)
+
 
 def joinclass_filter(userid, args):
     # If the command is not joinclass, stop here
@@ -145,6 +152,7 @@ def joinclass_filter(userid, args):
                                                       int(gg_dm_respawn_delay))
     return 1
 
+
 def player_disconnect(event_var):
     # Get userid
     userid = event_var['userid']
@@ -152,6 +160,7 @@ def player_disconnect(event_var):
     # Delete the player-specific repeat
     if repeat.find('gungameRespawnPlayer%s' % userid):
         repeat.delete('gungameRespawnPlayer%s' % userid)
+
 
 def player_death(event_var):
     # Get the userid
@@ -171,6 +180,7 @@ def player_death(event_var):
 
             repeat.start('gungameRespawnPlayer%s' % userid, 1,
                                                       int(gg_dm_respawn_delay))
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS

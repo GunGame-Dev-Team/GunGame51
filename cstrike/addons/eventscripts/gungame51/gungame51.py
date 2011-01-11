@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/gungame51.py
+# ../gungame51.py
 
 '''
 $Rev$
@@ -138,6 +138,7 @@ credits = {
         'The Cheebs']
 }
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -148,7 +149,7 @@ class RoundInfo(object):
             # Set round information variables
             cls._the_instance.round = 1
         return cls._the_instance
-        
+
     @property
     def remaining(self):
         total = int(gg_multi_round) - self.round
@@ -161,17 +162,18 @@ class RoundInfo(object):
 info = es.AddonInfo()
 del info['keylist'][:]
 
-info.About = ('\n' + 
-                    '\t'*4 + 'GunGame 5.1 (v%s)\n\n' % gungame_info('version')) 
+info.About = ('\n' +
+                '\t' * 4 + 'GunGame 5.1 (v%s)\n\n' % gungame_info('version'))
 
 info.Authors = ('\n' +
-             '\t'*4 + 'Michael Barr (XE_ManUp)\n' +
-             '\t'*4 + 'Luke Robinson (Monday)\n' +
-             '\t'*4 + 'Warren Alpert\n' +
-             '\t'*4 + 'Paul Smith (RideGuy)\n' +
-             '\t'*4 + 'Deniz Sezen (your-name-here)\n\n')
+             '\t' * 4 + 'Michael Barr (XE_ManUp)\n' +
+             '\t' * 4 + 'Luke Robinson (Monday)\n' +
+             '\t' * 4 + 'Warren Alpert\n' +
+             '\t' * 4 + 'Paul Smith (RideGuy)\n' +
+             '\t' * 4 + 'Deniz Sezen (your-name-here)\n\n')
 
-info.Website = ('\n' + '\t'*4 + 'http://forums.gungame.net/\n')
+info.Website = ('\n' + '\t' * 4 + 'http://forums.gungame.net/\n')
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -179,10 +181,10 @@ info.Website = ('\n' + '\t'*4 + 'http://forums.gungame.net/\n')
 def load():
     # Load translations
     loadTranslation('gungame', 'gungame')
-    
+
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
-    es.server.cmd('exec server.cfg')       
+    es.server.cmd('exec server.cfg')
 
     try:
         initialize()
@@ -193,10 +195,10 @@ def load():
         es.unload('gungame')
 
     # If the public variables exist, remove them
-    if not es.exists('variable','eventscripts_gg'):
+    if not es.exists('variable', 'eventscripts_gg'):
         es.ServerVar('eventscripts_gg').removeFlag('notify')
         es.ServerVar('eventscripts_gg').removeFlag('replicated')
-    if not es.exists('variable','eventscripts_gg5'):
+    if not es.exists('variable', 'eventscripts_gg5'):
         es.ServerVar('eventscripts_gg5').removeFlag('notify')
         es.ServerVar('eventscripts_gg5').removeFlag('replicated')
 
@@ -214,6 +216,7 @@ def load():
     tags = set(str(sv_tags).split(','))
     tags.add('gungame')
     sv_tags.set(','.join(tags))
+
 
 def unload():
     # Remove gungame from sv_tags
@@ -241,7 +244,7 @@ def unload():
         # If an addon we just unloaded unloaded this addon, skip it
         if not addon in AddonManager().__loaded__:
             continue
-        
+
         # Unload the addons that have required dependencies
         AddonManager().unload(addon, True)
 
@@ -270,16 +273,18 @@ def unload():
 
     # Fire gg_unload event
     EventManager().gg_unload()
-    
+
     # Unregister !thanks command
     unregisterSayCommand('!thanks')
-    
+
+
 def initialize():
     # Load custom events
-    es.loadevents('declare', 
+    es.loadevents('declare',
         'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
 
-    es.dbgmsg(0, langstring("Load_Start", {'version': gungame_info('version')}))
+    es.dbgmsg(0, langstring("Load_Start",
+        {'version': gungame_info('version')}))
 
     # Load all main configs
     es.dbgmsg(0, langstring("Load_Configs"))
@@ -303,6 +308,7 @@ def initialize():
 
     # Pause a moment for the configs to be loaded (OB engine requires this)
     gamethread.delayed(0.1, completeInitialize)
+
 
 def completeInitialize():
     # Print load started
@@ -331,7 +337,7 @@ def completeInitialize():
 
     # Load error logging
     gamethread.delayed(3.50, make_log_file)
-    
+
     # Load menus
     es.dbgmsg(0, langstring("Load_Commands"))
     MenuManager().load('#all')
@@ -354,9 +360,11 @@ def completeInitialize():
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
 
+
 def printWeaponOrder():
     # Print out Weapon Order when GunGame is "re-loaded" on a server
     set_weapon_order(str(gg_weapon_order_file), str(gg_weapon_order_sort_type))
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -370,7 +378,7 @@ def es_map_start(event_var):
     make_downloadable()
 
     # Load custom GunGame events
-    es.loadevents('addons/eventscripts/' + 
+    es.loadevents('addons/eventscripts/' +
                   'gungame51/core/events/data/es_gungame_events.res')
 
     # Execute GunGame's autoexec.cfg
@@ -405,10 +413,12 @@ def es_map_start(event_var):
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
 
+
 def check_priority():
     # If there is nothing in priority addons, fire event gg_start
     if not PriorityAddon():
         EventManager().gg_start()
+
 
 def round_start(event_var):
     # Retrieve a random userid
@@ -431,7 +441,7 @@ def round_start(event_var):
         # Remove all weapons of this type from the map
         for index in weapon.indexlist:
             # If the weapon has an owner, stop here
-            if es.getindexprop(index,'CBaseEntity.m_hOwnerEntity') != -1:
+            if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') != -1:
                 continue
 
             spe.removeEntityByIndex(index)
@@ -439,9 +449,10 @@ def round_start(event_var):
     # Equip players with a knife and possibly item_kevlar or item_assaultsuit
     equip_player()
 
+
 def player_spawn(event_var):
     global firstPlayerSpawned
-    
+
     if not firstPlayerSpawned:
         # Replace this with whatever PlayerManager() uses to remove
         # non-existant players
@@ -474,12 +485,12 @@ def player_spawn(event_var):
                     # Make sure the player doesn't already have a defuser
                     if not getPlayer(userid).get('defuser'):
                         es.server.queuecmd('es_xgive %d item_defuser' % userid)
-    
+
     # Strip bots (sometimes they keep previous weapons)
     if es.isbot(userid):
         gamethread.delayed(0.25, give_weapon_check, (userid))
         gamethread.delayed(0.35, ggPlayer.strip)
-        
+
     # Player is human
     else:
         # Reset AFK
@@ -489,6 +500,7 @@ def player_spawn(event_var):
 
         # Give the player their weapon
         gamethread.delayed(0.05, give_weapon_check, (userid))
+
 
 def player_death(event_var):
     # Check for priority addons
@@ -510,30 +522,30 @@ def player_death(event_var):
     # TEAM-KILL CHECK
     if (event_var['es_userteam'] == event_var['es_attackerteam']):
         return
-    
+
     # Get victim object
     ggVictim = Player(userid)
-    
+
     # Get attacker object
-    ggAttacker = Player(attacker)           
+    ggAttacker = Player(attacker)
 
     # Check the weapon was correct (Normal Kill)
     if event_var['weapon'] != ggAttacker.weapon:
         return
-    
+
     # Don't continue if the victim is AFK
     if not int(gg_allow_afk_levels):
-        
+
         # Make sure the victim is not a bot
         if not es.isbot(userid):
-            
+
             # Is AFK ?
             if ggVictim.afk():
-                
+
                 # Is their weapon an hegrenade and do we allow AFK leveling?
                 if ggAttacker.weapon == 'hegrenade' and \
                     int(gg_allow_afk_levels_nade):
-                        
+
                         # Pass if we are allowing AFK leveling on nade level
                         pass
 
@@ -557,46 +569,48 @@ def player_death(event_var):
     # =========================================================================
     # MULTIKILL CHECK
     # =========================================================================
-    
+
     # Get the current level's multikill value
     multiKill = get_level_multikill(ggAttacker.level)
-    
+
     # If set to 1, level the player up
     if multiKill == 1:
         # Level them up
         ggAttacker.levelup(1, userid, 'kill')
-        
+
         # Play the levelup sound
         ggAttacker.playsound('levelup')
-        
+
         return
-    
+
     # Multikill value is > 1 ... add 1 to the multikill attribute
     ggAttacker.multikill += 1
-    
+
     # Finished the multikill
     if ggAttacker.multikill >= multiKill:
         # Level them up
         ggAttacker.levelup(1, userid, 'kill')
-            
+
         # Play the levelup sound
         ggAttacker.playsound('levelup')
-        
+
     # Increment their current multikill value
     else:
         # Message the attacker
         multiKill = get_level_multikill(ggAttacker.level)
-        ggAttacker.hudhint('MultikillNotification', 
+        ggAttacker.hudhint('MultikillNotification',
                            {'kills': ggAttacker.multikill, 'total': multiKill})
-            
+
         # Play the multikill sound
         ggAttacker.playsound('multikill')
 
+
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
-    
+
     # Check to see if player was the leader
     LeaderManager().disconnected_leader(userid)
+
 
 def player_team(event_var):
     # If it was a disconnect, stop here
@@ -607,6 +621,7 @@ def player_team(event_var):
     # welcome sound
     if int(event_var['oldteam']) < 2 and int(event_var['team']) > 1:
         Player(int(event_var['userid'])).playsound('welcome')
+
 
 def gg_levelup(event_var):
     # Check for priority addons
@@ -621,6 +636,7 @@ def gg_levelup(event_var):
         send_level_info_hudhint(Player(attacker))
     if userid and not es.isbot(userid):
         send_level_info_hudhint(Player(userid))
+
 
 def gg_win(event_var):
     # Get player info
@@ -637,9 +653,9 @@ def gg_win(event_var):
         # End game
         es.server.queuecmd("es_xgive %s game_end" % userid)
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
-        
+
         # Tell the world
-        saytext2('#human', index, 'PlayerWon', {'player':playerName})
+        saytext2('#human', index, 'PlayerWon', {'player': playerName})
 
         # Play the winner sound
         for userid in getUseridList('#human'):
@@ -651,7 +667,7 @@ def gg_win(event_var):
         # =====================================================================
         # Calculate round number
         RoundInfo().round += 1
-        
+
         # Reset the players
         resetPlayers()
 
@@ -691,93 +707,101 @@ def gg_win(event_var):
     # =========================================================================
     # Tell the world (center message)
     centermsg('#human', 'PlayerWon_Center', {'player': playerName})
-    gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center', 
+    gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center',
                                                     {'player': playerName}))
-    gamethread.delayed(2, centermsg, ('#human', 'PlayerWon_Center', 
+    gamethread.delayed(2, centermsg, ('#human', 'PlayerWon_Center',
                                                     {'player': playerName}))
-    gamethread.delayed(3, centermsg, ('#human', 'PlayerWon_Center', 
+    gamethread.delayed(3, centermsg, ('#human', 'PlayerWon_Center',
                                                     {'player': playerName}))
-    
+
     # Toptext
     if int(event_var['es_attackerteam']) == 2:
-        toptext('#human', 10, '#red', 'PlayerWon_Center', 
+        toptext('#human', 10, '#red', 'PlayerWon_Center',
                                                     {'player': playerName})
     else:
-        toptext('#human', 10, '#blue', 'PlayerWon_Center', 
+        toptext('#human', 10, '#blue', 'PlayerWon_Center',
                                                     {'player': playerName})
 
     # Update DB
     gamethread.delayed(1.5, Database().commit)
-        
+
+
 def gg_start(event_var):
     # Disable warmup due to "gg_multi_round"?
     if gg_warmup_round_backup != int(gg_warmup_round) and \
         gg_warmup_round_backup:
             es.server.queuecmd('gg_warmup_round 0')
 
+
 def gg_addon_loaded(event_var):
-    es.dbgmsg(0, 'gg_addon_loaded: "%s" ' % event_var['addon'] + 
+    es.dbgmsg(0, 'gg_addon_loaded: "%s" ' % event_var['addon'] +
                  'of type "%s"' % event_var['type'])
-    
+
+
 def gg_addon_unloaded(event_var):
-    es.dbgmsg(0, 'gg_addon_unloaded: "%s" ' % event_var['addon'] + 
+    es.dbgmsg(0, 'gg_addon_unloaded: "%s" ' % event_var['addon'] +
                  'of type "%s"' % event_var['type'])
+
 
 def server_cvar(event_var):
     cvarName = event_var['cvarname']
-    
+
     # Make sure we have both set before setting the weapon order
     if cvarName == 'gg_weapon_order_file' and str(gg_weapon_order_sort_type) \
                 == "0":
         return
 
-    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type', 
+    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type',
                                                     'gg_multikill_override']:
         # For weapon order file and sort type, reset player's levels to 1
         if cvarName != "gg_multikill_override":
             setAttribute("#all", "level", 1)
-        
+
         # Set the weapon order and set the weapon order type
-        currentOrder = set_weapon_order(str(gg_weapon_order_file), 
+        currentOrder = set_weapon_order(str(gg_weapon_order_file),
                                       str(gg_weapon_order_sort_type))
 
         # If the multikill override is not 0
         if int(gg_multikill_override):
             # Set multikill override
             currentOrder.set_multikill_override(int(gg_multikill_override))
-        
+
+
 def player_changename(event_var):
     # Update the player's name in the winners database if they are in it
     if Player(int(event_var['userid'])).wins:
-        update_winner('name', event_var['newname'], 
+        update_winner('name', event_var['newname'],
             uniqueid=event_var['es_steamid'])
+
 
 def player_activate(event_var):
     # Update the player in the database
     userid = int(event_var['userid'])
     Player(userid).database_update()
-    
-    if event_var['es_steamid'] in ('STEAM_0:1:5021657', 'STEAM_0:1:5244720', 
-      'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):   
+
+    if event_var['es_steamid'] in ('STEAM_0:1:5021657', 'STEAM_0:1:5244720',
+      'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):
         msg('#human', 'GGThanks', {'name': event_var['es_username']})
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
 def thanks(userid, args):
-    msg(userid, 'CheckConsole')    
+    msg(userid, 'CheckConsole')
     es.cexec(userid, 'echo [GG Thanks] ')
-    
+
     # Loop through the credits
     for x in credits.keys():
         # Print category
         es.cexec(userid, 'echo [GG Thanks] %s:' % (x))
-        
+
         # Show all in this category
         for y in credits[x]:
             es.cexec(userid, 'echo [GG Thanks]    %s' % y)
-        
+
         es.cexec(userid, 'echo [GG Thanks] ')
+
 
 def equip_player():
     userid = es.getuserid()
@@ -800,6 +824,7 @@ def equip_player():
             'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' % userid
 
     es.server.queuecmd(cmd)
+
 
 def send_level_info_hudhint(ggPlayer):
     # Get the level, total number of levels and leader level for the
@@ -834,14 +859,16 @@ def send_level_info_hudhint(ggPlayer):
             leaderString = 'LevelInfo_AmongstLeaders'
     else:
         leaderString = 'LevelInfo_LeaderLevel'
-        leaderTokens={'level': leaderLevel,
+        leaderTokens = {'level': leaderLevel,
                     'total': totalLevels,
                     'weapon': get_level_weapon(leaderLevel)}
 
-    text += langstring(leaderString, tokens=leaderTokens, userid=ggPlayer.userid)
+    text += langstring(leaderString,
+        tokens=leaderTokens, userid=ggPlayer.userid)
 
     # Send the level information hudhint
     ggPlayer.hudhint(text)
+
 
 def give_weapon_check(userid):
     # Is a spectator or dead ?

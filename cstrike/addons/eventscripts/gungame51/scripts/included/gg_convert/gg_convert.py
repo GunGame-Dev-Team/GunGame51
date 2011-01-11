@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_convert/gg_convert.py
+# ../scripts/included/gg_convert/gg_convert.py
 
 '''
 $Rev$
@@ -31,9 +31,9 @@ from gungame51.core.sql.shortcuts import update_winner
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_convert'
-info.title = 'GG Welcome Message' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG Welcome Message'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -44,6 +44,7 @@ convertDir = es.ServerVar('eventscripts_gamedir') + '/cfg/gungame51/converter/'
 # An instance of the Database() class to adjust the winners database with
 ggDB = Database()
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
@@ -52,8 +53,10 @@ def load():
     # Check for files to convert and run the conversion
     run_conversion()
 
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -61,6 +64,7 @@ def unload():
 def es_map_start(event_var):
     # Check for files to convert and run the conversion
     run_conversion()
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -142,8 +146,7 @@ def run_conversion():
             for uniqueid in winners:
                 # Add the winner to the current database
                 add_winner(winners[uniqueid]['name'], uniqueid, \
-                winners[uniqueid]['wins'], int(winners[uniqueid] \
-                ['timestamp']))
+                winners[uniqueid]['wins'], int(winners[uniqueid]['timestamp']))
 
         # --------------------------------------------------------------------
         # GunGame3 SpawnPoints Conversion
@@ -215,11 +218,13 @@ def run_conversion():
     # Commit the queries to the database
     ggDB.commit()
 
+
 def check_delete():
     # If gg_convert is set to overwrite the current database
     if int(gg_convert) == 2:
         # Delete everything from it
         ggDB._query("DELETE FROM gg_wins")
+
 
 def write_spawnpoint_file(fileName, mapName, convertedSpawnPoints):
     # The name of the new spawnpoints file
@@ -263,12 +268,13 @@ def write_spawnpoint_file(fileName, mapName, convertedSpawnPoints):
     # Close the file
     newFile.close()
 
+
 def add_winner(name, uniqueid, wins, timestamp):
     # Store the number of wins that the player currently has, or None if they
     # do not exist
     currentWins = ggDB.select('gg_wins', 'wins', 'where uniqueid = "%s"' % \
     uniqueid)
-    
+
     # If the uniqueid is not in the database, add it
     if currentWins == None:
         insert_winner(name, uniqueid, wins, timestamp)

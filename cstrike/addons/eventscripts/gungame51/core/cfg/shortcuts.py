@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/cfg/shortcuts.py
+# ../core/cfg/shortcuts.py
 
 '''
 $Rev$
@@ -13,25 +13,30 @@ $LastChangedDate$
 from gungame51.core.cfg import ConfigManager
 from gungame51.core.cfg import get_config_list
 
+
 def loadConfig(names=[]):
     if not isinstance(names, list):
-        names = [names,]
+        names = [names, ]
 
     for config in names:
         ConfigManager().load(config)
 
+
 def unloadConfig(names=[]):
     if not isinstance(names, list):
-        names = [names,]
+        names = [names, ]
 
     for config in names:
         ConfigManager().unload(config)
 
+
 def getConfig(name):
     return ConfigManager().get_config_by_name(name)
 
+
 def config_exists(name):
     return ConfigManager.config_exists(name)
+
 
 def get_config_type(name):
     return ConfigManager.get_config_type(name)

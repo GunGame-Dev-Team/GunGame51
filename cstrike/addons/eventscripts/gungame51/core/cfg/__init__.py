@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/cfg/__init__.py
+# ../core/cfg/__init__.py
 
 '''
 $Rev$
@@ -30,6 +30,7 @@ from gungame51.core import get_game_dir
 # >> GLOBAL VARIABLES
 # =============================================================================
 cfgExecuting = False
+
 
 # =============================================================================
 # >> CLASSES
@@ -65,7 +66,7 @@ class ConfigManager(object):
         config = self.get_config_by_name(name)
 
         # Load the config if it has a load function
-        if config.__dict__.has_key('load'):
+        if 'load' in config.__dict__:
             config.load()
 
         # Make sure that no DependencyErrors are raised by GunGame itself due
@@ -73,20 +74,20 @@ class ConfigManager(object):
         for item in config.__dict__:
             if isinstance(config.__dict__[item], AddonCFG):
                 cfg = config.__dict__[item]
-                
+
                 # List to store addons that are defaulted to "on"
                 revisit = []
-               
+
                 # Loop through the CVARs in the configlib.AddonCFG instance
                 for cvar, value, description in cfg.getCvars().values():
                     # Add the CVAR and default value to the dictionary
                     self.__cvardefaults__[cvar] = value
-                    
+
                     # Search for CVARs defaulted to "on"
                     if bool(str(value)) and False in \
                         [x == '0' for x in str(value).split('.')]:
                             revisit.append(cvar)
-                
+
                 global cfgExecuting
                 cfgExecuting = True
                 gamethread.delayed(0.01, self._reset_config_execution, ())
@@ -101,9 +102,9 @@ class ConfigManager(object):
                 for cvar in revisit:
                     # Force their values to 0
                     es.forcevalue(cvar, 0)
-                    
+
                     # Change back to their defaults to trigger server_cvar
-                    gamethread.delayed(0, es.server.queuecmd, ("%s %s" % (cvar, 
+                    gamethread.delayed(0, es.server.queuecmd, ("%s %s" % (cvar,
                                                 self.__cvardefaults__[cvar])))
 
     def unload(self, name):
@@ -132,7 +133,7 @@ class ConfigManager(object):
                     es.ServerVar(cvar).removeFlag('notify')
 
         # Unload the config if it has an unload function
-        if config.__dict__.has_key('unload'):
+        if 'unload' in config.__dict__:
             config.unload()
 
         # Remove the stored config module
@@ -163,10 +164,10 @@ class ConfigManager(object):
         # Import the config and store the module
         if cfgType == 'main':
             self.__loaded__[name] = __import__('gungame51.core.cfg.files.%s'
-                %name, globals(), locals(), [''])
+                % name, globals(), locals(), [''])
         else:
-            self.__loaded__[name] = __import__('gungame51.scripts' + \
-                '.%s.%s.%s' %(cfgType, addon, name), globals(), locals(), [''])
+            self.__loaded__[name] = __import__('gungame51.scripts.%s.%s.%s'
+                % (cfgType, addon, name), globals(), locals(), [''])
 
         # We have to reload the module to re-instantiate the globals
         reload(self.__loaded__[name])
@@ -187,10 +188,10 @@ class ConfigManager(object):
         if cvarName not in get_valid_addons():
             return
 
-        # Load addons if the value is not 0, '', or a float equal to 0 
+        # Load addons if the value is not 0, '', or a float equal to 0
         if bool(str(cvarValue)) and False in \
         [x == '0' for x in str(cvarValue).split('.')]:
-        
+
             # Make sure the addon is not already loaded
             if cvarName in AddonManager().__loaded__:
                 return
@@ -199,11 +200,11 @@ class ConfigManager(object):
             # was executed by a config
             if cfgExecuting and cvarName in conflicts.keys():
                 if str(ConfigManager().__cvardefaults__[cvarName]) == \
-                  str(cvarValue):                    
+                  str(cvarValue):
                     return
 
             gamethread.delayed(0, load, (cvarName))
-            
+
         # Unload addons with the value of 0 (including floats) or ''
         else:
             # Make sure that the addon is loaded
@@ -225,13 +226,13 @@ class ConfigManager(object):
         Returns an int (bool) value depending on a GunGame addon's existance.
         '''
         return get_game_dir('addons/eventscripts/gungame51/' +
-            'core/cfg/files/%s.py' %name).isfile() or \
+            'core/cfg/files/%s.py' % name).isfile() or \
             get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/included/%s/%s.py' \
-                %(name.replace("_config", ""), name)).isfile() or \
+                % (name.replace("_config", ""), name)).isfile() or \
             get_game_dir('addons/eventscripts/gungame51/' +
             'scripts/custom/%s/%s.py' \
-                %(name.replace("_config", ""), name)).isfile()
+                % (name.replace("_config", ""), name)).isfile()
 
     @staticmethod
     def get_config_type(name):
@@ -248,18 +249,18 @@ class ConfigManager(object):
 
         # Get config type
         if get_game_dir('addons/eventscripts/gungame51/core/cfg' +
-            '/files/%s.py' %name).isfile():
+            '/files/%s.py' % name).isfile():
                 return 'main'
-        elif get_game_dir('addons/eventscripts/gungame51/scripts/' +
-            'included/%s/%s.py' %(name.replace("_config", ""), name)).isfile():
+        elif get_game_dir('addons/eventscripts/gungame51/scripts/included' +
+            '/%s/%s.py' % (name.replace("_config", ""), name)).isfile():
                 return 'included'
         elif get_game_dir('addons/eventscripts/gungame51/scripts/' +
-            'custom/%s/%s.py' %(name.replace("_config", ""), name)).isfile():
+            'custom/%s/%s.py' % (name.replace("_config", ""), name)).isfile():
                 return 'custom'
 
 
 # Register the ConfigManager instance for the "server_cvar" event
-es.addons.registerForEvent(ConfigManager(), 'server_cvar', 
+es.addons.registerForEvent(ConfigManager(), 'server_cvar',
                                                    ConfigManager().server_cvar)
 
 # =============================================================================
@@ -273,7 +274,8 @@ list_config_types = [
     ]
 
 # Dictionary used to cache configs, optmizing having to read from disk
-dict_configs_cache = {"main":[],"included":[],"custom":[]}
+dict_configs_cache = {"main": [], "included": [], "custom": []}
+
 
 def __cache_configs():
     # Loop through each config path
@@ -296,6 +298,7 @@ def __cache_configs():
 # Cache the configs
 __cache_configs()
 
+
 def get_config_list(type=None):
     '''
     Retrieves a list of cfglib configs of the following types:
@@ -304,7 +307,7 @@ def get_config_list(type=None):
         * custom (custom addon configs)
 
     Note:
-        If no argument is provided, all possible configs will be returned 
+        If no argument is provided, all possible configs will be returned
         in the list.
     '''
     # Did they supply us with a type?
@@ -312,7 +315,7 @@ def get_config_list(type=None):
         # Make sure they provided us with a valid argument value
         if type not in [x[0] for x in list_config_types]:
             raise ValueError('Invalid argument type: "%s". Use only: "%s"'
-                %(type, '", "'.join([x[0] for x in list_config_types])) +
+                % (type, '", "'.join([x[0] for x in list_config_types])) +
                 ', or None.')
 
         # Return the specific type
@@ -324,37 +327,38 @@ def get_config_list(type=None):
     # Return the list of config names (no ".py" extension)
     return [item for sublist in searchList for item in sublist]
 
+
 def generate_header(config):
     '''
     Generates a generic header based off of the addon name.
     '''
-    config.text('*'*76)
+    config.text('*' * 76)
 
     # Retrieve the config path
     cfgPath = config.cfgpath
 
     # Get the addon name from the config path
-    addon = cfgPath.split('/')[len(cfgPath.split('/'))-1].replace('.cfg', '')
+    addon = cfgPath.split('/')[len(cfgPath.split('/')) - 1].replace('.cfg', '')
 
     # Split the name via underscores
     list_title = str(addon).split('_')
 
     # Format the addon title
-    addonTitle = '%s.cfg --' %str(addon)
+    addonTitle = '%s.cfg --' % str(addon)
     for index in range(1, len(list_title)):
-        addonTitle += ' %s' %list_title[index].title()
-    addonTitle +=' Configuration'
+        addonTitle += ' %s' % list_title[index].title()
+    addonTitle += ' Configuration'
 
     config.text('*' + addonTitle.center(74) + '*')
-    config.text('*' + ' '*74 + '*')
+    config.text('*' + ' ' * 74 + '*')
     config.text('*' + 'This file defines GunGame Addon settings.'.center(74) +
                 '*')
-    config.text('*' + ' '*74 + '*')
+    config.text('*' + ' ' * 74 + '*')
     config.text('*' +
                 'Note: Any alteration of this file requires a'.center(74) +
                 '*')
     config.text('*' + 'server restart or a reload of GunGame.'.center(74) +
                 '*')
-    config.text('*'*76)
+    config.text('*' * 76)
     config.text('')
     config.text('')

@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/scripts/included/gg_afk_punish/gg_afk_punish.py
+# ../scripts/included/gg_afk_punish/gg_afk_punish.py
 
 '''
 $Rev$
@@ -23,9 +23,9 @@ from gungame51.core.players.shortcuts import Player
 # =============================================================================
 info = AddonInfo()
 info.name = 'gg_afk_punish'
-info.title = 'GG AFK Punish' 
-info.author = 'GG Dev Team' 
-info.version = "5.1.%s" %"$Rev$".split('$Rev: ')[1].split()[0]
+info.title = 'GG AFK Punish'
+info.author = 'GG Dev Team'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_afk_punish']
 
 # =============================================================================
@@ -37,14 +37,17 @@ gg_afk_punish = es.ServerVar('gg_afk_punish')
 # Get the es.ServerVar() instance of "gg_afk_rounds"
 gg_afk_rounds = es.ServerVar('gg_afk_rounds')
 
+
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-    
+
+
 def unload():
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
+
 
 # =============================================================================
 # >> GAME EVENTS
@@ -79,18 +82,20 @@ def player_death(event_var):
         # Check AFK punishment
         afkPunishCheck(userid)
 
+
 def round_end(event_var):
     # Was a ROUND_DRAW or GAME_COMMENCING?
     if int(event_var['reason']) in [10, 16]:
         return
-    
-    # Now, we will loop through the userid list and run the AFK Punishment 
+
+    # Now, we will loop through the userid list and run the AFK Punishment
     #   checks on them
     for userid in getUseridList('#alive,#human'):
         # See if the player was AFK
         if Player(userid).afk():
             # Check AFK punishment
             afkPunishCheck(userid)
+
 
 def afkPunishCheck(userid):
     ggPlayer = Player(userid)
@@ -106,18 +111,19 @@ def afkPunishCheck(userid):
     else:
         punish(userid)
 
+
 def punish(userid):
     ggPlayer = Player(userid)
-    
+
     # Kick Punishment
     if int(gg_afk_punish) == 1:
-        es.server.queuecmd('kickid %d %s' %(userid,
+        es.server.queuecmd('kickid %d %s' % (userid,
                            ggPlayer.langstring('KickedForAFK')))
 
     # Spectate Punishment
     elif int(gg_afk_punish) == 2:
         # Send them to spectator
-        es.server.queuecmd('es_xfire %d !self SetTeam 1' %userid)
+        es.server.queuecmd('es_xfire %d !self SetTeam 1' % userid)
 
         # Send a popup saying they were switched
         popuplib.quicksend(0, userid,

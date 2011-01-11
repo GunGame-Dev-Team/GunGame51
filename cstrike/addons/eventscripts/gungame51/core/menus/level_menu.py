@@ -1,4 +1,4 @@
-# ../addons/eventscripts/gungame51/core/menus/level_menu.py
+# ../core/menus/level_menu.py
 
 '''
 $Rev$
@@ -25,6 +25,7 @@ from gungame51.core.leaders.shortcuts import is_leader
 from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.messaging.shortcuts import msg
+
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -55,6 +56,7 @@ def load():
     es.dbgmsg(0, '\t!level')
     registerSayCommand('!level', level_menu_cmd, 'Displays a !level menu.')
 
+
 def unload():
     # Delete the popup if it exists
     if popuplib.exists('ggLevelMenu'):
@@ -63,6 +65,7 @@ def unload():
 
     # Unregister commands
     unregisterSayCommand('!level')
+
 
 # =============================================================================
 # >> MENU FUNCTIONS
@@ -79,7 +82,7 @@ def level_menu_cmd(userid, args):
 
         # If the search failed, tell them and return
         if not checkUserid:
-            msg(userid, 'LevelInfo_PlayerSearchFailed', 
+            msg(userid, 'LevelInfo_PlayerSearchFailed',
                 {'player': searchInput})
             return
 
@@ -88,12 +91,13 @@ def level_menu_cmd(userid, args):
 
         # Send the results
         saytext2(userid, ggPlayer.index, 'LevelInfo_PlayerSearch',
-                            {'player': es.getplayername(checkUserid), 
+                            {'player': es.getplayername(checkUserid),
                             'level': ggPlayer.level,
                             'weapon': ggPlayer.weapon})
     else:
         # Send menu
         popuplib.send('ggLevelMenu', userid)
+
 
 def prep_level_menu(userid, popupid):
     # Make sure the popup exists
@@ -149,6 +153,7 @@ def prep_level_menu(userid, popupid):
 
     # Wins information
     ggLevelMenu.modline(6, '   * You have won %s time(s)' % ggPlayer.wins)
+
 
 def send_leader_menu(userid, choice, popupname):
     # Send the leader menu
