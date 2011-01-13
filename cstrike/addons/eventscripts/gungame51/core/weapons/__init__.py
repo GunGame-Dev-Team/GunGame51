@@ -459,5 +459,5 @@ def load_weapon_orders():
     weaponOrderPath = get_game_dir('cfg/gungame51/weapon_orders')
 
     for item in weaponOrderPath.files("*.txt"):
-        es.dbgmsg(0, '\t' + item.name)
-        WeaponManager().load(item.name)
+        es.dbgmsg(0, '\t' + item.namebase)
+        WeaponManager().load(item.namebase)
