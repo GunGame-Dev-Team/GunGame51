@@ -54,6 +54,9 @@ def load():
     global respawnAllowed
     respawnAllowed = False
 
+    # Loaded message
+    es.dbgmsg(0, 'Loaded: %s' % info.name)
+
     # Set freezetime and roundtime to avoid gameplay interuptions
     mp_freezetime.set('0')
     mp_roundtime.set('9')
@@ -81,6 +84,7 @@ def load():
 
 
 def unload():
+    # Unload message
     es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
     # Set freezetime and roundtime back to their original values

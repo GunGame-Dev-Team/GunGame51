@@ -23,6 +23,7 @@ from playerlib import getUseridList
 
 # GunGame Imports
 from gungame51.core import get_game_dir
+from gungame51.core.messaging.shortcuts import langstring
 
 
 # =============================================================================
@@ -272,17 +273,23 @@ class BaseWeaponOrders(object):
         Echos (prints) the current weapon order to console.
         '''
         es.dbgmsg(0, ' ')
-        es.dbgmsg(0, '[GunGame] Weapon Order: %s' % self.file)
+        es.dbgmsg(0, '[GunGame] ' + langstring('WeaponOrder:Echo:Info',
+                                                    {'file': self.file}))
         es.dbgmsg(0, ' ')
-        es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
-        es.dbgmsg(0, '[GunGame] | Level | Multikill |    Weapon     |')
-        es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
+        echo_string = langstring('WeaponOrder:Echo:TableColumns')
+        echo_lengths = [len(x) for x in echo_string.split('|')[1:4]]
+        echo_columns = '+'.join(['-' * x for x in echo_lengths]) + '+'
+        es.dbgmsg(0, '[GunGame] +' + echo_columns)
+        es.dbgmsg(0, '[GunGame] ' + echo_string)
+        es.dbgmsg(0, '[GunGame] +' + echo_columns)
         for level in self.order:
             weapon = self.order[level][0]
             multikill = self.order[level][1]
-            es.dbgmsg(0, '[GunGame] |  %2s   |     %d     | %13s |' % (level,
-                                                            multikill, weapon))
-        es.dbgmsg(0, '[GunGame] +-------+-----------+---------------+')
+            es.dbgmsg(0, '[GunGame] |%s|%s|%s |' % (
+                        str(level).center(echo_lengths[0]),
+                        str(multikill).center(echo_lengths[1]),
+                        weapon.rjust(echo_lengths[2] - 1)))
+        es.dbgmsg(0, '[GunGame] +' + echo_columns)
 
     def get_weapon(self, level):
         if not level in range(1, len(self.order) + 1):
