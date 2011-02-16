@@ -33,7 +33,8 @@ info = AddonInfo()
 info.name = 'gg_prop_physics'
 info.title = 'GG Prop Physics'
 info.author = 'Satoon101'
-info.version = '1.0'
+info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.translations = ['gg_prop_physics']
 
 # =============================================================================
 # >> GLOBAL VARIABLES

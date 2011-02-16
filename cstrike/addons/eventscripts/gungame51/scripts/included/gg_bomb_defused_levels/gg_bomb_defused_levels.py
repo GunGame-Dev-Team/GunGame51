@@ -34,6 +34,7 @@ info.name = 'gg_bomb_defused_levels'
 info.title = 'GG Welcome Message'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.translations = ['gg_bomb_defused_levels']
 
 # =============================================================================
 # >> GLOBAL VARIABLES

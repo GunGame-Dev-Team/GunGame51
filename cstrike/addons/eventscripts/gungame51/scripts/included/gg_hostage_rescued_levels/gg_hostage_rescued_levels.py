@@ -35,6 +35,7 @@ info.name = 'gg_hostage_rescued_levels'
 info.title = 'GG Hostage Rescued'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.translations = ['gg_hostage_rescued_levels']
 
 # =============================================================================
 # >> GLOBAL VARIABLES

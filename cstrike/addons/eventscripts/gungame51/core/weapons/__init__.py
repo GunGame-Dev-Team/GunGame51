@@ -266,15 +266,15 @@ class BaseWeaponOrders(object):
 
         self.echo()
         es.server.queuecmd('mp_restartgame 2')
-        es.msg('Weapon Order Changed! Restarting in 2 seconds!')
+        es.msg(langstring('WeaponOrder:ChangedTo', {'to': self.title}))
 
     def echo(self):
         '''
         Echos (prints) the current weapon order to console.
         '''
         es.dbgmsg(0, ' ')
-        es.dbgmsg(0, '[GunGame] ' + langstring('WeaponOrder:Echo:Info',
-                                                    {'file': self.file}))
+        es.dbgmsg(0, '[GunGame] ' + langstring('WeaponOrder:Echo',
+                                                    {'file': self.title}))
         es.dbgmsg(0, ' ')
         echo_string = langstring('WeaponOrder:Echo:TableColumns')
         echo_lengths = [len(x) for x in echo_string.split('|')[1:4]]
