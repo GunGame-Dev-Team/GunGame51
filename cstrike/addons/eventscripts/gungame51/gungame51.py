@@ -731,13 +731,13 @@ def gg_start(event_var):
 
 
 def gg_addon_loaded(event_var):
-    es.dbgmsg(0, 'gg_addon_loaded: "%s" ' % event_var['addon'] +
-                 'of type "%s"' % event_var['type'])
+    es.dbgmsg(0, langstring('Addon_Loaded',
+        {'addon': event_var['addon'], 'type': event_var['type']}))
 
 
 def gg_addon_unloaded(event_var):
-    es.dbgmsg(0, 'gg_addon_unloaded: "%s" ' % event_var['addon'] +
-                 'of type "%s"' % event_var['type'])
+    es.dbgmsg(0, langstring('Addon_UnLoaded',
+        {'addon': event_var['addon'], 'type': event_var['type']}))
 
 
 def server_cvar(event_var):
@@ -762,10 +762,8 @@ def server_cvar(event_var):
         currentOrder = set_weapon_order(str(gg_weapon_order_file),
                                       str(gg_weapon_order_sort_type))
 
-        # If the multikill override is not 0
-        if int(gg_multikill_override):
-            # Set multikill override
-            currentOrder.set_multikill_override(int(gg_multikill_override))
+        # Set multikill override
+        currentOrder.set_multikill_override(int(gg_multikill_override))
 
 
 def player_changename(event_var):
