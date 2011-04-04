@@ -48,7 +48,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_welcome_msg', 0, 'Enables/Disables ' +
                 'gg_welcome_msg.').addFlag('notify')
-    config.text('')
 
     # gg_welcome_msg_timeout
     config.text('')
@@ -64,7 +63,6 @@ def load():
     config.text('Default Value: 10')
     config.cvar('gg_welcome_msg_timeout', 10, 'Sets the number of seconds ' +
                 'for gg_welcome_msg_timeout.')
-    config.text('')
 
     config.write()
     es.dbgmsg(0, '\tgg_welcome_msg.cfg')

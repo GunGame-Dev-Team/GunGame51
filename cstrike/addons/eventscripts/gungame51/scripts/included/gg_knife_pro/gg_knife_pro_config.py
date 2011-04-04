@@ -33,6 +33,7 @@ def load():
     # GG_KNIFE_PRO CVARS
     # =========================================================================
     # Knife Pro
+    config.text('')
     config.text('=' * 76)
     config.text('>> KNIFE PRO')
     config.text('=' * 76)
@@ -106,8 +107,8 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_knife_pro_skip_nade', 0, 'Enables/Disables always ' +
                 'skipping nade.')
-    config.write()
 
+    config.write()
     es.dbgmsg(0, '\tgg_knife_pro.cfg')
 
 

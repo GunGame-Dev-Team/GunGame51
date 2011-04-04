@@ -29,13 +29,14 @@ config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
 def load():
     generate_header(config)
 
+    config.text('')
     config.text('+' * 76)
     config.text('|' + ' ' * 28 + 'MAP VOTE SETTINGS' + ' ' * 29 + '|')
     config.text('+' * 76)
     config.text('')
-    config.text('')
 
     # gg_map_vote
+    config.text('')
     config.text('=' * 76)
     config.text('>> GUNGAME MAP VOTE')
     config.text('=' * 76)
@@ -50,9 +51,9 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_map_vote', 0, 'Controls GunGame\'s map ' +
         'voting.').addFlag('notify')
-    config.text('')
 
     # gg_map_vote_command
+    config.text('')
     config.text('=' * 76)
     config.text('>> 3RD PARTY VOTE COMMAND')
     config.text('=' * 76)
@@ -68,9 +69,9 @@ def load():
     config.text('Default Value: "ma_voterandom end 4"')
     config.cvar('gg_map_vote_command', "ma_voterandom end 4",
                                         'Triggers 3rd party voting.')
-    config.text('')
 
     # gg_map_vote_size
+    config.text('')
     config.text('=' * 76)
     config.text('>> MAP VOTE SIZE')
     config.text('=' * 76)
@@ -85,9 +86,9 @@ def load():
     config.text('   # = (Enabled) Use # amount of options.')
     config.text('Default Value: 6')
     config.cvar('gg_map_vote_size', 6, 'Controls GunGame\'s map vote size.')
-    config.text('')
 
     # gg_map_vote_trigger
+    config.text('')
     config.text('=' * 76)
     config.text('>> MAP VOTE TRIGGER LEVEL')
     config.text('=' * 76)
@@ -105,9 +106,9 @@ def load():
     config.text('Default Value: 4')
     config.cvar('gg_map_vote_trigger', 4,
                             'Which level to trigger GunGame\'s map voting.')
-    config.text('')
 
     # gg_map_vote_time
+    config.text('')
     config.text('=' * 76)
     config.text('>> MAP VOTE TIME')
     config.text('=' * 76)
@@ -120,9 +121,9 @@ def load():
     config.text('   # = (Enabled) Time in seconds to allow voting.')
     config.text('Default Value: 30')
     config.cvar('gg_map_vote_time', 30, 'GunGame\'s map voting time limit.')
-    config.text('')
 
     # gg_map_vote_dont_show_last_maps
+    config.text('')
     config.text('=' * 76)
     config.text('>> EXCLUDE RECENTLY PLAYED MAPS')
     config.text('=' * 76)
@@ -138,9 +139,9 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_map_vote_dont_show_last_maps', 0,
                             'Exclude recent maps from GunGame\'s map voting.')
-    config.text('')
 
     # gg_map_vote_show_player_vote
+    config.text('')
     config.text('=' * 76)
     config.text('>> SHOW PLAYER VOTES')
     config.text('=' * 76)
@@ -157,9 +158,9 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_map_vote_show_player_vote', 0,
                         'Shows player feedback from GunGame\'s map voting.')
-    config.text('')
 
     # gg_map_vote_list_source
+    config.text('')
     config.text('=' * 76)
     config.text('>> MAP LIST SOURCE')
     config.text('=' * 76)
@@ -177,9 +178,9 @@ def load():
     config.text('Default Value: 1')
     config.cvar('gg_map_vote_list_source', 1,
                                 'Source of maps for GunGame\'s map voting.')
-    config.text('')
 
     # gg_map_vote_file
+    config.text('')
     config.text('=' * 76)
     config.text('>> MAP LIST FILE')
     config.text('=' * 76)
@@ -198,9 +199,9 @@ def load():
     config.text('Default Value: cfg/gungame51/gg_vote_list.txt')
     config.cvar('gg_map_vote_file', 'cfg/gungame51/gg_vote_list.txt',
                                     'Map list for GunGame\'s map voting.')
-    config.text('')
 
     # gg_map_vote_player_command
+    config.text('')
     config.text('=' * 76)
     config.text('>> PLAYER VOTE COMMAND')
     config.text('=' * 76)
@@ -214,9 +215,9 @@ def load():
     config.text('Default Value: "!vote"')
     config.cvar('gg_map_vote_player_command', "!vote",
                             'Player say command for GunGame\'s map voting.')
-    config.text('')
 
     # gg_map_vote_after_death
+    config.text('')
     config.text('=' * 76)
     config.text('>> DEAD FILTER')
     config.text('=' * 76)
@@ -233,16 +234,16 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_map_vote_after_death', 0,
                     'Only the dead get popups during GunGame\'s map voting.')
-    config.text('')
-    config.text('')
 
+    config.text('')
+    config.text('')
     config.text('+' * 76)
     config.text('|' + ' ' * 26 + 'ROCK THE VOTE SETTINGS' + ' ' * 26 + '|')
     config.text('+' * 76)
     config.text('')
-    config.text('')
 
     # gg_map_vote_rtv
+    config.text('')
     config.text('=' * 76)
     config.text('>> ROCK THE VOTE')
     config.text('=' * 76)
@@ -257,9 +258,9 @@ def load():
     config.text('Default Value: 1')
     config.cvar('gg_map_vote_rtv', 1,
                             'Allow rocking the vote.')
-    config.text('')
 
     # gg_map_vote_rtv_command
+    config.text('')
     config.text('=' * 76)
     config.text('>> ROCK THE VOTE COMMAND')
     config.text('=' * 76)
@@ -270,9 +271,9 @@ def load():
     config.text('Default Value: "!rtv"')
     config.cvar('gg_map_vote_rtv_command', "!rtv",
                             'Player say command for GunGame\'s RTV.')
-    config.text('')
 
     # gg_map_vote_rtv_disable_level
+    config.text('')
     config.text('=' * 76)
     config.text('>> ROCK THE VOTE DISABLE LEVEL')
     config.text('=' * 76)
@@ -284,12 +285,12 @@ def load():
     config.text('   60 = (If there are 24 total levels, when the leader hits' +
                 ' level')
     config.text('           15 (we round down), RTV is disabled)')
-    config.text('Default Value: 50')
+    config.text('Default Value: 60')
     config.cvar('gg_map_vote_rtv_levels_required', 60,
                             'Level percentage when RTV gets disabled.')
-    config.text('')
 
     # gg_map_vote_rtv_percent
+    config.text('')
     config.text('=' * 76)
     config.text('>> ROCK THE VOTE PERCENTAGE')
     config.text('=' * 76)
@@ -303,16 +304,16 @@ def load():
     config.text('Default Value: 60')
     config.cvar('gg_map_vote_rtv_percent', 60,
                             'Player say command for GunGame\'s rtv.')
-    config.text('')
-    config.text('')
 
+    config.text('')
+    config.text('')
     config.text('+' * 76)
     config.text('|' + ' ' * 28 + 'NOMINATION SETTINGS' + ' ' * 29 + '|')
     config.text('+' * 76)
     config.text('')
-    config.text('')
 
     # gg_map_vote_nominate
+    config.text('')
     config.text('=' * 76)
     config.text('>> NOMINATE FOR VOTE')
     config.text('=' * 76)
@@ -328,9 +329,9 @@ def load():
     config.text('Default Value: 1')
     config.cvar('gg_map_vote_nominate', 1,
                             'Allow vote nominations.')
-    config.text('')
 
     # gg_map_vote_nominate_command
+    config.text('')
     config.text('=' * 76)
     config.text('>> ROCK THE VOTE COMMAND')
     config.text('=' * 76)
@@ -341,7 +342,6 @@ def load():
     config.text('Default Value: "!nominate"')
     config.cvar('gg_map_vote_nominate_command', "!nominate",
                             'Player say command for GunGame\'s nominate.')
-    config.text('')
 
     # Write
     config.write()

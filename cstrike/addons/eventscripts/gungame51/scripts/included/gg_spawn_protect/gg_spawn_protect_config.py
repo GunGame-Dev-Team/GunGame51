@@ -45,7 +45,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_spawn_protect', 0, 'Enables/Disables spawn ' +
                 'protection.').addFlag('notify')
-    config.text('')
 
     # Spawn Protection Colors
     config.text('')
@@ -77,7 +76,6 @@ def load():
                 'protected player.')
     config.cvar('gg_spawn_protect_alpha', 150, 'The alpha of the spawn ' +
                 'protected player.')
-    config.text('')
 
     # Spawn Protection "Cancel On Fire"
     config.text('')
@@ -96,7 +94,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_spawn_protect_cancelonfire', 0, 'Cancels spawn ' +
                 'protection when the weapon is fired.')
-    config.text('')
 
     # Allow Leveling Whilst Protected
     config.text('')
@@ -111,7 +108,7 @@ def load():
     config.text('   1 = (Enabled) Allow players to level up while spawn ' +
                 'protected.')
     config.text('Default Value: 0')
-    config.cvar('gg_spawn_protect_can_level_up', 1, 'Allow players ' +
+    config.cvar('gg_spawn_protect_can_level_up', 0, 'Allow players ' +
                 'to level up while spawn protected')
 
     config.write()

@@ -66,8 +66,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_nade_bonus', 0, 'The weapon(s) to be given as a grenade ' +
                 'level bonus weapon.').addFlag('notify')
-    config.text('')
-    config.text('')
 
     # gg_nade_bonus_mode
     config.text('')
@@ -88,8 +86,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_nade_bonus_mode', 0, 'Defines how the last weapon in ' +
                 'the order is handled.')
-    config.text('')
-    config.text('')
 
     # gg_nade_bonus_reset
     config.text('')

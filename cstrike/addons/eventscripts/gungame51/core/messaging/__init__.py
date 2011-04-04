@@ -174,7 +174,8 @@ class MessageManager(object):
 
     def __clean_string(self, string):
         '''Cleans the string for output to the console.'''
-        return string.replace('\3', '').replace('\4', '').replace('\1', '')
+        return string.replace('\3', '').replace('\4',
+                    '').replace('\1', '').replace('\5', '')
 
     def __format_string(self, string, tokens, userid=0):
         '''Retrieves and formats the string.'''
@@ -194,7 +195,7 @@ class MessageManager(object):
 
         # Format it
         string = string.replace('#lightgreen', '\3').replace('#green',
-            '\4').replace('#default', '\1')
+            '\4').replace('#default', '\1').replace('#darkgreen', '\5')
 
         '''
         # Not sure what this does, so I will leave it commented out for now:

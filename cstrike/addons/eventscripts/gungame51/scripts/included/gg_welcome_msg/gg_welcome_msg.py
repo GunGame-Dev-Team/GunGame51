@@ -50,7 +50,7 @@ def load():
     es.dbgmsg(0, 'Loaded: %s' % info.name)
 
     # Register !welcome
-    registerSayCommand('!welcome', welcome, 'Displays a !top10 menu.')
+    registerSayCommand('!welcome', welcome, 'Displays a !welcome menu.')
 
     # Build the main gg_welcome popup
     buildPopups()

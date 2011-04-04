@@ -190,10 +190,7 @@ def load():
     try:
         initialize()
     except:
-        es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
-        es.excepter(*sys.exc_info())
-        es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
-        es.unload('gungame')
+        unload_on_error()
 
     # If the public variables exist, remove them
     if not es.exists('variable', 'eventscripts_gg'):
@@ -312,6 +309,13 @@ def initialize():
 
 
 def completeInitialize():
+    try:
+        finishInitialize()
+    except:
+        unload_on_error()
+
+
+def finishInitialize():
     # Print load started
     #es.dbgmsg(0, '[GunGame]' + '=' * 79)
 
@@ -361,6 +365,15 @@ def completeInitialize():
 
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
+
+
+def unload_on_error():
+    es.dbgmsg(0, '[GunGame51] %s' % ('=' * 79))
+    es.excepter(*sys.exc_info())
+    es.dbgmsg(0, '[GunGame51] %s' % ('=' * 79))
+    for delayname in ('gg_mp_restartgame',):
+        gamethread.cancelDelayed(delayname)
+    es.unload('gungame51')
 
 
 # =============================================================================
@@ -781,6 +794,9 @@ def player_activate(event_var):
     if event_var['es_steamid'] in ('STEAM_0:1:5021657', 'STEAM_0:1:5244720',
       'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):
         msg('#human', 'GGThanks', {'name': event_var['es_username']})
+
+    # Is player returning and in the lead?
+    LeaderManager().check(Player(userid))
 
 
 # =============================================================================

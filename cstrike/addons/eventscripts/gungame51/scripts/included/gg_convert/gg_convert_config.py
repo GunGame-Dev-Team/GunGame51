@@ -62,7 +62,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_convert', 0, 'Enables/Disables ' +
                 'gg_convert.').addFlag('notify')
-    config.text('')
 
     config.write()
     es.dbgmsg(0, '\tgg_convert.cfg')

@@ -43,6 +43,7 @@ class BaseWeaponOrders(object):
         self.title = 'Untitled Weapon Order'
         self.type = '#default'
         self.order = {}
+        self.backup = {}
 
         # Parse the weapon order file
         self.parse()
@@ -130,6 +131,9 @@ class BaseWeaponOrders(object):
 
             # Set level values as a list
             self.order[levelCounter] = [weapon, multikill]
+
+            # Store the backup for this level
+            self.backup[levelCounter] = multikill
 
     def __set_weapon_order_type(self, type):
         # =====================================================================
@@ -242,7 +246,17 @@ class BaseWeaponOrders(object):
             # Set multikill if its not a knife or a hegrenade
             if self.order[level][0] != 'knife' and \
               self.order[level][0] != 'hegrenade':
-                self.order[level][1] = value
+
+                # Is there a MultiKill Override value?
+                if value:
+                    # Set the level's value to the MultiKill Override value
+                    self.order[level][1] = value
+
+                # Is MultiKill Override set to 0?
+                else:
+
+                    # Set the level's value to the backup value
+                    self.order[level][1] = self.backup[level]
 
         # When the weapon order changes, we create/cancel a delayed name so
         # that we do not restart the round multiple times due to one weapon

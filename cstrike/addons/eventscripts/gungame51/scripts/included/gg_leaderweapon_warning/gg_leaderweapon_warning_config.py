@@ -45,7 +45,6 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_leaderweapon_warning', 0, 'Play a sound when a player ' +
                 'reaches "hegrenade" or "knife" level.').addFlag('notify')
-    config.text('')
 
     config.write()
     es.dbgmsg(0, '\tgg_leaderweapon_warning.cfg')
