@@ -382,6 +382,7 @@ def unload_on_error():
 def es_map_start(event_var):
     # Set firstPlayerSpawned to False, so player_spawn will know when the first
     # spawn is
+    global firstPlayerSpawned
     firstPlayerSpawned = False
 
     # Make the sounds downloadable

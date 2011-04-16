@@ -50,7 +50,7 @@ def load():
     config.text('=' * 76)
     config.text('Notes:')
     config.text('   * The file must be located under ' +
-                '"cfg/gungame5/weapon_orders/".')
+                '"cfg/gungame51/weapon_orders/".')
     config.text('   * Changing this variable in-game will result in a' +
                 'restart.')
     config.text('   * If gg_weapon_order_random = 1, this will be the ' +
@@ -249,7 +249,7 @@ def load():
     config.text('>> SOUND PACK')
     config.text('=' * 76)
     config.text('Notes:')
-    config.text('   * Sound packs are located in "../cstrike/cfg/gungame5/' +
+    config.text('   * Sound packs are located in "../cstrike/cfg/gungame51/' +
                 'sound_packs".')
     config.text('   * The INI file names located in the "sound_packs" ' +
                 'directory minus')
