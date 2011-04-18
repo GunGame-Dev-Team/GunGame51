@@ -232,8 +232,12 @@ def respawnPlayer(userid, respawnRound):
     # Retrieve the playerlib player object
     plPlayer = getPlayer(userid)
 
-    # Make sure the player is respawnable
-    if not plPlayer.isdead or es.getplayerteam(userid) < 2:
+    # Is spectator?
+    if es.getplayerteam(userid) < 2:
+        return
+
+    # Is player alive?
+    if not plPlayer.isdead:
         return
 
     # Retrieve the GunGame player object
@@ -269,8 +273,12 @@ def respawnEliminated(userid, respawnRound):
         if not es.exists('userid', playerid):
             continue
 
-        # Make sure the player is respawnable
-        if not getPlayer(playerid).isdead or es.getplayerteam(playerid) < 2:
+        # Is spectator?
+        if es.getplayerteam(playerid) < 2:
+            continue
+
+        # Is player already alive?
+        if not getPlayer(playerid).isdead:
             continue
 
         # Respawn player

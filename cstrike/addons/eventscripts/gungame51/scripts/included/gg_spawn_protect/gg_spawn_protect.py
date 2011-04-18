@@ -110,11 +110,15 @@ def weapon_fire(event_var):
 
 
 def player_spawn(event_var):
-    # Get userid
+    # Is spectator?
+    if int(event_var['es_userteam']) < 2:
+        return
+
+    # Set player's id
     userid = int(event_var['userid'])
 
-    # Is player alive?
-    if int(event_var['es_userdead']) or int(event_var['es_userteam']) < 2:
+    # Is player dead?
+    if getPlayer(userid).isdead:
         return
 
     if userid in protectedList:

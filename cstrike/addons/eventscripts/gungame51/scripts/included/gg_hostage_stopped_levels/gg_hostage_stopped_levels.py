@@ -14,7 +14,6 @@ $LastChangedDate$
 
 # Eventscripts Imports
 import es
-from playerlib import getPlayer
 
 # GunGame Imports
 #   Addons
@@ -80,9 +79,9 @@ def player_activate(event_var):
 
 def player_death(event_var):
     # Find the number of hostages following the victim
-    handle = getPlayer(event_var['userid']).handle
+    handle = es.getplayerhandle(event_var['userid'])
     hostages = len(filter(lambda index: es.getindexprop(index,
-        'CHostage.m_leader') == handle, es.createentitylist('hostage_entity')))
+        'CHostage.m_leader') == handle, es.getEntityIndexes('hostage_entity')))
 
     # Were any hostages following?
     if not hostages:

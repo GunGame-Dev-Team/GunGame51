@@ -50,9 +50,16 @@ def unload():
 # >> GAME EVENTS
 # =============================================================================
 def player_spawn(event_var):
-    # Is the player on a team
-    if not int(event_var['es_userteam']) > 1:
+    # Is spectator?
+    if int(event_var['es_userteam']) < 2:
+        return
+
+    # Set player's id
+    userid = int(event_var['userid'])
+
+    # Is player dead?
+    if getPlayer(userid).isdead:
         return
 
     # Enable noblock for this player
-    getPlayer(event_var['userid']).noblock = 1
+    getPlayer(userid).noblock = 1

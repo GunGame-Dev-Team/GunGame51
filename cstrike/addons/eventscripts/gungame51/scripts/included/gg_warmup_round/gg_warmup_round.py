@@ -185,6 +185,10 @@ def hegrenade_detonate(event_var):
     if not warmupCountDown:
         return
 
+    # Is the warmup weapon hegrenade?
+    if warmup_weapon != 'hegrenade':
+        return
+
     # Get player userid and player object
     userid = int(event_var['userid'])
 
@@ -192,14 +196,28 @@ def hegrenade_detonate(event_var):
     if not es.exists('userid', userid) and userid != 0:
         return
 
-    # Give user a hegrenade, if eligable
-    if int(event_var['es_userteam']) > 1 and not getPlayer(userid).isdead and \
-        warmup_weapon == 'hegrenade':
-            Player(userid).give('hegrenade')
+    # Is spectator?
+    if int(event_var['es_userteam']) < 2:
+        return
+
+    # Is player dead?
+    if getPlayer(userid).isdead:
+        return
+
+    Player(userid).give('hegrenade')
 
 
 def player_spawn(event_var):
+    # Is spectator?
+    if int(event_var['es_userteam']) < 2:
+        return
+
+    # Set player's id
     userid = int(event_var['userid'])
+
+    # Is player dead?
+    if getPlayer(userid).isdead:
+        return
 
     # If it is the last split second before mp_restartgame fires, protect the
     # player
@@ -210,10 +228,6 @@ def player_spawn(event_var):
     warmupCountDown = repeat.find('gungameWarmupTimer')
 
     if not warmupCountDown:
-        return
-
-    # Is a spectator or dead?
-    if int(event_var['es_userteam']) < 2 or getPlayer(userid).isdead:
         return
 
     # Get player object

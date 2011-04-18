@@ -72,15 +72,15 @@ def give_weapon(userid, previousLevel):
     if not es.exists('userid', userid) and userid != 0:
         return
 
-    # Added to prevent "Player has left server" error on map change
-    if not es.createplayerlist(userid):
+    # Is spectator?
+    if es.getplayerteam(userid) < 2:
         return
 
     # Get playerlib object
     pPlayer = getPlayer(userid)
 
-    # Is player dead or a spectator?
-    if pPlayer.isdead or es.getplayerteam(userid) < 2:
+    # Is player dead?
+    if pPlayer.isdead:
         return
 
     # Give them their next weapon

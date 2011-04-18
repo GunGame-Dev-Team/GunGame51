@@ -283,7 +283,7 @@ def gg_levelup(event_var):
         return
 
     # Teamkill?
-    if int(es.getplayerteam(userid)) == int(es.getplayerteam(attacker)):
+    if event_var['es_userteam'] == event_var['es_attackerteam']:
         return
 
     # Increment multi-kills for attacker
@@ -339,52 +339,53 @@ def stop_multi_levelers():
 
 def do_multi_level(userid):
     # Check userid validity
-    if es.exists('userid', userid):
+    if not es.exists('userid', userid):
+        return
 
-        # Retrieve the player's name
-        name = es.getplayername(userid)
+    # Retrieve the player's name
+    name = es.getplayername(userid)
 
-        # Tell everyone we leveled!
-        centermsg('#all', "CenterMultiLevelled", {'name': name})
-        saytext2('#all', Player(userid).index, 'MultiLevelled', {'name': name})
+    # Tell everyone we leveled!
+    centermsg('#all', "CenterMultiLevelled", {'name': name})
+    saytext2('#all', Player(userid).index, 'MultiLevelled', {'name': name})
 
-        # Play game sound
-        sound = Player(userid).emitsound('multilevel')
+    # Play game sound
+    sound = Player(userid).emitsound('multilevel')
 
-        # Add the player to the multi-leveling dictionary with the sound to
-        # remove
-        currentMultiLevel[userid] = sound
+    # Add the player to the multi-leveling dictionary with the sound to
+    # remove
+    currentMultiLevel[userid] = sound
 
-        # Create env_spark
-        spark_instance = spe.giveNamedItem(userid, "env_spark")
-        spark_index = spe.getIndexOfEntity(spark_instance)
+    # Create env_spark
+    spark_instance = spe.giveNamedItem(userid, "env_spark")
+    spark_index = spe.getIndexOfEntity(spark_instance)
 
-        cmd = 'es_xfire %s env_spark SetParent !activator;' % userid
-        cmd += 'es_xfire %s env_spark AddOutput "spawnflags 896";' % userid
-        cmd += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' % userid
-        cmd += 'es_xfire %s env_spark AddOutput "magnitude 8";' % userid
-        cmd += 'es_xfire %s env_spark AddOutput "traillength 3";' % userid
-        cmd += 'es_xfire %s env_spark StartSpark' % userid
-        es.server.queuecmd(cmd)
+    cmd = 'es_xfire %s env_spark SetParent !activator;' % userid
+    cmd += 'es_xfire %s env_spark AddOutput "spawnflags 896";' % userid
+    cmd += 'es_xfire %s env_spark AddOutput "angles -90 0 0";' % userid
+    cmd += 'es_xfire %s env_spark AddOutput "magnitude 8";' % userid
+    cmd += 'es_xfire %s env_spark AddOutput "traillength 3";' % userid
+    cmd += 'es_xfire %s env_spark StartSpark' % userid
+    es.server.queuecmd(cmd)
 
-        # Set the player's speed
-        getPlayer(userid).speed = int(gg_multi_level_speed) / 100.0
+    # Set the player's speed
+    getPlayer(userid).speed = int(gg_multi_level_speed) / 100.0
 
-        # If gg_multi_level_gravity is enabled, ajust the player's gravity
-        if int(gg_multi_level_gravity) != 100 and \
-        int(gg_multi_level_gravity) >= 0:
-            gravity.addGravityChange(userid,
-                                     int(gg_multi_level_gravity) * 0.01)
+    # If gg_multi_level_gravity is enabled, ajust the player's gravity
+    if int(gg_multi_level_gravity) != 100 and \
+    int(gg_multi_level_gravity) >= 0:
+        gravity.addGravityChange(userid,
+                                 int(gg_multi_level_gravity) * 0.01)
 
-        # Append the spark's index to this player's list
-        if spark_index:
-            Player(userid).multiLevelEntities.append(spark_index)
+    # Append the spark's index to this player's list
+    if spark_index:
+        Player(userid).multiLevelEntities.append(spark_index)
 
-        # Fire gg_multi_level
-        es.event('initialize', 'gg_multi_level')
-        es.event('setint', 'gg_multi_level', 'userid', userid)
-        es.event('setint', 'gg_multi_level', 'leveler', userid)
-        es.event('fire', 'gg_multi_level')
+    # Fire gg_multi_level
+    es.event('initialize', 'gg_multi_level')
+    es.event('setint', 'gg_multi_level', 'userid', userid)
+    es.event('setint', 'gg_multi_level', 'leveler', userid)
+    es.event('fire', 'gg_multi_level')
 
 
 def remove_multi_level(userid):
@@ -403,11 +404,11 @@ def remove_multi_level(userid):
             ind = ggPlayer.multiLevelEntities.pop()
 
             # Create entitylists for the sparks
-            validIndexes = es.createentitylist('env_spark')
+            validIndexes = es.getEntityIndexes('env_spark')
 
             # If the saved index of the index given to the player still exists
             #   remove it.
-            if ind in validIndexes.keys():
+            if ind in validIndexes:
                 spe.removeEntityByIndex(ind)
 
         # Stop the sound

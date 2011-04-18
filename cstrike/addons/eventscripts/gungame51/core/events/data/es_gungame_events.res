@@ -72,6 +72,13 @@
         "old_leaders"   "string"    // String of old leaders' userids separated by "," e.g. "2,7,9"
         "leader_level"  "short"     // The current leader's level
     }
+    "gg_leader_disconnect"
+    {
+        "userid"        "short"     // The userid of the leader that disconnected
+        "leaders"       "string"    // String of current leaders' userids separated by "," e.g. "2,7,9"
+        "old_leaders"   "string"    // String of old leaders' userids separated by "," e.g. "2,7,9"
+        "leader_level"  "short"     // The current leader's level
+    }
     "gg_start"
     {
         // Fires at the end of the warmup round

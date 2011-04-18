@@ -238,8 +238,8 @@ class BaseWeaponOrders(object):
         '''
         value = int(value)
 
-        if not value > 1:
-            value = 1
+        if value < 0:
+            value = 0
 
         # Loop through the weapon order dictionary
         for level in self.order:

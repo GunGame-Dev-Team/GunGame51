@@ -117,9 +117,9 @@ def loadSpawnFile(mapName):
 
 def loadRandomPoints(userid):
     # Remove existing spawnpoints
-    for tSpawn in es.createentitylist('info_player_terrorist'):
+    for tSpawn in es.getEntityIndexes('info_player_terrorist'):
         es.server.cmd('es_xremove %s' % tSpawn)
-    for ctSpawn in es.createentitylist('info_player_counterterrorist'):
+    for ctSpawn in es.getEntityIndexes('info_player_counterterrorist'):
         es.server.cmd('es_xremove %s' % ctSpawn)
 
     # Loop through the spawnpoints

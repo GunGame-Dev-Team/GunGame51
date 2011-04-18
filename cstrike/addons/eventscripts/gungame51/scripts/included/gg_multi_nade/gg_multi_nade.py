@@ -67,7 +67,7 @@ def hegrenade_detonate(event_var):
     userid = int(event_var['userid'])
 
     # If the player is not on an active team, return
-    if int(event_var['es_userteam']) <= 1:
+    if int(event_var['es_userteam']) < 2:
         return
 
     # If the player is not on hegrenade level, return

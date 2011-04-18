@@ -35,8 +35,6 @@ from core.logs import make_log_file
 #    Weapon Function Imports
 from core.weapons.shortcuts import set_weapon_order
 from core.weapons.shortcuts import get_level_multikill
-from core.weapons.shortcuts import get_level_weapon
-from core.weapons.shortcuts import get_total_levels
 from core.weapons import WeaponManager
 from core.weapons import load_weapon_orders
 
@@ -57,18 +55,12 @@ from core.players.shortcuts import resetPlayers
 from core.players.shortcuts import setAttribute
 
 #    Leaders Function Imports
-from core.leaders.shortcuts import get_leader_count
-from core.leaders.shortcuts import get_leader_level
-from core.leaders.shortcuts import is_leader
 from core.leaders.shortcuts import LeaderManager
 
 #   Messaging Function Imports
 from core.messaging.shortcuts import langstring
 from core.messaging.shortcuts import loadTranslation
 from core.messaging.shortcuts import unloadTranslation
-from core.messaging.shortcuts import saytext2
-from core.messaging.shortcuts import centermsg
-from core.messaging.shortcuts import toptext
 from core.messaging.shortcuts import msg
 
 #   Event Function Imports
@@ -96,6 +88,7 @@ gg_multi_round = es.ServerVar('gg_multi_round')
 gg_multi_round_intermission = es.ServerVar('gg_multi_round_intermission')
 gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
+gg_map_obj = es.ServerVar('gg_map_obj')
 gg_player_defuser = es.ServerVar('gg_player_defuser')
 gg_warmup_round = es.ServerVar('gg_warmup_round')
 gg_warmup_round_backup = None
@@ -478,24 +471,33 @@ def player_spawn(event_var):
 
     userid = int(event_var['userid'])
 
-    # Is a spectator or dead ?
-    if es.getplayerteam(userid) < 2 or getPlayer(userid).isdead:
+    # Is a spectator?
+    if int(event_var['es_userteam']) < 2:
+        return
+
+    # Is player dead?
+    if getPlayer(userid).isdead:
         return
 
     ggPlayer = Player(userid)
 
-    # Retrieve the defuser setting
+    # Do we need to give the player a defuser?
     if int(gg_player_defuser):
-        gg_map_obj = int(es.ServerVar('gg_map_obj'))
-        # If bomb sites are enabled by gg_map_obj
-        if not gg_map_obj or gg_map_obj == 3:
-            # Check to see if this player is a CT
-            if es.getplayerteam(userid) == 3:
+
+        # Is the player a CT?
+        if int(event_var['es_userteam']) == 3:
+
+            # Are we removing bomb objectives from map?
+            if not int(gg_map_obj) in (1, 2):
+
                 # Does the map have a bombsite?
-                if len(es.createentitylist('func_bomb_target')) > 0:
-                    # Make sure the player doesn't already have a defuser
-                    if not getPlayer(userid).get('defuser'):
-                        es.server.queuecmd('es_xgive %d item_defuser' % userid)
+                if len(es.getEntityIndexes('func_bomb_target')):
+
+                    # Does the player already have a defuser?
+                    if not getPlayer(userid).defuser:
+
+                        # Give the player a defuser:
+                        getPlayer(userid).defuser = 1
 
     # Strip bots (sometimes they keep previous weapons)
     if es.isbot(userid):
@@ -506,8 +508,6 @@ def player_spawn(event_var):
     else:
         # Reset AFK
         gamethread.delayed(0.60, ggPlayer.afk.reset)
-
-        send_level_info_hudhint(ggPlayer)
 
         # Give the player their weapon
         gamethread.delayed(0.05, give_weapon_check, (userid))
@@ -607,10 +607,6 @@ def player_death(event_var):
 
     # Increment their current multikill value
     else:
-        # Message the attacker
-        multiKill = get_level_multikill(ggAttacker.level)
-        ggAttacker.hudhint('MultikillNotification',
-                           {'kills': ggAttacker.multikill, 'total': multiKill})
 
         # Play the multikill sound
         ggAttacker.playsound('multikill')
@@ -634,26 +630,9 @@ def player_team(event_var):
         Player(int(event_var['userid'])).playsound('welcome')
 
 
-def gg_levelup(event_var):
-    # Check for priority addons
-    if PriorityAddon():
-        return
-
-    attacker = int(event_var['attacker'])
-    userid = int(event_var['userid'])
-
-    # If each player exists and is not a bot, send the level info hudhint
-    if attacker and not es.isbot(attacker):
-        send_level_info_hudhint(Player(attacker))
-    if userid and not es.isbot(userid):
-        send_level_info_hudhint(Player(userid))
-
-
 def gg_win(event_var):
     # Get player info
     userid = int(event_var['winner'])
-    index = getPlayer(userid).index
-    playerName = es.getplayername(userid)
     if not es.isbot(userid):
         Player(userid).wins += 1
 
@@ -664,9 +643,6 @@ def gg_win(event_var):
         # End game
         es.server.queuecmd("es_xgive %s game_end" % userid)
         es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
-
-        # Tell the world
-        saytext2('#human', index, 'PlayerWon', {'player': playerName})
 
         # Play the winner sound
         for userid in getUseridList('#human'):
@@ -706,32 +682,9 @@ def gg_win(event_var):
         else:
             gamethread.delayed(2, EventManager().gg_start())
 
-        # Tell the world
-        saytext2('#human', index, 'PlayerWonRound', {'player': playerName})
-
         # Play the winner sound
         for userid in getUseridList('#human'):
             Player(userid).playsound('winner')
-
-    # =========================================================================
-    # ALL WINS
-    # =========================================================================
-    # Tell the world (center message)
-    centermsg('#human', 'PlayerWon_Center', {'player': playerName})
-    gamethread.delayed(1, centermsg, ('#human', 'PlayerWon_Center',
-                                                    {'player': playerName}))
-    gamethread.delayed(2, centermsg, ('#human', 'PlayerWon_Center',
-                                                    {'player': playerName}))
-    gamethread.delayed(3, centermsg, ('#human', 'PlayerWon_Center',
-                                                    {'player': playerName}))
-
-    # Toptext
-    if int(event_var['es_attackerteam']) == 2:
-        toptext('#human', 10, '#red', 'PlayerWon_Center',
-                                                    {'player': playerName})
-    else:
-        toptext('#human', 10, '#blue', 'PlayerWon_Center',
-                                                    {'player': playerName})
 
     # Update DB
     gamethread.delayed(1.5, Database().commit)
@@ -842,53 +795,13 @@ def equip_player():
     es.server.queuecmd(cmd)
 
 
-def send_level_info_hudhint(ggPlayer):
-    # Get the level, total number of levels and leader level for the
-    # hudhint
-    level = ggPlayer.level
-    totalLevels = get_total_levels()
-    leaderLevel = get_leader_level()
-
-    # Create a string for the hudhint
-    text = langstring('LevelInfo_CurrentLevel', tokens={
-                            'level': level,
-                            'total': totalLevels},
-                            userid=ggPlayer.userid)
-
-    text += langstring('LevelInfo_CurrentWeapon', tokens={
-                            'weapon': ggPlayer.weapon},
-                            userid=ggPlayer.userid)
-    multiKill = get_level_multikill(level)
-    if multiKill > 1:
-        text += langstring('LevelInfo_RequiredKills', tokens={
-                            'kills': ggPlayer.multikill,
-                            'total': get_level_multikill(level)},
-                            userid=ggPlayer.userid)
-
-    leaderTokens = {}
-    # Choose the leaderString based on the player's leadership status
-    if get_leader_count() == 0:
-        leaderString = 'LevelInfo_NoLeaders'
-    elif is_leader(ggPlayer.userid):
-        leaderString = 'LevelInfo_CurrentLeader'
-        if get_leader_count() > 1:
-            leaderString = 'LevelInfo_AmongstLeaders'
-    else:
-        leaderString = 'LevelInfo_LeaderLevel'
-        leaderTokens = {'level': leaderLevel,
-                    'total': totalLevels,
-                    'weapon': get_level_weapon(leaderLevel)}
-
-    text += langstring(leaderString,
-        tokens=leaderTokens, userid=ggPlayer.userid)
-
-    # Send the level information hudhint
-    ggPlayer.hudhint(text)
-
-
 def give_weapon_check(userid):
-    # Is a spectator or dead ?
-    if es.getplayerteam(userid) < 2 or getPlayer(userid).isdead:
+    # Is spectator?
+    if es.getplayerteam(userid) < 2:
+        return
+
+    # Is player dead?
+    if getPlayer(userid).isdead:
         return
 
     # Give the weapon

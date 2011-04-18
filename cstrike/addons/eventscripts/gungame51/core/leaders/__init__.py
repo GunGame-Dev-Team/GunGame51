@@ -16,8 +16,6 @@ import es
 
 # GunGame Imports
 from gungame51.core.events.shortcuts import EventManager
-from gungame51.core.messaging.shortcuts import saytext2
-from gungame51.core.messaging.shortcuts import msg
 
 
 # =============================================================================
@@ -158,19 +156,6 @@ class LeaderManager(object):
         # Update the current userid
         self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
 
-        # Tied leader messaging
-        leaderCount = len(self.current)
-
-        if leaderCount == 2:
-            saytext2('#human', ggPlayer.index, 'TiedLeader_Singular',
-                {'player': es.getplayername(ggPlayer.userid),
-                'level': self.leaderlevel}, False)
-        else:
-            saytext2('#human', ggPlayer.index, 'TiedLeader_Plural',
-                {'count': leaderCount,
-                'player': es.getplayername(ggPlayer.userid),
-                'level': self.leaderlevel}, False)
-
         if event:
             # Fire gg_tied_leader
             EventManager().gg_tied_leader(ggPlayer.userid)
@@ -217,11 +202,6 @@ class LeaderManager(object):
         # Update the current userid
         self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
 
-        # Message about new leader
-        saytext2('#human', ggPlayer.index, 'NewLeader',
-            {'player': es.getplayername(ggPlayer.userid),
-            'level': self.leaderlevel}, False)
-
         if not event:
             return
 
@@ -243,41 +223,11 @@ class LeaderManager(object):
 
             return
 
-        # Set up a variable for triggering a new leader message
-        newLeader = False
-
-        # See if we need to message a new leader
-        if len(self.current) == 1:
-            newLeader = True
-
         # Remove the userid
         self.__remove_userid(userid)
 
-        # Trigger new leader messaging if a single leader is found
-        if not newLeader:
-            return
-
-        from gungame51.core.players.shortcuts import Player
-
-        leaderCount = len(self.current)
-        # No new leaders?
-        if not leaderCount:
-            return
-        # One new leader?
-        elif leaderCount == 1:
-            leader = self.current[0]
-            # Message about new leader
-            saytext2('#human', Player(leader).index, 'NewLeader',
-                {'player': es.getplayername(leader),
-                'level': self.leaderlevel}, False)
-
-        # More than one leader
-        else:
-            # Message about the multiple new leaders
-            msg('#human', 'NewLeaders',
-                {'players': ", ".join(
-                    [es.getplayername(x) for x in self.current]),
-                'level': self.leaderlevel}, False)
+        # Fire the "gg_leader_disconnect" event
+        EventManager().gg_leader_disconnect(userid)
 
     def __remove_userid(self, userid):
         """Removes all relations of the userid from the LeaderManager."""

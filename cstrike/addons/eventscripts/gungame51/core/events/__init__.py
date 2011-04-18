@@ -215,6 +215,23 @@ class EventManager(object):
                  LeaderManager().leaderlevel)
         es.event('fire', 'gg_leader_lostlevel')
 
+    def gg_leader_disconnect(self, userid):
+        from gungame51.core.leaders.shortcuts import LeaderManager
+
+        # Set up leaders strings
+        new_leaders = ",".join([str(x) for x in LeaderManager().current[:]])
+        old_leaders = ",".join([str(x) for x in LeaderManager().previous[:]])
+
+        es.event('initialize', 'gg_leader_disconnect')
+        es.event('setint', 'gg_leader_disconnect', 'userid', userid)
+        es.event('setstring', 'gg_leader_disconnect', 'leaders',
+            new_leaders if new_leaders else "None")
+        es.event('setstring', 'gg_leader_disconnect', 'old_leaders',
+            old_leaders if old_leaders else "None")
+        es.event('setint', 'gg_leader_disconnect', 'leader_level',
+                 LeaderManager().leaderlevel)
+        es.event('fire', 'gg_leader_disconnect')
+
     # =========================================================================
     # >> LOAD/UNLOAD, START/END EVENTS
     # =========================================================================

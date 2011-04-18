@@ -316,7 +316,7 @@ def give_bonus(userid, sound=False, turboCheck=False):
     if len(weapons) == 1 and weapons[0] == 'knife':
 
         # Not carrying a nade?
-        if int(getPlayer(userid).get('he')) == 0:
+        if getPlayer(userid).get('he') == 0:
 
             # Pull out knife
             es.sexec(userid, 'use weapon_knife')
@@ -338,7 +338,7 @@ def give_bonus(userid, sound=False, turboCheck=False):
         ggPlayer.give(weapon, False, True)
 
     # if they are carrying an hegrenade, make them use it
-    if int(getPlayer(userid).get('he')) != 0:
+    if getPlayer(userid).get('he') != 0:
         es.sexec(userid, 'use weapon_hegrenade')
 
     # If a weapon list is being used, strip the previous weapons

@@ -250,7 +250,7 @@ def cmd_spawn_show(args=None):
 
     # If spawnpoints are currently being shown, toggle them off and stop here
     if len(propIndexes):
-        entityIndexes = es.createentitylist("prop_dynamic").keys()
+        entityIndexes = es.getEntityIndexes("prop_dynamic")
 
         for index in propIndexes:
             if propIndexes[index] in entityIndexes:
