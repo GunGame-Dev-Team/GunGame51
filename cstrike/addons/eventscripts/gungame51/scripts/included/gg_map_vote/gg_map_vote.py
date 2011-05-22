@@ -684,8 +684,8 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
 
             # Restriction list ?
             else:
-                maps_from_file = x.strip().replace('\t', ' ') for x in \
-                                                                f.readlines()
+                maps_from_file = (x.strip().replace('\t', ' ') 
+                                                    for x in f.readlines())
 
                 maps = []
                 for map in maps_from_file:
@@ -698,7 +698,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
                     if len(map) == 1:
                         maps.append(map[0])
                     # Just min
-                    else if len(map) == 2:
+                    elif len(map) == 2:
                         if not map[1].isdigit():
                             continue
 
@@ -707,7 +707,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
                         
                         maps.append(map[0])
                     # Min and max
-                    else if len(map) == 3:
+                    elif len(map) == 3:
                         if not (map[1].isdigit() and map[2].isdigit()):
                             continue
 
