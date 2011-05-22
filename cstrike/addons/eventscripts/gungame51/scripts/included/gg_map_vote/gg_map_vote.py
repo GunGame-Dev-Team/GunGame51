@@ -702,7 +702,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
                         if not map[1].isdigit():
                             continue
 
-                        if numPlayers < map[1]:
+                        if numPlayers < int(map[1]):
                             continue
                         
                         maps.append(map[0])
@@ -711,7 +711,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
                         if not (map[1].isdigit() and map[2].isdigit()):
                             continue
 
-                        if numPlayers < map[1] or numPlayers > map[2]:
+                        if numPlayers < int(map[1]) or numPlayers > int(map[2]):
                             continue
                         
                         maps.append(map[0])
