@@ -684,9 +684,9 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
 
             # Restriction list ?
             else:
-                maps_from_file = x.strip().replace('\t', ' ')
-                                    for x in f.readlines()
-                                    
+                maps_from_file = x.strip().replace('\t', ' ') for x in \
+                                                                f.readlines()
+
                 maps = []
                 for map in maps_from_file:
                     if map == "" or map.startswith("/"):
