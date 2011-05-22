@@ -684,11 +684,37 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
 
             # Restriction list ?
             else:
-                maps = [z[0] for z in [y.replace(' ' * (y.count(' ') - 1),
-                        '').split(' ') for y in [x.strip().replace('\t', ' ')
-                        for x in f.readlines()] if not (y == '' or
-                        y.startswith('/'))] if len(z) == 1 or (int(z[1]) if
-                        z[1].isdigit() else 0) <= len(getUseridList('#all'))]
+                maps_from_file = x.strip().replace('\t', ' ')
+                                    for x in f.readlines()
+                                    
+                maps = []
+                for map in maps_from_file:
+                    if map == "" or map.startswith("/"):
+                        continue
+                    map = map.replace('  ', ' ').split(' ')
+                    
+                    numPlayers = len(getUseridList('#all'))
+                    # No min or max
+                    if len(map) == 1:
+                        maps.append(map[0])
+                    # Just min
+                    else if len(map) == 2:
+                        if not map[1].isdigit():
+                            continue
+
+                        if numPlayers < map[1]:
+                            continue
+                        
+                        maps.append(map[0])
+                    # Min and max
+                    else if len(map) == 3:
+                        if not (map[1].isdigit() and map[2].isdigit()):
+                            continue
+
+                        if numPlayers < map[1] or numPlayers > map[2]:
+                            continue
+                        
+                        maps.append(map[0])
 
     # Make sure the map exists on the server, and that the capitalization is
     # correct

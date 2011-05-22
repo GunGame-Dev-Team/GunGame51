@@ -6,10 +6,10 @@
 //    =========================================================================
 //        You can use this file, or another of this format, to filter 
 //    maps for map voting (gg_map_vote) based on player count.  You can 
-//    specify a minimum amount of players that must be currently logged 
-//    in on the server before the map will display in the vote list.
-//        
-//    Format: <map name>  [minimum players]
+//    specify a minimum and maximum amount of players that must be currently
+//    logged in on the server for the map will display in the vote list.
+//
+//    Format: <map name>  [minimum players]  [maximum players]
 //
 //     >> Example:
 //    =========================================================================
@@ -23,14 +23,19 @@
 //            knas_speedcastle_css 10
 //            de_dust2 10
 //            aim_shotty
+//        
+//        If you wanted aim_shotty to only be in the vote when there are
+//          between 0 and 10 players:
+//
+//            aim_shotty 0 10
 //
 //           
 //    >> FAQ:
 //   ==========================================================================
-//        * It is not necessary to include a minimum player filter for every 
-//          map. If the number is blank, 0 is assumed and the map will always 
-//          be available. 
-//    
+//        * It is not necessary to include a minimum or maximum player filter
+//          for every map. If the number is blank, 0 is assumed and the map
+//          will always be available.
+//          
 //        * You CANNOT get this functionality from "maplist.txt" or 
 //          "mapcycle.txt"! You must copy that list into this file.
 //          
@@ -42,7 +47,7 @@
 
 de_dust2    10
 cs_office   6
-de_train
+de_train    0   10
 cs_italy
 cs_militia
 cs_havana   6
