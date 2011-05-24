@@ -683,7 +683,7 @@ class BasePlayer(object):
 
         # Format the stripWeapons list for all names to start with "weapon_"
         stripWeapons = [w if w.startswith("weapon_") else \
-            "weapon_%s" %w for w in stripWeapons]
+            "weapon_%s" % w for w in stripWeapons]
 
         # Insure that the player owns the weapons by using 2 sets intersection
         remWeapons = set(stripWeapons).intersection(

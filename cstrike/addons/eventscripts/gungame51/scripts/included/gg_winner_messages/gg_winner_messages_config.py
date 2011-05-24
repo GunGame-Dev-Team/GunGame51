@@ -35,7 +35,8 @@ def load():
     config.text('>> WINNER MESSAGES')
     config.text('=' * 76)
     config.text('Description:')
-    config.text('   Sends messages to player when someone wins a round/match.')
+    config.text('   Sends messages to players when ' +
+        'someone wins a round/match.')
     config.text('Options:')
     config.text('   0 = (Disabled) Do not load gg_winner_messages.')
     config.text('   1 = (Enabled) Load gg_winner_messages.')

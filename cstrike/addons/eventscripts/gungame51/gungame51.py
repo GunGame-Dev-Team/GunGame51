@@ -820,4 +820,4 @@ def give_weapon_check(userid):
 # Hopefully temporary code to allow es_fire commands
 # All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
 def disable_auto_kick(userid):
-   es.server.mp_disable_autokick(userid)
+    es.server.mp_disable_autokick(userid)

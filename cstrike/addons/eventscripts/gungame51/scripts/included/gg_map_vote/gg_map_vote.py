@@ -80,7 +80,7 @@ eventscripts_maphandler_backup = int(eventscripts_maphandler)
 eventscripts_maphandler.set(1)
 
 # Player command backup var
-player_command_backup = '%s' % gg_map_vote_player_command
+player_command_backup = str(gg_map_vote_player_command)
 
 # Dictionary to store the location of the source of the map files
 dict_mapListSource = {1: get_game_dir('mapcycle.txt'),
@@ -155,12 +155,9 @@ def load():
 
 def unload():
     # Unregister player command ?
-    if int(es.exists('saycommand', '%s' % gg_map_vote_player_command)):
-        es.unregsaycmd('%s' % gg_map_vote_player_command)
-    if int(es.exists('saycommand', '%s' % gg_map_vote_rtv_command)):
-        unregisterSayCommand(str(gg_map_vote_rtv_command))
-    if int(es.exists('saycommand', '%s' % gg_map_vote_nominate_command)):
-        unregisterSayCommand(str(gg_map_vote_nominate_command))
+    unregisterSayCommand(str(gg_map_vote_player_command))
+    unregisterSayCommand(str(gg_map_vote_rtv_command))
+    unregisterSayCommand(str(gg_map_vote_nominate_command))
 
     eventscripts_maphandler.set(eventscripts_maphandler_backup)
 
@@ -234,7 +231,7 @@ def gg_levelup(event_var):
 
     # Use 3rd party voting system ?
     if int(gg_map_vote) > 1:
-        es.server.queuecmd('%s' % gg_map_vote_command)
+        es.server.queuecmd(str(gg_map_vote_command))
         return
 
     voteStart()
@@ -664,7 +661,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
     # Check to make sure the value of "gg_map_vote" is 1-4
     if int(gg_map_vote_list_source) not in range(1, 5):
         raise ValueError('"gg_map_vote_list_source" must be 1-4: current ' +
-            'value "%s"' % int(gg_map_vote))
+            'value "%s"' % gg_map_vote)
 
     # Get the map files to check through later to make sure our capitalization
     # is correct and that all the files exist
@@ -684,7 +681,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
 
             # Restriction list ?
             else:
-                maps_from_file = (x.strip().replace('\t', ' ') 
+                maps_from_file = (x.strip().replace('\t', ' ')
                                                     for x in f.readlines())
 
                 maps = []
@@ -692,7 +689,7 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
                     if map == "" or map.startswith("/"):
                         continue
                     map = map.replace('  ', ' ').split(' ')
-                    
+
                     numPlayers = len(getUseridList('#all'))
                     # No min or max
                     if len(map) == 1:
@@ -704,16 +701,17 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
 
                         if numPlayers < int(map[1]):
                             continue
-                        
+
                         maps.append(map[0])
                     # Min and max
                     elif len(map) == 3:
                         if not (map[1].isdigit() and map[2].isdigit()):
                             continue
 
-                        if numPlayers < int(map[1]) or numPlayers > int(map[2]):
+                        if (numPlayers < int(map[1]) or
+                          numPlayers > int(map[2])):
                             continue
-                        
+
                         maps.append(map[0])
 
     # Make sure the map exists on the server, and that the capitalization is
@@ -775,33 +773,36 @@ def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
 def registerPlayerCmd():
     global player_command_backup
 
+    # Get the current value
+    gg_map_vote_player_command_current = str(gg_map_vote_player_command)
+
     # Is blank/disabled ?
-    if gg_map_vote_player_command in ['', '0']:
+    if gg_map_vote_player_command_current in ['', '0']:
         return
 
     # New command ?
-    if gg_map_vote_player_command != player_command_backup:
+    if gg_map_vote_player_command_current != player_command_backup:
 
-        # Does the new command allready exist?
-        if int(es.exists('saycommand', gg_map_vote_player_command)):
+        # Does the new command already exist?
+        if int(es.exists('saycommand', gg_map_vote_player_command_current)):
 
             # Send error and stop
             raise ValueError('(%s) ' % gg_map_vote_player_command +
                         'is allready a registered command!')
 
         # Does the old command exist?
-        if int(es.exists('saycommand', gg_map_vote_player_command)):
+        if int(es.exists('saycommand', player_command_backup)):
 
             # Unregister old command
-            es.unregsaycmd(player_command_backup)
+            unregisterSayCommand(player_command_backup)
 
     # Command was allready loaded ?
-    if int(es.exists('saycommand', gg_map_vote_player_command)):
+    if int(es.exists('saycommand', gg_map_vote_player_command_current)):
         return
 
     # Register new command
-    es.regsaycmd(gg_map_vote_player_command, voteSendcmd, 'Allows ' +
-                     'players to vote for the next map. (gg_map_vote)')
+    registerSayCommand(gg_map_vote_player_command_current, voteSendcmd,
+                    'Allows players to vote for the next map. (gg_map_vote)')
 
     # Backup command
-    player_command_backup = '%s' % gg_map_vote_player_command
+    player_command_backup = str(gg_map_vote_player_command)

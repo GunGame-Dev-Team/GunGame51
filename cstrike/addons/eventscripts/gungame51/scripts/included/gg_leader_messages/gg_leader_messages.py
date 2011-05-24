@@ -63,28 +63,47 @@ def gg_new_leader(event_var):
 
 
 def gg_tied_leader(event_var):
-    leaders = event_var['leaders'].split(',')
-    if len(leaders) == 2:
+    # Get the number of current leaders
+    leaders = len(event_var['leaders'].split(','))
+
+    # Are there only 2 leaders now?
+    if leaders == 2:
+
+        # Send message that the player just tied the other leader
         saytext2('#human', event_var['es_userindex'], 'TiedLeader_Singular',
             {'player': event_var['es_username'],
             'level': event_var['leader_level']})
+
+    # Do we have a tie of 3 or more players?
     else:
+
+        # Send message that the player just tied the other leaders
         saytext2('#human', event_var['es_userindex'], 'TiedLeader_Plural',
-            {'count': len(leaders),
+            {'count': leaders,
             'player': event_var['es_username'],
             'level': event_var['leader_level']})
 
 
 def gg_leader_disconnect(event_var):
+    # Are there any current leaders?
     if event_var['leaders'] == "None":
         return
 
+    # Get the userids of each of the current leaders in a list
     leaders = [int(x) for x in event_var['leaders'].split(',')]
+
+    # Is there only 1 leader?
     if len(leaders) == 1:
+
+        # Send message about our new leader
         saytext2('#human', getPlayer(leaders[0]).index, 'NewLeader',
             {'player': es.getplayername(leaders[0]),
             'level': event_var['leader_level']})
+
+    # Are there multiple leaders currently?
     else:
+
+        # Send message about all our current leaders
         msg('#human', 'NewLeaders',
             {'players': ', '.join([es.getplayername(x) for x in leaders]),
             'level': event_var['leader_level']})

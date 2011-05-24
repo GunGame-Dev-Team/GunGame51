@@ -99,7 +99,7 @@ def loadSpawnFile(mapName):
     pointsLoaded = False
 
     # Get spawnpoint file
-    spawnFile = ('%s' % str(es_gamedir).replace('\\', '/') +
+    spawnFile = (str(es_gamedir).replace('\\', '/') +
                  '/cfg/gungame51/spawnpoints/%s.txt' % mapName)
 
     # Does the file exist?

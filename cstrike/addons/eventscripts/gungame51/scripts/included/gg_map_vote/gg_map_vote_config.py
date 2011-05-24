@@ -308,7 +308,7 @@ def load():
     config.text('')
     config.text('')
     config.text('+' * 76)
-    config.text('|' + ' ' * 28 + 'NOMINATION SETTINGS' + ' ' * 29 + '|')
+    config.text('|' + ' ' * 28 + 'NOMINATION SETTINGS' + ' ' * 27 + '|')
     config.text('+' * 76)
     config.text('')
 

@@ -63,7 +63,7 @@ def es_map_start(event_var):
     currentFile = get_weapon_order().file
 
     # Remove the current weapon order's file name
-    files.remove('%s' % currentFile)
+    files.remove(str(currentFile))
 
     # Do not choose from excluded weapon orders
     for excluded_file in str(gg_weapon_order_random_excluded).split(","):
