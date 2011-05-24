@@ -681,38 +681,21 @@ class BasePlayer(object):
         # Get the player's current held weapons
         playerWeapons = spe.getWeaponDict(self.userid)
 
+        # Format the stripWeapons list for all names to start with "weapon_"
+        stripWeapons = [w if w.startswith("weapon_") else \
+            "weapon_%s" %w for w in stripWeapons]
+
+        # Insure that the player owns the weapons by using 2 sets intersection
+        remWeapons = set(stripWeapons).intersection(
+            set(playerWeapons.keys())).difference(set(["weapon_knife"]))
+
         # Loop through any weapons to strip
-        for stripWeapon in stripWeapons:
-            weapToStrip = None
-            stripWeapon = "weapon_%s" % stripWeapon
+        for stripWeapon in remWeapons:
+            # Drop the weapon
+            spe.dropWeapon(self.userid, stripWeapon)
 
-            # If the player does not own the weapon, stop here
-            if not stripWeapon in playerWeapons:
-                continue
-
-            # If the weapon to strip is primary or secondary, set it up to be
-            # stripped
-            if stripWeapon in list_pWeapons or stripWeapon in list_sWeapons:
-                weapToStrip = stripWeapon
-
-            # If stripWeapon is a grenade, and the player is has it,
-            # set it up to be stripped
-            elif stripWeapon == "weapon_hegrenade" and \
-                                        "weapon_hegrenade" in playerWeapons:
-                weapToStrip = stripWeapon
-            elif stripWeapon == "weapon_flashbang" and \
-                                                getPlayer(self.userid).getFB():
-                weapToStrip = stripWeapon
-            elif stripWeapon == "weapon_smokegrenade" and \
-                                        "weapon_smokegrenade" in playerWeapons:
-                weapToStrip = stripWeapon
-
-            # Did we find a weapon to strip ?
-            if weapToStrip:
-                # Drop and remove the weapon
-                spe.dropWeapon(self.userid, weapToStrip)
-                spe.removeEntityByInstance(playerWeapons
-                                                    [weapToStrip]["instance"])
+            # Remove the weapon
+            spe.removeEntityByInstance(playerWeapons[stripWeapon]["instance"])
 
     # =========================================================================
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS

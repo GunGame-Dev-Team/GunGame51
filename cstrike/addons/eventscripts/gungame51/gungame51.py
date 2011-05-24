@@ -208,6 +208,11 @@ def load():
     tags.add('gungame')
     sv_tags.set(','.join(tags))
 
+    # Hopefully temporary code to allow es_fire commands
+    # All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
+    for userid in es.getUseridList():
+        disable_auto_kick(userid)
+
 
 def unload():
     # Remove gungame from sv_tags
@@ -752,6 +757,10 @@ def player_activate(event_var):
     # Is player returning and in the lead?
     LeaderManager().check(Player(userid))
 
+    # Hopefully temporary code to allow es_fire commands
+    # All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
+    disable_auto_kick(userid)
+
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
@@ -806,3 +815,9 @@ def give_weapon_check(userid):
 
     # Give the weapon
     Player(userid).give_weapon()
+
+
+# Hopefully temporary code to allow es_fire commands
+# All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
+def disable_auto_kick(userid):
+   es.server.mp_disable_autokick(userid)
