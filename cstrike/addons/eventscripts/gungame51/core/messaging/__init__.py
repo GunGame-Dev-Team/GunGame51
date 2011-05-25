@@ -195,7 +195,8 @@ class MessageManager(object):
 
         # Format it
         string = string.replace('#lightgreen', '\3').replace('#green',
-            '\4').replace('#default', '\1').replace('#darkgreen', '\5')
+            '\4').replace('#default', '\1').replace('#darkgreen',
+            '\5').replace('"', "'")
 
         '''
         # Not sure what this does, so I will leave it commented out for now:
