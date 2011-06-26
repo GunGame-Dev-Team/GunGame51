@@ -73,7 +73,7 @@ def load():
     config.text('Description:')
     config.text('   gg_handicap will only process a handicap level for the ' +
                 'first time')
-    config.text('   a player joins the server.  This prevents players from ' +
+    config.text('   a player joins a team.  This prevents players from ' +
                 'abusing the')
     config.text('   handicap system. (reconnecting to level up)')
     config.text('Notes:')
@@ -103,6 +103,23 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
                 'players\' levels using handicap.')
+
+    # Legacy Mode
+    config.text('')
+    config.text('=' * 76)
+    config.text('>> LEGACY MODE')
+    config.text('=' * 76)
+    config.text('Description:')
+    config.text('   This enables the old method of handicap adjustment, ' +
+                'which is')
+    config.text('   based on when a player joins the server. Instead of the ' +
+                'new method,')
+    config.text('   which is when the player joins a team for the first time.')
+    config.text('Options:')
+    config.text('   0 = (Disabled)')
+    config.text('   1 = (Enabled)')
+    config.text('Default Value: 0')
+    config.cvar('gg_handicap_legacy_mode', 0, 'Legacy mode').addFlag('notify')
 
     config.write()
     es.dbgmsg(0, '\tgg_handicap.cfg')

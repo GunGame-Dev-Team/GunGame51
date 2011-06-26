@@ -62,7 +62,7 @@ gg_map_vote_dont_show_last_maps = es.ServerVar(
 gg_map_vote_show_player_vote = es.ServerVar('gg_map_vote_show_player_vote')
 gg_map_vote_file = es.ServerVar('gg_map_vote_file')
 gg_map_vote_list_source = es.ServerVar('gg_map_vote_list_source')
-gg_map_vote_player_command = es.ServerVar('gg_map_player_command')
+gg_map_vote_player_command = es.ServerVar('gg_map_vote_player_command')
 gg_map_vote_after_death = es.ServerVar('gg_map_vote_after_death')
 
 gg_map_vote_rtv = es.ServerVar('gg_map_vote_rtv')
@@ -137,10 +137,11 @@ def load():
         registerPlayerCmd()
 
         # Register RTV and nomination commands
-        registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, '' +
-                                                            'RTV command.')
-        registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
-                                                        'Nominate command.')
+        if int(gg_map_vote_rtv):
+            registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, '' +
+                                                                'RTV command.')
+            registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
+                                                           'Nominate command.')
 
         # Store the current map in the list of recently played maps
         if int(gg_map_vote_dont_show_last_maps):
@@ -154,7 +155,7 @@ def load():
 
 
 def unload():
-    # Unregister player command ?
+    # Unregister say commands
     unregisterSayCommand(str(gg_map_vote_player_command))
     unregisterSayCommand(str(gg_map_vote_rtv_command))
     unregisterSayCommand(str(gg_map_vote_nominate_command))
@@ -171,19 +172,32 @@ def unload():
 #  GAME EVENTS
 # =============================================================================
 def server_cvar(event_var):
-    cvarName = event_var['cvarname']
+    cvar_name = event_var['cvarname']
+    cvar_value = event_var['cvarvalue']
 
     # If the weapon order changed, get the new rtv_DisableLevel
-    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
+    if cvar_name in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
         global rtv_DisableLevel
         rtv_DisableLevel = (get_total_levels() *
             gg_map_vote_rtv_levels_required / 100)
+
+    # Register RTV commmands?
+    if cvar_name == 'gg_map_vote_rtv':
+        # Register RTV and nomination commands
+        if int(cvar_value): 
+            registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, '' +
+                                                                'RTV command.')
+            registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
+                                                           'Nominate command.')
+        # Unregister RTV and nomination commands        
+        else:
+            unregisterSayCommand(str(gg_map_vote_rtv_command))
+            unregisterSayCommand(str(gg_map_vote_nominate_command))            
 
 
 def gg_win(event_var):
     if winningMap:
         es.set('nextlevel', winningMap)
-
 
 def es_map_start(event_var):
     global voteHasStarted
@@ -559,20 +573,33 @@ def set_nextmap(mapName):
 
 
 def voteSendcmd():
-    # Is map vote running ?
-    if not popuplib.exists('gg_map_vote'):
+    # If the map vote isn't running, then stop here
+    ggRepeat = repeat.find('gg_map_vote')
+    if not ggRepeat:
+        return
+
+    # Make sure the popup exists
+    if not ggVote:
         return
 
     userid = es.getcmduserid()
 
+    # Make sure the player is eligable to vote
     if userid not in voteUserids:
         return
 
+    
+    # Make sure the player has not recently used the cmd (prevent spam)
     if userid in voteCmdUserids:
         return
 
+    # Add userid to list of cmd ussage
     voteCmdUserids.append(userid)
+    
+    # Remove from list in 3 seconds
     gamethread.delayed(3, voteCmdUserids.remove, userid)
+    
+    # Send the menu to the player
     ggVote.send(userid)
 
 

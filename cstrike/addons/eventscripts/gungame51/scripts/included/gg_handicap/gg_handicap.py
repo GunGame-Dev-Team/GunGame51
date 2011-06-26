@@ -6,6 +6,7 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
+
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
@@ -20,6 +21,7 @@ from gungame51.core.players.shortcuts import Player
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.players.shortcuts import setAttribute
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -30,6 +32,7 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_handicap']
 
+
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
@@ -37,8 +40,10 @@ gg_handicap_update = es.ServerVar('gg_handicap_update')
 gg_handicap_max = es.ServerVar('gg_handicap_max')
 gg_handicap = es.ServerVar('gg_handicap')
 gg_handicap_no_reconnect = es.ServerVar('gg_handicap_no_reconnect')
-eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
+gg_handicap_legacy_mode = es.ServerVar('gg_handicap_legacy_mode')
 
+# Players that have joined a team this map [<joined a team?>, <reconnecting?>]
+handicap_players = {}
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -49,7 +54,6 @@ def load():
 
     # Load message
     es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     # Delete the repeat loop
@@ -63,27 +67,85 @@ def unload():
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
+def es_map_start(event_var):
+    # Delete all player information since we are starting a new map
+    handicap_players.clear() 
+
 def player_activate(event_var):
     userid = int(event_var['userid'])
 
-    # Get the player
-    ggPlayer = Player(userid)
+    # Is the player new to the map?
+    if userid not in handicap_players:
+        handicap_players[userid] = [False, False]
 
-    # Check for rejoining players ?
-    if int(gg_handicap_no_reconnect):
+    # Player must have reconnected
+    else:
+        handicap_players[userid][1] = True
+        
+    # For legacy mode, delegate work to helper function
+    handicap(userid, True)         
+                
+def player_team(event_var):
+    # Ignore everything but T/CT
+    if int(event_var['team']) not in (2,3):
+        return
 
-        # Is the player joining this map for the first time?
-        if not hasattr(ggPlayer, 'current_map'):
-            setAttribute(userid, 'current_map', str(eventscripts_currentmap))
+    userid = int(event_var['userid'])
 
-        # Player's current_map attr needs updated?
-        elif ggPlayer.current_map != str(eventscripts_currentmap):
-            ggPlayer.current_map = str(eventscripts_currentmap)
+    # Delegate work to helper function
+    handicap(userid, False)
 
-        # If the player's attr matches the current map, then the player has
-        # rejoined during the same map.  No new weapon is given!
+def round_start(event_var):
+    # Start loop
+    loopStart()
+
+def gg_win(event_var):
+    # Stop loop
+    loopStop()
+
+
+# =============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# =============================================================================
+def handicap(userid, from_player_activate):    
+    # Did the request come from player_activate? (for legacy mode only)
+    if from_player_activate:
+        
+        # Use legacy mode?
+        if int(gg_handicap_legacy_mode):      
+            
+            # Disallow reconnecting players?
+            if int(gg_handicap_no_reconnect) and handicap_players[userid][1]:
+                return
+                
+        # Stop here if we are not using legacy mode
         else:
             return
+    
+    # This must be a bot, they get goofy sometimes
+    if userid not in handicap_players:
+        handicap_players[userid] = [False, False]
+
+    # Has the player joined a team this map?
+    elif handicap_players[userid][0]:
+        
+        # Reconnecting player?
+        if handicap_players[userid][1]:
+            
+            # Stop here if no reconnections allowed
+            if int(gg_handicap_no_reconnect):
+                return
+                
+            # Set the player's reconnecting status to no, so they don't get
+            # a new weapon while switching teams
+            handicap_players[userid][1] = False
+                
+        # Stop here, player isn't reconnecting
+        else:
+            return           
+
+    # Get the player
+    ggPlayer = Player(userid)                    
 
     # Get the level of the lowest level player other than himself?
     if gg_handicap == 1:
@@ -103,21 +165,10 @@ def player_activate(event_var):
 
         # Tell the player that their level was adjusted
         ggPlayer.msg('LevelLowest', {'level': handicapLevel}, prefix=True)
+        
+    # Record the player joined a team this map
+    handicap_players[userid][0] = True
 
-
-def round_start(event_var):
-    # Start loop
-    loopStart()
-
-
-def gg_win(event_var):
-    # Stop loop
-    loopStop()
-
-
-# =============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# =============================================================================
 def loopStart():
     myRepeat = repeat.find('gungameHandicapLoop')
     status = repeat.status('gungameHandicapLoop')
@@ -150,13 +201,11 @@ def loopStart():
         # Start loop
         myRepeat.start(int(gg_handicap_update), 0)
 
-
 def loopStop():
     # Loop running ?
     if repeat.status('gungameHandicapLoop'):
         # Stop loop
         repeat.stop('gungameHandicapLoop')
-
 
 def handicapUpdate():
     # Get the handicap level
@@ -177,7 +226,6 @@ def handicapUpdate():
 
             # Play the update sound
             ggPlayer.playsound('handicap')
-
 
 def getLowestLevelUsers():
     lowestLevel = get_leader_level()
@@ -203,7 +251,6 @@ def getLowestLevelUsers():
             userList.append(userid)
 
     return userList
-
 
 def getLevelAboveLowest():
     levels = []
@@ -232,7 +279,6 @@ def getLevelAboveLowest():
     levels.sort()
     return levels[1]
 
-
 def getLevelAboveUser(uid):
     levels = []
 
@@ -259,7 +305,6 @@ def getLevelAboveUser(uid):
     # Sort levels, and return the level above lowest
     levels.sort()
     return levels[0]
-
 
 def getAverageLevel(uid):
     # Everyone on level 1?
