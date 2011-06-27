@@ -572,7 +572,7 @@ def set_nextmap(mapName):
         es.server.queuecmd('sm_nextmap %s' % mapName)
 
 
-def voteSendcmd():
+def voteSendcmd(userid, args):
     # If the map vote isn't running, then stop here
     ggRepeat = repeat.find('gg_map_vote')
     if not ggRepeat:
@@ -582,12 +582,9 @@ def voteSendcmd():
     if not ggVote:
         return
 
-    userid = es.getcmduserid()
-
     # Make sure the player is eligable to vote
     if userid not in voteUserids:
         return
-
     
     # Make sure the player has not recently used the cmd (prevent spam)
     if userid in voteCmdUserids:
