@@ -262,9 +262,20 @@ def player_death(event_var):
 
     userid = int(event_var['userid'])
 
+    # Has the player already voted?
+    if userid in voteUserids:
+        return
+
     # Is map vote running ?
-    if popuplib.exists('gg_map_vote'):
-        ggVote.send(userid)
+    if not popuplib.exists('gg_map_vote'):
+        return
+
+    # Is the map vote currently in the player's queue
+    if popuplib.isqueued('gg_map_vote', userid):
+        return
+
+    # Send the map vote to the player
+    ggVote.send(userid)
 
 
 def player_disconnect(event_var):
