@@ -252,6 +252,14 @@ def gg_levelup(event_var):
 
 
 def player_death(event_var):
+    # Is the player a bot?
+    if event_var['es_steamid'] == 'BOT':
+        return
+
+    # Is map vote running?
+    if ggVote is None:
+        return
+
     # Using 3rd party voting system ?
     if int(gg_map_vote) > 1:
         return
@@ -262,17 +270,16 @@ def player_death(event_var):
 
     userid = int(event_var['userid'])
 
-    # Has the player already voted?
-    if userid in voteUserids:
-        return
-
-    # Is map vote running ?
-    if not popuplib.exists('gg_map_vote'):
-        return
-
     # Is the map vote currently in the player's queue
     if popuplib.isqueued('gg_map_vote', userid):
         return
+
+    # Has the player already voted?
+    if userid in voteSentUserids:
+        return
+
+    # Add the userid to voteSentUserids
+    voteSentUserids.extend(userid)
 
     # Send the map vote to the player
     ggVote.send(userid)
