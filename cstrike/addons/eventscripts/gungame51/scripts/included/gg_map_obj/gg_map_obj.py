@@ -34,9 +34,6 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 # 3 = Hostage objectives disabled.
 gg_map_obj = es.ServerVar('gg_map_obj')
 
-# Get the es.ServerVar() instance of "gg_player_defuser"
-gg_player_defuser = es.ServerVar('gg_player_defuser')
-
 
 # =============================================================================
 # >> LOAD & UNLOAD

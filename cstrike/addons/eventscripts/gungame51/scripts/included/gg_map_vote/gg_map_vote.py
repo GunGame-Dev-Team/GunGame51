@@ -93,6 +93,9 @@ dict_mapListSource = {1: get_game_dir('mapcycle.txt'),
 # List to store the maps previously voted for "gg_map_vote_dont_show_last_maps"
 list_lastMaps = []
 
+# Store the players that have already voted
+votedUserids = set()
+
 # Holds options and the userids that voted for them
 mapVoteOptions = {}
 
@@ -183,21 +186,23 @@ def server_cvar(event_var):
 
     # Register RTV commmands?
     if cvar_name == 'gg_map_vote_rtv':
+
         # Register RTV and nomination commands
-        if int(cvar_value): 
+        if int(cvar_value):
             registerSayCommand(str(gg_map_vote_rtv_command), rtv_cmd, '' +
                                                                 'RTV command.')
             registerSayCommand(str(gg_map_vote_nominate_command), nominate_cmd,
                                                            'Nominate command.')
-        # Unregister RTV and nomination commands        
+        # Unregister RTV and nomination commands
         else:
             unregisterSayCommand(str(gg_map_vote_rtv_command))
-            unregisterSayCommand(str(gg_map_vote_nominate_command))            
+            unregisterSayCommand(str(gg_map_vote_nominate_command))
 
 
 def gg_win(event_var):
     if winningMap:
         es.set('nextlevel', winningMap)
+
 
 def es_map_start(event_var):
     global voteHasStarted
@@ -275,11 +280,8 @@ def player_death(event_var):
         return
 
     # Has the player already voted?
-    if userid in voteSentUserids:
+    if userid in votedUserids:
         return
-
-    # Add the userid to voteSentUserids
-    voteSentUserids.extend(userid)
 
     # Send the map vote to the player
     ggVote.send(userid)
@@ -463,6 +465,7 @@ def cleanVote():
 
 
 def voteSubmit(userid, choice, popupname):
+    votedUserids.add(userid)
     # Is a revote ?
     for option in mapVoteOptions.keys():
         if userid in mapVoteOptions[option]:
@@ -603,17 +606,17 @@ def voteSendcmd(userid, args):
     # Make sure the player is eligable to vote
     if userid not in voteUserids:
         return
-    
+
     # Make sure the player has not recently used the cmd (prevent spam)
     if userid in voteCmdUserids:
         return
 
     # Add userid to list of cmd ussage
     voteCmdUserids.append(userid)
-    
+
     # Remove from list in 3 seconds
     gamethread.delayed(3, voteCmdUserids.remove, userid)
-    
+
     # Send the menu to the player
     ggVote.send(userid)
 

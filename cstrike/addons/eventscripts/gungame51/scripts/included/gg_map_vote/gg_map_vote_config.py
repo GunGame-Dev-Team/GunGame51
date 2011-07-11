@@ -173,7 +173,7 @@ def load():
     config.text('Options:')
     config.text('   1 = mapcycle.txt')
     config.text('   2 = maplist.txt')
-    config.text('   3 = "gg_map_list_file" variable')
+    config.text('   3 = "gg_map_vote_file" variable')
     config.text('   4 = All maps in the "maps" folder')
     config.text('Default Value: 1')
     config.cvar('gg_map_vote_list_source', 1,

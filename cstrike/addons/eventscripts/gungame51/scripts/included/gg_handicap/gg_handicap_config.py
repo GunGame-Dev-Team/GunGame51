@@ -83,7 +83,7 @@ def load():
     config.text('   0 = (Disabled)')
     config.text('   1 = (Enabled)')
     config.text('Default Value: 0')
-    config.cvar('gg_handicap_no_reconnect', 0, 'Prevents abuse from reconne ' +
+    config.cvar('gg_handicap_no_reconnect', 0, 'Prevents abuse from reconne' +
                 'cting').addFlag('notify')
 
     # Handicap Update

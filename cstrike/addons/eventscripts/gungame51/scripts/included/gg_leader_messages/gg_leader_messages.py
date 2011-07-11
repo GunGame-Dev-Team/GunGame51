@@ -95,6 +95,10 @@ def gg_leader_disconnect(event_var):
     # Is there only 1 leader?
     if len(leaders) == 1:
 
+        # Is the player still on the server?
+        if not es.exists('userid', leaders[0]):
+            return
+
         # Send message about our new leader
         saytext2('#human', getPlayer(leaders[0]).index, 'NewLeader',
             {'player': es.getplayername(leaders[0]),
