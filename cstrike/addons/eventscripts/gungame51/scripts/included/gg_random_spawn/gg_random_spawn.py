@@ -11,6 +11,7 @@ $LastChangedDate$
 # =============================================================================
 #Python Imports
 import os
+import random
 
 # SPE Imports
 import spe
@@ -113,6 +114,9 @@ def loadSpawnFile(mapName):
 
     # Set up spawnpoints
     spawnPoints = [x.split(' ', 6) for x in fileLines]
+
+    # Randomize spawnpoints
+    random.shuffle(spawnPoints)
 
 
 def loadRandomPoints(userid):
