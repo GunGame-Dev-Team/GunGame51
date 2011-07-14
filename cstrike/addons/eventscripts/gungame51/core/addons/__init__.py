@@ -19,7 +19,8 @@ import gamethread
 # GunGame Imports
 from gungame51.core import get_game_dir
 from gungame51.core import get_file_list
-from gungame51.core.events.shortcuts import EventManager
+from gungame51.core.events import GG_Addon_Loaded
+from gungame51.core.events import GG_Addon_Unloaded
 from gungame51.core.messaging import MessageManager
 
 # =============================================================================
@@ -307,8 +308,11 @@ class AddonManager(object):
         # Updating es.AddonInfo
         gungame_info('update')
 
+        # Set up the "gg_addon_loaded" event
+        gg_addon_loaded = GG_Addon_Loaded(addon=name,
+                                          type=self.get_addon_type(name))
         # Fire the event "gg_addon_loaded"
-        EventManager().gg_addon_loaded(name, self.get_addon_type(name))
+        gg_addon_loaded.fire()
 
     def unload(self, name, unloading_gg=False):
         '''
@@ -350,8 +354,11 @@ class AddonManager(object):
         if not unloading_gg:
             gungame_info('update')
 
-        # Fire the event "gg_addon_unloaded"
-        EventManager().gg_addon_unloaded(name, self.get_addon_type(name))
+        # Set up the "gg_addon_loaded" event
+        gg_addon_unloaded = GG_Addon_Unloaded(addon=name,
+                                            type=self.get_addon_type(name))
+        # Fire the event "gg_addon_loaded"
+        gg_addon_unloaded.fire()
 
     def register_events(self, addon, name):
         '''

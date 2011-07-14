@@ -6,4 +6,4 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
-from gungame51.core.events import EventManager
+from gungame51.core.events import *

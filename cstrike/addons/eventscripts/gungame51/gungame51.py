@@ -64,7 +64,10 @@ from core.messaging.shortcuts import unloadTranslation
 from core.messaging.shortcuts import msg
 
 #   Event Function Imports
-from core.events.shortcuts import EventManager
+from core.events import ggResourceFile
+from core.events import GG_Load
+from core.events import GG_Unload
+from core.events import GG_Start
 
 #   Sound Function Imports
 from core.sound import make_downloadable
@@ -269,7 +272,7 @@ def unload():
     es.server.queuecmd('es_xfire %s func_buyzone Enable' % es.getuserid())
 
     # Fire gg_unload event
-    EventManager().gg_unload()
+    GG_Unload().fire()
 
     # Unregister !thanks command
     unregisterSayCommand('!thanks')
@@ -277,8 +280,7 @@ def unload():
 
 def initialize():
     # Load custom events
-    es.loadevents('declare',
-        'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res')
+    ggResourceFile.declare_and_load()
 
     es.dbgmsg(0, langstring("Load_Start",
         {'version': gungame_info('version')}))
@@ -328,7 +330,7 @@ def finishInitialize():
     msg('#human', 'Loaded')
 
     # Fire gg_load event
-    EventManager().gg_load()
+    GG_Load().fire()
 
     # Print load completed
     #es.dbgmsg(0, '[GunGame] %s' % ('=' * 79))
@@ -388,8 +390,7 @@ def es_map_start(event_var):
     make_downloadable()
 
     # Load custom GunGame events
-    es.loadevents('addons/eventscripts/' +
-                  'gungame51/core/events/data/es_gungame_events.res')
+    ggResourceFile.load()
 
     # Execute GunGame's autoexec.cfg
     es.delayed('1', 'exec gungame51/gg_server.cfg')
@@ -433,7 +434,7 @@ def check_priority():
     # If there is nothing in priority addons, fire event gg_start
     if not PriorityAddon():
         if firstGGStart:
-            EventManager().gg_start()
+            GG_Start().fire()
 
 
 def round_start(event_var):
@@ -692,7 +693,7 @@ def gg_win(event_var):
                 from scripts.included.gg_warmup_round import do_warmup
                 do_warmup()
         else:
-            gamethread.delayed(2, EventManager().gg_start())
+            gamethread.delayed(2, GG_Start().fire())
 
         # Play the winner sound
         for userid in getUseridList('#human'):

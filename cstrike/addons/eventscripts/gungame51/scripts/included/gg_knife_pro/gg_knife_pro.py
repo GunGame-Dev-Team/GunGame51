@@ -22,6 +22,7 @@ from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
+from gungame51.core.events import GG_Knife_Steal
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -207,15 +208,12 @@ def level_down_victim(attacker, victim):
 def fire_gg_knife_steal(attacker, victim):
     ggAttacker = Player(attacker)
 
-    # ===================
-    # Fire the event
-    # ===================
-    es.event('initialize', 'gg_knife_steal')
-    es.event('setint', 'gg_knife_steal', 'attacker', attacker)
-    es.event('setint', 'gg_knife_steal', 'attacker_level', ggAttacker.level)
-    es.event('setint', 'gg_knife_steal', 'userid_level', Player(victim).level)
-    es.event('setint', 'gg_knife_steal', 'userid', victim)
-    es.event('fire', 'gg_knife_steal')
+    # Set up the gg_knife_steal event
+    gg_knife_steal = GG_Knife_Steal(attacker=attacker, userid=victim,
+                                    attacker_level=ggAttacker.level,
+                                    userid_level=Player(victim).level)
+    # Fire the gg_knife_steal event
+    gg_knife_steal.fire()
 
     # Announce the level steal
     saytext2('#human', ggAttacker.index, 'StoleLevel',

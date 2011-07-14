@@ -32,7 +32,7 @@ from gungame51.core.addons import unload as addon_unload
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.messaging.shortcuts import msg
-from gungame51.core.events.shortcuts import EventManager
+from gungame51.core.events import GG_Start
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # =============================================================================
@@ -451,7 +451,7 @@ def prepare_game():
         PriorityAddon().remove(addedAddon)
 
     # Fire gg_start event
-    EventManager().gg_start()
+    GG_Start().fire()
 
 
 def remove_godmode():

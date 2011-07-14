@@ -24,6 +24,7 @@ from gungame51.core.players.shortcuts import setAttribute
 from gungame51.core.players.shortcuts import deleteAttribute
 from gungame51.core.messaging.shortcuts import centermsg
 from gungame51.core.messaging.shortcuts import saytext2
+from gungame51.core.events import GG_Multi_Level
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -381,11 +382,11 @@ def do_multi_level(userid):
     if spark_index:
         Player(userid).multiLevelEntities.append(spark_index)
 
-    # Fire gg_multi_level
-    es.event('initialize', 'gg_multi_level')
-    es.event('setint', 'gg_multi_level', 'userid', userid)
-    es.event('setint', 'gg_multi_level', 'leveler', userid)
-    es.event('fire', 'gg_multi_level')
+    # Set up the gg_multi_level event
+    gg_multi_level_event = GG_Multi_Level(userid=userid, leveler=userid)
+
+    # Fire the gg_multi_level event
+    gg_multi_level_event.fire()
 
 
 def remove_multi_level(userid):

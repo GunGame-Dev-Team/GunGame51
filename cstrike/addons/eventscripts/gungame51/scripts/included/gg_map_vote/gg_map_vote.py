@@ -34,7 +34,7 @@ from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.messaging.shortcuts import langstring
-from gungame51.core.events.shortcuts import EventManager
+from gungame51.core.events import GG_Vote
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.weapons.shortcuts import get_total_levels
 
@@ -656,7 +656,7 @@ def voteStart():
     voteRepeat.start(1, int(gg_map_vote_time))
 
     # Fire event
-    EventManager().gg_vote()
+    GG_Vote().fire()
 
 
 def voteCountDown():

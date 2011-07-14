@@ -32,6 +32,7 @@ except ImportError:
 
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import get_level_weapon
+from gungame51.core.weapons.shortcuts import get_total_levels
 from gungame51.core import getOS
 from gungame51.core import GunGameError
 from gungame51.core.messaging import MessageManager
@@ -41,6 +42,9 @@ from gungame51.core.sql import Database
 from gungame51.core.sql.shortcuts import insert_winner
 from gungame51.core.sql.shortcuts import update_winner
 from afk import AFK
+from gungame51.core.events import GG_LevelUp
+from gungame51.core.events import GG_LevelDown
+from gungame51.core.events import GG_Win
 
 # =============================================================================
 # >> GLOBALS
@@ -49,6 +53,8 @@ list_pWeapons = getWeaponNameList('#primary')
 list_sWeapons = getWeaponNameList('#secondary')
 list_allWeapons = getWeaponNameList()
 gg_soundpack = es.ServerVar('gg_soundpack')
+gg_multi_round = es.ServerVar('gg_multi_round')
+recentWinner = False
 
 
 # =============================================================================
@@ -387,8 +393,7 @@ class BasePlayer(object):
     # >> BasePlayer() LEVELING CLASS METHODS
     # =========================================================================
     def levelup(self, levelsAwarded, victim=0, reason=''):
-        '''
-        Adds a declared number of levels to the attacker.
+        """ Adds a declared number of levels to the attacker.
 
         Arguments:
             * levelsAwarded: (required)
@@ -397,17 +402,59 @@ class BasePlayer(object):
                 The userid of the victim.
             * reason: (not required)
                 The string reason for leveling up the attacker.
-        '''
+
+        """
         # Return false if we can't level up
         if self.preventlevel or self.preventlevelup:
             return False
 
-        # Get the victim's Player() instance
-        if victim:
-            victim = Player(victim)
+        # Calculate the new level
+        newLevel = self.level + int(levelsAwarded)
 
-        # Use the EventManager to call the gg_levelup event
-        return EventManager().gg_levelup(self, levelsAwarded, victim, reason)
+        # TODO: Winner check would be good for the callback method of eventlib
+        # See if we have a winner
+        if newLevel > get_total_levels():
+            global recentWinner
+
+            # If there was a recentWinner, stop here to prevent multiple wins
+            if recentWinner:
+                return False
+
+            # Set recentWinner to True
+            recentWinner = True
+
+            # In 3 seconds, remove the recentWinner
+            gamethread.delayed(3, remove_recent_winner, ())
+
+
+            # If "gg_multi_round" is disabled
+            if not int(gg_multi_round):
+                # Set up the gg_win event
+                gg_win = GG_Win(attacker=self.userid, winner=self.userid,
+                                userid=victim, loser=victim, round=0)
+            else:
+                # If "gg_multi_round" is enabled
+                from gungame51.gungame51 import RoundInfo
+                # Set up the gg_win event
+                gg_win = GG_Win(attacker=self.userid, winner=self.userid,
+                                userid=victim, loser=victim,
+                                round=int(RoundInfo().remaining))
+            # Fire the gg_win event
+            return gg_win.fire()
+
+        # Set the new level
+        self.level = newLevel
+
+        # Reset multikill
+        self.multikill = 0
+
+        # Set up the gg_levelup event
+        gg_levelup = GG_LevelUp(attacker=self.userid, leveler=self.userid,
+                                userid=victim, old_level=self.level,
+                                new_level=newLevel, reason=reason)
+
+        # Fire the gg_levelup event
+        return gg_levelup.fire()
 
     def leveldown(self, levelsTaken, attacker=0, reason=''):
         '''
@@ -425,12 +472,25 @@ class BasePlayer(object):
         if self.preventlevel or self.preventleveldown:
             return False
 
-        # Get the attacker's Player() instance
-        if attacker:
-            attacker = Player(attacker)
+        # Make sure the attacker is an int
+        attacker = int(attacker)
 
-        # Use the EventManager to call the gg_leveldown event
-        return EventManager().gg_leveldown(self, levelsTaken, attacker, reason)
+        # Set old level and the new level
+        oldLevel = self.level
+        if (oldLevel - int(levelsTaken)) > 0:
+            self.level = oldLevel - int(levelsTaken)
+        else:
+            self.level = 1
+
+        # Reset multikill
+        self.multikill = 0
+
+        # Set up the gg_leveldown event
+        gg_leveldown = GG_LevelDown(attacker=attacker, leveler=self.userid,
+                                    userid=self.userid, old_level=oldLevel,
+                                    new_level=self.level, reason=reason)
+        # Fire the gg_leveldown event
+        return gg_leveldown.fire()
 
     # =========================================================================
     # >> BasePlayer() MESSAGING CLASS METHODS
@@ -967,4 +1027,6 @@ class Player(PlayerManager):
             # Remove the custom attribute callback
             CustomAttributeCallbacks().remove(attribute, addon)
 
-from gungame51.core.events.shortcuts import EventManager
+def remove_recent_winner():
+    global recentWinner
+    recentWinner = False

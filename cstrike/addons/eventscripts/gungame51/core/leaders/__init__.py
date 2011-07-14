@@ -15,7 +15,10 @@ $LastChangedDate$
 import es
 
 # GunGame Imports
-from gungame51.core.events.shortcuts import EventManager
+from gungame51.core.events import GG_Leader_Disconnect
+from gungame51.core.events import GG_New_Leader
+from gungame51.core.events import GG_Leader_LostLevel
+from gungame51.core.events import GG_Tied_Leader
 
 
 # =============================================================================
@@ -157,8 +160,16 @@ class LeaderManager(object):
         self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
 
         if event:
+            # Set up the gg_tied_leader event
+            new_leaders, old_leaders = self._get_leader_strings()
+
+            gg_tied_leader = GG_Tied_Leader(userid=ggPlayer.userid,
+                                            leveler=ggPlayer.userid,
+                                            leaders=new_leaders,
+                                            old_leaders=old_leaders,
+                                            leader_level=self.leaderlevel)
             # Fire gg_tied_leader
-            EventManager().gg_tied_leader(ggPlayer.userid)
+            return gg_tied_leader.fire()
 
     def lost_leader(self, ggPlayer, event=True):
         """Removes a player from the current leaders list.
@@ -181,8 +192,18 @@ class LeaderManager(object):
         self.__update_level(int(ggPlayer.userid), int(ggPlayer.level))
 
         if event:
+            # Set up the gg_leader_lostlevel event
+            new_leaders, old_leaders = self._get_leader_strings()
+
+            leaderLevel = self.leaderlevel
+
+            gg_leader_lostlevel = GG_Leader_LostLevel(userid=ggPlayer.userid,
+                                                      leveler=ggPlayer.userid,
+                                                      leaders=new_leaders,
+                                                      old_leaders=old_leaders,
+                                                      leader_level=leaderLevel)
             # Fire gg_leader_lostlevel
-            EventManager().gg_leader_lostlevel(ggPlayer.userid)
+            gg_leader_lostlevel.fire()
 
     def new_or_same_leader(self, ggPlayer, event=True):
         """Sets the current leader list as the new leader's userid.
@@ -205,8 +226,16 @@ class LeaderManager(object):
         if not event:
             return
 
+        # Set up the gg_new_leader event
+        new_leaders, old_leaders = self._get_leader_strings()
+
+        gg_new_leader = GG_New_Leader(userid=ggPlayer.userid,
+                                      leveler=ggPlayer.userid,
+                                      leaders=new_leaders,
+                                      old_leaders=old_leaders,
+                                      leader_level=self.leaderlevel)
         # Fire the "gg_new_leader" event
-        EventManager().gg_new_leader(ggPlayer.userid)
+        return gg_new_leader.fire()
 
     def disconnected_leader(self, userid):
         """Handles the disconnection of players."""
@@ -226,8 +255,17 @@ class LeaderManager(object):
         # Remove the userid
         self.__remove_userid(userid)
 
+        # Set up the gg_leader_disconnect event
+        new_leaders, old_leaders = self._get_leader_strings()
+
+        leaderLevel = self.leaderlevel
+
+        gg_leader_disconnect = GG_Leader_Disconnect(userid=userid,
+                                                    leaders=new_leaders,
+                                                    old_leaders=old_leaders,
+                                                    leader_level=leaderLevel)
         # Fire the "gg_leader_disconnect" event
-        EventManager().gg_leader_disconnect(userid)
+        return gg_leader_disconnect.fire()
 
     def __remove_userid(self, userid):
         """Removes all relations of the userid from the LeaderManager."""
@@ -250,3 +288,12 @@ class LeaderManager(object):
         del self.useridlist[:]
         del self.levellist[:]
         del self.previous[:]
+
+    def _get_leader_strings(self):
+        new_leaders = ",".join([str(x) for x in self.current[:]])
+        old_leaders = ",".join([str(x) for x in self.previous[:]])
+
+        new_leaders = new_leaders if new_leaders else "None"
+        old_leaders = old_leaders if old_leaders else "None"
+
+        return (new_leaders, old_leaders)
