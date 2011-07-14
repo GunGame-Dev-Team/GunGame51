@@ -29,7 +29,7 @@ config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
 def load():
     generate_header(config)
 
-    # gg_leaderweapon_warning
+    # Leader Weapon Warning
     config.text('')
     config.text('=' * 76)
     config.text('>> GUNGAME LEADER WEAPON WARNING')
@@ -45,6 +45,21 @@ def load():
     config.text('Default Value: 0')
     config.cvar('gg_leaderweapon_warning', 0, 'Play a sound when a player ' +
                 'reaches "hegrenade" or "knife" level.').addFlag('notify')
+
+    # Play Warning only on last leves
+    config.text('')
+    config.text('=' * 76)
+    config.text('>> WARN ONLY ON LAST LEVELS')
+    config.text('=' * 76)
+    config.text('Description:')
+    config.text('   Only play warnings on the last level of each weapon')
+    config.text('Options:')
+    config.text('   0 = (Disabled)')
+    config.text('   1 = (Enabled)')
+    config.text('Default Value: 0')
+    config.cvar('gg_leaderweapon_warning_only_last', 0,
+                'Only play a sound when a player reaches ' +
+                'the "last" hegrenade or knife level.').addFlag('notify')
 
     config.write()
     es.dbgmsg(0, '\tgg_leaderweapon_warning.cfg')

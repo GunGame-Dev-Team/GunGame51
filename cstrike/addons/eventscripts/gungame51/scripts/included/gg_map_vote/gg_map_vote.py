@@ -447,6 +447,9 @@ def cleanVote():
     # Clear options
     mapVoteOptions.clear()
 
+    # Clear voters
+    votedUserids.clear()
+
     # Delete popup ?
     if popuplib.exists('gg_map_vote'):
         popuplib.delete('gg_map_vote')

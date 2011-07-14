@@ -95,6 +95,7 @@ gg_warmup_round_backup = None
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 firstPlayerSpawned = False
+firstGGStart = False
 
 sv_tags = es.ServerVar('sv_tags')
 
@@ -362,7 +363,7 @@ def finishInitialize():
     gg_weapon_order_file.set(gg_weapon_order_file_backup)
 
     # See if we need to fire event gg_start after everything is loaded
-    gamethread.delayed(2, check_priority)
+    gamethread.delayed(2, first_gg_start)
 
 
 def unload_on_error():
@@ -423,10 +424,16 @@ def es_map_start(event_var):
     gamethread.delayed(2, check_priority)
 
 
+def first_gg_start():
+    global firstGGStart
+    firstGGStart = True
+    check_priority()
+
 def check_priority():
     # If there is nothing in priority addons, fire event gg_start
     if not PriorityAddon():
-        EventManager().gg_start()
+        if firstGGStart:
+            EventManager().gg_start()
 
 
 def round_start(event_var):
@@ -726,9 +733,12 @@ def server_cvar(event_var):
 
     if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type',
                                                     'gg_multikill_override']:
-        # For weapon order file and sort type, reset player's levels to 1
+        # For weapon order file and sort type,
+        # reset player's levels and multikills to 1
+        # and call gg_start again
         if cvarName != "gg_multikill_override":
-            setAttribute("#all", "level", 1)
+            resetPlayers()
+            check_priority()
 
         # Set the weapon order and set the weapon order type
         currentOrder = set_weapon_order(str(gg_weapon_order_file),
