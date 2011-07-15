@@ -172,4 +172,3 @@ def check_leader_warning(level):
 
         # Play the leader level sound
         Player(userid).playsound(sound)
-        Player(userid).centermsg('PLAYER ON %s LEVEL' % sound.upper())
