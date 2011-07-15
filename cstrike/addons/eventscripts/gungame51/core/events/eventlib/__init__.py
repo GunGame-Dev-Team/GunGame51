@@ -17,7 +17,7 @@ from exceptions import ESEventError
 # =============================================================================
 info = es.AddonInfo()
 info.name = "Eventlib - EventScripts python library"
-info.version = "Eventlib Draft 8"
+info.version = "Eventlib Draft 9"
 info.url = "http://www.eventscripts.com/pages/Eventlib/"
 info.basename = "eventlib"
 info.author = "XE_ManUp"

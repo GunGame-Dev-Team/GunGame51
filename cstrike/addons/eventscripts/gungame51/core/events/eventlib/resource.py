@@ -69,45 +69,53 @@ class ResourceFile(object):
             if self.path.exists():
                 return
 
-        # Create the resource file keygroup
-        res = KeyValues(name=self.name)
+        # Create the line list to write to file
+        line_list = ['"%s"\n' % self.name, '{\n']
 
         # Loop through each ESEvent instance
         for event in events:
             # Retrieve the event name
             event_name = event().get_event_name()
 
-            # Add the event to the keygroup as a keyvalue
-            res[event_name] = KeyValues(name=event_name)
+            # Retrieve the event docstring and add to the line list
+            doc = event.__doc__
+            if doc:
+                doc = ' '.join([x.strip() for x in event.__doc__.split('\n') \
+                                if x.strip()])
+            line_list.append('\t%-29s%s' % ('"%s"' % event_name,
+                             '// %s' % doc if doc else ''))
 
-            # Create a placeholder for the event description since a value is
-            # required to generate the brackets in KeyValues
-            if not event._fields:
-                res[event_name]["eventlib_fake"] = 0
-                continue
+            # Open the event
+            line_list.append('\t{')
 
-            # Retrieve ESEventVariable fields (should be the only items stored)
-            for name, field in event._fields.items():
-                # Add event variable and data key to the event
-                res[event_name][name] = field.data_key
+            # Retrieve EventFields fields and order them based on creation
+            fields = [(name, event._fields.pop(name)) for name,
+                      obj in event._fields.items()]
+            fields.sort(lambda x, y: cmp(x[1].creation_counter,
+                        y[1].creation_counter))
 
-        # Save the keygroup to disk
-        res.save(self.path)
+            # Prepare a list of field values to place on each line
+            field_list = [{'n': '"%s"' % name, 'k': '"%s"' % field.data_key,
+                           'c': '%s' % ('// %s' % (
+                           field.comment if field.comment else ''))} for name,
+                           field in fields]
 
-        # Open file to add descriptions and remove temporary values
-        self._clean_fakes()
+            # Add the event names, data keys, and comments
+            for field_dict in field_list:
+                line_list.append('\t\t%(n)-25s%(k)-25s%(c)-25s' % field_dict)
 
-        # Add comments
-        ResourceFileParser(self).add_comments(events)
+            # Close the event
+            line_list.append('\t}')
 
-    def _clean_fakes(self):
-        with open(self.path, 'r') as f:
-            lines = f.readlines()
+        # Add the closing bracket
+        line_list.append('}')
 
-        lines = [x for x in lines if not '"eventlib_fake"' in x]
+        # Clean up excess spacing and add carriage returns to each line
+        line_list = ['%s\n' % x.rstrip() for x in line_list]
 
+        # Write the lines to file
         with open(self.path, 'w') as f:
-            f.writelines(lines)
+            f.writelines(line_list)
 
     def to_dict(self):
         """Converts a resource file to a python dictionary which contains the
@@ -127,6 +135,7 @@ class ResourceFile(object):
         # Retrieve the keygroup
         res = KeyValues(filename=self.path)
 
+        # Loop through each event and retrieve its variables
         for event in res:
             return_dict[str(event)] = {}
 
@@ -148,88 +157,3 @@ class ResourceFile(object):
                                'exist!')
 
         return KeyValues(filename=self.path).keys()
-
-
-class ResourceFileParser(object):
-    def __init__(self, path_to_res):
-        self.path = str(path_to_res)
-        self.opener = '{'
-        self.closer = '}'
-        self.comment = '\t\t// '
-
-    def find_event_lines(self, event):
-        event = str(event)
-
-        with open(str(self.path), 'r') as f:
-            lines = [x.strip() for x in f.readlines()]
-
-        try:
-            for line in lines:
-                if line.startswith('"%s"' % event):
-                    break
-
-            start_index = lines.index(line)
-            if lines[start_index + 1] == self.opener:
-                for index in xrange(start_index, len(lines)):
-                    if lines[index] == self.closer:
-                        end_index = index
-                        break
-        except:
-            raise ESEventError('Unable to find event "%s" in ' % event_name +
-                               'resource file "%s"' % self.path)
-
-        return (start_index, (start_index + 2, end_index))
-
-    def add_comments(self, events):
-        for event in events:
-            event_lines = self.find_event_lines(event().get_event_name())
-            event_line = event_lines[0]
-            ev_start = event_lines[1][0]
-            ev_end = event_lines[1][1]
-
-            # Retrieve all lines in the resource file
-            with open(self.path, 'r') as f:
-                lines = f.readlines()
-
-            # Modify the lines
-            if event.__doc__:
-                # Format the docstring
-                doc = ' '.join([x.strip() for x in event.__doc__.split('\n') \
-                                if x.strip()])
-
-                # Retrieve the line
-                ln = lines[event_line]
-
-                # Make sure the line does not already have a comment
-                if not self.comment in ln:
-                    lines[event_line] = ln.replace('\n', '%s%s\n' % (
-                                                   self.comment, doc))
-
-            # Retrieve the max length of lines for aligning comments
-            if event._fields:
-                max_length = max([len(lines[index].replace('\t',
-                             '')) for index in xrange(ev_start, ev_end)])
-
-            # Loop through each event variable and add the commment
-            for name, field in event._fields.items():
-                comment = event._fields[name].comment
-                if comment:
-                    for index in xrange(ev_start, ev_end):
-                        if lines[index].strip().startswith('"%s"' % name):
-                            ln = lines[index]
-                            if self.comment in ln:
-                                break
-
-                            # Align the comments for the event variables
-                            if [len(x.strip()) % 8 for x in ln.split(
-                                '\t') if x][1]:
-                                ln = '%s\t\n' % (ln.rstrip())
-
-                            # Add the comment
-                            lines[index] = ln.replace('\n',
-                                                      '%s%s\n' % (self.comment,
-                                                      comment))
-
-            # Write the new lines to the resource file
-            with open(self.path, 'w') as f:
-                f.writelines(lines)

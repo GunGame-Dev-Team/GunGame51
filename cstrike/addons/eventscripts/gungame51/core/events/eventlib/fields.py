@@ -18,6 +18,8 @@ DATAKEYS = {'bool': int, 'byte': int, 'short': int, 'long': int,
 # CLASSES
 # =============================================================================
 class EventField(object):
+    creation_counter = 0
+
     def __init__(self, data_key=None, comment='',
                  validators=[]):
         self.validators = validators or []
@@ -32,7 +34,10 @@ class EventField(object):
         self._ftype = DATAKEYS[self.data_key]
         # Set the comment
         self.comment = str(comment)
-
+        # Increase the creation counter, and save our local copy.
+        self.creation_counter = EventField.creation_counter
+        EventField.creation_counter += 1
+        
     def run_validators(self, value):
         errors = []
         for validator in self.validators:
