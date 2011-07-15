@@ -89,7 +89,7 @@ class ResourceFile(object):
             line_list.append('\t{')
 
             # Retrieve EventFields fields and order them based on creation
-            fields = [(name, event._fields.pop(name)) for name,
+            fields = [(name, event._fields[name]) for name,
                       obj in event._fields.items()]
             fields.sort(lambda x, y: cmp(x[1].creation_counter,
                         y[1].creation_counter))
