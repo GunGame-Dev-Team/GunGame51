@@ -17,7 +17,7 @@ from exceptions import ESEventError
 # =============================================================================
 info = es.AddonInfo()
 info.name = "Eventlib - EventScripts python library"
-info.version = "Eventlib Draft 10"
+info.version = "Eventlib Draft 11"
 info.url = "http://www.eventscripts.com/pages/Eventlib/"
 info.basename = "eventlib"
 info.author = "XE_ManUp"
@@ -87,14 +87,15 @@ class EventManager(object):
         firing the event if no errors are raised. If errors are raised during
         the process, the event firing will be cancelled.
 
-        Note:
+        Notes:
             * Returns True if the event was successfully fired.
-            * Returns False if the event was cancelled.
+            * Returns False if the event was cancelled via a callback.
+            * Raises an exception if the event was not fired due to an error.
 
         """
         # Prepare the values
         field_dict = {}
-        
+
         # Loop through each event variable and set the types
         for field, ev in self._fields.items():
             try:
@@ -108,23 +109,18 @@ class EventManager(object):
 
         # Handle callbacks        
         for callback in self._callbacks:
-            try:
-                continue_event = callback(**field_dict)
-                if continue_event is None:
-                    continue
-                elif bool(continue_event) is False:
-                    return False
-            except:
-                pass
+            continue_event = callback(**field_dict)
+            if continue_event is None:
+                continue
+            elif bool(continue_event) is False:
+                return False
 
-        try:
-            # Fire the event using the EventContextManager
-            with EventContextManager(self.get_event_name()) as event:
-                for field, value in field_dict.items():
-                    # Set the event variable value
-                    event.set(field, value)
-        except:
-            return False
+        # Fire the event using the EventContextManager
+        with EventContextManager(self.get_event_name()) as event:
+            for field, value in field_dict.items():
+                # Set the event variable value
+                event.set(field, value)
+
         return True
 
     def register_prefire_callback(self, callback):
