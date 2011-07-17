@@ -17,7 +17,7 @@ from exceptions import ESEventError
 # =============================================================================
 info = es.AddonInfo()
 info.name = "Eventlib - EventScripts python library"
-info.version = "Eventlib Draft 9"
+info.version = "Eventlib Draft 10"
 info.url = "http://www.eventscripts.com/pages/Eventlib/"
 info.basename = "eventlib"
 info.author = "XE_ManUp"
@@ -92,9 +92,6 @@ class EventManager(object):
             * Returns False if the event was cancelled.
 
         """
-        # Retrieve the event name
-        event_name = self.get_event_name()
-
         # Prepare the values
         field_dict = {}
         
@@ -120,13 +117,17 @@ class EventManager(object):
             except:
                 pass
 
-        # Fire the event using the EventContextManager
-        with EventContextManager(event_name) as event:
-            for field, value in field_dict.items():
-                # Set the event variable value
-                event.set(field, value)
+        try:
+            # Fire the event using the EventContextManager
+            with EventContextManager(self.get_event_name()) as event:
+                for field, value in field_dict.items():
+                    # Set the event variable value
+                    event.set(field, value)
+        except:
+            return False
+        return True
 
-    def register_callback(self, callback):
+    def register_prefire_callback(self, callback):
         """Registers a callback to be performed just before the event fires.
 
         Notes:
@@ -138,13 +139,19 @@ class EventManager(object):
               still fire.
 
         """
-        if callable(callback):
-            self._callbacks.append(callback)
-        else:
+        # Make sure the callback is callable
+        if not callable(callback):
             raise ESEventError('Callback registration failed: %s ' % callback +
                                'is not callable.')
 
-    def unregister_callback(self, callback):
+        # Make sure we do not register the same callback twice
+        if callback in self._callbacks:
+            return
+
+        # Add the callback to the list
+        self._callbacks.append(callback)
+
+    def unregister_prefire_callback(self, callback):
         """Unregisters a callback."""
         if callback in self._callbacks:
             self._callbacks.remove(callback)
