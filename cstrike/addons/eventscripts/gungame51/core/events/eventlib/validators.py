@@ -9,6 +9,7 @@ from exceptions import ValidationError
 # CLASSES
 # =============================================================================
 class MinValueValidator(object):
+    """Validates that a value is greater than or equal to the set minimum."""
     def __init__(self, value):
         self.value = value
 
@@ -20,6 +21,7 @@ class MinValueValidator(object):
 
 
 class MaxValueValidator(object):
+    """Validates that a value is less than or equal to the set minimum."""
     def __init__(self, value):
         self.value = value
 
@@ -30,6 +32,10 @@ class MaxValueValidator(object):
 
 
 class MinLengthValidator(object):
+    """Validates that the length of a value is greater than or equal to the
+    minimum.
+
+    """
     def __init__(self, value):
         self.value = value
 
@@ -41,6 +47,10 @@ class MinLengthValidator(object):
 
 
 class MaxLengthValidator(object):
+    """Validates that the length of a value is less than or equal to the
+    minimum.
+
+    """
     def __init__(self, value):
         self.value = value
 

@@ -8,8 +8,8 @@ from validators import *
 # =============================================================================
 # GLOBAL VARIABLES/CONSTANTS
 # =============================================================================
-__all__ = ['EventField', 'IntegerField', 'BooleanField', 'ByteField',
-           'ShortField', 'LongField', 'FloatField', 'StringField', 'DATAKEYS']
+__all__ = ['EventField', 'BooleanField', 'ByteField', 'ShortField',
+           'LongField', 'FloatField', 'StringField']
 DATAKEYS = {'bool': int, 'byte': int, 'short': int, 'long': int,
             'float': float, 'string': str}
 
@@ -18,11 +18,14 @@ DATAKEYS = {'bool': int, 'byte': int, 'short': int, 'long': int,
 # CLASSES
 # =============================================================================
 class EventField(object):
+    """The parent class of all event fields."""
+    # Used to maintain order
     creation_counter = 0
 
-    def __init__(self, data_key=None, comment='',
-                 validators=[]):
+    def __init__(self, data_key=None, comment='', validators=[]):
+        # Set the validators
         self.validators = validators or []
+
         # Validate the data key
         data_key = str(data_key).lower()
         if data_key in DATAKEYS:
@@ -30,15 +33,18 @@ class EventField(object):
         else:
             raise ESEventError('Invalid data key: %s. Expected ' % data_key +
                                '%s.' % str(', ').join(DATAKEYS.keys()))
-        # Set the field type
-        self._ftype = DATAKEYS[self.data_key]
         # Set the comment
         self.comment = str(comment)
-        # Increase the creation counter, and save our local copy.
+
+        # Increase the creation counter
         self.creation_counter = EventField.creation_counter
         EventField.creation_counter += 1
-        
+
     def run_validators(self, value):
+        """Calls each validator and raises a single ValidationError for any
+        errors that occur.
+
+        """
         errors = []
         for validator in self.validators:
             try:
@@ -50,7 +56,10 @@ class EventField(object):
 
 
 class IntegerField(EventField):
-    """Byte, Short, Long"""
+    """EventField that the ByteField, ShortField, LongField, and FloatField
+    inherits which adds the min_value and max_value validators.
+
+    """
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         super(IntegerField, self).__init__(*args, **kwargs)
 
@@ -60,12 +69,13 @@ class IntegerField(EventField):
             self.validators.append(MinValueValidator(min_value))
 
     def is_valid(self, value):
+        """Returns if the value given is a valid type for this EventField."""
         return isinstance(value, int)
 
     def to_python(self, value):
-        """
-        Validates that int() can be called on the input. Returns the result
+        """Validates that int() can be called on the input. Returns the result
         of int().
+
         """
         try:
             value = int(str(value))
@@ -75,11 +85,15 @@ class IntegerField(EventField):
 
 
 class BooleanField(EventField):
+    """Event Field that validates the boolean type. This field must always be a
+    boolean value.
+
+    """
     def __init__(self, *args, **kwargs):
-        super(BooleanField, self).__init__(data_key='bool', *args,
-                                                **kwargs)
+        super(BooleanField, self).__init__(data_key='bool', *args, **kwargs)
 
     def is_valid(self, value):
+        """Returns if the value given is a valid type for this EventField."""
         if isinstance(value, bool):
             return True
         elif value in (0, 1):
@@ -88,7 +102,7 @@ class BooleanField(EventField):
             return False
 
     def to_python(self, value):
-        """Returns a Python boolean object."""
+        """Returns a Python boolean value as an integer."""
         value = bool(value)
         self.run_validators(value)
         # Coerce to int() type for the Source engine
@@ -96,18 +110,19 @@ class BooleanField(EventField):
 
 
 class ByteField(IntegerField):
+    """Event Field that validates the byte type. This field must always be an
+    integer value. Minimum value is -128. Maximum value is 127.
+
+    """
     def __init__(self, *args, **kwargs):
         validators = [MaxValueValidator(127), MinValueValidator(-128)]
-        super(ByteField, self).__init__(validators=validators,
-                                             data_key='byte', *args, **kwargs)
-
-    def is_valid(self, value):
-        return isinstance(value, int)
+        super(ByteField, self).__init__(validators=validators, data_key='byte',
+                                        *args, **kwargs)
 
     def to_python(self, value):
-        """
-        Validates that int() can be called on the input. Returns the result
+        """Validates that int() can be called on the input. Returns the result
         of int().
+
         """
         value = super(ByteField, self).to_python(value)
         self.run_validators(value)
@@ -115,19 +130,19 @@ class ByteField(IntegerField):
 
 
 class ShortField(IntegerField):
+    """Event Field that validates the short type. This field must always be an
+    integer value. Minimum value is -32768. Maximum value is 32767.
+
+    """
     def __init__(self, *args, **kwargs):
         validators = [MaxValueValidator(32767), MinValueValidator(-32768)]
         super(ShortField, self).__init__(validators=validators,
-                                              data_key='short',
-                                              *args, **kwargs)
-
-    def is_valid(self, value):
-        return isinstance(value, int)
+                                         data_key='short', *args, **kwargs)
 
     def to_python(self, value):
-        """
-        Validates that int() can be called on the input. Returns the result
+        """Validates that int() can be called on the input. Returns the result
         of int().
+
         """
         value = super(ShortField, self).to_python(value)
         self.run_validators(value)
@@ -135,20 +150,20 @@ class ShortField(IntegerField):
 
 
 class LongField(IntegerField):
+    """Event Field that validates the long type. This field must always be an
+    integer value. Minimum value is -2147483648. Maximum value is 2147483647.
+
+    """
     def __init__(self, *args, **kwargs):
         validators = [MaxValueValidator(2147483647),
                       MinValueValidator(-2147483648)]
-        super(LongField, self).__init__(validators=validators,
-                                              data_key='long',
-                                              *args, **kwargs)
-
-    def is_valid(self, value):
-        return isinstance(value, int)
+        super(LongField, self).__init__(validators=validators, data_key='long',
+                                        *args, **kwargs)
 
     def to_python(self, value):
-        """
-        Validates that int() can be called on the input. Returns the result
+        """Validates that int() can be called on the input. Returns the result
         of int().
+
         """
         value = super(LongField, self).to_python(value)
         self.run_validators(value)
@@ -156,17 +171,21 @@ class LongField(IntegerField):
 
 
 class FloatField(IntegerField):
+    """Event Field that validates the float type. This field must always be an
+    float value.
+
+    """
     def __init__(self, *args, **kwargs):
-        super(FloatField, self).__init__(data_key='float', *args,
-                                              **kwargs)
+        super(FloatField, self).__init__(data_key='float', *args, **kwargs)
 
     def is_valid(self, value):
+        """Returns if the value given is a valid type for this EventField."""
         return isinstance(value, float)
 
     def to_python(self, value):
-        """
-        Validates that float() can be called on the input. Returns the result
-        of float().
+        """Validates that float() can be called on the input. Returns the
+        result of float().
+
         """
         try:
             value = float(value)
@@ -177,18 +196,24 @@ class FloatField(IntegerField):
 
 
 class StringField(EventField):
+    """Event Field that validates the string type. This field must always be an
+    string value.
+
+    """
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        super(StringField, self).__init__(data_key='string', *args,
-                                               **kwargs)
+        super(StringField, self).__init__(data_key='string', *args, **kwargs)
+
         if max_length is not None:
             self.validators.append(MaxLengthValidator(max_length))
         if min_length is not None:
             self.validators.append(MinLengthValidator(min_length))
 
     def is_valid(self, value):
+        """Returns if the value given is a valid type for this EventField."""
         return isinstance(value, str)
 
     def to_python(self, value):
+        """Converts the input to a string."""
         value = str(value)
         self.run_validators(value)
         return value

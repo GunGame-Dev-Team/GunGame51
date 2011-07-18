@@ -8,7 +8,8 @@ from __future__ import with_statement
 import es
 
 # Eventlib Imports
-from fields import EventField
+from fields import *
+from resource import *
 from exceptions import ESEventError
 
 
@@ -17,7 +18,7 @@ from exceptions import ESEventError
 # =============================================================================
 info = es.AddonInfo()
 info.name = "Eventlib - EventScripts python library"
-info.version = "Eventlib Draft 11"
+info.version = "Eventlib Draft 12"
 info.url = "http://www.eventscripts.com/pages/Eventlib/"
 info.basename = "eventlib"
 info.author = "XE_ManUp"
@@ -107,7 +108,7 @@ class EventManager(object):
             # Store the field and value to the dictionary
             field_dict[field] = value
 
-        # Handle callbacks        
+        # Handle callbacks
         for callback in self._callbacks:
             continue_event = callback(**field_dict)
             if continue_event is None:

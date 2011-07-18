@@ -16,6 +16,7 @@ from exceptions import ESEventError
 # =============================================================================
 # GLOBAL VARIABLES/CONSTANTS
 # =============================================================================
+__all__ = ['ResourceFile']
 DATAKEYS = {'none': None, 'bool': bool, 'byte': int, 'short': int,
             'long': float, 'float': float, 'string': str}
 
@@ -122,8 +123,6 @@ class ResourceFile(object):
         event names as keys and a sub-dictionary containing the event variables
         as keys, and the data keys as values.
 
-        Note:
-            * The resource file must exist as a saved keygroup.
         """
         if not self.path.exists():
             raise ESEventError('Resource file (%s) does not ' % self.path +
@@ -146,12 +145,7 @@ class ResourceFile(object):
         return return_dict
 
     def get_events(self):
-        """Returns a list of events found in the resource file.
-
-        Note:
-            * The resource file must exist as a saved keygroup
-
-        """
+        """Returns a list of events found in the resource file."""
         if not self.path.exists():
             raise ESEventError('Resource file (%s) does not ' % self.path +
                                'exist!')
