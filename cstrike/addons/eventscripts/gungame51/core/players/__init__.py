@@ -22,13 +22,7 @@ from weaponlib import getWeaponNameList
 from usermsg import showVGUIPanel
 
 # SPE Imports
-# Import SPE if installed
-try:
-    import spe
-except ImportError:
-    raise ImportError('SPE Is not installed on this server! Please visit ' +
-        'http://forums.eventscripts.com/viewtopic.php?t=29657 and download ' +
-        'the latest version!')
+import spe
 
 # GunGame Imports
 from gungame51.core.weapons.shortcuts import get_level_weapon
@@ -55,6 +49,13 @@ list_allWeapons = getWeaponNameList()
 gg_soundpack = es.ServerVar('gg_soundpack')
 gg_multi_round = es.ServerVar('gg_multi_round')
 recentWinner = False
+
+
+# =============================================================================
+# >> CLASS HELPER FUNCTION
+# =============================================================================
+def prop(fcn):
+    return property(**fcn())
 
 
 # =============================================================================
@@ -155,7 +156,7 @@ class BasePlayer(object):
         self.preventlevel = PreventLevel()
         self.preventlevelup = PreventLevel()
         self.preventleveldown = PreventLevel()
-        self.level = 1
+        self._level = 1
         self.multikill = 0
         self.stripexceptions = []
         self.soundpack = SoundPack(str(gg_soundpack))
@@ -170,30 +171,30 @@ class BasePlayer(object):
         '''
         return self.get_weapon()
 
-    def __setattr__(self, name, value):
-        # First, we execute the custom attribute callbacks
-        if name in CustomAttributeCallbacks():
-            for function in CustomAttributeCallbacks()[name].values():
-                function(name, value, self)
+    @prop
+    def level():
+        def fget(self):
+            return self._level
 
-        # Are they setting the "level" attribute?
-        if name == 'level':
-            # Return if preventlevel is set
+        def fset(self, value):
             if not self.preventlevel:
 
                 # Prevent player from leveling up?
-                if self.preventlevelup and value > self.level:
+                if self.preventlevelup and value > self._level:
                     return
 
                 # Prevent player from leveling down?
-                if self.preventleveldown and value < self.level:
+                if self.preventleveldown and value < self._level:
                     return
 
                 # Set the attribute value
-                object.__setattr__(self, name, value)
+                self._level = value
                 LeaderManager().check(self)
-            return
+        # Required for @prop
+        return locals()
 
+    @prop
+    def team():
         '''
         Player(userid).team is just the same as es.getplayerteam(userid)
         Player(userid).team = 1 move player to spec
@@ -203,38 +204,37 @@ class BasePlayer(object):
         * Dead players will be moved using es.changeteam()
         * Alive players will be moved using SPE
         '''
+        def fget(self):
+            return es.getplayerteam(self.userid)
 
-        # Team change
-        if name == 'team':
+        def fset(self, value):
             if not es.exists('userid', self.userid):
                 raise ValueError('userid (%s) doesn\'t exist.' % self.userid)
-
-            # Is the value a int ?
-            if not str(value).isdigit():
+            try:
+                value = int(value)
+            except (TypeError, ValueError):
+                """It is my belief that passing these values is overkill, and
+                we may want to consider removing them for performance."""
+                value = str(value)
 
                 # Other CT values
                 if value in ('ct', '#ct'):
                     value = 3
-
                 # Other T values
                 elif value in ('t', '#t'):
                     value = 2
-
-                # Raise error
                 else:
                     raise ValueError('"%s" is an invalid team' % value)
 
             # Is the value in range ?
-            elif int(value) not in range(1, 4):
+            if value not in xrange(1, 3):
                 raise ValueError('"%s" is an invalid teamid' % value)
 
+            # Retrieve a playerlib instance
             pPlayer = getPlayer(self.userid)
-            value = int(value)
-
-            # Make sure we are not moving the player to the same team
-            if pPlayer.teamid == value:
-                return
-
+            """
+            # Is there any reason we did this? Was it because we were afraid of
+            # SPE at first?
             # If the player is dead, use es.changeteam()
             elif pPlayer.isdead:
                 es.changeteam(self.userid, value)
@@ -256,50 +256,32 @@ class BasePlayer(object):
                 # Set prop & hide vgui
                 es.setplayerprop(self.userid, 'CCSPlayer.m_iClass', iClass)
                 showVGUIPanel(self.userid, menuname, False, {})
+            """
 
-                # If player is a bot, kill him
-                if es.isbot(self.userid):
-                    es.server.queuecmd('es_xsexec %s kill' % self.userid)
+            # Make sure we are not moving the player to the same team
+            if pPlayer.teamid == value:
                 return
 
-            # Import SPE if installed
-            try:
-                #from spe.games import cstrike
-                import spe
-
-            # No SPE ?
-            except ImportError:
-
-                # Move the player in a very basic manner
-                es.changeteam(self.userid, value)
-
-                # Raise error, and request for SPE to be installed.
-                raise ImportError('SPE Is not installed on this server! ' +
-                        'Please visit http://forums.eventscripts.com/viewtop' +
-                        'ic.php?t=29657 and download the latest version!')
-
             # Change the team
-            # With the latest SPE, you no longer have to import
-            # cstrike manually. Just do spe.<moduleFunction>!
             spe.switchTeam(self.userid, value)
 
-            #cstrike.switchTeam(self.userid, value)
-
-            # Change the model
+            # No model change needed if going to spectator
             if value == 1:
                 return
 
-            # Terrorist Models
-            if int(value) == 2:
-                pPlayer.model = 'player/%s' \
-                    % choice(('t_arctic', 't_guerilla', 't_leet', 't_phoenix'))
-
-            # Counter-Terrorist Models
+            # Change to Terrorist Models
+            if value == 2:
+                pPlayer.model = 'player/%s' % choice(('t_arctic', 't_guerilla',
+                                                      't_leet', 't_phoenix'))
+            # Change to Counter-Terrorist Models
             else:
-                pPlayer.model = 'player/%s' \
-                    % choice(('ct_gign', 'ct_gsg9', 'ct_sas', 'ct_urban'))
-            return
+                pPlayer.model = 'player/%s' % choice(('ct_gign', 'ct_gsg9',
+                                                      'ct_sas', 'ct_urban'))
+        # Required for @prop
+        return locals()
 
+    @prop
+    def wins():
         '''
         Player(userid).wins returns the amount of wins a player has
             * If they are not in the DB it will return 0
@@ -310,61 +292,57 @@ class BasePlayer(object):
           value of your choice, although this method should only be used for
           internal ussage.
         '''
+        def fget(self):
+            # Query the wins database
+            winsQuery = Database().select('gg_wins', 'wins', 'where uniqueid' +
+                                          ' = "%s"' % self.steamid)
+            if winsQuery:
+                return int(winsQuery)
+            return 0
 
-        # From winner's DB ?
-        if name == 'wins':
-            # We using a int?
-            if not str(value).isdigit():
-                raise ValueError('wins has to be a int value, you passed ' +
-                                '"%s"' % value)
-
+        def fset(self, value):
             # Bots can't win
             if es.isbot(self.userid):
                 return
 
-            value = int(value)
+            # We using a int?
+            try:
+                value = int(value)
+            except (ValueError, TypeError):
+                raise ValueError('wins has to be a int value, you passed ' +
+                                 '"%s"' % value)
 
             # Has won before
             if self.wins:
                 update_winner('wins', value, uniqueid=self.steamid)
-
             # New entry
             else:
                 name = es.getplayername(self.userid)
-
                 if not name:
                     name = "unnamed"
-
                 insert_winner(name, self.steamid, value)
-            return
+
+        # Required for @prop
+        return locals()
+
+    def __setattr__(self, name, value):
+        # First, we execute the custom attribute callbacks
+        if name in CustomAttributeCallbacks():
+            for function in CustomAttributeCallbacks()[name].values():
+                function(name, value, self)
 
         # Set the attribute value
         object.__setattr__(self, name, value)
 
     def __getattr__(self, name):
-
-        # Team ?
-        if name == 'team':
-            return es.getplayerteam(self.userid)
-
-        # From winners DB?
-        if name == 'wins':
-            winsQuery = Database().select('gg_wins', 'wins',
-                                    'where uniqueid = "%s"' % self.steamid)
-
-            if winsQuery:
-                return int(winsQuery)
-
-            return 0
-
         # Return the attribute value
         return object.__getattribute__(self, name)
 
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes
         if name in ('userid', 'level', 'preventlevel', 'steamid', 'soundpack',
-          'stripexceptions', 'multikill', 'wins', 'team', 'name', 'index',
-                                'preventleveldown', 'preventlevelup', 'afk'):
+                    'stripexceptions', 'multikill', 'wins', 'team', 'name',
+                    'index', 'preventleveldown', 'preventlevelup', 'afk'):
             raise AttributeError('Unable to delete attribute "%s". ' % name +
                     'This is a required attribute for GunGame.')
 
@@ -528,14 +506,14 @@ class BasePlayer(object):
         '''
         error = None
         # Make sure player is on a team
-        if es.getplayerteam(self.userid) < 2:
-            error = ('Unable to give player weapon (%s):'
-                % self.userid + ' is not on a team.')
+        if self.team < 2:
+            error = ('Unable to give player weapon (%s): ' % self.userid +
+                     'is not on a team.')
 
         # Make sure player is alive
         elif getPlayer(self.userid).isdead:
-            error = ('Unable to give player weapon (%s):'
-                % self.userid + ' is not alive.')
+            error = ('Unable to give player weapon (%s): ' % self.userid +
+                     'is not alive.')
 
         # Error ?
         if error:
@@ -580,7 +558,6 @@ class BasePlayer(object):
                 es.server.queuecmd('es_xsexec %s "use weapon_%s"'
                     % (self.userid, self.weapon))
 
-                # Done.
                 return
 
             # Player DOES NOT own this weapon.
@@ -761,9 +738,7 @@ class BasePlayer(object):
     # >> BasePlayer() MISCELLANEOUS CLASS METHODS
     # =========================================================================
     def respawn(self, force=False):
-        '''
-        Respawns the player.
-        '''
+        '''Respawns the player.'''
         # Player on server ?
         if not es.exists('userid', self.userid):
             return
@@ -1027,6 +1002,10 @@ class Player(PlayerManager):
             # Remove the custom attribute callback
             CustomAttributeCallbacks().remove(attribute, addon)
 
+
+# =============================================================================
+# Functions
+# =============================================================================
 def remove_recent_winner():
     global recentWinner
     recentWinner = False

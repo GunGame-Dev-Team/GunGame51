@@ -22,7 +22,14 @@ from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
 # SPE Imports
-import spe
+try:
+    import spe
+except ImportError:
+    es.unload('gungame51')
+    raise ImportError('SPE Is not installed on this server! Please visit ' +
+        'http://forums.eventscripts.com/viewtopic.php?t=29657 and download ' +
+        'the latest version! SPE is required to run GunGame 5.1.')
+  
 
 # GunGame Imports
 
