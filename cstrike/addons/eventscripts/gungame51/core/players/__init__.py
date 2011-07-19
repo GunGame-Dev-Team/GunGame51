@@ -18,7 +18,6 @@ import es
 import gamethread
 from playerlib import uniqueid
 from playerlib import getPlayer
-from usermsg import showVGUIPanel
 
 # SPE Imports
 import spe
@@ -141,10 +140,10 @@ class BasePlayer(PlayerMessaging, PlayerWeapons, PlayerSounds):
     # =========================================================================
     def __new__(cls, userid):
         self = object.__new__(cls, userid)
-        self.userid = int(userid)
-        self.steamid = uniqueid(self.userid, 1)
-        self.afk = AFK(self.userid)
-        self.index = int(getPlayer(str(self.userid)).index)
+        self._userid = int(userid)
+        self._steamid = uniqueid(self.userid, 1)
+        self._afk = AFK(self.userid)
+        self._index = int(getPlayer(str(self.userid)).index)
         return self
 
     def __init__(self, userid):
@@ -154,11 +153,31 @@ class BasePlayer(PlayerMessaging, PlayerWeapons, PlayerSounds):
         self._level = 1
         self.multikill = 0
         self.stripexceptions = []
-        self.soundpack = SoundPack(str(gg_soundpack))
+        self._soundpack = SoundPack(str(gg_soundpack))
 
     # =========================================================================
     # >> BasePlayer() CLASS ATTRIBUTE METHODS
     # =========================================================================
+    @property
+    def userid(self):
+        return self._userid
+
+    @property
+    def steamid(self):
+        return self._steamid
+
+    @property
+    def afk(self):
+        return self._afk
+
+    @property
+    def index(self):
+        return self._index
+
+    @property
+    def soundpack(self):
+        return self._soundpack
+
     @property
     def weapon(self):
         '''
@@ -513,13 +532,13 @@ class PlayerManager(dict):
                 del self[self[userid].userid]
 
                 # Set the BasePlayer() instance userid to the current
-                self[userid].userid = userid
+                self[userid]._userid = userid
 
                 # Set the BasePlayer() instance index to the current
-                self[userid].index = int(getPlayer(str(userid)).index)
+                self[userid]._index = int(getPlayer(str(userid)).index)
 
                 # Set the BasePlayer() .AFK() instance userid
-                self[userid].afk.userid = userid
+                self[userid]._afk.userid = userid
 
         # We don't want to call our __getitem__ again
         return super(PlayerManager, self).__getitem__(userid)
