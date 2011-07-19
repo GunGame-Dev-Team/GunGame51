@@ -30,15 +30,6 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_leader_messages']
 
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-
-
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-
 
 # =============================================================================
 # >> LOAD & UNLOAD
@@ -90,7 +81,7 @@ def gg_leader_disconnect(event_var):
         return
 
     # Get the userids of each of the current leaders in a list
-    leaders = [int(x) for x in event_var['leaders'].split(',')]
+    leaders = [int(userid) for userid in event_var['leaders'].split(',')]
 
     # Is there only 1 leader?
     if len(leaders) == 1:
@@ -109,10 +100,6 @@ def gg_leader_disconnect(event_var):
 
         # Send message about all our current leaders
         msg('#human', 'NewLeaders',
-            {'players': ', '.join([es.getplayername(x) for x in leaders]),
+            {'players': ', '.join([es.getplayername(userid)
+                for userid in leaders if es.exists('userid', userid)]),
             'level': event_var['leader_level']})
-
-
-# =============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# =============================================================================
