@@ -195,9 +195,6 @@ class BasePlayer(PlayerMessaging, PlayerWeapons, PlayerSounds):
         Player(userid).team = 1 move player to spec
         Player(userid).team = 2 move player to terrorist
         Player(userid).team = 3 move player to counter-terrorist
-
-        * Dead players will be moved using es.changeteam()
-        * Alive players will be moved using SPE
         '''
         def fget(self):
             return es.getplayerteam(self.userid)
@@ -208,18 +205,7 @@ class BasePlayer(PlayerMessaging, PlayerWeapons, PlayerSounds):
             try:
                 value = int(value)
             except (TypeError, ValueError):
-                """It is my belief that passing these values is overkill, and
-                we may want to consider removing them for performance."""
-                value = str(value)
-
-                # Other CT values
-                if value in ('ct', '#ct'):
-                    value = 3
-                # Other T values
-                elif value in ('t', '#t'):
-                    value = 2
-                else:
-                    raise ValueError('"%s" is an invalid team' % value)
+                raise ValueError('"%s" is an invalid team' % value)
 
             # Is the value in range ?
             if value not in xrange(1, 3):
@@ -227,31 +213,6 @@ class BasePlayer(PlayerMessaging, PlayerWeapons, PlayerSounds):
 
             # Retrieve a playerlib instance
             pPlayer = getPlayer(self.userid)
-            """
-            # Is there any reason we did this? Was it because we were afraid of
-            # SPE at first?
-            # If the player is dead, use es.changeteam()
-            elif pPlayer.isdead:
-                es.changeteam(self.userid, value)
-
-                # going to spectator ?
-                if value == 1:
-                    return
-
-                # Terrorist ?
-                if value == 2:
-                    iClass = randint(1, 4)
-                    menuname = 'class_ter'
-
-                # Counter-Terrorist ?
-                else:
-                    iClass = randint(4, 8)
-                    menuname = 'class_ct'
-
-                # Set prop & hide vgui
-                es.setplayerprop(self.userid, 'CCSPlayer.m_iClass', iClass)
-                showVGUIPanel(self.userid, menuname, False, {})
-            """
 
             # Make sure we are not moving the player to the same team
             if pPlayer.teamid == value:
