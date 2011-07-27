@@ -56,7 +56,7 @@ from core.addons import PriorityAddon
 from core.addons import gungame_info
 
 #    Player Function Imports
-from core.players import PlayerManager
+from core.players.players import _PlayerContainer
 from core.players.shortcuts import Player
 from core.players.shortcuts import resetPlayers
 from core.players.shortcuts import setAttribute
@@ -267,7 +267,7 @@ def unload():
     unloadTranslation('gungame', 'gungame')
 
     # Remove all player instances
-    PlayerManager().clear()
+    _PlayerContainer().clear()
 
     # Close the database
     Database().close()
@@ -478,9 +478,9 @@ def player_spawn(event_var):
     global firstPlayerSpawned
 
     if not firstPlayerSpawned:
-        # Replace this with whatever PlayerManager() uses to remove
+        # Replace this with whatever _PlayerContainer() uses to remove
         # non-existant players
-        PlayerManager().remove_old()
+        _PlayerContainer().remove_old()
 
         # The first player has spawned
         firstPlayerSpawned = True

@@ -168,7 +168,7 @@ def startProtect(userid):
     if not int(gg_spawn_protect_can_level_up):
         ggPlayer = Player(userid)
 
-        if not 'gg_spawn_protect' in ggPlayer.preventlevel:
+        if not 'gg_spawn_protect' in ggPlayer.preventlevel():
             ggPlayer.preventlevel.append('gg_spawn_protect')
 
     # Start the delay to cancel spawn protection
@@ -203,5 +203,5 @@ def endProtect(userid):
     if not int(gg_spawn_protect_can_level_up):
         ggPlayer = Player(userid)
 
-        if 'gg_spawn_protect' in ggPlayer.preventlevel:
+        if 'gg_spawn_protect' in ggPlayer.preventlevel():
             ggPlayer.preventlevel.remove('gg_spawn_protect')

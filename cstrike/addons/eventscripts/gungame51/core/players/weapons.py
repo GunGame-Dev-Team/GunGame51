@@ -1,4 +1,4 @@
-# ../core/players/extended_player.py
+# ../core/players/weapons.py
 
 '''
 $Rev$
@@ -9,64 +9,40 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
-from random import choice
-from random import randint
-
 # EventScripts Imports
-import es
-import gamethread
-from playerlib import getPlayer
-from weaponlib import getWeaponNameList
+import es as _es
+import gamethread as _gamethread
+from playerlib import getPlayer as _getPlayer
+from weaponlib import getWeaponNameList as _getWeaponNameList
 
-# SPE Imports
-import spe
+# SPE
+import spe as _spe
 
 # GunGame Imports
-from gungame51.core.messaging import MessageManager
-from gungame51.core.weapons.shortcuts import get_level_weapon
-
+from gungame51.core.weapons.shortcuts import get_level_weapon as _level_weapon
 
 # =============================================================================
 # >> GLOBALS
 # =============================================================================
-__all__ = ['PlayerMessaging', 'PlayerWeapons', 'PlayerSounds']
-list_pWeapons = getWeaponNameList('#primary')
-list_sWeapons = getWeaponNameList('#secondary')
-list_allWeapons = getWeaponNameList()
+list_pWeapons = _getWeaponNameList('#primary')
+list_sWeapons = _getWeaponNameList('#secondary')
+list_allWeapons = _getWeaponNameList()
 
 
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class PlayerMessaging(object):
-    """Adds messaging methods to the BasePlayer class."""
-    def msg(self, string, tokens={}, prefix=False):
-        MessageManager().msg(self.userid, string, tokens, prefix)
-
-    def saytext2(self, index, string, tokens={}, prefix=False):
-        MessageManager().saytext2(self.userid, index, string, tokens, prefix)
-
-    def centermsg(self, string, tokens={}):
-        MessageManager().centermsg(self.userid, string, tokens)
-
-    def hudhint(self, string, tokens={}):
-        MessageManager().hudhint(self.userid, string, tokens)
-
-    def toptext(self, duration, color, string, tokens={}):
-        MessageManager().toptext(self.userid, duration, color, string, tokens)
-
-    def echo(self, level, string, tokens={}, prefix=False):
-        MessageManager().echo(self.userid, level, string, tokens, prefix)
-
-    def langstring(self, string, tokens={}, prefix=False):
-        return MessageManager().langstring(string, tokens, self.userid, prefix)
-
-
 class PlayerWeapons(object):
     """Adds weapon methods to the BasePlayer class."""
+    @property
+    def weapon(self):
+        '''
+        Return the weapon name
+        '''
+        return self.get_weapon()
+
     def get_weapon(self):
-        return get_level_weapon(self.level)
+        return _level_weapon(self.level)
 
     def give_weapon(self):
         '''
@@ -79,7 +55,7 @@ class PlayerWeapons(object):
                      'is not on a team.')
 
         # Make sure player is alive
-        elif getPlayer(self.userid).isdead:
+        elif _getPlayer(self.userid).isdead:
             error = ('Unable to give player weapon (%s): ' % self.userid +
                      'is not alive.')
 
@@ -90,40 +66,40 @@ class PlayerWeapons(object):
         # Knife ?
         if self.weapon == 'knife':
             # Make them use their knife
-            es.server.queuecmd('es_xsexec %s "use weapon_knife"' % (
+            _es.server.queuecmd('es_xsexec %s "use weapon_knife"' % (
                                                                 self.userid))
 
             # If there is a level below the user's current level
             if self.level > 1:
                 # Strip previous weapons
-                self.strip_weapons(get_level_weapon(self.level - 1))
+                self.strip_weapons(_level_weapon(self.level - 1))
             else:
                 self.strip()
 
         # Nade ?
         elif self.weapon == 'hegrenade':
             # Give them a grenade.
-            given_weapon = spe.giveNamedItem(self.userid, "weapon_hegrenade")
+            given_weapon = _spe.giveNamedItem(self.userid, "weapon_hegrenade")
 
             # Make them use the grenade
-            es.server.queuecmd('es_xsexec %s "use weapon_hegrenade"' % (
+            _es.server.queuecmd('es_xsexec %s "use weapon_hegrenade"' % (
                                                                 self.userid))
 
             # If there is a level below the user's current level
             if self.level > 1:
                 # Strip previous weapons
-                self.strip_weapons(get_level_weapon(self.level - 1))
+                self.strip_weapons(_level_weapon(self.level - 1))
             else:
                 self.strip()
 
         else:
             # Player owns this weapon.
-            if spe.ownsWeapon(self.userid, "weapon_%s" % self.weapon):
+            if _spe.ownsWeapon(self.userid, "weapon_%s" % self.weapon):
                 # Make them use it. If we don't do this, a very
                 # strange bug comes up which prevents the player
                 # from getting their current level's weapon after
                 # being stripped,
-                es.server.queuecmd('es_xsexec %s "use weapon_%s"'
+                _es.server.queuecmd('es_xsexec %s "use weapon_%s"'
                     % (self.userid, self.weapon))
 
                 return
@@ -132,7 +108,7 @@ class PlayerWeapons(object):
             else:
                 # Retrieve a list of all weapon names in the player's
                 # possession
-                playerWeapons = spe.getWeaponDict(self.userid)
+                playerWeapons = _spe.getWeaponDict(self.userid)
 
                 if playerWeapons:
                     # See if there is a primary weapon in the list of weapons
@@ -157,31 +133,31 @@ class PlayerWeapons(object):
 
                     if weapToStrip:
                         # Make them drop the weapon
-                        spe.dropWeapon(self.userid, weapToStrip)
+                        _spe.dropWeapon(self.userid, weapToStrip)
 
                         # Now remove it
-                        spe.removeEntityByInstance(playerWeapons
+                        _spe.removeEntityByInstance(playerWeapons
                                                     [weapToStrip]["instance"])
 
                 # Now give them the weapon and save the weapon instance
-                given_weapon = spe.giveNamedItem(self.userid,
+                given_weapon = _spe.giveNamedItem(self.userid,
                     "weapon_%s" % self.weapon)
 
                 # Retrieve the weapon instance of the weapon they "should" own
-                weapon_check = spe.ownsWeapon(self.userid, "weapon_%s"
+                weapon_check = _spe.ownsWeapon(self.userid, "weapon_%s"
                     % self.weapon)
 
                 # Make sure that the player owns the weapon we gave them
                 if weapon_check != given_weapon:
                     # Remove the given weapon since the player does not own it
-                    spe.removeEntityByInstance(given_weapon)
+                    _spe.removeEntityByInstance(given_weapon)
 
                     # If they don't have the right weapon, fire give_weapon()
                     if not weapon_check:
                         self.give_weapon()
                         return
 
-                es.server.queuecmd('es_xsexec %s "use weapon_%s"'
+                _es.server.queuecmd('es_xsexec %s "use weapon_%s"'
                     % (self.userid, self.weapon))
 
     def give(self, weapon, useWeapon=False, strip=False):
@@ -203,22 +179,24 @@ class PlayerWeapons(object):
 
         # Add weapon to strip exceptions so gg_dead_strip will not
         #   strip the weapon
-        if int(es.ServerVar('gg_dead_strip')):
+        if int(_es.ServerVar('gg_dead_strip')):
             self.stripexceptions.append(weapon[7:])
 
             # Delay removing the weapon long enough for gg_dead_strip to fire
-            gamethread.delayed(0.10, self.stripexceptions.remove, (weapon[7:]))
+            _gamethread.delayed(0.10, self.stripexceptions.remove,
+                                (weapon[7:]))
 
         # If the player owns the weapon and the player is not being given a
         # second flashbang, stop here
-        if spe.ownsWeapon(self.userid, weapon) and not (weapon == \
-                    "weapon_flashbang" and getPlayer(self.userid).getFB() < 2):
+        if _spe.ownsWeapon(self.userid, weapon) and not (weapon == \
+                    "weapon_flashbang" and _getPlayer(
+                        self.userid).getFB() < 2):
             return
 
         # Strip the weapon ?
         if strip:
             # Retrieve a list of all weapon names in the player's possession
-            playerWeapons = spe.getWeaponDict(self.userid)
+            playerWeapons = _spe.getWeaponDict(self.userid)
 
             if playerWeapons:
                 # See if there is a primary weapon in the list of weapons
@@ -240,17 +218,18 @@ class PlayerWeapons(object):
                 # Strip the weapon
                 if stripWeapon:
                     # Make them drop the weapon
-                    spe.dropWeapon(self.userid, stripWeapon)
+                    _spe.dropWeapon(self.userid, stripWeapon)
 
                     # Remove the weapon
-                    spe.removeEntityByInstance(playerWeapons[stripWeapon]["i" +
-                                                                    "nstance"])
+                    _spe.removeEntityByInstance(playerWeapons[stripWeapon][
+                                                                "instance"])
 
         # Give the player the weapon
-        spe.giveNamedItem(self.userid, weapon)
+        _spe.giveNamedItem(self.userid, weapon)
 
         if useWeapon:
-            es.server.queuecmd('es_xsexec %s "use %s"' % (self.userid, weapon))
+            _es.server.queuecmd('es_xsexec %s "use %s"' % (self.userid,
+                                                           weapon))
 
     def strip(self, levelStrip=False, exceptions=[]):
         '''
@@ -263,7 +242,7 @@ class PlayerWeapons(object):
               exceptions will not be stripped.
         '''
         # Retrieve a dictionary of the player's weapons
-        pWeapons = spe.getWeaponDict(self.userid)
+        pWeapons = _spe.getWeaponDict(self.userid)
 
         if not pWeapons:
             return
@@ -274,8 +253,8 @@ class PlayerWeapons(object):
               weapon[7:] in exceptions):
                 continue
 
-            spe.dropWeapon(self.userid, weapon)
-            spe.removeEntityByInstance(pWeapons[weapon]["instance"])
+            _spe.dropWeapon(self.userid, weapon)
+            _spe.removeEntityByInstance(pWeapons[weapon]["instance"])
 
     def strip_weapons(self, stripWeapons):
         '''
@@ -284,7 +263,7 @@ class PlayerWeapons(object):
         stripWeapons must be a list.
         '''
         # Get the player's current held weapons
-        playerWeapons = spe.getWeaponDict(self.userid)
+        playerWeapons = _spe.getWeaponDict(self.userid)
 
         # Format the stripWeapons list for all names to start with "weapon_"
         stripWeapons = [w if w.startswith("weapon_") else \
@@ -297,59 +276,7 @@ class PlayerWeapons(object):
         # Loop through any weapons to strip
         for stripWeapon in remWeapons:
             # Drop the weapon
-            spe.dropWeapon(self.userid, stripWeapon)
+            _spe.dropWeapon(self.userid, stripWeapon)
 
             # Remove the weapon
-            spe.removeEntityByInstance(playerWeapons[stripWeapon]["instance"])
-
-
-class PlayerSounds(object):
-    def playsound(self, sound, volume=1.0):
-        '''
-        Plays the declared sound to the player.
-        '''
-        # Format the sound
-        sound = self._format_sound(sound)
-
-        # Make sure the sound exists
-        if sound:
-            # Play the sound
-            es.playsound(self.userid, sound, volume)
-
-        # Return the sound used
-        return sound
-
-    def emitsound(self, sound, volume=1.0, attenuation=1.0):
-        '''
-        Emits the declared sound from the player.
-        '''
-        # Format the sound
-        sound = self._format_sound(sound)
-
-        # Make sure the sound exists
-        if sound:
-            # Play the sound
-            es.emitsound('player', self.userid, sound, volume, attenuation)
-
-        # Return the sound used
-        return sound
-
-    def stopsound(self, sound):
-        '''
-        Stops the sound from being played for the player.
-        '''
-        # Format the sound
-        sound = self._format_sound(sound)
-
-        # Make sure the sound exists
-        if sound:
-            # Stop the sound
-            es.stopsound(self.userid, sound)
-
-        # Return the sound used
-        return sound
-
-    def _format_sound(self, sound):
-        if not self.soundpack[sound]:
-            return None
-        return self.soundpack[sound]
+            _spe.removeEntityByInstance(playerWeapons[stripWeapon]["instance"])

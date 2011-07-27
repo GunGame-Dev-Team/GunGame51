@@ -61,6 +61,7 @@ class IntegerField(EventField):
 
     """
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
         super(IntegerField, self).__init__(*args, **kwargs)
 
         if max_value is not None:
@@ -201,6 +202,7 @@ class StringField(EventField):
 
     """
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        self.max_length, self.min_length = max_length, min_length
         super(StringField, self).__init__(data_key='string', *args, **kwargs)
 
         if max_length is not None:

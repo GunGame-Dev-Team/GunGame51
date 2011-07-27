@@ -17,7 +17,7 @@ from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core.players import Player
-from gungame51.core.players import PlayerManager
+from gungame51.core.players.players import _PlayerContainer
 from gungame51.core.leaders.shortcuts import reset_leaders
 
 
@@ -101,15 +101,16 @@ def resetPlayers():
           the scripter uses event gg_start to re-initialize custom
           player attributes.
     '''
-    PlayerManager().reset()
+    _PlayerContainer().reset()
     reset_leaders()
 
 # =============================================================================
 # >> DOCTSTRING REDIRECTS
 # =============================================================================
+from gungame51.core.players.callbacks import PlayerCallbacks as _CB
 # Declare the docstring for add_attribute_callback
-add_attribute_callback.__doc__ = Player.add_attribute_callback.__doc__
+add_attribute_callback.__doc__ = _CB.add_attribute_callback.__doc__
 # Declare the docstring for remove_attribute_callback
-remove_attribute_callback.__doc__ = Player.remove_attribute_callback.__doc__
+remove_attribute_callback.__doc__ = _CB.remove_attribute_callback.__doc__
 # Declare the docstring for remove_callbacks_for_addon
-remove_callbacks_for_addon.__doc__ = Player.remove_callbacks_for_addon.__doc__
+remove_callbacks_for_addon.__doc__ = _CB.remove_callbacks_for_addon.__doc__
