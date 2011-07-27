@@ -636,7 +636,7 @@ def player_disconnect(event_var):
     userid = int(event_var['userid'])
 
     # Check to see if player was the leader
-    LeaderManager().disconnected_leader(userid)
+    LeaderManager()._disconnected_leader(userid)
 
 
 def player_team(event_var):

@@ -29,12 +29,6 @@ def get_leader_count():
     return len(LeaderManager().current)
 
 
-def get_old_leader_list():
-    """Returns the userids of the old/previous leader(s)."""
-    # Remove disconnected userids from the previous leaders and return the list
-    return LeaderManager().previous
-
-
 def get_leader_list():
     """Returns the userids of the current leader(s)."""
     # Remove disconnected userids from the current leaders and return the list
@@ -53,4 +47,4 @@ def get_leader_level():
 
 def reset_leaders():
     """Resets the internal leader lists."""
-    LeaderManager()._reset()
+    LeaderManager().reset()
