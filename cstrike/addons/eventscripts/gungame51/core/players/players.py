@@ -185,13 +185,13 @@ class _PlayerContainer(dict):
         self[userid] = _BasePlayer(userid)
 
         # Update the level value
-        self[userid]._level = int(pInstance.level)
+        self[userid]._level = pInstance.level
 
         # Update the multikill value
-        self[userid].multikill = int(pInstance.multikill)
+        self[userid].multikill = pInstance.multikill
 
         # Delete the old _BasePlayer() instance
-        del self[self[userid].userid]
+        del self[pInstance.userid]
 
     def reset(self):
         self.clear()
