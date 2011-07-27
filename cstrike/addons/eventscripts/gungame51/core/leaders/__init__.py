@@ -81,7 +81,7 @@ class LeaderManager(dict):
 
             # NO LEADER-RELATION
             else:
-                self._update_level(userid, int(level))
+                self._update_level(userid, level)
 
     def is_leader(self, userid):
         """Checks to see if the userid is a current leader."""
