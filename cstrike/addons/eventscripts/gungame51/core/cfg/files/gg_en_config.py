@@ -9,271 +9,196 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/gungame51/gg_en_config.cfg'
-        % es.ServerVar('eventscripts_gamedir'))
+# GunGame Imports
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    config.text('*' * 76)
-    config.text('*' + ' ' * 13 + 'gg_en_config.cfg -- English Server' +
-                ' Configuration' + ' ' * 13 + '*')
-    config.text('*' + ' ' * 74 + '*')
-    config.text('*' + ' ' * 19 + 'This file controls GunGame settings.' +
-                ' ' * 19 + '*')
-    config.text('*' + ' ' * 74 + '*')
-    config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' ' * 8 + '*')
-    config.text('*' + ' ' * 11 + 'reload of GunGame.' + ' ' * 45 + '*')
-    config.text('*' * 76)
-    config.text('')
-    config.text('')
+    # Create the .cfg file
+    with ConfigContextManager(path(__file__).namebase) as config:
 
-    config.text('+' * 76)
-    config.text('|' + ' ' * 29 + 'WEAPON SETTINGS' + ' ' * 30 + '|')
-    config.text('+' * 76)
+        config.name = 'English Server Configuration'
+        config.description = 'This file controls GunGame51 settings.'
 
-    # Weapon Order File
-    config.text('')
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WEAPON ORDER FILE')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * The file must be located under ' +
-                '"cfg/gungame51/weapon_orders/".')
-    config.text('   * Changing this variable in-game will result in a' +
-                'restart.')
-    config.text('   * If gg_weapon_order_random = 1, this will be the ' +
-                'starting weapon')
-    config.text('     order.')
-    config.text('Default Value: "default_weapon_order"')
-    config.cvar('gg_weapon_order_file', 'default_weapon_order', 'The file ' +
-                'that will be used for the weapon order.').addFlag('notify')
+        config.cfg_section('WEAPON SETTINGS')
 
-    # Random Weapon Order File
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> RANDOM WEAPON ORDER FILE')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = (Disabled) use gg_weapon_order for a static weapon ' +
-                'order.')
-    config.text('   1 = (Enabled) get a new weapon order each map change.')
-    config.text('Default Value: 0')
-    config.cvar('gg_weapon_order_random', 0, 'Randomly select a new weapon ' +
-                'order file each map.').addFlag('notify')
+        with config.cfg_cvar('gg_weapon_order_file') as cvar:
 
-    # Random Weapon Order Excluded Files
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> RANDOM WEAPON ORDER EXCLUDED FILES')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   "" = (Disabled) No weapon orders are excluding when ' +
-                'choosing a random')
-    config.text('         weapon order with gg_weapon_order_random enabled ' +
-                'above.')
-    config.text('   "name1,name2" = (Enabled) Exclude these orders when ' +
-                'choosing a random')
-    config.text('         weapon order with gg_weapon_order_random enabled ' +
-                'above.')
-    config.text('Default Value: "weapon_short,nade_bonus_order"')
-    config.cvar('gg_weapon_order_random_excluded',
-                "weapon_short,nade_bonus_order", 'Excluded orders when ' +
-                'choosing a random order with gg_weapon_order_random.') \
-                                                            .addFlag('notify')
+            cvar.name = 'WEAPON ORDER FILE'
+            cvar.notes.append('The file must be ' +
+                'located under "cfg/gungame51/weapon_orders/".')
+            cvar.notes.append('Changing this variable ' +
+                'in-game will result in a restart.')
+            cvar.notes.append('If gg_weapon_order_random = 1' +
+                ', this will be the starting weapon order.')
+            cvar.default = 'default_weapon_order'
+            cvar.text = 'The file that will be used for the weapon order.'
+            cvar.notify = True
 
-    # Weapon Order Sort Type
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WEAPON ORDER SORT TYPE')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   #default  = Order will go Top -> Bottom.')
-    config.text('   #reversed = Order will go Bottom -> Top.')
-    config.text('   #random   = Order will be randomly shuffled.')
-    config.text('Note:')
-    config.text('   #reversed and #random sort types will move hegrenade ' +
-                'and knife levels')
-    config.text('   to the end of the order.')
-    config.text('Default Value: "#default"')
-    config.cvar('gg_weapon_order_sort_type', '#default', 'The order in which' +
-                ' the weapons and levels will be sorted.').addFlag('notify')
+        with config.cfg_cvar('gg_weapon_order_random') as cvar:
 
-    # Multikill Override
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MULTIKILL OVERRIDE')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Keep this variable set to 0 unless you want to ' +
-                'override the')
-    config.text('     values you have set in your weapon order file.')
-    config.text('   * This will not override hegrenade and knife, these are ' +
-                'always 1.')
-    config.text('Default Value: 0')
-    config.cvar('gg_multikill_override', 0, 'The amount of kills a player ' +
-                'needs to level up per weapon.').addFlag('notify')
+            cvar.name = 'RANDOM WEAPON ORDER FILE'
+            cvar.options.append('0 = (Disabled) use ' +
+                'gg_weapon_order for a static weapon order.')
+            cvar.options.append('1 = (Enabled) ' +
+                'get a new weapon order each map change.')
+            cvar.default = 0
+            cvar.text = 'Randomly select a new weapon order file each map.'
+            cvar.notify = True
 
-    # Weapon Removal
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WEAPON REMOVAL')
-    config.text('=' * 76)
-    config.text('Note:')
-    config.text('   * Only weapon_* entities are supported.')
-    config.text('Default Value: "hegrenade,flashbang,smokegrenade"')
-    config.cvar('gg_map_strip_exceptions', 'hegrenade,flashbang,smokegrenade',
-                'The weapons that will not be removed from the ' +
-                'map.')
+        with config.cfg_cvar('gg_weapon_order_random_excluded') as cvar:
 
-    config.text('')
-    config.text('')
-    config.text('+' * 76)
-    config.text('|' + ' ' * 31 + 'MAP SETTINGS' + ' ' * 31 + '|')
-    config.text('+' * 76)
+            cvar.name = 'RANDOM WEAPON ORDER EXCLUDED FILES'
+            cvar.options.append('"" = (Disabled) No weapon ' +
+                'orders are excluding when choosing a random')
+            cvar.options.append([
+                '"" = (Disabled) No weapon orders ' +
+                    'are excluding when choosing a random',
+                'weapon order with gg_weapon_order_random enabled above.',
+                ])
+            cvar.options.append([
+                '"name1,name2" = (Enabled) Exclude ' +
+                    'these orders when choosing a random',
+                'weapon order with gg_weapon_order_random enabled above.',
+                ])
+            cvar.default = 'weapon_short,nade_bonus_order'
+            cvar.text = ('Excluded orders when choosing ' +
+                'a random order with gg_weapon_order_random.')
+            cvar.notify = True
 
-    # Multi-Round
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MULTI-ROUND')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Only set this variable if you want more than one ' +
-                'round per map')
-    config.text('     change.')
-    config.text('   * The map vote will only trigger on the final round.')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   # = The number of rounds that need to be played before ' +
-                'a map')
-    config.text('       change.')
-    config.text('Default Value: 0')
-    config.cvar('gg_multi_round', 0, 'The number of rounds that need to be ' +
-                'played before a map change.')
+        with config.cfg_cvar('gg_weapon_order_sort_type') as cvar:
 
-    # Multi-Round Intermission
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MULTI-ROUND INTERMISSION')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * This option is only valid if "gg_multi_round" is set ' +
-                'to a value')
-    config.text('     higher than "0".')
-    config.text('   * This will load "gg_warmup_round" based off of the ' +
-                '"gg_warmup timer"')
-    config.text('     between rounds.')
-    config.text('   * Without an intermission, the next GunGame round will ' +
-                'start immediately after a win.')
-    config.text('Options:')
-    config.text('   0 = Do not have an intermission.')
-    config.text('   1 = Enable the intermission.')
-    config.text('Default Value: 0')
-    config.cvar('gg_multi_round_intermission', 0, 'The amount of time (in ' +
-                'seconds) that the intermission lasts between rounds.')
+            cvar.name = 'WEAPON ORDER SORT TYPE'
+            cvar.options.append('#default  = Order will go Top -> Bottom.')
+            cvar.options.append('#reversed = Order will go Bottom -> Top.')
+            cvar.options.append('#random   = Order will be randomly shuffled.')
+            cvar.notes.append('#reversed and #random sort ' +
+                'types will move hegrenade and knife levels')
+            cvar.notes.append('to the end of the order.')
+            cvar.default = '#default'
+            cvar.text = ('The order in which ' +
+                'the weapons and levels will be sorted.')
+            cvar.notify = True
 
-    # Dynamic End of Map Chat Time
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> DYNAMIC END OF MAP CHAT TIME')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Dynamic chat time is based on the end of round winner ' +
-                'music.')
-    config.text('   * When enabled, the players will be able to chat for the' +
-                ' length')
-    config.text('     of the winner music.')
-    config.text('   * If disabled, the "mp_chattime" variable will be used.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Use the server\'s mp_chattime variable.')
-    config.text('   1 = (Enabled) Use the length of the individual audio ' +
-                'file.')
-    config.text('Default Value: 0')
-    config.cvar('gg_dynamic_chattime', 0, 'Enables dynamic end of round chat' +
-                ' time based on the winner music.')
-    config.text('')
-    config.text('')
+        with config.cfg_cvar('gg_multikill_override') as cvar:
 
-    config.text('+' * 76)
-    config.text('|' + ' ' * 29 + 'PLAYER SETTINGS' + ' ' * 30 + '|')
-    config.text('+' * 76)
+            cvar.name = 'MULTIKILL OVERRIDE'
+            cvar.notes.append([
+                'Keep this variable set to 0 unless you want to override the',
+                'values you have set in your weapon order file.',
+                ])
+            cvar.notes.append('This will not override ' +
+                'hegrenade and knife, these are always 1.')
+            cvar.default = 0
+            cvar.text = ('The amount of kills a ' +
+                'player needs to level up per weapon.')
+            cvar.notify = True
 
-    # Defusers
-    config.text('')
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> DEFUSERS')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = Disabled')
-    config.text('   1 = Enabled')
-    config.text('Default Value: 0')
-    config.cvar('gg_player_defuser', 0, 'Automatically equip Counter-' +
-                'Terrorist players with defusal kits on bomb ' +
-                'maps.')
+        with config.cfg_cvar('gg_map_strip_exceptions') as cvar:
 
-    # Armor
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ARMOR')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = No armor')
-    config.text('   1 = Kevlar only')
-    config.text('   2 = Assaultsuit (Kevlar + Helmet)')
-    config.text('Default Value: 2')
-    config.cvar('gg_player_armor', 2, 'The type of armor players are ' +
-                'equipped with when they spawn.')
-    config.text('')
-    config.text('')
+            cvar.name = 'WEAPON REMOVAL'
+            cvar.notes.append('Only weapon_* entities are supported.')
+            cvar.default = 'hegrenade,flashbang,smokegrenade'
+            cvar.text = 'The weapons that will not be removed from the map.'
 
-    config.text('+' * 76)
-    config.text('|' + ' ' * 30 + 'SOUND SETTINGS' + ' ' * 30 + '|')
-    config.text('+' * 76)
+        config.cfg_section('MAP SETTINGS')
 
-    # Sound Pack
-    config.text('')
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> SOUND PACK')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Sound packs are located in "../cstrike/cfg/gungame51/' +
-                'sound_packs".')
-    config.text('   * The INI file names located in the "sound_packs" ' +
-                'directory minus')
-    config.text('     the ".ini" extension are what you would use when ' +
-                'declaring the')
-    config.text('     default sound pack that players will hear when sounds' +
-                ' are played.')
-    config.text('Default Value: "default"')
-    config.cvar('gg_soundpack', 'default', 'The controls which sound pack ' +
-                'will be used by default.')
+        with config.cfg_cvar('gg_multi_round') as cvar:
 
-    # This line creates/updates the .cfg file
-    config.write()
+            cvar.name = 'MULTI-ROUND'
+            cvar.notes.append('Only set this variable ' +
+                'if you want more than one round per map change.')
+            cvar.notes.append('The map vote ' +
+                'will only trigger on the final round.')
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('# = The number of rounds ' +
+                'that need to be played before a map change.')
+            cvar.default = 0
+            cvar.text = ('The number of rounds that ' +
+                'need to be played before a map change.')
 
-    # Print to console to show successfule loading of the config
-    es.dbgmsg(0, '\tgg_en_config.cfg')
+        with config.cfg_cvar('gg_multi_round_intermission') as cvar:
 
+            cvar.name = 'MULTI-ROUND INTERMISSION'
+            cvar.notes.append([
+                'This option is only valid if ' +
+                    '"gg_multi_round" is set to a value',
+                'higher than "0".',
+                ])
+            cvar.notes.append([
+                'This will load "gg_warmup_round" ' +
+                    'based off of the "gg_warmup timer"',
+                'between rounds.',
+                ])
+            cvar.notes.append('Without an intermission, the next ' +
+                'GunGame round will start immediately after a win.')
+            cvar.options.append('0 = Do not have an intermission.')
+            cvar.options.append('1 = Enable the intermission.')
+            cvar.default = 0
+            cvar.text = ('The amount of time (in seconds) ' +
+                'that the intermission lasts between rounds.')
 
-def unload():
-    global config
+        with config.cfg_cvar('gg_dynamic_chattime') as cvar:
 
-    # Remove the "notify" and "replicated" flags as set by makepublic()
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
+            cvar.name = 'DYNAMIC END OF MAP CHAT TIME'
+            cvar.notes.append('Dynamic chat time is ' +
+                'based on the end of round winner music.')
+            cvar.notes.append([
+                'When enabled, the players will be able to chat for the',
+                'length of the winner music.',
+                ])
+            cvar.notes.append('If disabled, the ' +
+                '"mp_chattime" variable will be used.')
+            cvar.options.append("0 = (Disabled) Use " +
+                "the server\'s mp_chattime variable.")
+            cvar.options.append('1 = (Enabled) Use the ' +
+                'length of the individual audio file.')
+            cvar.default = 0
+            cvar.text = ('Enables dynamic end of round ' +
+                'chat time based on the winner music.')
 
-    # Delete the cfglib.AddonCFG instance
-    del config
+        config.cfg_section('PLAYER SETTINGS')
+
+        with config.cfg_cvar('gg_player_defuser') as cvar:
+
+            cvar.name = 'DEFUSERS'
+            cvar.options.append('0 = Disabled')
+            cvar.options.append('1 = Enabled')
+            cvar.default = 0
+            cvar.text = ('Automatically equip Counter-Terrorist ' +
+                'players with defusal kits on bomb maps.')
+
+        with config.cfg_cvar('gg_player_armor') as cvar:
+
+            cvar.name = 'ARMOR'
+            cvar.options.append('0 = No armor')
+            cvar.options.append('1 = Kevlar only')
+            cvar.options.append('2 = Assaultsuit (Kevlar + Helmet)')
+            cvar.default = 2
+            cvar.text = ('The type of armor players ' +
+                'are equipped with when they spawn.')
+
+        config.cfg_section('SOUND SETTINGS')
+
+        with config.cfg_cvar('gg_soundpack') as cvar:
+
+            cvar.name = 'SOUND PACK'
+            cvar.notes.append('Sound packs are located in ' +
+                '"../cstrike/cfg/gungame51/sound_packs".')
+            cvar.notes.append([
+                'The INI file names located in ' +
+                    'the "sound_packs" directory minus',
+                'the ".ini" extension are what you ' +
+                    'would use when declaring the',
+                'default sound pack that players will ' +
+                    'hear when sounds are played.',
+                ])
+            cvar.default = 'default'
+            cvar.text = 'Controls which sound pack will be used by default.'

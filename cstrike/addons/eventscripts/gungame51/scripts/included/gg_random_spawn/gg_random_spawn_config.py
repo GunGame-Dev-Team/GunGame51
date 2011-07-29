@@ -9,55 +9,33 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_random_spawn.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Random Spawnpoints
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> RANDOM SPAWNPOINTS')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Loads random spawnpoints if a spawnpoint file for the ' +
-                'current map has')
-    config.text('    been created.')
-    config.text('Note:')
-    config.text('   Create spawnpoint files with the gg_spawnpoints ' +
-                'included addon.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_random_spawn.')
-    config.text('   1 = (Enabled) Load gg_random_spawn.')
-    config.text('Default Value: 0')
-    config.cvar('gg_random_spawn', 0, 'Enables/Disables random spawn ' +
-        'points').addFlag('notify')
+        with config.cfg_cvar('gg_random_spawn') as cvar:
 
-    config.write()
-    es.dbgmsg(0, '\tgg_random_spawn.cfg')
-
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'RANDOM SPAWNPOINTS'
+            cvar.description.append([
+                'Loads random spawnpoints if a ' +
+                    'spawnpoint file for the ',
+                'current map has been created.',
+                ])
+            cvar.notes.append('Create spawnpoint files ' +
+                'with the gg_spawnpoints included addon.')
+            cvar.options.append('0 = (Disabled) Do not load gg_random_spawn.')
+            cvar.options.append('1 = (Enabled) Load gg_random_spawn.')
+            cvar.default = 0
+            cvar.text = 'Enables/Disables random spawn points.'

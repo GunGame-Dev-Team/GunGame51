@@ -55,7 +55,7 @@ class PlayerWins(_PlayerMeta):
             _update_winner('wins', value, uniqueid=self.steamid)
         # New entry
         else:
-            name = es.getplayername(self.userid)
+            name = _es.getplayername(self.userid)
             if not name:
                 name = "unnamed"
             _insert_winner(name, self.steamid, value)

@@ -29,7 +29,7 @@ except ImportError:
     raise ImportError('SPE Is not installed on this server! Please visit ' +
         'http://forums.eventscripts.com/viewtopic.php?t=29657 and download ' +
         'the latest version! SPE is required to run GunGame 5.1.')
-  
+
 
 # GunGame Imports
 
@@ -46,9 +46,7 @@ from core.weapons import WeaponManager
 from core.weapons import load_weapon_orders
 
 #    Config Function Imports
-from core.cfg.shortcuts import loadConfig
-from core.cfg.shortcuts import unloadConfig
-from core.cfg.shortcuts import get_config_list
+from core.cfg.shortcuts import ConfigManager
 
 #    Addon Function Imports
 from core.addons import AddonManager
@@ -273,7 +271,7 @@ def unload():
     Database().close()
 
     # Unload configs (removes flags from CVARs)
-    unloadConfig(get_config_list())
+    ConfigManager().unload_configs()
 
     # Enable Buyzones
     es.server.queuecmd('es_xfire %s func_buyzone Enable' % es.getuserid())
@@ -292,21 +290,8 @@ def initialize():
     es.dbgmsg(0, langstring("Load_Start",
         {'version': gungame_info('version')}))
 
-    # Load all main configs
-    es.dbgmsg(0, langstring("Load_Configs"))
-    loadConfig(get_config_list("main"))
-
-    # Load all included addon configs
-    loadConfig(get_config_list("included"))
-
-    es.dbgmsg(0, langstring("Load_CustomConfigs"))
-
-    # Are there any custom addon configs?
-    configs = get_config_list("custom")
-    if configs:
-
-        # Load all custom addon configs
-        loadConfig(configs)
+    # Load all configs
+    ConfigManager().load_configs()
 
     # Parse Weapon Order Files
     es.dbgmsg(0, langstring("Load_WeaponOrders"))

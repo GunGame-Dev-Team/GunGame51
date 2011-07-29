@@ -9,51 +9,28 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_reload.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Reload
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> RELOAD')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   When a player gains a level, the ammo in their clip is ' +
-                'replenished.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_reload.')
-    config.text('   1 = (Enabled) Load gg_reload.')
-    config.text('Default Value: 0')
-    config.cvar('gg_reload', 0, 'Enables/Disables ' +
-                'gg_reload.').addFlag('notify')
+        with config.cfg_cvar('gg_reload') as cvar:
 
-    config.write()
-    es.dbgmsg(0, '\tgg_reload.cfg')
-
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'RELOAD'
+            cvar.description.append('When a player gains a ' +
+                'level, the ammo in their clip is replenished.')
+            cvar.options.append('0 = (Disabled) Do not load gg_reload.')
+            cvar.options.append('1 = (Enabled) Load gg_reload.')
+            cvar.default = 0
+            cvar.text = 'Enables/Disables gg_reload.'

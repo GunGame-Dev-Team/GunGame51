@@ -9,76 +9,49 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_deathmatch.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Deathmatch
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> DEATHMATCH')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Emulates a team-deathmatch mode, and players will ' +
-                'respawn when they die.')
-    config.text('Notes:')
-    config.text('   * "gg_dead_strip" will automatically be enabled.')
-    config.text('   * Will not load if "gg_dead_strip" can not be enabled.')
-    config.text('   * "gg_dissolver" will automatically be enabled.')
-    config.text('   * Will not load if "gg_dissolver" can not be enabled.')
-    config.text('   * Will not load with "gg_elimination" enabled.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_deathmatch.')
-    config.text('   1 = (Enabled) Load gg_deathmatch.')
-    config.text('Default Value: 0')
-    config.cvar('gg_deathmatch', 0, 'Enables/Disables ' +
-                'gg_deathmatch.').addFlag('notify')
+        # Deathmatch
+        with config.cfg_cvar('gg_deathmatch') as cvar:
 
-    # Deathmatch Respawn Delay
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> DEATHMATCH RESPAWN DELAY')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   The amount of time (in seconds) to wait before ' +
-                'respawning a player after')
-    config.text('   they die.')
-    config.text('Notes:')
-    config.text('   * The respawn delay must be greater than 0.')
-    config.text('   * You can use 0.1 for a nearly immediate respawn time.')
-    config.text('   * If set to 0 or less, the delay will be set to 0.1.')
-    config.text('Options:')
-    config.text('   # = Time (in seconds) to wait before respawning a player.')
-    config.text('Default Value: 2')
-    config.cvar('gg_dm_respawn_delay', 2, 'Seconds to wait before respawning' +
-                ' a player after death.')
+            cvar.name = 'DEATHMATCH'
+            cvar.description.append('Emulates a team-deathmatch mode, ' +
+                'and players will respawn when they die.')
+            cvar.notes.requires.append('gg_dead_strip')
+            cvar.notes.requires.append('gg_dissolver')
+            cvar.notes.conflict.append('gg_elimination')
+            cvar.options.append('0 = (Disabled) Do not load gg_deathmatch.')
+            cvar.options.append('1 = (Enabled) Load gg_deathmatch.')
+            cvar.default = 0
+            cvar.text = 'Enables/Disables gg_deathmatch.'
 
-    config.write()
-    es.dbgmsg(0, '\tgg_deathmatch.cfg')
+        # Respawn Delay
+        with config.cfg_cvar('gg_dm_respawn_delay') as cvar:
 
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'DEATHMATCH RESPAWN DELAY'
+            cvar.description.append('The amount of time (in seconds)' +
+                ' to wait before respawning a player after they die')
+            cvar.notes.append('The respawn delay must be greater than 0.')
+            cvar.notes.append(
+                'You can use 0.1 for a nearly immediate respawn time')
+            cvar.notes.append(
+                'If set to 0 or less, the delay will be set to 0.1.')
+            cvar.options.append(
+                '# = Time (in seconds) to wait before respawning a player.')
+            cvar.default = 2
+            cvar.text = (
+                'Seconds to wait before respawning a player after death.')

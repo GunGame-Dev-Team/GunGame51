@@ -13,27 +13,35 @@ $LastChangedDate$
 from path import path
 
 # EventScripts Imports
+#   ES
 import es
-import gamethread
+#   Cfglib
 from cfglib import AddonCFG
+#   Gamethread
+from gamethread import delayed
 
 # GunGame Imports
+#   Addons
 from gungame51.core.addons import get_valid_addons
 from gungame51.core.addons import AddonManager
 from gungame51.core.addons import load
 from gungame51.core.addons import unload
 from gungame51.core.addons import dependencies
 from gungame51.core.addons import conflicts
+#   Messaging
+from gungame51.core.messaging.shortcuts import langstring
+#   Base
 from gungame51.core import get_game_dir
 
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-cfgExecuting = False
+base_config_path = path(
+    path(__file__).parent.rsplit('addons', 1)[0]).joinpath('cfg/gungame51')
 
 
 # =============================================================================
-# >> CLASSES
+# >> CONFIG MANAGER CLASS
 # =============================================================================
 class ConfigManager(object):
     '''
@@ -46,140 +54,141 @@ class ConfigManager(object):
             # Initialize the class instance variables
             cls._the_instance.__loaded__ = {}
             cls._the_instance.__cvardefaults__ = {}
+            cls._the_instance._config_files = {}
         return cls._the_instance
 
-    # =========================================================================
-    # >> ConfigManager() CUSTOM CLASS METHODS
-    # =========================================================================
-    def load(self, name):
-        '''
-        Loads the config's python file.
+    def load_configs(self):
+        '''Loads all "main", "included", and "custom" addon config files'''
 
-        Notes:
-            * Attempts to execute the python file's "load" function if it
-              exists.
-            * Executes the config.
-            * The scripter is responsible for the cfglib.AddonCFG().write()
-              method.
-        '''
-        # Retrieve the config module
-        config = self.get_config_by_name(name)
+        es.addons.registerForEvent(self, 'server_cvar', self.server_cvar)
 
-        # Load the config if it has a load function
+        self.cfg_executing = False
+
+        es.dbgmsg(0, langstring('Load_Configs'))
+
+        for cfgfile in _config_types['main']:
+
+            self.load(cfgfile, 'main')
+
+        for cfgfile in _config_types['included']:
+
+            self.load(cfgfile, 'included')
+
+        es.dbgmsg(0, langstring('Load_CustomConfigs'))
+
+        for cfgfile in _config_types['custom']:
+
+            self.load(cfgfile, 'custom')
+
+    def load(self, cfgfile, cfg_type):
+        config = self._import_config(cfgfile.namebase, cfg_type)
+
         if 'load' in config.__dict__:
             config.load()
 
-        # Make sure that no DependencyErrors are raised by GunGame itself due
-        # to the order in which the configs are executed
-        for item in config.__dict__:
-            if isinstance(config.__dict__[item], AddonCFG):
+        cfg = None
+
+        basepath = path(config.__dict__['__file__']).namebase
+
+        if cfg_type != 'main':
+
+            basepath = basepath[:~6]
+
+        if basepath in self._config_files:
+
+            cfg = self._config_files[basepath]
+
+        else:
+
+            for item in config.__dict__:
+
+                if not isinstance(config.__dict__[item], AddonCFG):
+                    continue
+
                 cfg = config.__dict__[item]
 
-                # List to store addons that are defaulted to "on"
-                revisit = []
+                self._config_files[basepath] = cfg
 
-                # Loop through the CVARs in the configlib.AddonCFG instance
-                for cvar, value, description in cfg.getCvars().values():
-                    # Add the CVAR and default value to the dictionary
-                    self.__cvardefaults__[cvar] = value
+                break
 
-                    # Search for CVARs defaulted to "on"
-                    if bool(str(value)) and False in \
-                        [x == '0' for x in str(value).split('.')]:
-                            revisit.append(cvar)
+        if cfg is None:
+            return
 
-                global cfgExecuting
-                cfgExecuting = True
-                gamethread.delayed(0.01, self._reset_config_execution, ())
-                # "Some" Linux servers were executing the config before or at
-                # the same time as setting the notify flag on the "trigger"
-                # CVARs. Therefore, a slight delay is needed here to guarantee
-                # that the notify flag is set before the config executes.
+        revisit = []
 
-                gamethread.delayed(0, cfg.execute)
+        for cvar, value, description in cfg.getCvars().values():
 
-                # Load addons that were defaulted to "on"
-                revisit = [x for x in revisit if x in get_valid_addons()]
-                for cvar in revisit:
-                    # Force their values to 0
-                    es.forcevalue(cvar, 0)
+            self.__cvardefaults__[cvar] = value
 
-                    # Change back to their defaults to trigger server_cvar
-                    gamethread.delayed(0, es.server.queuecmd, ("%s %s" % (cvar,
-                                                self.__cvardefaults__[cvar])))
+            if bool(str(value)) and False in [
+              x == '0' for x in str(value).split('.')]:
 
-    def unload(self, name):
-        '''
-        Unloads the config's python file.
+                revisit.append(cvar)
 
-        Notes:
-            * Attempts to execute the python file's "unload" function if it
-              exists.
-            * Removes the "notify" flag from all CVARs declared in the config's
-              python file.
-        '''
-        # Retrieve the config module
-        config = self.get_config_by_name(name)
+        self.cfg_executing = True
 
-        for item in config.__dict__:
-            if isinstance(config.__dict__[item], AddonCFG):
-                cfg = config.__dict__[item]
-                # Loop through the CVARs in the configlib.AddonCFG instance
-                for cvar, value, description in cfg.getCvars().values():
-                    # Return values to their original state
-                    es.ServerVar(cvar).set(value)
-                    # Remove the CVAR and default value from the dictionary
-                    del self.__cvardefaults__[cvar]
-                    # Remove the "notify" flag for the CVAR
-                    es.ServerVar(cvar).removeFlag('notify')
+        delayed(0.01, self._reset_config_execution)
 
-        # Unload the config if it has an unload function
-        if 'unload' in config.__dict__:
-            config.unload()
+        delayed(0, cfg.execute)
 
-        # Remove the stored config module
-        del self.__loaded__[name]
+        revisist = [x for x in revisit if x in get_valid_addons()]
 
-    def _reset_config_execution(self):
-        '''
-        Resets the global veriable cfgExecuting for when configs are being
-        executed via cfglib.AddonCFG().execute().
-        '''
-        global cfgExecuting
-        cfgExecuting = False
+        for cvar in revisit:
 
-    def get_config_by_name(self, name):
-        '''
-        Returns the module of a config by name.
-        '''
-        # If the config is loaded we have stored the module
+            es.forcevalue(cvar, 0)
+
+            delayed(0, es.server.queuecmd,
+                ('%s %s' % (cvar, self.__cvardefaults__[cvar])))
+
+    def _import_config(self, name, cfg_type):
         if name in self.__loaded__:
             return self.__loaded__[name]
 
-        # Get the config type
-        cfgType = ConfigManager.get_config_type(name)
+        if cfg_type == 'main':
 
-        # Get the name of the addon the config belongs to
-        addon = name.replace("_config", "")
-
-        # Import the config and store the module
-        if cfgType == 'main':
             self.__loaded__[name] = __import__('gungame51.core.cfg.files.%s'
                 % name, globals(), locals(), [''])
-        else:
-            self.__loaded__[name] = __import__('gungame51.scripts.%s.%s.%s'
-                % (cfgType, addon, name), globals(), locals(), [''])
 
-        # We have to reload the module to re-instantiate the globals
+        else:
+
+            addon = name.replace('_config', '')
+
+            self.__loaded__[name] = __import__('gungame51.scripts.%s.%s.%s'
+                % (cfg_type, addon, name), globals(), locals(), [''])
+
         reload(self.__loaded__[name])
 
         return self.__loaded__[name]
 
-    # =========================================================================
-    # ConfigManager() STATIC CLASS METHODS
-    # =========================================================================
-    @staticmethod
-    def server_cvar(event_var):
+    def _reset_config_execution(self):
+        self.cfg_executing = False
+
+    def unload_configs(self):
+        for cfg in self._config_files.values():
+
+            for cvar, value, description in cfg.getCvars().values():
+
+                es.ServerVar(cvar).set(value)
+
+                if cvar in self.__cvardefaults__:
+
+                    del self.__cvardefaults__[cvar]
+
+                es.ServerVar(cvar).removeFlag('notify')
+
+        for name in self.__loaded__.keys():
+
+            reload(self.__loaded__[name])
+
+            if 'unload' in self.__loaded__[name].__dict__:
+
+                self.__loaded__[name].unload()
+
+            del self.__loaded__[name]
+
+        es.addons.unregisterForEvent(self, 'server_cvar')
+
+    def server_cvar(self, event_var):
         '''
         Handles CVARs that are loaded via GunGame's ConfigManager.
         '''
@@ -199,12 +208,12 @@ class ConfigManager(object):
 
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
-            if cfgExecuting and cvarName in conflicts.keys():
+            if self.cfg_executing and cvarName in conflicts.keys():
                 if str(ConfigManager().__cvardefaults__[cvarName]) == \
                   str(cvarValue):
                     return
 
-            gamethread.delayed(0, load, (cvarName))
+            delayed(0, load, (cvarName))
 
         # Unload addons with the value of 0 (including floats) or ''
         else:
@@ -214,119 +223,404 @@ class ConfigManager(object):
 
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
-            if cfgExecuting and cvarName in dependencies.keys():
+            if self.cfg_executing and cvarName in dependencies.keys():
                 if str(ConfigManager().__cvardefaults__[cvarName]) == \
                   str(cvarValue):
                     return
 
-            gamethread.delayed(0, unload, (cvarName))
+            delayed(0, unload, (cvarName))
 
-    @staticmethod
-    def config_exists(name):
+
+# =============================================================================
+# >> LIST MANAGEMENT CLASSES
+# =============================================================================
+class ListManagement(list):
+    header = ''
+    first = ''
+    indent = 0
+
+    def __init__(self, config):
+        self.config = config
+
+    def print_to_text(self):
+        if not len(self):
+            return
+        if self.header:
+            self.config.text(self.header)
+        for section in self:
+            if isinstance(section, str):
+                self.config.text(self.first + section)
+            elif isinstance(section, list):
+                self.config.text(self.first + section[0])
+                for line in section[1:]:
+                    self.config.text(' ' * self.indent + line)
+
+
+class ListDescription(ListManagement):
+    header = 'Description:'
+    first = ' ' * 3
+    indent = 6
+
+
+class ListInstructions(ListManagement):
+    header = 'Instructions:'
+    first = '   * '
+    indent = 7
+
+
+class ListNotes(ListManagement):
+    header = 'Notes:'
+    first = '   * '
+    indent = 6
+    requires = list()
+    conflict = list()
+
+    def print_to_text(self):
+        if not (len(self) or self.conflict or self.requires):
+            return
+        self.config.text(self.header)
+        for addon in self.requires:
+            self.config.text(
+                self.first + '"' + addon + '" will automatically be enabled.')
+            self.config.text(self.first +
+                'Will not load if "' + addon + '" can not be enabled.')
+        for addon in self.conflict:
+            self.config.text(
+                self.first + 'Will not load with "' + addon + '" enabled.')
+        for section in self:
+            if isinstance(section, str):
+                self.config.text(self.first + section)
+            elif isinstance(section, list):
+                self.config.text(self.first + section[0])
+                for line in section[1:]:
+                    self.config.text(' ' * self.indent + line)
+
+
+class ListExamples(ListManagement):
+    header = 'Examples:'
+    first = '   * '
+    indent = 9
+
+
+class ListOptions(ListManagement):
+    header = 'Options:'
+    first = ' ' * 3
+    indent = 9
+
+
+# =============================================================================
+# >> CONTEXT MANAGEMENT CLASSES
+# =============================================================================
+class ConfigContextManager(object):
+    '''Context Management class used to create config files'''
+
+    class CvarContextManager(object):
         '''
-        Returns an int (bool) value depending on a GunGame addon's existance.
+        Context Management class used to create variables within config files
         '''
-        return get_game_dir('addons/eventscripts/gungame51/' +
-            'core/cfg/files/%s.py' % name).isfile() or \
-            get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/included/%s/%s.py' \
-                % (name.replace("_config", ""), name)).isfile() or \
-            get_game_dir('addons/eventscripts/gungame51/' +
-            'scripts/custom/%s/%s.py' \
-                % (name.replace("_config", ""), name)).isfile()
 
-    @staticmethod
-    def get_config_type(name):
-        '''
-        Returns a string value of the config type:
-            "custom"
-            "included"
-            "main"
-        '''
-        # Check to see if the config exists
-        if not ConfigManager().config_exists(name):
-            raise ValueError('Cannot get config type (%s): doesn\'t exist.'
-                % name)
+        def __init__(self, cvarname, notify, config):
+            '''Called when the class is first initialized'''
 
-        # Get config type
-        if get_game_dir('addons/eventscripts/gungame51/core/cfg' +
-            '/files/%s.py' % name).isfile():
-                return 'main'
-        elif get_game_dir('addons/eventscripts/gungame51/scripts/included' +
-            '/%s/%s.py' % (name.replace("_config", ""), name)).isfile():
-                return 'included'
-        elif get_game_dir('addons/eventscripts/gungame51/scripts/' +
-            'custom/%s/%s.py' % (name.replace("_config", ""), name)).isfile():
-                return 'custom'
+            # Create the cvar's attributes as their base values
+            self.cvarname = cvarname
+            self.name = None
+            self.description = ListDescription(config)
+            self.instructions = ListInstructions(config)
+            self.notes = ListNotes(config)
+            self.extra = ListManagement(config)
+            self.examples = ListExamples(config)
+            self.options = ListOptions(config)
+            self.default = None
+            self.text = None
+            self.notify = notify
+
+        def __enter__(self):
+            '''Returns the class instance to use for Context Management'''
+
+            # Return the class
+            return self
+
+        def __exit__(self, exc_type, exc_value, _traceback):
+            '''Verifies that certain attributes have values on exit'''
+
+            if _traceback:
+                es.dbgmsg(0, _traceback)
+                return False
+
+            # Does the cvar have a name value?
+            if self.name is None:
+
+                # Raise an error
+                raise NameError
+
+            # Does the cvar have a default value?
+            if self.default is None:
+
+                # Raise an error
+                raise NameError
+
+            # Does the cvar have a text value?
+            if self.text is None:
+
+                # Raise an error
+                raise NameError
+
+            return True
+
+    def __init__(self, filepath):
+        '''Called when the class is first initialized'''
+
+        # Split the given file path.
+        config_path = path(filepath).splitpath()
+
+        # Get the first part of the path
+        config_type = config_path[0]
+
+        # Set the filename of the cfg file
+        self.filename = config_path[1] + '.cfg'
+
+        # Is the path from an included or custom addon?
+        if config_type in ('included', 'custom'):
+
+            # Get the name of the addon
+            self.name = ' '.join(config_path[1].split('_')).capitalize()
+
+            # Set the description to use
+            self.description = ('This file defines GunGame '
+                + config_type.capitalize() + ' Addon settings.')
+
+            # Set the path within ../cfg/gungame51/ for the .cfg file
+            self.cfgpath = config_type + '_addon_configs/' + self.filename
+
+        # Is this from the core of GunGame?
+        else:
+
+            # Set name to None to be set later by the _config.py file itself
+            self.name = None
+
+            # Set desc to None to be set later by the _config.py file itself
+            self.description = None
+
+            # Set the path within ../cfg/gungame51/ for the .cfg file
+            self.cfgpath = self.filename
+
+        # Set the path to the .cfg file
+        self.filepath = base_config_path.joinpath(self.cfgpath)
+
+    def __enter__(self):
+        '''Returns the class instance to use for Context Management'''
+
+        # Get the AddonCFG instance for the .cfg file
+        self.config = AddonCFG(self.filepath)
+
+        # Add the AddonCFG instance to config_files
+        ConfigManager()._config_files[self.filename[:~3]] = self.config
+
+        # Create the list of sections to add cvars and text to
+        self.sections = list()
+
+        # Return the instance
+        return self
+
+    def cfg_cvar(self, cvarname):
+        '''Used to create cvars and their text for the .cfg file'''
+
+        # Set "notify" to False
+        notify = False
+
+        # Is this cvar the name of the file?
+        # Used for auto adding the "notify" flag for included/custom addons
+        if cvarname == self.filename[:~3]:
+
+            # Set the "notify" flag to True
+            notify = True
+
+        # Get the CvarContextManager instance for the current cvar
+        section = self.CvarContextManager(cvarname, notify, self.config)
+
+        # Add the CvarContextManager instance to the list of sections
+        self.sections.append(section)
+        return section
+
+    def cfg_section(self, section_name):
+        '''Used to create separated sections within the .cfg file'''
+
+        # Add the new section name to the list of sections
+        self.sections.append(section_name.upper())
+
+    def __exit__(self, exc_type, exc_value, _traceback):
+        '''Verifies that there is a description and creates the .cfg file'''
+
+        if _traceback:
+            es.dbgmsg(0, _traceback)
+            return False
+
+        # Does the .cfg file have a description
+        if self.description is None:
+
+            # Raise an error
+            raise NameError
+
+        # Create the first line of the header
+        self.config.text('*' * 76)
+
+        # Is there nothing to add to the filename in the header?
+        if self.name is None:
+
+            # Set the topline to be just the filename
+            topline = self.filename
+
+        # Is there a name that needs to be added to the filename in the header?
+        else:
+
+            # Set the topline to be the filename and the name
+            topline = self.filename + ' -- ' + self.name
+
+        # Add the topline to the header
+        self.config.text('*' + topline.center(74) + '*')
+
+        # Add a blank line to the header
+        self.config.text('*' + ' ' * 74 + '*')
+
+        # Add the description to the header
+        self.config.text('*' + self.description.center(74) + '*')
+
+        # Add a blank line to the header
+        self.config.text('*' + ' ' * 74 + '*')
+
+        # Add the note lines to the header
+        self.config.text('*' +
+            'Note: Any alteration of this file requires a'.center(74) + '*')
+        self.config.text('*' +
+            'server restart or a reload of GunGame.'.center(74) + '*')
+
+        # Add the last line of the header
+        self.config.text('*' * 76)
+
+        # Loop through all sections to add to the .cfg file
+        for section in self.sections:
+
+            # Add a blank line before each section
+            self.config.text('')
+
+            # Is the current section just text?
+            if isinstance(section, str):
+
+                # Add a blank line for separation
+                self.config.text('')
+
+                # Start the section header
+                self.config.text('+' * 76)
+
+                # Add the section header name
+                self.config.text('|' + section.center(74) + '|')
+
+                # End the section header
+                self.config.text('+' * 76)
+
+                # Add a blank line for separation
+                self.config.text('')
+
+            # Is the section for a cvar?
+            else:
+
+                # Start the cvar section header
+                self.config.text('=' * 76)
+
+                # Add the section name
+                self.config.text('>> ' + section.name)
+
+                # End the cvar section header
+                self.config.text('=' * 76)
+
+                # Print the description
+                section.description.print_to_text()
+
+                # Print the instructions
+                section.instructions.print_to_text()
+
+                # Print the notes
+                section.notes.print_to_text()
+
+                # Print any extra text
+                section.extra.print_to_text()
+
+                # Print the examples
+                section.examples.print_to_text()
+
+                # Print the options
+                section.options.print_to_text()
+
+                # Is the default value a string?
+                if isinstance(section.default, str):
+
+                    # Add "" around the value when printing the default
+                    self.config.text('Default Value: "' +
+                        str(section.default) + '"')
+
+                # Is the default value not a string?
+                else:
+
+                    # Add the default value section
+                    self.config.text('Default Value: ' + str(section.default))
+
+                # Create the ServerVar instance for the cvar
+                current = self.config.cvar(
+                    section.cvarname, section.default, section.text)
+
+                # Is the cvar supposed to be set to notify?
+                if section.notify:
+
+                    # Add the notify flag
+                    current.addFlag('notify')
+
+        # Print message that the file has been created
+        es.dbgmsg(0, '\t' + self.cfgpath)
+
+        # Write the .cfg file
+        self.config.write()
+
+        return True
 
 
-# Register the ConfigManager instance for the "server_cvar" event
-es.addons.registerForEvent(ConfigManager(), 'server_cvar',
-                                                   ConfigManager().server_cvar)
+class ConfigTypeDictionary(dict):
+    def __getitem__(self, item):
+        if item in self:
+            return super(ConfigTypeDictionary, self).__getitem__(item)
+        values = self[item] = get_configs_by_type(item)
+        return values
+
+_config_types = ConfigTypeDictionary()
+
 
 # =============================================================================
 # >> FUNCTIONS
 # =============================================================================
-list_config_types = [
-    ("main", get_game_dir("/addons/eventscripts/gungame51/core/cfg/files")),
-    ("included",
-        get_game_dir("/addons/eventscripts/gungame51/scripts/included")),
-    ("custom", get_game_dir("/addons/eventscripts/gungame51/scripts/custom"))
-    ]
-
-# Dictionary used to cache configs, optmizing having to read from disk
-dict_configs_cache = {"main": [], "included": [], "custom": []}
-
-
-def __cache_configs():
-    # Loop through each config path
-    for cfgpath in [x[1] for x in list_config_types]:
-        # Walk through all files in the path
-        for file in cfgpath.walkfiles('*.py'):
-            # We require the configs to end with "_config.py"
-            if not file.name.endswith("_config.py"):
-                continue
-
-            # Check for "main"
-            if cfgpath == list_config_types[0][1]:
-                dict_configs_cache["main"].append(file.namebase)
-            # Check for "included"
-            elif cfgpath == list_config_types[1][1]:
-                dict_configs_cache["included"].append(file.namebase)
-            else:
-                dict_configs_cache["custom"].append(file.namebase)
-
-# Cache the configs
-__cache_configs()
+def get_configs_by_type(name):
+    cfg_list = []
+    if not name in ('main', 'included', 'custom'):
+        raise ValueError('"%s" is not a valid config type' % name)
+    if name == 'main':
+        cfgpaths = path(__file__).parent.joinpath('files')
+    else:
+        cfgpaths = path(
+            path(__file__).parent.rsplit('core')[0]).joinpath('scripts', name)
+    for cfgpath in cfgpaths.walkfiles('*_config.py'):
+        cfg_list.append(cfgpath)
+    return cfg_list
 
 
-def get_config_list(type=None):
-    '''
-    Retrieves a list of cfglib configs of the following types:
-        * main (the primary GunGame configs)
-        * included (included addon configs)
-        * custom (custom addon configs)
-
-    Note:
-        If no argument is provided, all possible configs will be returned
-        in the list.
-    '''
-    # Did they supply us with a type?
-    if type:
-        # Make sure they provided us with a valid argument value
-        if type not in [x[0] for x in list_config_types]:
-            raise ValueError('Invalid argument type: "%s". Use only: "%s"'
-                % (type, '", "'.join([x[0] for x in list_config_types])) +
-                ', or None.')
-
-        # Return the specific type
-        return dict_configs_cache[type]
-
-    # Search all possible configs
-    searchList = [dict_configs_cache[x[0]] for x in list_config_types]
-
-    # Return the list of config names (no ".py" extension)
-    return [item for sublist in searchList for item in sublist]
+def get_config_list(cfg_type=None):
+    if cfg_type is None:
+        cfg_list = []
+        for each_type in ('main', 'included', 'custom'):
+            cfg_list.extend(
+                [item.namebase for item in _config_types[each_type]])
+        return cfg_list
+    if not cfg_type in ('main', 'included', 'custom'):
+        raise ValueError('"%s" is not a valid config type' % name)
+    return [item.namebase for item in _config_types[cfg_type]]
 
 
 def generate_header(config):

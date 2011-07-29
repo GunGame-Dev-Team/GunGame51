@@ -19,7 +19,7 @@ import es
 # =============================================================================
 # >> GLOBALS
 # =============================================================================
-gamePath = str(es.ServerVar('eventscripts_gamedir')).replace('\\', '/')
+gamePath = path(path(__file__).parent.rsplit('addons', 1)[0][:~0])
 
 
 # =============================================================================
@@ -42,8 +42,8 @@ def get_game_dir(folder=None):
     @return An absolute path to the game directory plus \p dir.'''
     if folder:
         folder = str(folder).replace('\\', '/')
-        return path('%s/%s' % (gamePath, folder))
-    return path(gamePath)
+        return gamePath.joinpath(folder)
+    return gamePath
 
 
 def getOS():
@@ -85,17 +85,19 @@ def get_file_list(top=get_game_dir('addons/eventscripts')):
 # >> OLD FILE REMOVAL
 # =============================================================================
 # List of old files no longer in use.
-old_files = [get_game_dir('addons/eventscripts/gungame51/scripts/included' +
-                '/gg_error_logging'),
-             get_game_dir('addons/eventscripts/gungame51/scripts/included' +
-                '/gg_thanks'),
-             get_game_dir('cfg/gungame51/included_addon_configs' +
-                '/gg_error_logging.cfg'),
-             get_game_dir('cfg/gungame51/included_addon_configs' +
-                '/gg_thanks.cfg')]
+old_files = [
+    'addons/eventscripts/gungame51/core/events/data/es_gungame_events.res',
+    'addons/eventscripts/gungame51/scripts/included/gg_error_logging',
+    'addons/eventscripts/gungame51/scripts/included/gg_thanks',
+    'cfg/gungame51/included_addon_configs/gg_error_logging.cfg',
+    'cfg/gungame51/included_addon_configs/gg_thanks.cfg',
+]
 
 # Delete any out of date files
 for old_file in old_files:
+
+    # Get the full path to the file
+    old_file = get_game_dir(old_file)
 
     if old_file.isfile():
         old_file.remove()

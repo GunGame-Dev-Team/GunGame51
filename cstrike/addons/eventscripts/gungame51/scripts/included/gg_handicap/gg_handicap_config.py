@@ -9,128 +9,98 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_handicap.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Handicap
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HANDICAP')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Helps newly connected players by adjusting their level.')
-    config.text('   Basically "catching them up".')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_handicap.')
-    config.text('   1 = Set player to the lowest level of all the other ' +
-                'players.')
-    config.text('   2 = Set player to the average level of all the other ' +
-                'players.')
-    config.text('Default Value: 0')
-    config.cvar('gg_handicap', 0, 'Helps newly connected players by ' +
-                'adjusting their level.').addFlag('notify')
+        with config.cfg_cvar('gg_handicap') as cvar:
 
-    # Handicap max join level
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HANDICAP MAXIMUM FIRST LEVEL')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   The highest level a player may receive when first joinin' +
-                'g the server.')
-    config.text('Notes:')
-    config.text('   * If you are running handicap update, this setting is ' +
-                'pointless.')
-    config.text('Options:')
-    config.text('   0 = (Disabled)')
-    config.text('   # = Max. level a player may join in on.')
-    config.text('Default Value: 0')
-    config.cvar('gg_handicap_max', 0, 'Helps newly connected players by ' +
-                'adjusting their level. (max)').addFlag('notify')
+            cvar.name = 'HANDICAP'
+            cvar.description.append(
+                'Helps newly connected players by adjusting their level.')
+            cvar.description.append('Basically "catching them up".')
+            cvar.options.append('0 = (Disabled) Do not load gg_handicap.')
+            cvar.options.append('1 = Set player to the ' +
+                'lowest level of all the other players.')
+            cvar.options.append('2 = Set player to the ' +
+                'average level of all the other players.')
+            cvar.default = 0
+            cvar.text = ('Helps newly connected ' +
+                'players by adjusting their level.')
 
-    # No Reconnect
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HANDICAP NO RECONNECT')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   gg_handicap will only process a handicap level for the ' +
-                'first time')
-    config.text('   a player joins a team.  This prevents players from ' +
-                'abusing the')
-    config.text('   handicap system. (reconnecting to level up)')
-    config.text('Notes:')
-    config.text('   * If you are running handicap update, this setting is ' +
-                'pointless.')
-    config.text('Options:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
-    config.text('Default Value: 0')
-    config.cvar('gg_handicap_no_reconnect', 0, 'Prevents abuse from reconne' +
-                'cting').addFlag('notify')
+        with config.cfg_cvar('gg_handicap_max') as cvar:
 
-    # Handicap Update
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HANDICAP UPDATE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   A timer (in seconds) that updates players with the ' +
-                'lowest level to the')
-    config.text('   lowest level of the other players. Basically "catching ' +
-                'them up".')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_handicap_update.')
-    config.text('   180 = (Enabled) Update the lowest level players')
-    config.text('                    every 180 seconds (3 minutes).')
-    config.text('Default Value: 0')
-    config.cvar('gg_handicap_update', 0, 'The time (in seconds) to update ' +
-                'players\' levels using handicap.')
+            cvar.name = 'HANDICAP MAXIMUM FIRST LEVEL'
+            cvar.description.append('The highest level a player ' +
+                'may receive when first joining the server.')
+            cvar.notes.append('If you are running ' +
+                'handicap update, this setting is pointless.')
+            cvar.options.append('0 = (Disabled)')
+            cvar.options.append('# = Max. level a player may join in on.')
+            cvar.default = 0
+            cvar.text = ('Helps newly connected ' +
+                'players by adjusting their level. (max)')
+            cvar.notify = True
 
-    # Legacy Mode
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> LEGACY MODE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This enables the old method of handicap adjustment, ' +
-                'which is')
-    config.text('   based on when a player joins the server. Instead of the ' +
-                'new method,')
-    config.text('   which is when the player joins a team for the first time.')
-    config.text('Options:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
-    config.text('Default Value: 0')
-    config.cvar('gg_handicap_legacy_mode', 0, 'Legacy mode').addFlag('notify')
+        with config.cfg_cvar('gg_handicap_no_reconnect') as cvar:
 
-    config.write()
-    es.dbgmsg(0, '\tgg_handicap.cfg')
+            cvar.name = 'HANDICAP NO RECONNECT'
+            cvar.description.append([
+                'gg_handicap will only process a handicap ' +
+                    'level for the first time',
+                'a player joins a team.  This prevents ' +
+                    'players from abusing the',
+                'handicap system. (reconnecting to level up)',
+                ])
+            cvar.notes.append('If you are running ' +
+                'handicap update, this setting is pointless.')
+            cvar.options.append('0 = (Disabled)')
+            cvar.options.append('1 = (Enabled)')
+            cvar.default = 0
+            cvar.text = 'Prevents abuse from reconnecting'
+            cvar.notify = True
 
+        with config.cfg_cvar('gg_handicap_update') as cvar:
 
-def unload():
-    global config
+            cvar.name = 'HANDICAP UPDATE'
+            cvar.description.append([
+                'A timer (in seconds) that updates ' +
+                    'players with the lowest level to the',
+                'lowest level of the other players. ' +
+                    'Basically "catching them up".',
+                ])
+            cvar.options.append(
+                '0 = (Disabled) Do not load gg_handicap_update.')
+            cvar.options.append('180 = (Enabled) Update the ' +
+                'lowest level players every 180 seconds (3 minutes).')
+            cvar.default = 0
+            cvar.text = ('The time (in seconds) to update ' +
+                "players' levels using handicap.")
 
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
+        with config.cfg_cvar('gg_handicap_legacy_mode') as cvar:
 
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'LEGACY MODE'
+            cvar.description.append([
+                'This enables the old method of ' +
+                    'handicap adjustment, which is',
+                'based on when a player joins the ' +
+                    'server. Instead of the new method,',
+                'which is when the player joins a team for the first time.',
+                ])
+            cvar.options.append('0 = (Disabled)')
+            cvar.options.append('1 = (Enabled)')
+            cvar.default = 0
+            cvar.text = 'Legacy mode'
+            cvar.notify = True

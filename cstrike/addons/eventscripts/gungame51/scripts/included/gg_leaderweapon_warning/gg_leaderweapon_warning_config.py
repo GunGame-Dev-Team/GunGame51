@@ -9,68 +9,44 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_leaderweapon_warning.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Leader Weapon Warning
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> GUNGAME LEADER WEAPON WARNING')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Announces via sound at the beginning of each round ' +
-                'when a player')
-    config.text('information.')
-    config.text('     has reached either "hegrenade" or "knife" level.')
-    config.text('Options:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
-    config.text('Default Value: 0')
-    config.cvar('gg_leaderweapon_warning', 0, 'Play a sound when a player ' +
-                'reaches "hegrenade" or "knife" level.').addFlag('notify')
+        with config.cfg_cvar('gg_leaderweapon_warning') as cvar:
 
-    # Play Warning only on last leves
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WARN ONLY ON LAST LEVELS')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Only play warnings on the last level of each weapon')
-    config.text('Options:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
-    config.text('Default Value: 0')
-    config.cvar('gg_leaderweapon_warning_only_last', 0,
-                'Only play a sound when a player reaches ' +
-                'the "last" hegrenade or knife level.').addFlag('notify')
+            cvar.name = 'GUNGAME LEADER WEAPON WARNING'
+            cvar.description.append([
+                'Announces via sound at the beginning ' +
+                    'of each round when a player',
+                'has reached either "hegrenade" or "knife" level.'
+                ])
+            cvar.options.append('0 = (Disabled)')
+            cvar.options.append('1 = (Enabled)')
+            cvar.default = 0
+            cvar.text = ('Play a sound when a player ' +
+                'reaches "hegrenade" or "knife" level.')
 
-    config.write()
-    es.dbgmsg(0, '\tgg_leaderweapon_warning.cfg')
+        with config.cfg_cvar('gg_leaderweapon_warning_only_last') as cvar:
 
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'WARN ONLY ON LAST LEVELS'
+            cvar.description.append(
+                'Only play warnings on the last level of each weapon')
+            cvar.options.append('0 = (Disabled)')
+            cvar.options.append('1 = (Enabled)')
+            cvar.default = 0
+            cvar.text = ('Only play a sound when a player ' +
+                'reaches the "last" hegrenade or knife level.')
+            cvar.notify = True

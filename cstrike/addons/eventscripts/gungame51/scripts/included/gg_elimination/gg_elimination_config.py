@@ -9,72 +9,45 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_elimination.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Elimination
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ELIMINATION')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Respawn when your killer is killed.')
-    config.text('Notes:')
-    config.text('   * "gg_dead_strip" will automatically be enabled.')
-    config.text('   * Will not load if "gg_dead_strip" can not be enabled.')
-    config.text('   * "gg_dissolver" will automatically be enabled.')
-    config.text('   * Will not load if "gg_dissolver" can not be enabled.')
-    config.text('   * Will not load with "gg_deathmatch" enabled.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_elimination.')
-    config.text('   1 = (Enabled) Load gg_elimination.')
-    config.text('Default Value: 0')
-    config.cvar('gg_elimination', 0, 'Enables/Disables ' +
-                'gg_elimination.').addFlag('notify')
+        with config.cfg_cvar('gg_elimination') as cvar:
 
-    # Elimination Spawn
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ELIMINATION SPAWN')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allow players to spawn when they join, if they didn\'t ')
-    config.text('   spawn already that round.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Have players wait until the round ends ' +
-                'to spawn.')
-    config.text('   1 = (Enabled) Have players spawn when they join.')
-    config.text('Default Value: 0')
-    config.cvar('gg_elimination_spawn', 0, 'Have players spawn when they ' +
-                'join if they haven\'t already for that round.')
+            cvar.name = 'ELIMINATION'
+            cvar.description.append('Respawn when your killer is killed.')
+            cvar.notes.requires.append('gg_dead_strip')
+            cvar.notes.requires.append('gg_dissolver')
+            cvar.notes.conflict.append('gg_deathmatch')
+            cvar.options.append('0 = (Disabled) Do not load gg_elimination.')
+            cvar.options.append('1 = (Enabled) Load gg_elimination.')
+            cvar.default = 0
+            cvar.text = 'Enables/Disables gg_elimination.'
 
-    config.write()
-    es.dbgmsg(0, '\tgg_elimination.cfg')
+        with config.cfg_cvar('gg_elimination_spawn') as cvar:
 
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'ELIMINATION SPAWN'
+            cvar.description.append([
+                "Allow players to spawn when they join, if they didn't ",
+                'spawn already that round.',
+                ])
+            cvar.options.append('0 = (Disabled) Have ' +
+                'players wait until the round ends to spawn.')
+            cvar.options.append(
+                '1 = (Enabled) Have players spawn when they join.')
+            cvar.default = 0
+            cvar.text = ('Have players spawn when they join ' +
+                "if they haven't already for that round.")

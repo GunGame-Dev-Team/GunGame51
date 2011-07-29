@@ -9,54 +9,33 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_earn_nade.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Earn Grenade
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> EARN GRENADES')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   When a player reaches grenade level, they can earn extra' +
-                ' grenades by')
-    config.text('   killing enemies with another weapon.')
-    config.text('Note:')
-    config.text('   * Players can only carry one hegrenade at a time.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not load gg_earn_nade.')
-    config.text('   1 = (Enabled) Load gg_earn_nade.')
-    config.text('Default Value: 0')
-    config.cvar('gg_earn_nade', 0, 'Enables/Disables ' +
-                'gg_earn_nade.').addFlag('notify')
+        with config.cfg_cvar('gg_earn_nade') as cvar:
 
-    config.write()
-    es.dbgmsg(0, '\tgg_earn_nade.cfg')
-
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'EARN GRENADES'
+            cvar.description.append([
+                'When a player reaches grenade level, ' +
+                    'they can earn extra grenades by',
+                'killing enemies with another weapon.',
+                ])
+            cvar.notes.append(
+                'Players can only carry one hegrenade at a time.')
+            cvar.options.append('0 = (Disabled) Do not load gg_earn_nade.')
+            cvar.options.append('1 = (Enabled) Load gg_earn_nade.')
+            cvar.default = 0
+            cvar.text = 'Enables/Disables gg_earn_nade.'

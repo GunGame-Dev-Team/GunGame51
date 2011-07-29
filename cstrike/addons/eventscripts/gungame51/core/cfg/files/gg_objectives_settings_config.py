@@ -9,287 +9,220 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/gungame51/gg_objectives_settings.cfg'
-        % es.ServerVar('eventscripts_gamedir'))
+# GunGame Imports
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    config.text('*' * 76)
-    config.text('*' + ' ' * 24 + 'gg_objectives_settings.cfg' + ' ' * 24 + '*')
-    config.text('*' + ' ' * 74 + '*')
-    config.text('*' + ' ' * 14 + 'This file controls GunGame objectives ' +
-                'settings.' + ' ' * 13 + '*')
-    config.text('*' + ' ' * 74 + '*')
-    config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' ' * 8 + '*')
-    config.text('*' + ' ' * 11 + 'reload of GunGame.' + ' ' * 45 + '*')
-    config.text('*' * 76)
-    config.text('')
-    config.text('')
+    # Create the .cfg file
+    with ConfigContextManager(path(__file__).namebase) as config:
 
-    # Map Objectives
-    config.text('=' * 76)
-    config.text('>> MAP OBJECTIVES')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = No objectives disabled.')
-    config.text('   1 = All objectives disabled.')
-    config.text('   2 = Bomb objective disabled.')
-    config.text('   3 = Hostage objective disabled.')
-    config.text('Default Value: 0')
-    config.cvar('gg_map_obj', 0, 'Controls which objectives will be ' +
-        'disabled.').addFlag('notify')
+        config.name = 'Objectives Configuration'
+        config.description = 'This file controls GunGame51 objectives settings'
 
-    # Bomb Defused Leveling
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> BOMB DEFUSED LEVELS')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 3"')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   # = The number of levels to reward a player for bomb ' +
-                'defusal')
-    config.text('Default Value: 0')
-    config.cvar('gg_bomb_defused_levels', 0, 'Levels to reward a player for ' +
-                'bomb defusal.').addFlag('notify')
+        with config.cfg_cvar('gg_map_obj') as cvar:
 
-    # Bomb Defused Leveling Knife
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> BOMB DEFUSED LEVELING (KNIFE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 3"')
-    config.text('   * Requires "gg_bomb_defused_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up if they defuse the ' +
-                'bomb while on knife level.')
-    config.text('   1 = Allow players to level up if they defuse the bomb ' +
-                'while on knife level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_bomb_defused_skip_knife', 0, 'Allow players to level up ' +
-                'when they are on knife level.')
+            cvar.name = 'MAP OBJECTIVES'
+            cvar.options.append('0 = No objectives disabled.')
+            cvar.options.append('1 = All objectives disabled.')
+            cvar.options.append('2 = Bomb objective disabled.')
+            cvar.options.append('3 = Hostage objective disabled.')
+            cvar.default = 0
+            cvar.text = 'Controls which objectives will be disabled.'
+            cvar.notify = True
 
-    # Bomb Defused Leveling HEGrenade
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> BOMB DEFUSED LEVELING (HEGRENADE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 3"')
-    config.text('   * Requires "gg_bomb_defused_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up if they defuse the ' +
-                'bomb while on HEGrenade level.')
-    config.text('   1 = Allow players to level up if they defuse the bomb ' +
-                'while on HEGrenade level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_bomb_defused_skip_nade', 0, 'Allow players to level up ' +
-                'when they are on HEGrenade level.')
+        config.cfg_section('BOMB DEFUSAL OBJECTIVE')
 
-    # Bomb Exploded Leveling
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> BOMB EXPLODED LEVELS')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 3"')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   # = The number of levels to reward a player for the ' +
-                'bomb exploding')
-    config.text('Default Value: 0')
-    config.cvar('gg_bomb_exploded_levels', 0, 'Levels to reward a player ' +
-                'for bomb exploding.').addFlag('notify')
+        with config.cfg_cvar('gg_bomb_defused_levels') as cvar:
 
-    # Bomb Exploded Leveling Knife
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> BOMB EXPLODED LEVELING (KNIFE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 3"')
-    config.text('   * Requires "gg_bomb_exploded_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up if the bomb ' +
-                'explodes while on knife level.')
-    config.text('   1 = Allow players to level up if the bomb explodes ' +
-                'while on knife level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_bomb_exploded_skip_knife', 0, 'Allow players to level ' +
+            cvar.name = 'BOMB DEFUSED LEVELS'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 3"')
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('# = The number of levels ' +
+                'to reward a player for bomb defusal')
+            cvar.default = 0
+            cvar.text = 'Levels to reward a player for bomb defusal.'
+            cvar.notify = True
+
+        with config.cfg_cvar('gg_bomb_defused_skip_knife') as cvar:
+
+            cvar.name = 'BOMB DEFUSED LEVELING (KNIFE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 3"')
+            cvar.notes.append('Requires "gg_bomb_defused_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to ' +
+                'level up if they defuse the bomb while on knife level.')
+            cvar.options.append('1 = Allow players to level ' +
+                'up if they defuse the bomb while on knife level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
                 'up when they are on knife level.')
 
-    # Bomb Exploded Leveling HEGrenade
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> BOMB EXPLODED LEVELING (HEGRENADE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 3"')
-    config.text('   * Requires "gg_bomb_exploded_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up if the bomb ' +
-                'explodes while on HEGrenade level.')
-    config.text('   1 = Allow players to level up if the bomb explodes ' +
-                'while on HEGrenade level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_bomb_exploded_skip_nade', 0, 'Allow players to level up ' +
-                'when they are on HEGrenade level.')
+        with config.cfg_cvar('gg_bomb_defused_skip_nade') as cvar:
 
-    # Hostage Rescued Leveling
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE RESCUED LEVELS')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   # = The number of levels to reward a player for ' +
-                'rescuing hostages')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_rescued_levels', 0, 'Levels to reward a player ' +
-                'for rescuing hostages.').addFlag('notify')
-
-    # Hostage Rescued Required Rescues
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE RESCUED REQUIRED RESCUES')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('   * Requires "gg_hostage_rescued_levels 1" or higher')
-    config.text('Options:')
-    config.text('   # = The number of hostages a player must rescue ' +
-                'to level up.')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_rescued_rescues', 0, 'Number of hostages rescued' +
-                ' required to level up.')
-
-    # Hostage Rescued Leveling Knife
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE RESCUED LEVELING (KNIFE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('   * Requires "gg_hostage_rescued_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up when they ' +
-                'rescue hostages while on knife level.')
-    config.text('   1 = Allow players to level up when they rescue hostages ' +
-                'while on knife level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_rescued_skip_knife', 0, 'Allow players to level ' +
-                'up when they are on knife level.')
-
-    # Hostage Rescued Leveling HEGrenade
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE RESCUED LEVELING (HEGRENADE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('   * Requires "gg_hostage_rescued_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up when they ' +
-                'rescue hostages while on HEGrenade level.')
-    config.text('   1 = Allow players to level up when they rescue hostages ' +
-                'while on HEGrenade level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_rescued_skip_nade', 0, 'Allow players to level ' +
+            cvar.name = 'BOMB DEFUSED LEVELING (HEGRENADE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 3"')
+            cvar.notes.append('Requires "gg_bomb_defused_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to ' +
+                'level up if they defuse the bomb while on hegrenade level.')
+            cvar.options.append('1 = Allow players to level ' +
+                'up if they defuse the bomb while on hegrenade level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
                 'up when they are on HEGrenade level.')
 
-    # Hostage Stopped Leveling
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE STOPPED LEVELS')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   # = The number of levels to reward a player for ' +
-                'stopping others from rescuing hostages')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_stopped_levels', 0, 'Levels to reward a player ' +
-                'for stopping other players from rescuing hostages.'
-                ).addFlag('notify')
+        config.cfg_section('BOMB EXPLODE OBJECTIVE')
 
-    # Hostage Rescued Required Stops
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE RESCUED REQUIRED STOPS')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('   * Requires "gg_hostage_stopped_levels 1" or higher')
-    config.text('Options:')
-    config.text('   # = The number of hostages a player must stop from ' +
-                'being rescued to level up.')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_stopped_stops', 0, 'Number of hostages stopped ' +
-                'required to level up.')
+        with config.cfg_cvar('gg_bomb_exploded_levels') as cvar:
 
-    # Hostage Stopped Leveling Knife
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE STOPPED LEVELING (KNIFE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('   * Requires "gg_hostage_stopped_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up when they ' +
-                'stop hostages from being rescued while on knife level.')
-    config.text('   1 = Allow players to level up when they stop hostages ' +
-                'from being rescued while on knife level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_stopped_skip_knife', 0, 'Allow players to level ' +
+            cvar.name = 'BOMB EXPLODED LEVELS'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 3"')
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('# = The number of levels ' +
+                'to reward a player for the bomb exploding')
+            cvar.default = 0
+            cvar.text = 'Levels to reward a player for bomb exploding.'
+            cvar.notify = True
+
+        with config.cfg_cvar('gg_bomb_exploded_skip_knife') as cvar:
+
+            cvar.name = 'BOMB EXPLODED LEVELING (KNIFE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 3"')
+            cvar.notes.append('Requires "gg_bomb_exploded_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to ' +
+                'level up if the bomb explodes while on knife level.')
+            cvar.options.append('1 = Allow players to level ' +
+                'up if the bomb explodes while on knife level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
                 'up when they are on knife level.')
 
-    # Hostage Stopped Leveling HEGrenade
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE STOPPED LEVELING (HEGRENADE LEVEL)')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Requires "gg_map_obj 0" or "gg_map_obj 2"')
-    config.text('   * Requires "gg_hostage_stopped_levels 1" or higher')
-    config.text('Options:')
-    config.text('   0 = Do not allow players to level up when they ' +
-                'stop hostages from being rescued while on HEGrenade level.')
-    config.text('   1 = Allow players to level up when they stop hostages ' +
-                'from being rescued while on HEGrenade level.')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_stopped_skip_nade', 0, 'Allow players to level ' +
-                'up when they are on HEGrenade level.')
+        with config.cfg_cvar('gg_bomb_exploded_skip_nade') as cvar:
 
-    # This line creates/updates the .cfg file
-    config.write()
+            cvar.name = 'BOMB EXPLODED LEVELING (HEGRENADE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 3"')
+            cvar.notes.append('Requires "gg_bomb_exploded_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to ' +
+                'level up if the bomb explodes while on hegrenade level.')
+            cvar.options.append('1 = Allow players to level ' +
+                'up if the bomb explodes while on hegrenade level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
+                'up when they are on hegrenade level.')
 
-    # Print to console to show successfule loading of the config
-    es.dbgmsg(0, '\tgg_objectives_settings.cfg')
+        config.cfg_section('HOSTAGE RESCUE OBJECTIVE')
 
+        with config.cfg_cvar('gg_hostage_rescued_levels') as cvar:
 
-def unload():
-    global config
+            cvar.name = 'HOSTAGE RESCUED LEVELS'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('# = The number of levels ' +
+                'to reward a player for rescuing hostages')
+            cvar.default = 0
+            cvar.text = 'Levels to reward a player for rescuing hostages.'
+            cvar.notify = True
 
-    # Remove the "notify" and "replicated" flags as set by makepublic()
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
+        with config.cfg_cvar('gg_hostage_rescued_rescues') as cvar:
 
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'HOSTAGE RESCUED REQUIRED RESCUES'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.notes.append('Requires ' +
+                '"gg_hostage_rescued_levels 1" or higher')
+            cvar.options.append('# = The number of ' +
+                'hostages a player must rescue to level up.')
+            cvar.default = 0
+            cvar.text = 'Number of hostages rescued required to level up.'
+
+        with config.cfg_cvar('gg_hostage_rescued_skip_knife') as cvar:
+
+            cvar.name = 'HOSTAGE RESCUED LEVELING (KNIFE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.notes.append('Requires ' +
+                '"gg_hostage_rescued_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to level ' +
+                'up when they rescue hostages while on knife level.')
+            cvar.options.append('1 = Allow players to level ' +
+                'up when they rescue hostages while on knife level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
+                'up when they are on knife level.')
+
+        with config.cfg_cvar('gg_hostage_rescued_skip_nade') as cvar:
+
+            cvar.name = 'HOSTAGE RESCUED LEVELING (HEGRENADE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.notes.append('Requires ' +
+                '"gg_hostage_rescued_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to level ' +
+                'up when they rescue hostages while on hegrenade level.')
+            cvar.options.append('1 = Allow players to level ' +
+                'up when they rescue hostages while on hegrenade level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
+                'up when they are on hegrenade level.')
+
+        config.cfg_section('HOSTAGE STOP OBJECTIVE')
+
+        with config.cfg_cvar('gg_hostage_stopped_levels') as cvar:
+
+            cvar.name = 'HOSTAGE STOPPED LEVELS'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('# = The number of levels to reward ' +
+                'a player for stopping others from rescuing hostages')
+            cvar.default = 0
+            cvar.text = ('Levels to reward a player for ' +
+                'stopping other players from rescuing hostages.')
+            cvar.notify = True
+
+        with config.cfg_cvar('gg_hostage_stopped_stops') as cvar:
+
+            cvar.name = 'HOSTAGE STOPPED REQUIRED STOPS'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.notes.append('Requires ' +
+                '"gg_hostage_stopped_levels 1" or higher')
+            cvar.options.append('# = The number of hostages ' +
+                'a player must stop from being rescued to level up.')
+            cvar.default = 0
+            cvar.text = 'Number of hostages stopped required to level up.'
+
+        with config.cfg_cvar('gg_hostage_stopped_skip_knife') as cvar:
+
+            cvar.name = 'HOSTAGE STOPPED LEVELING (KNIFE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.notes.append('Requires ' +
+                '"gg_hostage_stopped_levels 1" or higher')
+            cvar.options.append('0 = Do not allow players to level up when ' +
+                'they stop hostages from being rescued while on knife level.')
+            cvar.options.append('1 = Allow players to level up when ' +
+                'they stop hostages from being rescued while on knife level.')
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
+                'up when they are on knife level.')
+
+        with config.cfg_cvar('gg_hostage_stopped_skip_nade') as cvar:
+
+            cvar.name = 'HOSTAGE STOPPED LEVELING (HEGRENADE LEVEL)'
+            cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
+            cvar.notes.append('Requires ' +
+                '"gg_hostage_stopped_levels 1" or higher')
+            cvar.options.append([
+                '0 = Do not allow players to level ' +
+                'up when they stop hostages from ',
+                'being rescued while on hegrenade level.',
+                ])
+            cvar.options.append([
+                '1 = Allow players to level up when ' +
+                'they stop hostages from being ',
+                'rescued while on hegrenade level.',
+                ])
+            cvar.default = 0
+            cvar.text = ('Allow players to level ' +
+                'up when they are on hegrenade level.')

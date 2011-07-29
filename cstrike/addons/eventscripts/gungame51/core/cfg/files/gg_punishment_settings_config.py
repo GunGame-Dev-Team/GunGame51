@@ -9,141 +9,95 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/gungame51/gg_punishment_settings.cfg'
-        % es.ServerVar('eventscripts_gamedir'))
+# GunGame Imports
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    config.text('*' * 76)
-    config.text('*' + ' ' * 24 + 'gg_punishment_settings.cfg' + ' ' * 24 + '*')
-    config.text('*' + ' ' * 74 + '*')
-    config.text('*' + ' ' * 14 + 'This file controls GunGame punishment ' +
-                'settings.' + ' ' * 13 + '*')
-    config.text('*' + ' ' * 74 + '*')
-    config.text('*  Note: Any alteration of this file requires a server ' +
-                'restart or a' + ' ' * 8 + '*')
-    config.text('*' + ' ' * 11 + 'reload of GunGame.' + ' ' * 45 + '*')
-    config.text('*' * 76)
-    config.text('')
-    config.text('')
+    # Create the .cfg file
+    with ConfigContextManager(path(__file__).namebase) as config:
 
-    # AFK Rounds
-    config.text('=' * 76)
-    config.text('>> AFK ROUNDS')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0  = Disabled')
-    config.text('   # = The number of rounds the player can be AFK before ' +
-                'punishment')
-    config.text('       occurs.')
-    config.text('Default Value: 0')
-    config.cvar('gg_afk_rounds', 0, 'The number of rounds a player can be ' +
-                'AFK before punishment occurs.')
+        config.name = 'Punishments Configuration'
+        config.description = 'This file controls GunGame51 punishment settings'
 
-    # AFK Rounds Punishment
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> AFK PUNISHMENT')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('  * Requires "gg_afk_rounds 1" or higher')
-    config.text('Options:')
-    config.text('   0 = No punishment.')
-    config.text('   1 = Kick the player.')
-    config.text('   2 = Move the player to spectator.')
-    config.text('Default Value: 0')
-    config.cvar('gg_afk_punish', 0, 'The punishment for players who are AFK ' +
-                'longer than "gg_afk_rounds".').addFlag('notify')
+        with config.cfg_cvar('gg_afk_rounds') as cvar:
 
-    # Suicide Punishment
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> SUICIDE PUNISHMENT')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = No punishment.')
-    config.text('   # = The number of levels a player will lose if they ' +
-                'commit suicide.')
-    config.text('Default Value: 0')
-    config.cvar('gg_suicide_punish', 0, 'The number of levels a player ' +
-                'will lose if they commit suicide.').addFlag('notify')
+            cvar.name = 'AFK ROUNDS'
+            cvar.options.append('0  = Disabled')
+            cvar.options.append('# = The number of rounds ' +
+                'the player can be AFK before punishment occurs.')
+            cvar.default = 0
+            cvar.text = ('The number of rounds a player ' +
+                'can be AFK before punishment occurs.')
 
-    # Team Kill Punishment
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> TEAM KILL PUNISHMENT')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = No punishment.')
-    config.text('   # = The number of levels a player will lose if they kill' +
-                ' a')
-    config.text('       teammate.')
-    config.text('Default Value: 0')
-    config.cvar('gg_tk_punish', 0, 'The number of levels a player will lose ' +
-                'if they kill a teammate.').addFlag('notify')
+        with config.cfg_cvar('gg_afk_punish') as cvar:
 
-    # Retry Punishment
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> RETRY/RECONNECT PUNISHMENT')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = No punishment.')
-    config.text('   # = The number of levels a player will lose if they ' +
-                'reconnect')
-    config.text('       in the same round.')
-    config.text('Default Value: 0')
-    config.cvar('gg_retry_punish', 0, 'The number of levels a player will ' +
-                'lose if they reconnect in the same round.').addFlag('notify')
+            cvar.name = 'AFK PUNISHMENT'
+            cvar.notes.append('Requires "gg_afk_rounds 1" or higher')
+            cvar.options.append('0 = No punishment.')
+            cvar.options.append('1 = Kick the player.')
+            cvar.options.append('2 = Move the player to spectator.')
+            cvar.default = 0
+            cvar.text = ('The punishment for players ' +
+                'who are AFK longer than "gg_afk_rounds".')
+            cvar.notify = True
 
-    # Hostage Killed Punishment
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE KILLED PUNISHMENT')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   0 = No punishment.')
-    config.text('   # = The number of levels a player will lose if they ' +
-                'kill hostages')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_killed_punish', 0, 'The number of levels a ' +
-                'player will lose if they kill hostages.').addFlag('notify')
+        with config.cfg_cvar('gg_suicide_punish') as cvar:
 
-    # Hostage Killed Required Kills
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> HOSTAGE KILLED REQUIRED KILLS')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   # = The number of hostages killed required to ' +
-                'level the player down')
-    config.text('Default Value: 0')
-    config.cvar('gg_hostage_killed_kills', 0, 'The number of levels a ' +
+            cvar.name = 'SUICIDE PUNISHMENT'
+            cvar.options.append('0 = No punishment.')
+            cvar.options.append('# = The number of levels a ' +
+                'player will lose if they commit suicide.')
+            cvar.default = 0
+            cvar.text = ('The number of levels a ' +
+                'player will lose if they commit suicide.')
+            cvar.notify = True
+
+        with config.cfg_cvar('gg_tk_punish') as cvar:
+
+            cvar.name = 'TEAM KILL PUNISHMENT'
+            cvar.options.append('0 = No punishment.')
+            cvar.options.append('# = The number of levels ' +
+                'a player will lose if they kill a teammate.')
+            cvar.default = 0
+            cvar.text = ('The number of levels a player ' +
+                'will lose if they kill a teammate.')
+            cvar.notify = True
+
+        with config.cfg_cvar('gg_retry_punish') as cvar:
+
+            cvar.name = 'RETRY/RECONNECT PUNISHMENT'
+            cvar.options.append('0 = No punishment.')
+            cvar.options.append('# = The number of levels a ' +
+                'player will lose if they reconnect in the same round.')
+            cvar.default = 0
+            cvar.text = ('The number of levels a player will ' +
+                'lose if they reconnect in the same round.')
+            cvar.notify = True
+
+        with config.cfg_cvar('gg_hostage_killed_punish') as cvar:
+
+            cvar.name = 'HOSTAGE KILLED PUNISHMENT'
+            cvar.options.append('0 = No punishment.')
+            cvar.options.append('# = The number of levels ' +
+                'a player will lose if they kill hostages.')
+            cvar.default = 0
+            cvar.text = ('The number of levels a ' +
                 'player will lose if they kill hostages.')
+            cvar.notify = True
 
-    # This line creates/updates the .cfg file
-    config.write()
+        with config.cfg_cvar('gg_hostage_killed_kills') as cvar:
 
-    # Print to console to show successfule loading of the config
-    es.dbgmsg(0, '\tgg_punishment_settings.cfg')
-
-
-def unload():
-    global config
-
-    # Remove the "notify" and "replicated" flags as set by makepublic()
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'HOSTAGE KILLED REQUIRED KILLS'
+            cvar.options.append('# = The number of hostages ' +
+                'killed required to level the player down')
+            cvar.default = 0
+            cvar.text = ('The number of hostages ' +
+                'killed required to level the player down')
