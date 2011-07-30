@@ -194,8 +194,23 @@ class _PlayerContainer(dict):
         del self[pInstance.userid]
 
     def reset(self):
-        self.clear()
+        """Reinitializes all existing players on the server and removes players
+        that no longer exist on the server.
 
+        """
+        # Retrieve a list of active userids
+        useridList = _es.getUseridList()
+
+        # Loop through all stored players and reinitialize or remove
+        for userid in self:
+            if userid in useridList:
+                self[userid].__init__(userid)
+                continue
+
+            del self[userid]
+        #self.remove_old()
+
+    """
     def remove_old(self):
         useridList = _es.getUseridList()
 
@@ -207,6 +222,7 @@ class _PlayerContainer(dict):
 
             # If the user is no longer in the server, remove their instance
             del self[userid]
+    """
 
 
 class _ExtendedPlayerBase(PlayerLevels, PlayerSounds, PlayerMessaging,

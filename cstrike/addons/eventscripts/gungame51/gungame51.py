@@ -102,7 +102,7 @@ gg_warmup_round = es.ServerVar('gg_warmup_round')
 gg_warmup_round_backup = None
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
-firstPlayerSpawned = False
+#firstPlayerSpawned = False
 firstGGStart = False
 
 sv_tags = es.ServerVar('sv_tags')
@@ -375,8 +375,10 @@ def unload_on_error():
 def es_map_start(event_var):
     # Set firstPlayerSpawned to False, so player_spawn will know when the first
     # spawn is
+    """
     global firstPlayerSpawned
     firstPlayerSpawned = False
+    """
 
     # Make the sounds downloadable
     make_downloadable()
@@ -460,6 +462,9 @@ def round_start(event_var):
 
 
 def player_spawn(event_var):
+    """
+    # This should not matter any longer if my theory is correct:
+    # When _PlayerContainer().reset() is called, old userids are removed.
     global firstPlayerSpawned
 
     if not firstPlayerSpawned:
@@ -470,6 +475,7 @@ def player_spawn(event_var):
         # The first player has spawned
         firstPlayerSpawned = True
 
+    """
     # Check for priority addons
     if PriorityAddon():
         return
