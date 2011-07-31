@@ -202,7 +202,7 @@ class _PlayerContainer(dict):
         useridList = _es.getUseridList()
 
         # Loop through all stored players and reinitialize or remove
-        for userid in self:
+        for userid in self.copy():
             if userid in useridList:
                 self[userid].__init__(userid)
                 continue
