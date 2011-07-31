@@ -55,6 +55,7 @@ class ConfigManager(object):
             cls._the_instance.__loaded__ = {}
             cls._the_instance.__cvardefaults__ = {}
             cls._the_instance._config_files = {}
+            cls._the_instance.files_have_been_executed = False
         return cls._the_instance
 
     def load_configs(self):
@@ -80,25 +81,20 @@ class ConfigManager(object):
 
             self.load(cfgfile, 'custom')
 
+        delayed(0, self.execute_cfg_files)
+
     def load(self, cfgfile, cfg_type):
         config = self._import_config(cfgfile.namebase, cfg_type)
 
         if 'load' in config.__dict__:
             config.load()
 
-        cfg = None
+        if cfg_type == 'main':
+            return
 
-        basepath = path(config.__dict__['__file__']).namebase
+        basepath = path(config.__dict__['__file__']).namebase[:~6]
 
-        if cfg_type != 'main':
-
-            basepath = basepath[:~6]
-
-        if basepath in self._config_files:
-
-            cfg = self._config_files[basepath]
-
-        else:
+        if not basepath in self._config_files:
 
             for item in config.__dict__:
 
@@ -109,36 +105,27 @@ class ConfigManager(object):
 
                 self._config_files[basepath] = cfg
 
-                break
+                return
 
-        if cfg is None:
-            return
+    def execute_cfg_files(self):
 
-        revisit = []
-
-        for cvar, value, description in cfg.getCvars().values():
-
-            self.__cvardefaults__[cvar] = value
-
-            if bool(str(value)) and False in [
-              x == '0' for x in str(value).split('.')]:
-
-                revisit.append(cvar)
+        self.files_have_been_executed = True
 
         self.cfg_executing = True
 
         delayed(0.01, self._reset_config_execution)
 
-        delayed(0, cfg.execute)
+        valid_addons = get_valid_addons()
 
-        revisist = [x for x in revisit if x in get_valid_addons()]
+        for cfg in self._config_files.values():
 
-        for cvar in revisit:
+            cfg.execute()
 
-            es.forcevalue(cvar, 0)
+            for cvar, value, description in cfg.getCvars().values():
 
-            delayed(0, es.server.queuecmd,
-                ('%s %s' % (cvar, self.__cvardefaults__[cvar])))
+                if cvar in valid_addons:
+                    es.forcevalue(cvar, 0)
+                    es.server.queuecmd('%s %s' % (cvar, value))
 
     def _import_config(self, name, cfg_type):
         if name in self.__loaded__:
@@ -192,6 +179,10 @@ class ConfigManager(object):
         '''
         Handles CVARs that are loaded via GunGame's ConfigManager.
         '''
+
+        if not self.files_have_been_executed:
+            return
+
         cvarName = event_var['cvarname']
         cvarValue = event_var['cvarvalue']
 

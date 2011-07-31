@@ -56,8 +56,6 @@ def load():
         with config.cfg_cvar('gg_weapon_order_random_excluded') as cvar:
 
             cvar.name = 'RANDOM WEAPON ORDER EXCLUDED FILES'
-            cvar.options.append('"" = (Disabled) No weapon ' +
-                'orders are excluding when choosing a random')
             cvar.options.append([
                 '"" = (Disabled) No weapon orders ' +
                     'are excluding when choosing a random',
@@ -79,9 +77,11 @@ def load():
             cvar.options.append('#default  = Order will go Top -> Bottom.')
             cvar.options.append('#reversed = Order will go Bottom -> Top.')
             cvar.options.append('#random   = Order will be randomly shuffled.')
-            cvar.notes.append('#reversed and #random sort ' +
-                'types will move hegrenade and knife levels')
-            cvar.notes.append('to the end of the order.')
+            cvar.notes.append([
+                '#reversed and #random sort types ' +
+                    'will move hegrenade and knife levels',
+                'to the end of the order.'
+                ])
             cvar.default = '#default'
             cvar.text = ('The order in which ' +
                 'the weapons and levels will be sorted.')
@@ -137,8 +137,11 @@ def load():
                     'based off of the "gg_warmup timer"',
                 'between rounds.',
                 ])
-            cvar.notes.append('Without an intermission, the next ' +
-                'GunGame round will start immediately after a win.')
+            cvar.notes.append([
+                'Without an intermission, the ' +
+                    'next GunGame round will start',
+                'immediately after a win.',
+                ])
             cvar.options.append('0 = Do not have an intermission.')
             cvar.options.append('1 = Enable the intermission.')
             cvar.default = 0

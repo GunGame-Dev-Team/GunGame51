@@ -9,122 +9,89 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_warmup_round.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # Warmup Round
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WARMUP ROUND')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Players cannot level up during the warmup round.')
-    config.text('   * Warmup round is triggered at the start of each map ' +
-                'change.')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   1 = Enabled.')
-    config.text('Default Value: 0')
-    config.cvar('gg_warmup_round', 0, 'Enables or disables warmup' +
-                'round.').addFlag('notify')
+        with config.cfg_cvar('gg_warmup_round') as cvar:
 
-    # Warmup Round Timer
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WARMUP ROUND TIMER')
-    config.text('=' * 76)
-    config.text('Options:')
-    config.text('   # = The amount of time (in seconds) that the warmup ' +
-                'round will last.')
-    config.text('Default Value: 30')
-    config.cvar('gg_warmup_timer', 30, 'The amount of time (in seconds) ' +
-                'that the the warmup round will last.')
+            cvar.name = 'WARMUP ROUND'
+            cvar.notes.append('Players cannot ' +
+                'level up during the warmup round.')
+            cvar.notes.append('Warmup round is triggered ' +
+                'at the start of each map change.')
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('1 = Enabled.')
+            cvar.default = 0
+            cvar.text = 'Enables or disables warmupround.'
 
-    # Warmup Round Weapon
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WARMUP ROUND WEAPON')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Only supports "weapon_*" entities.')
-    config.text('   * Warmup round is triggered at the start of each map ' +
-                'change.')
-    config.text('Options:')
-    config.text('\tawp   \tscout\taug   \tmac10\ttmp   \tmp5navy\tump45\tp90')
-    config.text('\tgalil\tfamas\tak47\tsg552\tsg550\tg3sg1\tm249\tm3')
-    config.text('\txm1014\tm4a1\tglock\tusp   \tp228\tdeagle\telite\t' +
-                'fiveseven')
-    config.text('\thegrenade\tknife')
-    config.text('')
-    config.text('\t0 = The first level weapon')
-    config.text('\tweapon1,weapon2,weapon3 = For each warmup, one of these ' +
-                'weapons is chosen')
-    config.text('\t#random = For each warmup, a random weapon is chosen.')
-    config.text('Default Value: "hegrenade"')
-    config.cvar('gg_warmup_weapon', 'hegrenade', 'The weapon that players ' +
+        with config.cfg_cvar('gg_warmup_timer') as cvar:
+
+            cvar.name = 'WARMUP ROUND TIMER'
+            cvar.options.append('The amount of time (in ' +
+                'seconds) that the warmup round will last.')
+            cvar.default = 30
+            cvar.text = ('The amount of time (in ' +
+                'seconds) that the the warmup round will last.')
+
+        with config.cfg_cvar('gg_warmup_weapon') as cvar:
+
+            cvar.name = 'WARMUP ROUND WEAPON'
+            cvar.notes.append('Only supports "weapon_*" entities.')
+            cvar.notes.append('Warmup round is triggered at ' +
+                'the start of each map change.')
+            cvar.options.first = ''
+            cvar.options.append('\tawp   \tscout\taug   \tmac10' +
+                '\ttmp   \tmp5navy\tump45\tp90')
+            cvar.options.append('\tgalil\tfamas\tak47\tsg552\t' +
+                'sg550\tg3sg1\tm249\tm3')
+            cvar.options.append('\txm1014\tm4a1\tglock\tusp   ' +
+                '\tp228\tdeagle\telite\tfiveseven')
+            cvar.options.append('\thegrenade\tknife')
+            cvar.options.append('')
+            cvar.options.append('\t0 = The first level weapon')
+            cvar.options.append('\tweapon1,weapon2,weapon3 = For ' +
+                'each warmup, one of these weapons is chosen')
+            cvar.options.append('\t#random = For ' +
+                'each warmup, a random weapon is chosen.')
+            cvar.default = 'hegrenade'
+            cvar.text = ('The weapon that players ' +
                 'will use during the warmup round.')
 
-    # Warmup Round Deathmatch Mode
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WARMUP ROUND DEATHMATCH MODE')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Please check the gg_deathmatch.cfg for information' +
-                ' regarding')
-    config.text('     what is required to be enabled and disabled when')
-    config.text('     running gg_deathmatch.')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   1 = Enabled.')
-    config.text('Default Value: 0')
-    config.cvar('gg_warmup_deathmatch', 0, 'Enable deathmatch during warmup ' +
-                'round only.')
+        with config.cfg_cvar('gg_warmup_deathmatch') as cvar:
 
-    # Warmup Round Elimination Mode
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> WARMUP ROUND ELIMINATION MODE')
-    config.text('=' * 76)
-    config.text('Notes:')
-    config.text('   * Please check the gg_elimination.cfg for information' +
-                ' regarding')
-    config.text('     what is required to be enabled and disabled when')
-    config.text('     running gg_elimination.')
-    config.text('Options:')
-    config.text('   0 = Disabled.')
-    config.text('   1 = Enabled.')
-    config.text('Default Value: 0')
-    config.cvar('gg_warmup_elimination', 0, 'Enable elimination during ' +
-                'warmup round only.')
+            cvar.name = 'WARMUP ROUND DEATHMATCH MODE'
+            cvar.notes.append([
+                'Please check the gg_deathmatch.cfg for information regarding',
+                'running gg_deathmatch.',
+                ])
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('1 = Enabled.')
+            cvar.default = 0
+            cvar.text = 'Enable deathmatch during warmup round only.'
 
-    config.write()
-    es.dbgmsg(0, '\tgg_warmup_round.cfg')
+        with config.cfg_cvar('gg_warmup_elimination') as cvar:
 
-
-def unload():
-    global config
-
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
-
-    # Delete the cfglib.AddonCFG instance
-    del config
+            cvar.name = 'WARMUP ROUND ELIMINATION MODE'
+            cvar.notes.append([
+                'Please check the gg_elimination.cfg ' +
+                    'for information regarding what is',
+                'required to be enabled and disabled ' +
+                    'when running gg_elimination.',
+                ])
+            cvar.options.append('0 = Disabled.')
+            cvar.options.append('1 = Enabled.')
+            cvar.default = 0
+            cvar.text = 'Enable elimination during warmup round only.'
