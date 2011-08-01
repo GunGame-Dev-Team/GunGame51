@@ -404,58 +404,47 @@ class ListNotes(ListManagement):
     first = '   * '
     indent = 6
 
-    # Create a list of required addons and conflicting addons
-    requires = list()
-    conflict = list()
+    def __init__(self, config):
+        self.config = config
 
-    def print_to_text(self):
-        '''Creates the text in the cfg file'''
+        # Create a list of required addons and conflicting addons
+        self.requires = list()
+        self.conflict = list()
 
-        # Is there any need to print notes to the cfg file?
-        if not (len(self) or self.conflict or self.requires):
+    def __getattribute__(self, item):
+        '''Checks if printing to text, and if so,
+            interject required and conflicting addons'''
 
-            # If not, return
-            return
+        # Is the attribute "print_to_text"?
+        if item == 'print_to_text':
 
-        # Add the header
-        self.config.text(self.header)
+            # Are there any required or conflicting addons?
+            if self.requires or self.conflict:
 
-        # Loop through all required addons
-        for addon in self.requires:
+                # Add the header
+                self.config.text(self.header)
 
-            # Add both lines about required addons
-            self.config.text(
-                self.first + '"' + addon + '" will automatically be enabled.')
-            self.config.text(self.first +
-                'Will not load if "' + addon + '" can not be enabled.')
+                # Change the header so it doesn't get added again later
+                self.header = ''
 
-        # Loop through all conflicting addons
-        for addon in self.conflict:
+                # Loop through all required addons
+                for addon in self.requires:
 
-            # Add the conflicting addon text
-            self.config.text(
-                self.first + 'Will not load with "' + addon + '" enabled.')
+                    # Add both lines about required addons
+                    self.config.text(
+                        self.first + '"' + addon + '" will automatically be enabled.')
+                    self.config.text(self.first +
+                        'Will not load if "' + addon + '" can not be enabled.')
 
-        # Loop through all items in the list
-        for section in self:
+                # Loop through all conflicting addons
+                for addon in self.conflict:
 
-            # Is the item a string?
-            if isinstance(section, str):
+                    # Add the conflicting addon text
+                    self.config.text(
+                        self.first + 'Will not load with "' + addon + '" enabled.')
 
-                # Add the text to the cfg file
-                self.config.text(self.first + section)
-
-            # Is the item a list?
-            elif isinstance(section, list):
-
-                # Add the first item to the cfg file
-                self.config.text(self.first + section[0])
-
-                # Loop through the remaining items in the list
-                for line in section[1:]:
-
-                    # Add the text after the indent amount
-                    self.config.text(' ' * self.indent + line)
+        # Return the attribute
+        return super(ListNotes, self).__getattribute__(item)
 
 
 class ListExamples(ListManagement):
