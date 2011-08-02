@@ -15,6 +15,8 @@ import es
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
+from gungame51.core.players.fields.exceptions import ValidationError
+
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -24,6 +26,7 @@ info.name = 'gg_retry_punish'
 info.title = 'GG Retry Punish'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -42,5 +45,7 @@ def player_activate(event_var):
     if ggPlayer.level > 1:
         try:
             ggPlayer.level -= int(gg_retry_punish)
-        except:
+        except ValidationError:
             pass
+        except (ValueError, TypeError):
+            raise

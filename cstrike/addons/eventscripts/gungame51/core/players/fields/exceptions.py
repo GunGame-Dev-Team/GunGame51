@@ -10,10 +10,6 @@ $LastChangedDate$
 # =============================================================================
 # >> Exception Classes
 # =============================================================================
-class PlayerFieldError(Exception):
-    pass
-
-
 class ValidationError(Exception):
     def __init__(self, msg):
         if isinstance(msg, list):
