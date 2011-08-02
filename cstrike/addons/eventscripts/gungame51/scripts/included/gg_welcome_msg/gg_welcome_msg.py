@@ -23,6 +23,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import gungame_info
 from gungame51.core.addons.shortcuts import get_loaded_addon_list
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -31,6 +32,7 @@ info.name = 'gg_welcome_msg'
 info.title = 'GG Welcome Message'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -47,8 +49,6 @@ messageQueue = []
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
     # Register !welcome
     registerSayCommand('!welcome', welcome, 'Displays a !welcome menu.')
 
@@ -57,8 +57,6 @@ def load():
 
 
 def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
     # Unregister !welcome
     unregisterSayCommand('!welcome')
 

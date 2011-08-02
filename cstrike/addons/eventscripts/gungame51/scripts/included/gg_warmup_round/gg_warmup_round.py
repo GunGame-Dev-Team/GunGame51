@@ -93,9 +93,6 @@ def load():
     # Load warmup round (delayed)
     gamethread.delayedname(1, "gg_do_warmup", do_warmup)
 
-    # Loaded message
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
     # Register a server command to to cancel an in-progress warmup round
     cmdlib.registerServerCommand('gg_end_warmup', servercmd_end_warmup,
         "Immediately ends the warmup round if there is one in progress.")
@@ -115,9 +112,6 @@ def unload():
 
     # Reset server vars
     reset_server_vars()
-
-    # Unload message
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
     # Unregister the server command that cancels an in-progress warmup round
     cmdlib.unregisterServerCommand('gg_end_warmup')

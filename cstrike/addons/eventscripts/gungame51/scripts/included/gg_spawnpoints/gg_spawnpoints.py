@@ -22,6 +22,7 @@ from playerlib import getPlayer
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import langstring
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -31,6 +32,7 @@ info.title = "GG Spawnpoints"
 info.author = "GG Dev Team"
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ["gg_spawnpoints"]
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -46,8 +48,6 @@ propModel = "player/ct_gign.mdl"
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    es.dbgmsg(0, "Loaded: %s" % info.name)
-
     # Register server commands
     registerServerCommand("spawn_add", cmd_spawn_add, "Adds a spawnpoint at " +
                                                         "the users location")
@@ -63,8 +63,6 @@ def load():
 
 
 def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
     # Unregister server commands
     unregisterServerCommand("spawn_add")
     unregisterServerCommand("spawn_remove")

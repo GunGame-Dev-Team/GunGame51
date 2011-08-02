@@ -19,6 +19,7 @@ import es
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core import get_game_dir
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -27,6 +28,7 @@ info.name = 'gg_stats_logging'
 info.title = 'GG Stats Logging'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -60,8 +62,6 @@ def load():
             # Add the event to the list of events
             list_events.append(line)
 
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     global list_events
@@ -72,8 +72,6 @@ def unload():
     for event in list_events:
         # Unregister for the event
         es.addons.unregisterForEvent(this, event)
-
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

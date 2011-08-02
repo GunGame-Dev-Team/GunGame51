@@ -18,6 +18,7 @@ from playerlib import getPlayer
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -68,13 +69,9 @@ def load():
         noisySave = int(eventscripts_noisy)
         eventscripts_noisy.set(1)
 
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     eventscripts_noisy.set(noisySave)
-
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

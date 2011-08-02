@@ -21,6 +21,7 @@ from gungame51.core import get_game_dir
 from gungame51.core.weapons.shortcuts import get_weapon_order
 from gungame51.core.weapons.shortcuts import set_weapon_order
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -30,6 +31,7 @@ info.title = 'GG Random Weapon Order File'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
+
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
@@ -37,17 +39,6 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 gg_weapon_order_random_excluded = \
                                 es.ServerVar("gg_weapon_order_random_excluded")
-
-
-# =============================================================================
-# >> LOAD & UNLOAD
-# =============================================================================
-def load():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
-
-def unload():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
 
 
 # =============================================================================

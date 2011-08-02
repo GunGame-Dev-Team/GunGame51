@@ -17,6 +17,7 @@ import gamethread
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players.shortcuts import Player
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -26,6 +27,7 @@ info.title = 'GG Suicide Punish'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_suicide_punish']
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -39,17 +41,6 @@ recentTeamChange = []
 
 # Is the round live?
 liveRound = True
-
-
-# =============================================================================
-# >> LOAD & UNLOAD
-# =============================================================================
-def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

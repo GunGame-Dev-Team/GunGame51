@@ -21,6 +21,7 @@ from gungame51.core.messaging.shortcuts import centermsg
 from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.messaging.shortcuts import toptext
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -30,28 +31,6 @@ info.title = 'GG Winner Messages'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_winner_messages']
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-
-
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-
-
-# =============================================================================
-# >> LOAD & UNLOAD
-# =============================================================================
-def load():
-    # Loaded message
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
-
-def unload():
-    # Unload message
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================
