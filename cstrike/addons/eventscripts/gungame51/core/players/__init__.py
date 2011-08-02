@@ -6,6 +6,7 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -88,8 +89,8 @@ class CustomAttributeCallbacks(dict):
         if not self[attribute]:
             del self[attribute]
 
-
 CALLBACKS = CustomAttributeCallbacks()
+
 
 # =============================================================================
 # >> POST-CLASS IMPORTS

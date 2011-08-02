@@ -21,12 +21,15 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the .cfg file
     with ConfigContextManager(path(__file__).namebase) as config:
 
+        # Add the config file base attributes
         config.name = 'Objectives Configuration'
         config.description = 'This file controls GunGame51 objectives settings'
 
+        # Create the gg_map_obj instance
         with config.cfg_cvar('gg_map_obj') as cvar:
 
             cvar.name = 'MAP OBJECTIVES'
@@ -38,8 +41,10 @@ def load():
             cvar.text = 'Controls which objectives will be disabled.'
             cvar.notify = True
 
+        # Create the Bomb Defusal section
         config.cfg_section('BOMB DEFUSAL OBJECTIVE')
 
+        # Create the gg_bomb_defused_levels instance
         with config.cfg_cvar('gg_bomb_defused_levels') as cvar:
 
             cvar.name = 'BOMB DEFUSED LEVELS'
@@ -51,6 +56,7 @@ def load():
             cvar.text = 'Levels to reward a player for bomb defusal.'
             cvar.notify = True
 
+        # Create the gg_bomb_defused_skip_knife instance
         with config.cfg_cvar('gg_bomb_defused_skip_knife') as cvar:
 
             cvar.name = 'BOMB DEFUSED LEVELING (KNIFE LEVEL)'
@@ -64,6 +70,7 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on knife level.')
 
+        # Create the gg_bomb_defused_skip_nade instance
         with config.cfg_cvar('gg_bomb_defused_skip_nade') as cvar:
 
             cvar.name = 'BOMB DEFUSED LEVELING (HEGRENADE LEVEL)'
@@ -77,8 +84,10 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on HEGrenade level.')
 
+        # Create the Bomb Explode section
         config.cfg_section('BOMB EXPLODE OBJECTIVE')
 
+        # Create the gg_bomb_exploded_levels instance
         with config.cfg_cvar('gg_bomb_exploded_levels') as cvar:
 
             cvar.name = 'BOMB EXPLODED LEVELS'
@@ -90,6 +99,7 @@ def load():
             cvar.text = 'Levels to reward a player for bomb exploding.'
             cvar.notify = True
 
+        # Create the gg_bomb_exploded_skip_knife instance
         with config.cfg_cvar('gg_bomb_exploded_skip_knife') as cvar:
 
             cvar.name = 'BOMB EXPLODED LEVELING (KNIFE LEVEL)'
@@ -103,6 +113,7 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on knife level.')
 
+        # Create the gg_bomb_exploded_skip_nade instance
         with config.cfg_cvar('gg_bomb_exploded_skip_nade') as cvar:
 
             cvar.name = 'BOMB EXPLODED LEVELING (HEGRENADE LEVEL)'
@@ -116,8 +127,10 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on hegrenade level.')
 
+        # Create the Hostage Rescue section
         config.cfg_section('HOSTAGE RESCUE OBJECTIVE')
 
+        # Create the gg_hostage_rescued_levels instance
         with config.cfg_cvar('gg_hostage_rescued_levels') as cvar:
 
             cvar.name = 'HOSTAGE RESCUED LEVELS'
@@ -129,6 +142,7 @@ def load():
             cvar.text = 'Levels to reward a player for rescuing hostages.'
             cvar.notify = True
 
+        # Create the gg_hostage_rescued_rescues instance
         with config.cfg_cvar('gg_hostage_rescued_rescues') as cvar:
 
             cvar.name = 'HOSTAGE RESCUED REQUIRED RESCUES'
@@ -140,6 +154,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Number of hostages rescued required to level up.'
 
+        # Create the gg_hostage_rescued_skip_knife instance
         with config.cfg_cvar('gg_hostage_rescued_skip_knife') as cvar:
 
             cvar.name = 'HOSTAGE RESCUED LEVELING (KNIFE LEVEL)'
@@ -154,6 +169,7 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on knife level.')
 
+        # Create the gg_hostage_rescued_skip_nade instance
         with config.cfg_cvar('gg_hostage_rescued_skip_nade') as cvar:
 
             cvar.name = 'HOSTAGE RESCUED LEVELING (HEGRENADE LEVEL)'
@@ -168,8 +184,10 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on hegrenade level.')
 
+        # Create the Hostage Stop section
         config.cfg_section('HOSTAGE STOP OBJECTIVE')
 
+        # Create the gg_hostage_stopped_levels instance
         with config.cfg_cvar('gg_hostage_stopped_levels') as cvar:
 
             cvar.name = 'HOSTAGE STOPPED LEVELS'
@@ -182,6 +200,7 @@ def load():
                 'stopping other players from rescuing hostages.')
             cvar.notify = True
 
+        # Create the gg_hostage_stopped_stops instance
         with config.cfg_cvar('gg_hostage_stopped_stops') as cvar:
 
             cvar.name = 'HOSTAGE STOPPED REQUIRED STOPS'
@@ -193,6 +212,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Number of hostages stopped required to level up.'
 
+        # Create the gg_hostage_stopped_skip_knife instance
         with config.cfg_cvar('gg_hostage_stopped_skip_knife') as cvar:
 
             cvar.name = 'HOSTAGE STOPPED LEVELING (KNIFE LEVEL)'
@@ -207,6 +227,7 @@ def load():
             cvar.text = ('Allow players to level ' +
                 'up when they are on knife level.')
 
+        # Create the gg_hostage_stopped_skip_nade instance
         with config.cfg_cvar('gg_hostage_stopped_skip_nade') as cvar:
 
             cvar.name = 'HOSTAGE STOPPED LEVELING (HEGRENADE LEVEL)'

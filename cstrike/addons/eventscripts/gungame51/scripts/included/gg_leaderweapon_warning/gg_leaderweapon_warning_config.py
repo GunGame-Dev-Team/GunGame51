@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_leaderweapon_warning instance
         with config.cfg_cvar('gg_leaderweapon_warning') as cvar:
 
             cvar.name = 'GUNGAME LEADER WEAPON WARNING'
@@ -39,6 +41,7 @@ def load():
             cvar.text = ('Play a sound when a player ' +
                 'reaches "hegrenade" or "knife" level.')
 
+        # Create the gg_leaderweapon_warning_only_last instance
         with config.cfg_cvar('gg_leaderweapon_warning_only_last') as cvar:
 
             cvar.name = 'WARN ONLY ON LAST LEVELS'

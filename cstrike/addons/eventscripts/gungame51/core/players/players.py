@@ -236,14 +236,14 @@ class _ExtendedPlayerBase(PlayerLevels, PlayerSounds, PlayerMessaging,
 
 class _BasePlayer(_ExtendedPlayerBase, _PlayerMeta):
     # Declare the default attribute fields
-    _fields = make_fields(multikill = IntegerField(min_value=0),
-                          _afk = InstanceField(instance=AFK),
-                          soundpack = InstanceField(instance=SoundPack),
-                          _userid = IntegerField(min_value=2),
-                          _steamid = StringField(),
-                          _index = IntegerField(),
-                          _preventlevel = InstanceField(instance=PreventLevel),
-                          stripexceptions = InstanceField(
+    _fields = make_fields(multikill=IntegerField(min_value=0),
+                          _afk=InstanceField(instance=AFK),
+                          soundpack=InstanceField(instance=SoundPack),
+                          _userid=IntegerField(min_value=2),
+                          _steamid=StringField(),
+                          _index=IntegerField(),
+                          _preventlevel=InstanceField(instance=PreventLevel),
+                          stripexceptions=InstanceField(
                                                 instance=StripExceptions),
                           )
 

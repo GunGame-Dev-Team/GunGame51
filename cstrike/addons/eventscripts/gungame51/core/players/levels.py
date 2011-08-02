@@ -69,7 +69,7 @@ class PlayerLevels(_PlayerMeta):
         _LEADERS.check(self)
 
     level = property(fget=_get_level, fset=_set_level)
- 
+
     # =========================================================================
     # Methods
     # =========================================================================

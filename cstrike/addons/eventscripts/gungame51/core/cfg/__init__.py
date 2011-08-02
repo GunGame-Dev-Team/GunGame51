@@ -431,8 +431,8 @@ class ListNotes(ListManagement):
                 for addon in self.requires:
 
                     # Add both lines about required addons
-                    self.config.text(
-                        self.first + '"' + addon + '" will automatically be enabled.')
+                    self.config.text(self.first + '"'
+                        + addon + '" will automatically be enabled.')
                     self.config.text(self.first +
                         'Will not load if "' + addon + '" can not be enabled.')
 
@@ -440,8 +440,8 @@ class ListNotes(ListManagement):
                 for addon in self.conflict:
 
                     # Add the conflicting addon text
-                    self.config.text(
-                        self.first + 'Will not load with "' + addon + '" enabled.')
+                    self.config.text(self.first +
+                        'Will not load with "' + addon + '" enabled.')
 
         # Return the attribute
         return super(ListNotes, self).__getattribute__(item)
@@ -668,14 +668,11 @@ class ConfigContextManager(object):
         # Loop through all sections to add to the .cfg file
         for section in self.sections:
 
-            # Add a blank line before each section
-            self.config.text('')
-
             # Is the current section just text?
             if isinstance(section, str):
 
-                # Add a blank line for separation
-                self.config.text('')
+                # Add 2 blank lines for separation
+                self.config.text('\n')
 
                 # Start the section header
                 self.config.text('+' * 76)
@@ -692,14 +689,19 @@ class ConfigContextManager(object):
             # Is the section for a cvar?
             else:
 
-                # Start the cvar section header
-                self.config.text('=' * 76)
+                if section.name:
 
-                # Add the section name
-                self.config.text('>> ' + section.name)
+                    # Add a blank line for separation
+                    self.config.text('')
 
-                # End the cvar section header
-                self.config.text('=' * 76)
+                    # Start the cvar section header
+                    self.config.text('=' * 76)
+
+                    # Add the section name
+                    self.config.text('>> ' + section.name)
+
+                    # End the cvar section header
+                    self.config.text('=' * 76)
 
                 # Print the description
                 section.description.print_to_text()
@@ -797,7 +799,7 @@ def get_configs_by_type(name):
         # Get the path to the base *_config.py files
         cfgpaths = path(__file__).parent.joinpath('files')
 
-    # Is the name wanting included/custom addon configs? 
+    # Is the name wanting included/custom addon configs?
     else:
 
         # Get the path to the *_config.py files

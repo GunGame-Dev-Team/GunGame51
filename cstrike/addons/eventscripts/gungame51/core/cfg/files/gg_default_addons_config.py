@@ -21,12 +21,15 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the .cfg file
     with ConfigContextManager(path(__file__).namebase) as config:
 
+        # Add the config file base attributes
         config.name = 'Default Addon Configuration'
         config.description = 'This file defines GunGame Addon settings.'
 
+        # Create the gg_prune_database instance
         with config.cfg_cvar('gg_prune_database') as cvar:
 
             cvar.name = 'STATS DATABASE PRUNE'

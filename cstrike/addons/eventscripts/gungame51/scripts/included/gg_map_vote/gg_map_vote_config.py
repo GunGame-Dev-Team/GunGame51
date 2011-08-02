@@ -9,351 +9,275 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
-import cfglib
+# Python Imports
+from __future__ import with_statement
+from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import generate_header
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-config = cfglib.AddonCFG('%s/cfg/' % es.ServerVar('eventscripts_gamedir') +
-    'gungame51/included_addon_configs/gg_map_vote.cfg')
+from gungame51.core.cfg import ConfigContextManager
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    generate_header(config)
 
-    config.text('')
-    config.text('+' * 76)
-    config.text('|' + ' ' * 28 + 'MAP VOTE SETTINGS' + ' ' * 29 + '|')
-    config.text('+' * 76)
-    config.text('')
+    # Create the cfg file
+    with ConfigContextManager(
+      path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-    # gg_map_vote
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> GUNGAME MAP VOTE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allows players to vote for the next map.')
-    config.text('Notes:')
-    config.text('   * This does not require any additional plug-ins.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not use voting.')
-    config.text('   1 = (Enabled) Use GunGame\'s map voting system.')
-    config.text('   2 = (Enabled) Use a 3rd-party voting system.')
-    config.text('Default Value: 0')
-    config.cvar('gg_map_vote', 0, 'Controls GunGame\'s map ' +
-        'voting.').addFlag('notify')
+        # Create the Map Vote section
+        config.cfg_section('MAP VOTE SETTINGS')
 
-    # gg_map_vote_command
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> 3RD PARTY VOTE COMMAND')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   If gg_map_vote is set to 2, this is the command that ' +
-                    'will be issued when.')
-    config.text('   the vote is triggered.')
-    config.text('Examples:')
-    config.text(' Mani:        gg_map_vote_command "ma_voterandom end 4"')
-    config.text(' BeetlesMod:  gg_map_vote_command "admin_votemaps"')
-    config.text(' SourceMod:   gg_map_vote_command "sm_mapvote" (with ' +
-                'mapchooser.smx enabled)')
-    config.text('Default Value: "ma_voterandom end 4"')
-    config.cvar('gg_map_vote_command', "ma_voterandom end 4",
-                                        'Triggers 3rd party voting.')
+        # Create the gg_map_vote instance
+        with config.cfg_cvar('gg_map_vote') as cvar:
 
-    # gg_map_vote_size
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MAP VOTE SIZE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This variable controls the number of maps that will be ' +
-                    'displayed as')
-    config.text('   options in the vote menu.')
-    config.text('Notes:')
-    config.text('   * It is recommended not to set this too high.')
-    config.text('Options:')
-    config.text('   0 = (Enabled) Use entire map list.')
-    config.text('   # = (Enabled) Use # amount of options.')
-    config.text('Default Value: 6')
-    config.cvar('gg_map_vote_size', 6, 'Controls GunGame\'s map vote size.')
+            cvar.name = 'GUNGAME MAP VOTE'
+            cvar.description.append('Allows players to vote for the next map.')
+            cvar.notes.append('This does not require any additional plug-ins.')
+            cvar.options.append('0 = (Disabled) Do not use voting.')
+            cvar.options.append(
+                '1 = (Enabled) Use GunGame\'s map voting system.')
+            cvar.options.append('2 = (Enabled) Use a 3rd-party voting system.')
+            cvar.default = 0
+            cvar.text = "Controls GunGame's map voting."
 
-    # gg_map_vote_trigger
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MAP VOTE TRIGGER LEVEL')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This variable controls what level the GunGame Vote is ' +
-                    'fired on.')
-    config.text('   The value will be subtracted from the total ' +
-                    'number of levels.')
-    config.text('Notes:')
-    config.text('   * If there are 23 levels, and "gg_vote_trigger" is set ' +
-                      'to "3", voting')
-    config.text('     will start on level 20.')
-    config.text('Options:')
-    config.text('   # = (Enabled) # from the last level to start the voting.')
-    config.text('Default Value: 4')
-    config.cvar('gg_map_vote_trigger', 4,
-                            'Which level to trigger GunGame\'s map voting.')
+        # Create the gg_map_vote_command instance
+        with config.cfg_cvar('gg_map_vote_command') as cvar:
 
-    # gg_map_vote_time
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MAP VOTE TIME')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This variable controls how long the vote will last for.')
-    config.text('Notes:')
-    config.text('   * It is recommended not to set this too high.')
-    config.text('   * If nobody votes, it will default to the "mapcycle.txt".')
-    config.text('Options:')
-    config.text('   # = (Enabled) Time in seconds to allow voting.')
-    config.text('Default Value: 30')
-    config.cvar('gg_map_vote_time', 30, 'GunGame\'s map voting time limit.')
+            cvar.name = '3RD PARTY VOTE COMMAND'
+            cvar.description.append([
+                'If gg_map_vote is set to 2, this ' +
+                    'is the command that will be issued',
+                'when the vote is triggered.',
+                ])
+            cvar.examples.append('Mani:        gg_map_vote_command ' +
+                '"ma_voterandom end 4"')
+            cvar.examples.append('BeetlesMod:  gg_map_vote_command ' +
+                '"admin_votemaps"')
+            cvar.examples.append('SourceMod:   gg_map_vote_command ' +
+                '"sm_mapvote" (with mapchooser.smx enabled)')
+            cvar.default = 'ma_voterandom end 4'
+            cvar.text = 'Triggers 3rd party voting.'
 
-    # gg_map_vote_dont_show_last_maps
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> EXCLUDE RECENTLY PLAYED MAPS')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This variable will exclude the selected number of ' +
-                    'recently')
-    config.text('   played maps from the vote menu.')
-    config.text('Notes:')
-    config.text('   * Make sure you have enough maps listed in your source.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not exclude recent maps.')
-    config.text('   # = (Enabled) # of last maps to exclude.')
-    config.text('Default Value: 0')
-    config.cvar('gg_map_vote_dont_show_last_maps', 0,
-                            'Exclude recent maps from GunGame\'s map voting.')
+        # Create the gg_map_vote_size instance
+        with config.cfg_cvar('gg_map_vote_size') as cvar:
 
-    # gg_map_vote_show_player_vote
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> SHOW PLAYER VOTES')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This variable controls if votes will be publically ' +
-                    'announced.')
-    config.text('Examples:')
-    config.text('   * Monday voted for gg_funtimes.')
-    config.text('   * XE_ManUp voted for gg_hello_kitty_island_adventure.')
-    config.text('   * Warren voted for aim_shotty.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Do not use display player votes.')
-    config.text('   1 = (Enabled) Display player votes.')
-    config.text('Default Value: 0')
-    config.cvar('gg_map_vote_show_player_vote', 0,
-                        'Shows player feedback from GunGame\'s map voting.')
+            cvar.name = 'MAP VOTE SIZE'
+            cvar.description.append([
+                'This variable controls the number ' +
+                    'of maps that will be displayed',
+                'as options in the vote menu.',
+                ])
+            cvar.notes.append('It is recommended not to set this too high.')
+            cvar.options.append('0 = (Enabled) Use entire map list.')
+            cvar.options.append('# = (Enabled) Use # amount of options.')
+            cvar.default = 6
+            cvar.text = "Controls GunGame's map vote size."
 
-    # gg_map_vote_list_source
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MAP LIST SOURCE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Controls which map list will be used ' +
-                    'to build the vote menu.')
-    config.text('Notes:')
-    config.text('   * You may only filter maps with option 3. See ' +
-                        'below for more information.')
-    config.text('Options:')
-    config.text('   1 = mapcycle.txt')
-    config.text('   2 = maplist.txt')
-    config.text('   3 = "gg_map_vote_file" variable')
-    config.text('   4 = All maps in the "maps" folder')
-    config.text('Default Value: 1')
-    config.cvar('gg_map_vote_list_source', 1,
-                                'Source of maps for GunGame\'s map voting.')
+        # Create the gg_map_vote_trigger instance
+        with config.cfg_cvar('gg_map_vote_trigger') as cvar:
 
-    # gg_map_vote_file
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> MAP LIST FILE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   This variable is not used, unless the above variable ' +
-                            'is set to 3.')
-    config.text('Notes:')
-    config.text('   * You may filter out maps by player count.')
-    config.text('   * See "/cfg/gungame51/gg_vote_list.txt" for examples and' +
-                        ' information.')
-    config.text('   * You can NOT add filters to "maplist.txt" and '
-                        '"mapcycle.txt"')
-    config.text('Examples:')
-    config.text('   gg_map_vote_file "cfg/gungame51/my_list.txt"')
-    config.text('   gg_map_vote_file "cfg/my_other_list.txt"')
-    config.text('Default Value: cfg/gungame51/gg_vote_list.txt')
-    config.cvar('gg_map_vote_file', 'cfg/gungame51/gg_vote_list.txt',
-                                    'Map list for GunGame\'s map voting.')
+            cvar.name = 'MAP VOTE TRIGGER LEVEL'
+            cvar.description.append('This variable controls what ' +
+                'level the GunGame Vote is fired on.')
+            cvar.description.append('The value will be subtracted ' +
+                'from the total number of levels.')
+            cvar.notes.append([
+                'If there are 23 levels, and ' +
+                    '"gg_vote_trigger" is set to "3",',
+                'voting will start on level 20.',
+                ])
+            cvar.options.append(
+                '# = (Enabled) # from the last level to start the voting.')
+            cvar.default = 4
+            cvar.text = "Which level to trigger GunGame's map voting."
 
-    # gg_map_vote_player_command
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> PLAYER VOTE COMMAND')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allows players to vote for the next map.')
-    config.text('Notes:')
-    config.text('   * Players can vote or revote using this say command.')
-    config.text('Examples:')
-    config.text('   gg_map_vote_player_command "!ggvote"')
-    config.text('   gg_map_vote_player_command "!vote"')
-    config.text('Default Value: "!vote"')
-    config.cvar('gg_map_vote_player_command', "!vote",
-                            'Player say command for GunGame\'s map voting.')
+        # Create the gg_map_vote_time instance
+        with config.cfg_cvar('gg_map_vote_time') as cvar:
 
-    # gg_map_vote_after_death
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> DEAD FILTER')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   * This will only send the vote menu to dead players. ')
-    config.text('   * Players will receive the menu once they die.')
-    config.text('Notes:')
-    config.text('   * Players can use the player vote command to load the ' +
-                        'menu if they')
-    config.text('     wish to vote while alive.')
-    config.text('Options:')
-    config.text('   0 = (Disabled) Send the vote menu to everyone.')
-    config.text('   1 = (Enabled) Only send the vote menu to dead players.')
-    config.text('Default Value: 0')
-    config.cvar('gg_map_vote_after_death', 0,
-                    'Only the dead get popups during GunGame\'s map voting.')
+            cvar.name = 'MAP VOTE TIME'
+            cvar.description.append(
+                'This variable controls how long the vote will last for.')
+            cvar.notes.append('It is recommended not to set this too high.')
+            cvar.notes.append(
+                'If nobody votes, it will default to the "mapcycle.txt".')
+            cvar.options.append(
+                '# = (Enabled) Time in seconds to allow voting.')
+            cvar.default = 30
+            cvar.text = "GunGame's map voting time limit."
 
-    config.text('')
-    config.text('')
-    config.text('+' * 76)
-    config.text('|' + ' ' * 26 + 'ROCK THE VOTE SETTINGS' + ' ' * 26 + '|')
-    config.text('+' * 76)
-    config.text('')
+        # Create the gg_map_vote_dont_show_last_maps instance
+        with config.cfg_cvar('gg_map_vote_dont_show_last_maps') as cvar:
 
-    # gg_map_vote_rtv
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ROCK THE VOTE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allows players to request a map vote in the middle of' +
-                ' a map.')
-    config.text('Note:')
-    config.text('   * Only takes effect with "gg_map_vote 1" set.')
-    config.text('Examples:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
-    config.text('Default Value: 1')
-    config.cvar('gg_map_vote_rtv', 1,
-                            'Allow rocking the vote.')
+            cvar.name = 'EXCLUDE RECENTLY PLAYED MAPS'
+            cvar.description.append([
+                'This variable will exclude the ' +
+                    'selected number of recently',
+                'played maps from the vote menu.',
+                ])
+            cvar.notes.append(
+                'Make sure you have enough maps listed in your source.')
+            cvar.options.append('0 = (Disabled) Do not exclude recent maps.')
+            cvar.options.append('# = (Enabled) # of last maps to exclude.')
+            cvar.default = 0
+            cvar.text = "Exclude recent maps from GunGame's map voting."
 
-    # gg_map_vote_rtv_command
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ROCK THE VOTE COMMAND')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allows players to rock the vote.')
-    config.text('Examples:')
-    config.text('   gg_map_vote_rtv_command "rtv"')
-    config.text('Default Value: "!rtv"')
-    config.cvar('gg_map_vote_rtv_command', "!rtv",
-                            'Player say command for GunGame\'s RTV.')
+        # Create the gg_map_vote_show_player_vote instance
+        with config.cfg_cvar('gg_map_vote_show_player_vote') as cvar:
 
-    # gg_map_vote_rtv_disable_level
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ROCK THE VOTE DISABLE LEVEL')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   The percentage of total number of levels which, when the' +
-                ' leader reaches')
-    config.text('   it, disables RTV for that map.')
-    config.text('Examples:')
-    config.text('   60 = (If there are 24 total levels, when the leader hits' +
-                ' level')
-    config.text('           15 (we round down), RTV is disabled)')
-    config.text('Default Value: 60')
-    config.cvar('gg_map_vote_rtv_levels_required', 60,
-                            'Level percentage when RTV gets disabled.')
+            cvar.name = 'SHOW PLAYER VOTES'
+            cvar.description.append('This variable controls ' +
+                'if votes will be publically announced.')
+            cvar.examples.append('Monday voted for gg_funtimes.')
+            cvar.examples.append('XE_ManUp voted for ' +
+                'gg_hello_kitty_island_adventure.')
+            cvar.examples.append('Warren voted for aim_shotty.')
+            cvar.options.append(
+                '0 = (Disabled) Do not use display player votes.')
+            cvar.options.append('1 = (Enabled) Display player votes.')
+            cvar.default = 0
+            cvar.text = "Shows player feedback from GunGame's map voting."
 
-    # gg_map_vote_rtv_percent
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ROCK THE VOTE PERCENTAGE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   The percentage of total players required to rtv before ' +
-                'the vote gets')
-    config.text('   rocked.')
-    config.text('Examples:')
-    config.text('   60 = 60% of players (rounded down) on the server need ' +
-                'to RTV.')
-    config.text('Default Value: 60')
-    config.cvar('gg_map_vote_rtv_percent', 60,
-                            'Player say command for GunGame\'s rtv.')
+        # Create the gg_map_vote_list_source instance
+        with config.cfg_cvar('gg_map_vote_list_source') as cvar:
 
-    config.text('')
-    config.text('')
-    config.text('+' * 76)
-    config.text('|' + ' ' * 28 + 'NOMINATION SETTINGS' + ' ' * 27 + '|')
-    config.text('+' * 76)
-    config.text('')
+            cvar.name = 'MAP LIST SOURCE'
+            cvar.description.append('Controls which map list ' +
+                'will be used to build the vote menu.')
+            cvar.notes.append('You may only filter maps with ' +
+                'option 3. See below for more information.')
+            cvar.options.append('1 = mapcycle.txt')
+            cvar.options.append('2 = maplist.txt')
+            cvar.options.append('3 = "gg_map_vote_file" variable')
+            cvar.options.append('4 = All maps in the "maps" folder')
+            cvar.default = 1
+            cvar.text = "Source of maps for GunGame's map voting."
 
-    # gg_map_vote_nominate
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> NOMINATE FOR VOTE')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allows players to request a map to be in the next vote.')
-    config.text('Notes:')
-    config.text('   * Only takes effect with "gg_map_vote 1" set.')
-    config.text('   * Only gg_map_vote_size nominations can be made.')
-    config.text('   * gg_map_vote_dont_show_last_maps can\'t be nominated.')
-    config.text('Examples:')
-    config.text('   0 = (Disabled)')
-    config.text('   1 = (Enabled)')
-    config.text('Default Value: 1')
-    config.cvar('gg_map_vote_nominate', 1,
-                            'Allow vote nominations.')
+        # Create the gg_map_vote_file instance
+        with config.cfg_cvar('gg_map_vote_file') as cvar:
 
-    # gg_map_vote_nominate_command
-    config.text('')
-    config.text('=' * 76)
-    config.text('>> ROCK THE VOTE COMMAND')
-    config.text('=' * 76)
-    config.text('Description:')
-    config.text('   Allows players to nominate.')
-    config.text('Examples:')
-    config.text('   gg_map_vote_nominate_command "!nominate"')
-    config.text('Default Value: "!nominate"')
-    config.cvar('gg_map_vote_nominate_command', "!nominate",
-                            'Player say command for GunGame\'s nominate.')
+            cvar.name = 'MAP LIST FILE'
+            cvar.description.append('This variable is not used, ' +
+                'unless the above variable is set to 3.')
+            cvar.notes.append('You may filter out maps by player count.')
+            cvar.notes.append('See "/cfg/gungame51/gg_vote_list.txt" ' +
+                'for examples and information.')
+            cvar.notes.append('You can NOT add filters to ' +
+                '"maplist.txt" and "mapcycle.txt"')
+            cvar.examples.append(
+                'gg_map_vote_file "cfg/gungame51/my_list.txt"')
+            cvar.examples.append('gg_map_vote_file "cfg/my_other_list.txt"')
+            cvar.default = 'cfg/gungame51/gg_vote_list.txt'
+            cvar.text = "Map list for GunGame's map voting."
 
-    # Write
-    config.write()
-    es.dbgmsg(0, '\tgg_map_vote.cfg')
+        # Create the gg_map_vote_player_command instance
+        with config.cfg_cvar('gg_map_vote_player_command') as cvar:
 
+            cvar.name = 'PLAYER VOTE COMMAND'
+            cvar.description.append('Allows players to vote for the next map.')
+            cvar.notes.append(
+                'Players can vote or revote using this say command.')
+            cvar.examples.append('gg_map_vote_player_command "!ggvote"')
+            cvar.examples.append('gg_map_vote_player_command "!vote"')
+            cvar.default = '!vote'
+            cvar.text = "Player say command for GunGame's map voting."
 
-def unload():
-    global config
+        # Create the gg_map_vote_after_death instance
+        with config.cfg_cvar('gg_map_vote_after_death') as cvar:
 
-    # Remove the "notify" flags as set by addFlag('notify')
-    for cvar in config.getCvars().keys():
-        es.flags('remove', 'notify', cvar)
+            cvar.name = 'DEAD FILTER'
+            cvar.description.append(
+                'This will only send the vote menu to dead players.')
+            cvar.description.append(
+                'Players will receive the menu once they die.')
+            cvar.notes.append([
+                'Players can use the player vote ' +
+                    'command to load the menu if they',
+                'wish to vote while alive.',
+                ])
+            cvar.options.append(
+                '0 = (Disabled) Send the vote menu to everyone.')
+            cvar.options.append(
+                '1 = (Enabled) Only send the vote menu to dead players.')
+            cvar.default = 0
+            cvar.text = "Only the dead get popups during GunGame's map voting."
 
-    # Delete the cfglib.AddonCFG instance
-    del config
+        # Create the RTV section
+        config.cfg_section('ROCK THE VOTE SETTINGS')
+
+        # Create the gg_map_vote_rtv instance
+        with config.cfg_cvar('gg_map_vote_rtv') as cvar:
+
+            cvar.name = 'ROCK THE VOTE'
+            cvar.description.append('Allows players to request a ' +
+                'map vote in the middle of a map.')
+            cvar.notes.append('Only takes effect with "gg_map_vote 1" set.')
+            cvar.examples.append('0 = (Disabled)')
+            cvar.examples.append('1 = (Enabled)')
+            cvar.default = 1
+            cvar.text = 'Allow rocking the vote.'
+
+        # Create the gg_map_vote_rtv_command instance
+        with config.cfg_cvar('gg_map_vote_rtv_command') as cvar:
+
+            cvar.name = 'ROCK THE VOTE COMMAND'
+            cvar.description.append('Allows players to rock the vote.')
+            cvar.examples.append('gg_map_vote_rtv_command "rtv"')
+            cvar.default = '!rtv'
+            cvar.text = "Player say command for GunGame's RTV."
+
+        # Create the gg_map_vote_rtv_levels_required instance
+        with config.cfg_cvar('gg_map_vote_rtv_levels_required') as cvar:
+
+            cvar.name = 'ROCK THE VOTE DISABLE LEVEL'
+            cvar.description.append([
+                'The percentage of total number ' +
+                    'of levels which, when the leader reaches',
+                'it, disables RTV for that map.',
+                ])
+            cvar.examples.append([
+                '60 = (If there are 24 total levels, ' +
+                    'when the leader hits level 15',
+                '(we round down), RTV is disabled)',
+                ])
+            cvar.default = 60
+            cvar.text = 'Level percentage when RTV gets disabled.'
+
+        # Create the gg_map_vote_rtv_percent instance
+        with config.cfg_cvar('gg_map_vote_rtv_percent') as cvar:
+
+            cvar.name = 'ROCK THE VOTE PERCENTAGE'
+            cvar.description.append('The percentage of total ' +
+                'players required to rtv before the vote gets rocked.')
+            cvar.examples.append('60 = 60% of players ' +
+                '(rounded down) on the server need to RTV.')
+            cvar.default = 60
+            cvar.text = "Player say command for GunGame's rtv."
+
+        # Create the Nomination section
+        config.cfg_section('NOMINATION SETTINGS')
+
+        # Create the gg_map_vote_nominate instance
+        with config.cfg_cvar('gg_map_vote_nominate') as cvar:
+
+            cvar.name = 'NOMINATE FOR VOTE'
+            cvar.description.append(
+                'Allows players to request a map to be in the next vote.')
+            cvar.notes.append('Only takes effect with "gg_map_vote 1" set.')
+            cvar.notes.append('Only gg_map_vote_size nominations can be made.')
+            cvar.notes.append(
+                'gg_map_vote_dont_show_last_maps can\'t be nominated.')
+            cvar.options.append('0 = (Disabled)')
+            cvar.options.append('1 = (Enabled)')
+            cvar.default = 1
+            cvar.text = 'Allow vote nominations.'
+
+        # Create the gg_map_vote_nominate_command instance
+        with config.cfg_cvar('gg_map_vote_nominate_command') as cvar:
+
+            cvar.name = 'ROCK THE VOTE COMMAND'
+            cvar.description.append('Allows players to nominate.')
+            cvar.options.append('gg_map_vote_nominate_command "!nominate"')
+            cvar.default = '!nominate'
+            cvar.text = "Player say command for GunGame's nominate."

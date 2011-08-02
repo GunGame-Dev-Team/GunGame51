@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_elimination instance
         with config.cfg_cvar('gg_elimination') as cvar:
 
             cvar.name = 'ELIMINATION'
@@ -37,6 +39,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_elimination.'
 
+        # Create the gg_elimination_spawn instance
         with config.cfg_cvar('gg_elimination_spawn') as cvar:
 
             cvar.name = 'ELIMINATION SPAWN'

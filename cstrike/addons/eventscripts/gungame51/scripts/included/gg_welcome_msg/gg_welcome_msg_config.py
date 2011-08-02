@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_welcome_msg instance
         with config.cfg_cvar('gg_welcome_msg') as cvar:
 
             cvar.name = 'GUNGAME WELCOME MESSAGE'
@@ -42,6 +44,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_welcome_msg.'
 
+        # Create the gg_welcome_msg_timeout instance
         with config.cfg_cvar('gg_welcome_msg_timeout') as cvar:
 
             cvar.name = 'GUNGAME WELCOME MESSAGE TIMEOUT'

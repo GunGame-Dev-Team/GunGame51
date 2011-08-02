@@ -57,7 +57,7 @@ class MinLengthValidator(object):
 
     def __call__(self, check_value):
         if len(check_value) < self.value:
-            raise ValidationError('Ensure this value has at least '+
+            raise ValidationError('Ensure this value has at least ' +
                                   '%d characters (it has %d).' % (self.value,
                                   len(check_value)))
 

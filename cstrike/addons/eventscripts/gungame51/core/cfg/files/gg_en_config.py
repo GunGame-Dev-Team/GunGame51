@@ -21,14 +21,18 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the .cfg file
     with ConfigContextManager(path(__file__).namebase) as config:
 
+        # Add the config file base attributes
         config.name = 'English Server Configuration'
         config.description = 'This file controls GunGame51 settings.'
 
+        # Create the Weapon Settings section
         config.cfg_section('WEAPON SETTINGS')
 
+        # Create the gg_weapon_order_file instance
         with config.cfg_cvar('gg_weapon_order_file') as cvar:
 
             cvar.name = 'WEAPON ORDER FILE'
@@ -42,6 +46,7 @@ def load():
             cvar.text = 'The file that will be used for the weapon order.'
             cvar.notify = True
 
+        # Create the gg_weapon_order_random instance
         with config.cfg_cvar('gg_weapon_order_random') as cvar:
 
             cvar.name = 'RANDOM WEAPON ORDER FILE'
@@ -53,6 +58,7 @@ def load():
             cvar.text = 'Randomly select a new weapon order file each map.'
             cvar.notify = True
 
+        # Create the gg_weapon_order_random_excluded instance
         with config.cfg_cvar('gg_weapon_order_random_excluded') as cvar:
 
             cvar.name = 'RANDOM WEAPON ORDER EXCLUDED FILES'
@@ -71,6 +77,7 @@ def load():
                 'a random order with gg_weapon_order_random.')
             cvar.notify = True
 
+        # Create the gg_weapon_order_sort_type instance
         with config.cfg_cvar('gg_weapon_order_sort_type') as cvar:
 
             cvar.name = 'WEAPON ORDER SORT TYPE'
@@ -87,6 +94,7 @@ def load():
                 'the weapons and levels will be sorted.')
             cvar.notify = True
 
+        # Create the gg_multikill_override instance
         with config.cfg_cvar('gg_multikill_override') as cvar:
 
             cvar.name = 'MULTIKILL OVERRIDE'
@@ -101,6 +109,7 @@ def load():
                 'player needs to level up per weapon.')
             cvar.notify = True
 
+        # Create the gg_map_strip_exceptions instance
         with config.cfg_cvar('gg_map_strip_exceptions') as cvar:
 
             cvar.name = 'WEAPON REMOVAL'
@@ -108,8 +117,10 @@ def load():
             cvar.default = 'hegrenade,flashbang,smokegrenade'
             cvar.text = 'The weapons that will not be removed from the map.'
 
+        # Create the Map Settings section
         config.cfg_section('MAP SETTINGS')
 
+        # Create the gg_multi_round instance
         with config.cfg_cvar('gg_multi_round') as cvar:
 
             cvar.name = 'MULTI-ROUND'
@@ -124,6 +135,7 @@ def load():
             cvar.text = ('The number of rounds that ' +
                 'need to be played before a map change.')
 
+        # Create the gg_multi_round_intermission instance
         with config.cfg_cvar('gg_multi_round_intermission') as cvar:
 
             cvar.name = 'MULTI-ROUND INTERMISSION'
@@ -148,6 +160,7 @@ def load():
             cvar.text = ('The amount of time (in seconds) ' +
                 'that the intermission lasts between rounds.')
 
+        # Create the gg_dynamic_chattime instance
         with config.cfg_cvar('gg_dynamic_chattime') as cvar:
 
             cvar.name = 'DYNAMIC END OF MAP CHAT TIME'
@@ -167,8 +180,10 @@ def load():
             cvar.text = ('Enables dynamic end of round ' +
                 'chat time based on the winner music.')
 
+        # Create the Player Settings section
         config.cfg_section('PLAYER SETTINGS')
 
+        # Create the gg_player_defuser instance
         with config.cfg_cvar('gg_player_defuser') as cvar:
 
             cvar.name = 'DEFUSERS'
@@ -178,6 +193,7 @@ def load():
             cvar.text = ('Automatically equip Counter-Terrorist ' +
                 'players with defusal kits on bomb maps.')
 
+        # Create the gg_player_armor instance
         with config.cfg_cvar('gg_player_armor') as cvar:
 
             cvar.name = 'ARMOR'
@@ -188,8 +204,10 @@ def load():
             cvar.text = ('The type of armor players ' +
                 'are equipped with when they spawn.')
 
+        # Create the Sound Settings section
         config.cfg_section('SOUND SETTINGS')
 
+        # Create the gg_soundpack instance
         with config.cfg_cvar('gg_soundpack') as cvar:
 
             cvar.name = 'SOUND PACK'

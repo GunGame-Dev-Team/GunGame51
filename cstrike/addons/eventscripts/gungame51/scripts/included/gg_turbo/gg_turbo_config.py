@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_turbo instance
         with config.cfg_cvar('gg_turbo') as cvar:
 
             cvar.name = 'TURBO MODE'

@@ -424,6 +424,7 @@ def first_gg_start():
     firstGGStart = True
     check_priority()
 
+
 def check_priority():
     # If there is nothing in priority addons, fire event gg_start
     if not PriorityAddon():

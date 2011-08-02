@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_handicap instance
         with config.cfg_cvar('gg_handicap') as cvar:
 
             cvar.name = 'HANDICAP'
@@ -40,6 +42,7 @@ def load():
             cvar.text = ('Helps newly connected ' +
                 'players by adjusting their level.')
 
+        # Create the gg_handicap_max instance
         with config.cfg_cvar('gg_handicap_max') as cvar:
 
             cvar.name = 'HANDICAP MAXIMUM FIRST LEVEL'
@@ -54,6 +57,7 @@ def load():
                 'players by adjusting their level. (max)')
             cvar.notify = True
 
+        # Create the gg_handicap_no_reconnect instance
         with config.cfg_cvar('gg_handicap_no_reconnect') as cvar:
 
             cvar.name = 'HANDICAP NO RECONNECT'
@@ -72,6 +76,7 @@ def load():
             cvar.text = 'Prevents abuse from reconnecting'
             cvar.notify = True
 
+        # Create the gg_handicap_update instance
         with config.cfg_cvar('gg_handicap_update') as cvar:
 
             cvar.name = 'HANDICAP UPDATE'
@@ -89,6 +94,7 @@ def load():
             cvar.text = ('The time (in seconds) to update ' +
                 "players' levels using handicap.")
 
+        # Create the gg_handicap_legacy_mode instance
         with config.cfg_cvar('gg_handicap_legacy_mode') as cvar:
 
             cvar.name = 'LEGACY MODE'

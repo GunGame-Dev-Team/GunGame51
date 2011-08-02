@@ -21,12 +21,15 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the .cfg file
     with ConfigContextManager(path(__file__).namebase) as config:
 
+        # Add the config file base attributes
         config.name = 'Punishments Configuration'
         config.description = 'This file controls GunGame51 punishment settings'
 
+        # Create the gg_afk_rounds instance
         with config.cfg_cvar('gg_afk_rounds') as cvar:
 
             cvar.name = 'AFK ROUNDS'
@@ -37,6 +40,7 @@ def load():
             cvar.text = ('The number of rounds a player ' +
                 'can be AFK before punishment occurs.')
 
+        # Create the gg_afk_punish instance
         with config.cfg_cvar('gg_afk_punish') as cvar:
 
             cvar.name = 'AFK PUNISHMENT'
@@ -49,6 +53,7 @@ def load():
                 'who are AFK longer than "gg_afk_rounds".')
             cvar.notify = True
 
+        # Create the gg_suicide_punish instance
         with config.cfg_cvar('gg_suicide_punish') as cvar:
 
             cvar.name = 'SUICIDE PUNISHMENT'
@@ -60,6 +65,7 @@ def load():
                 'player will lose if they commit suicide.')
             cvar.notify = True
 
+        # Create the gg_tk_punish instance
         with config.cfg_cvar('gg_tk_punish') as cvar:
 
             cvar.name = 'TEAM KILL PUNISHMENT'
@@ -71,6 +77,7 @@ def load():
                 'will lose if they kill a teammate.')
             cvar.notify = True
 
+        # Create the gg_retry_punish instance
         with config.cfg_cvar('gg_retry_punish') as cvar:
 
             cvar.name = 'RETRY/RECONNECT PUNISHMENT'
@@ -82,6 +89,7 @@ def load():
                 'lose if they reconnect in the same round.')
             cvar.notify = True
 
+        # Create the gg_hostage_killed_punish instance
         with config.cfg_cvar('gg_hostage_killed_punish') as cvar:
 
             cvar.name = 'HOSTAGE KILLED PUNISHMENT'
@@ -93,6 +101,7 @@ def load():
                 'player will lose if they kill hostages.')
             cvar.notify = True
 
+        # Create the gg_hostage_killed_kills instance
         with config.cfg_cvar('gg_hostage_killed_kills') as cvar:
 
             cvar.name = 'HOSTAGE KILLED REQUIRED KILLS'

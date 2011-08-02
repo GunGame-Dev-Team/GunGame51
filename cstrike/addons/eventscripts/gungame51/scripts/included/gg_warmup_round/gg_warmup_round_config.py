@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_warmup_round instance
         with config.cfg_cvar('gg_warmup_round') as cvar:
 
             cvar.name = 'WARMUP ROUND'
@@ -37,6 +39,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables or disables warmupround.'
 
+        # Create the gg_warmup_timer instance
         with config.cfg_cvar('gg_warmup_timer') as cvar:
 
             cvar.name = 'WARMUP ROUND TIMER'
@@ -46,30 +49,31 @@ def load():
             cvar.text = ('The amount of time (in ' +
                 'seconds) that the the warmup round will last.')
 
+        # Create the gg_warmup_weapon instance
         with config.cfg_cvar('gg_warmup_weapon') as cvar:
 
             cvar.name = 'WARMUP ROUND WEAPON'
             cvar.notes.append('Only supports "weapon_*" entities.')
             cvar.notes.append('Warmup round is triggered at ' +
                 'the start of each map change.')
-            cvar.options.first = ''
-            cvar.options.append('\tawp   \tscout\taug   \tmac10' +
+            cvar.options.append(' awp   \tscout\taug   \tmac10' +
                 '\ttmp   \tmp5navy\tump45\tp90')
-            cvar.options.append('\tgalil\tfamas\tak47\tsg552\t' +
+            cvar.options.append(' galil\tfamas\tak47\tsg552\t' +
                 'sg550\tg3sg1\tm249\tm3')
-            cvar.options.append('\txm1014\tm4a1\tglock\tusp   ' +
+            cvar.options.append(' xm1014\tm4a1\tglock\tusp   ' +
                 '\tp228\tdeagle\telite\tfiveseven')
-            cvar.options.append('\thegrenade\tknife')
+            cvar.options.append(' hegrenade\tknife')
             cvar.options.append('')
-            cvar.options.append('\t0 = The first level weapon')
-            cvar.options.append('\tweapon1,weapon2,weapon3 = For ' +
+            cvar.options.append(' 0 = The first level weapon')
+            cvar.options.append(' weapon1,weapon2,weapon3 = For ' +
                 'each warmup, one of these weapons is chosen')
-            cvar.options.append('\t#random = For ' +
+            cvar.options.append(' #random = For ' +
                 'each warmup, a random weapon is chosen.')
             cvar.default = 'hegrenade'
             cvar.text = ('The weapon that players ' +
                 'will use during the warmup round.')
 
+        # Create the gg_warmup_deathmatch instance
         with config.cfg_cvar('gg_warmup_deathmatch') as cvar:
 
             cvar.name = 'WARMUP ROUND DEATHMATCH MODE'
@@ -82,6 +86,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enable deathmatch during warmup round only.'
 
+        # Create the gg_warmup_elimination instance
         with config.cfg_cvar('gg_warmup_elimination') as cvar:
 
             cvar.name = 'WARMUP ROUND ELIMINATION MODE'

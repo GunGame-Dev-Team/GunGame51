@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_prop_physics instance
         with config.cfg_cvar('gg_prop_physics') as cvar:
 
             cvar.name = 'PROP PHYSICS'
@@ -35,6 +37,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_prop_physics.'
 
+        # Create the gg_prop_physics_increment_nade instance
         with config.cfg_cvar('gg_prop_physics_increment_nade') as cvar:
 
             cvar.name = 'INCREMENT NADE'
@@ -44,6 +47,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Increment or Levelup when on Nade level.'
 
+        # Create the gg_prop_physics_increment_knife instance
         with config.cfg_cvar('gg_prop_physics_increment_knife') as cvar:
 
             cvar.name = 'INCREMENT KNIFE'

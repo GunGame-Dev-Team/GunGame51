@@ -21,11 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
-        # Deathmatch
+        # Create the gg_deathmatch instance
         with config.cfg_cvar('gg_deathmatch') as cvar:
 
             cvar.name = 'DEATHMATCH'
@@ -39,7 +40,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_deathmatch.'
 
-        # Respawn Delay
+        # Create the gg_dm_respawn_delay instance
         with config.cfg_cvar('gg_dm_respawn_delay') as cvar:
 
             cvar.name = 'DEATHMATCH RESPAWN DELAY'

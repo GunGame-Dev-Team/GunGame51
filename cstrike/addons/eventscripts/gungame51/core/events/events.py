@@ -75,7 +75,7 @@ class GG_Multi_Level(ESEvent):
                         'multi-leveled')
     leveler = ShortField(min_value=2, comment='The userid of the player that' +
                          ' is leveling')
-    
+
 
 class GG_New_Leader(ESEvent):
     """Fires when a player becomes the new leader"""

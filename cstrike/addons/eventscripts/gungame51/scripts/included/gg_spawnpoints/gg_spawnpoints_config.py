@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_spawnpoints instance
         with config.cfg_cvar('gg_spawnpoints') as cvar:
 
             cvar.name = 'SPAWNPOINT MANAGER'

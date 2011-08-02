@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_knife_pro instance
         with config.cfg_cvar('gg_knife_pro') as cvar:
 
             cvar.name = 'KNIFE PRO'
@@ -43,6 +45,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_knife_pro.'
 
+        # Create the gg_knife_pro_limit instance
         with config.cfg_cvar('gg_knife_pro_limit') as cvar:
 
             cvar.name = 'KNIFE PRO LIMIT'
@@ -61,6 +64,7 @@ def load():
             cvar.text = ('Limit level stealing ' +
                 'to this # of levels below the attacker.')
 
+        # Create the gg_knife_pro_always_level instance
         with config.cfg_cvar('gg_knife_pro_always_level') as cvar:
 
             cvar.name = 'KNIFE PRO ALWAYS LEVEL'
@@ -79,6 +83,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables always stealing levels.'
 
+        # Create the gg_knife_pro_skip_nade instance
         with config.cfg_cvar('gg_knife_pro_skip_nade') as cvar:
 
             cvar.name = 'KNIFE PRO ALLOW SKIP NADE'

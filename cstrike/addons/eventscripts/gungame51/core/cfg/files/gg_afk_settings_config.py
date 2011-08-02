@@ -21,12 +21,15 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the .cfg file
     with ConfigContextManager(path(__file__).namebase) as config:
 
+        # Add the config file base attributes
         config.name = 'AFK Configuration'
         config.description = 'This file controls GunGame AFK settings.'
 
+        # Create the gg_allow_afk_levels instance
         with config.cfg_cvar('gg_allow_afk_levels') as cvar:
 
             cvar.name = 'AFK LEVELING'
@@ -37,6 +40,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Allow attackers to level up with AFK kills.'
 
+        # Create the gg_allow_afk_levels_knife instance
         with config.cfg_cvar('gg_allow_afk_levels_knife') as cvar:
 
             cvar.name = 'AFK LEVELING (KNIFE LEVEL)'
@@ -49,6 +53,7 @@ def load():
             cvar.text = ('Allow attackers to ' +
                 'level up with AFK kills when on knife level.')
 
+        # Create the gg_allow_afk_levels_nade instance
         with config.cfg_cvar('gg_allow_afk_levels_nade') as cvar:
 
             cvar.name = 'AFK LEVELING (HEGRENADE LEVEL)'

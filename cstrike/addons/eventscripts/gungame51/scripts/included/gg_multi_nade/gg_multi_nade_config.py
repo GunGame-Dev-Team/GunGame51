@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_multi_nade instance
         with config.cfg_cvar('gg_multi_nade') as cvar:
 
             cvar.name = 'MULTIPLE GRENADES'
@@ -38,6 +40,7 @@ def load():
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_multi_nade.'
 
+        # Create the gg_multi_nade_max_nades instance
         with config.cfg_cvar('gg_multi_nade_max_nades') as cvar:
 
             cvar.name = 'MAX GRENADES'

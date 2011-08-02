@@ -21,10 +21,12 @@ from gungame51.core.cfg import ConfigContextManager
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+
     # Create the cfg file
     with ConfigContextManager(
       path(__file__).parent.split('scripts')[~0][1:]) as config:
 
+        # Create the gg_multi_level instance
         with config.cfg_cvar('gg_multi_level') as cvar:
 
             cvar.name = 'MULTI-LEVEL'
@@ -50,6 +52,7 @@ def load():
             cvar.text = ('The # of levels it takes ' +
                 'to get the multi-level bonus.')
 
+        # Create the gg_multi_level_speed instance
         with config.cfg_cvar('gg_multi_level_speed') as cvar:
 
             cvar.name = 'MULTI-LEVEL SPEED'
@@ -63,6 +66,7 @@ def load():
             cvar.text = ('The percentage of gravity ' +
                 'included with the multi-level bonus.')
 
+        # Create the gg_multi_level_gravity instance
         with config.cfg_cvar('gg_multi_level_gravity') as cvar:
 
             cvar.name = 'MULTI-LEVEL GRAVITY'
@@ -76,6 +80,7 @@ def load():
             cvar.text = ('The percentage of gravity ' +
                 'included with the multi-level bonus.')
 
+        # Create the gg_multi_level_tk_reset instance
         with config.cfg_cvar('gg_multi_level_tk_reset') as cvar:
 
             cvar.name = 'MULTI-LEVEL TK VICTIM RESET'
