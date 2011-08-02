@@ -20,7 +20,7 @@ import spe
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.players import Player
-from gungame51.core.players.player import UseridError
+from gungame51.core.players.players import UseridError
 from gungame51.core.players.shortcuts import setAttribute
 from gungame51.core.players.shortcuts import deleteAttribute
 from gungame51.core.messaging.shortcuts import centermsg
