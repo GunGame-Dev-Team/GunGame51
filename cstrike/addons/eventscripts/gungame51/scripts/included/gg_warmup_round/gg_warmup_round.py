@@ -35,6 +35,7 @@ from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.events import GG_Start
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -44,6 +45,7 @@ info.title = 'GG Warmup Round'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_warmup_round']
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -76,6 +78,12 @@ giveGodMode = False
 
 # Approximates the number of seconds from round start to play beginning
 GG_WARMUP_EXTRA_TIME = 3
+
+# Backup variables
+mp_freezetime_backup = 0
+gg_dead_strip_backup = 0
+gg_deathmatch_backup = 0
+gg_elimination_backup = 0
 
 
 # =============================================================================
