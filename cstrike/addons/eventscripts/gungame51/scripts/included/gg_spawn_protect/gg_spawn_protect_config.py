@@ -61,6 +61,13 @@ def load():
                 ])
             cvar.options.append('0-255')
             cvar.default = 255
+            cvar.default_text = [
+                'Default Values:',
+                '   * Red: 255',
+                '   * Green: 255',
+                '   * Blue: 255',
+                '   * Alpha: 255',
+                ]
             cvar.text = 'The red shade of the spawn protected player.'
 
         # Create the gg_spawn_protect_green instance
@@ -68,6 +75,7 @@ def load():
 
             cvar.name = ''
             cvar.default = 255
+            cvar.default_text = ''
             cvar.text = 'The green shade of the spawn protected player.'
 
         # Create the gg_spawn_protect_blue instance
@@ -75,6 +83,7 @@ def load():
 
             cvar.name = ''
             cvar.default = 255
+            cvar.default_text = ''
             cvar.text = 'The blue shade of the spawn protected player.'
 
         # Create the gg_spawn_protect_alpha instance
@@ -82,6 +91,7 @@ def load():
 
             cvar.name = ''
             cvar.default = 150
+            cvar.default_text = ''
             cvar.text = 'The alpha of the spawn protected player.'
 
         # Create the gg_spawn_protect_cancelonfire instance

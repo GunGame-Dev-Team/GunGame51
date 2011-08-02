@@ -489,6 +489,7 @@ class ConfigContextManager(object):
             self.examples = ListExamples(config)
             self.options = ListOptions(config)
             self.default = None
+            self.default_text = None
             self.text = None
             self.notify = notify
 
@@ -721,8 +722,29 @@ class ConfigContextManager(object):
                 # Print the options
                 section.options.print_to_text()
 
+                # Is there default_text to print?
+                if not section.default_text is None:
+
+                    # Is the default_text a string?
+                    if isinstance(section.default_text, str):
+
+                        # Is there any text to print?
+                        if section.default_text:
+
+                            # Add the string to the cfg file
+                            self.config.text(section.default_text)
+
+                    # Is the default_text a list?
+                    elif isinstance(section.default_text, list):
+
+                        # Loop through each line in the list
+                        for line in section.default_text:
+
+                            # Add the line to the cfg file
+                            self.config.text(line)
+
                 # Is the default value a string?
-                if isinstance(section.default, str):
+                elif isinstance(section.default, str):
 
                     # Add "" around the value when printing the default
                     self.config.text('Default Value: "' +
