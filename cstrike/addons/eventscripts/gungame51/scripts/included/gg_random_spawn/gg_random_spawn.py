@@ -45,7 +45,6 @@ es_gamedir = es.ServerVar('eventscripts_gamedir')
 # =============================================================================
 def load():
     loadSpawnFile(str(es.ServerVar("eventscripts_currentmap")))
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
 
     userid = es.getuserid()
 
@@ -59,10 +58,6 @@ def load():
         return
 
     loadRandomPoints(userid)
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

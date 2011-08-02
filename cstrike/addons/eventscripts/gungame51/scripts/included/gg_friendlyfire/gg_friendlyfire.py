@@ -45,13 +45,7 @@ oldFriendlyFire = int(mp_friendlyfire)
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
-def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
-
 def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
     # Set friendlyfire back to what it was before gg_friendlyfire loaded
     mp_friendlyfire.set(oldFriendlyFire)
 

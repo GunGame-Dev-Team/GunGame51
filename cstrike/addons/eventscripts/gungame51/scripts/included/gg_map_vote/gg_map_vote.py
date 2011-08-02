@@ -153,9 +153,6 @@ def load():
         # Check file location if using list_source = 3
         mapFileClean(True)
 
-    # Loaded message
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     # Unregister say commands
@@ -166,9 +163,6 @@ def unload():
     eventscripts_maphandler.set(eventscripts_maphandler_backup)
 
     cleanVote()
-
-    # Unloaded message
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

@@ -37,9 +37,7 @@ def load():
         popuplib.delete('ggLeaderMenu')
 
     # Register commands
-    es.dbgmsg(0, '\t!leader')
     registerSayCommand('!leader', leader_menu_cmd, 'Displays a !leader menu.')
-    es.dbgmsg(0, '\t!leaders')
     registerSayCommand('!leaders', leader_menu_cmd,
         'Displays a !leaders menu.')
 

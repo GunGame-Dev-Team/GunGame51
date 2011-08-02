@@ -56,12 +56,6 @@ def load():
     # Adding attributes
     create_attributes('#all')
 
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
 
 # =============================================================================
 # >> GAME EVENTS

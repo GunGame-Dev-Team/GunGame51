@@ -42,14 +42,10 @@ def load():
     # Disable objectives
     objectiveToggle('Disable')
 
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     # Enable objectives
     objectiveToggle('Enable')
-
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

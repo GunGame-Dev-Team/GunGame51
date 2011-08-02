@@ -53,7 +53,6 @@ def load():
     ggLevelMenu.timeout('view', 10)
 
     # Register command
-    es.dbgmsg(0, '\t!level')
     registerSayCommand('!level', level_menu_cmd, 'Displays a !level menu.')
 
 

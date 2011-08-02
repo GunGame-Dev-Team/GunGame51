@@ -49,13 +49,8 @@ ggDB = Database()
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
     # Check for files to convert and run the conversion
     run_conversion()
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

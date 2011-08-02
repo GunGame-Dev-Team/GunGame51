@@ -41,31 +41,16 @@ info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 info.translations = ['gg_level_info']
 
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-
-
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    # Loaded Message
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
     # Register Multikill Attribute callback
     add_attribute_callback('multikill', multikill_call_back, info.name)
 
 
 def unload():
-    # Unload Message
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
     # Unregister Multikill Attribute callback
     remove_callbacks_for_addon(info.name)
 

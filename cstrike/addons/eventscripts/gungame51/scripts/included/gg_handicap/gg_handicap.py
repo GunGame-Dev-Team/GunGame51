@@ -53,17 +53,11 @@ def load():
     # Creating repeat loop
     loopStart()
 
-    # Load message
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     # Delete the repeat loop
     if repeat.status('gungameHandicapLoop'):
         repeat.delete('gungameHandicapLoop')
-
-    # Unload message
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

@@ -64,8 +64,6 @@ def load():
         for weapon in spe.getWeaponDict(userid):
             set_spawn_flags(userid, weapon[7:], 2)
 
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     # Unregister the drop command
@@ -78,8 +76,6 @@ def unload():
     for userid in es.getUseridList():
         for weapon in spe.getWeaponDict(userid):
             set_spawn_flags(userid, weapon[7:], 0)
-
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

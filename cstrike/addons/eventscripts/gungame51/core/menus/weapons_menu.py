@@ -28,7 +28,6 @@ from gungame51.core.weapons.shortcuts import get_total_levels
 # =============================================================================
 def load():
     # Register command
-    es.dbgmsg(0, '\t!weapons')
     registerSayCommand('!weapons', weapons_menu_cmd, 'Displays a ' +
         '!weapons menu.')
 

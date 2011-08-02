@@ -45,23 +45,13 @@ gg_hostage_stopped_stops = es.ServerVar('gg_hostage_stopped_stops')
 gg_hostage_stopped_skip_knife = es.ServerVar('gg_hostage_stopped_skip_knife')
 gg_hostage_stopped_skip_nade = es.ServerVar('gg_hostage_stopped_skip_nade')
 
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
     # Start all current players hostage stop counters
     setAttribute('#all', 'hostage_stopped', 0)
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

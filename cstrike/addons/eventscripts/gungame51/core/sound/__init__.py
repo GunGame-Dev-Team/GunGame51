@@ -131,9 +131,6 @@ def make_downloadable(gg_loading=False):
         # Grab the ConfigObj for the INI
         config = ConfigObj('%s/%s' % (iniDir, f.name))
 
-        if gg_loading:
-            es.dbgmsg(0, '\t' + f.name)
-
         # Loop through all names (keys) in the INI
         for name in config:
             # Make sure the name isn't "title"
@@ -154,9 +151,6 @@ def make_downloadable(gg_loading=False):
                 # Open the random sound file
                 randomFile = open(iniDir.joinpath('random_sound_files/%s'
                     % config[name]))
-
-                if gg_loading:
-                    es.dbgmsg(0, '\trandom_sound_files/' + config[name])
 
                 # If we are on a random winner sound, and we have more sounds
                 # in the current list of random sounds, choose one and make it

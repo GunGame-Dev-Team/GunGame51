@@ -26,7 +26,6 @@ from gungame51.core.menus.shortcuts import get_index_page
 # =============================================================================
 def load():
     # Register command
-    es.dbgmsg(0, '\t!score')
     registerSayCommand('!score', score_menu_cmd, 'Displays a !score menu.')
 
 

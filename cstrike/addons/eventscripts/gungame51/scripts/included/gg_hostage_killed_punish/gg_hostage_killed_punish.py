@@ -47,14 +47,8 @@ gg_hostage_killed_kills = es.ServerVar('gg_hostage_killed_kills')
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
     # Start all current players hostage killed counters
     setAttribute('#all', 'hostage_killed', 0)
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

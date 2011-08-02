@@ -31,16 +31,12 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
     # Enable noblock for every player that is alive and on a team
     for player in getPlayerList('#alive'):
         player.noblock = 1
 
 
 def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
     # Disable noblock for every player that is alive and on a team
     for player in getPlayerList('#alive'):
         player.noblock = 0

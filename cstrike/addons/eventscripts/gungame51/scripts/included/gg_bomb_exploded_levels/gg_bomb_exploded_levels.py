@@ -43,21 +43,6 @@ gg_bomb_exploded_levels = es.ServerVar('gg_bomb_exploded_levels')
 gg_bomb_exploded_skip_knife = es.ServerVar('gg_bomb_exploded_skip_knife')
 gg_bomb_exploded_skip_nade = es.ServerVar('gg_bomb_exploded_skip_nade')
 
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-
-
-# =============================================================================
-# >> LOAD & UNLOAD
-# =============================================================================
-def load():
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
-
-def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
-
 
 # =============================================================================
 # >> GAME EVENTS

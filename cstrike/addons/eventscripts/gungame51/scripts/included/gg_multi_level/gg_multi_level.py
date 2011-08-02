@@ -172,8 +172,6 @@ def load():
     setAttribute('#all', 'multiLevels', 0)
     setAttribute('#all', 'multiLevelEntities', [])
 
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
-
 
 def unload():
     # For all users currently multi-leveling
@@ -190,8 +188,6 @@ def unload():
     # Kill off our custom attributes
     deleteAttribute("#all", "multiLevels")
     deleteAttribute("#all", "multiLevelEntities")
-
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
 
 
 # =============================================================================

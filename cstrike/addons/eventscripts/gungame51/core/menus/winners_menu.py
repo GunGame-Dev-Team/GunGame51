@@ -25,11 +25,8 @@ from gungame51.core.menus.shortcuts import get_index_page
 # =============================================================================
 def load():
     # Register command
-    es.dbgmsg(0, '\t!top10')
     registerSayCommand('!top10', winner_menu_cmd, 'Displays a !top10 menu.')
-    es.dbgmsg(0, '\t!winners')
     registerSayCommand('!winners', winner_menu_cmd, 'Displays a !top10 menu.')
-    es.dbgmsg(0, '\t!top')
     registerSayCommand('!top', winner_menu_cmd, 'Displays a !top10 menu.')
 
 

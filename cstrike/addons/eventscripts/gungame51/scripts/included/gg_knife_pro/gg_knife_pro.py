@@ -53,11 +53,9 @@ recentlyOffKnife = []
 # =============================================================================
 def load():
     add_attribute_callback('level', level_call_back, info.name)
-    es.dbgmsg(0, 'Loaded: %s' % info.name)
 
 
 def unload():
-    es.dbgmsg(0, 'Unloaded: %s' % info.name)
     remove_callbacks_for_addon(info.name)
 
 

@@ -744,9 +744,6 @@ class ConfigContextManager(object):
                     # Add the notify flag
                     current.addFlag('notify')
 
-        # Print message that the file has been created
-        es.dbgmsg(0, '\t' + self.cfgpath)
-
         # Write the .cfg file
         self.config.write()
 
