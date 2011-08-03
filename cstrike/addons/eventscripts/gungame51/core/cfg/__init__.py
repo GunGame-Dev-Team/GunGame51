@@ -171,7 +171,7 @@ class ConfigManager(object):
         for cfg in self._config_files.values():
 
             # Execute the cfg file
-            cfg.execute()
+            es.mexec('gungame51' + cfg.cfgpath.rsplit('gungame51', 1)[1] + '"')
 
             # Loop through all cvar's for the cfg file
             for cvar, value, description in cfg.getCvars().values():
