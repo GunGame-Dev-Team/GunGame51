@@ -163,7 +163,7 @@ def player_disconnect(event_var):
     # Players may disconnect before activating, causing an error
     try:
         ggPlayer = Player(userid)
-    except ValueError:
+    except (ValueError, UseridError):
         return
 
     # Respawn eliminated players if needed
