@@ -10,7 +10,6 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Eventscripts Imports
-import es
 from gamethread import delayed
 
 # GunGame Imports

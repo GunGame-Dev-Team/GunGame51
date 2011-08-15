@@ -10,7 +10,6 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # EventScripts Imports
-import es
 from weaponlib import getWeaponList
 
 # GunGame Imports

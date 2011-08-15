@@ -18,8 +18,7 @@ import es
 from weaponlib import getWeaponList
 from gamethread import delayedname
 from gamethread import cancelDelayed
-from playerlib import getPlayer
-from playerlib import getUseridList
+from playerlib import getPlayerList
 
 # GunGame Imports
 from gungame51.core import get_game_dir
@@ -275,8 +274,8 @@ class BaseWeaponOrders(object):
         # spawning player in the 2 seconds after a weapon order is changed on
         # an active map (through rcon) will likely never happen, and if so,
         # will result in a levelup
-        for userid in getUseridList("#alive"):
-            getPlayer(userid).godmode = 1
+        for player in getPlayerList("#alive"):
+            player.godmode = 1
 
         self.echo()
         es.server.queuecmd('mp_restartgame 2')

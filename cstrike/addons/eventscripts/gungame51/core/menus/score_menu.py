@@ -11,7 +11,6 @@ $LastChangedDate$
 # =============================================================================
 # Eventscripts Imports
 import es
-from playerlib import getUseridList
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
@@ -44,7 +43,7 @@ def score_menu_cmd(userid, args):
 
     # Get list of levels
     scoreList = []
-    for player in getUseridList('#all'):
+    for player in es.getUseridList():
         scoreList.append('[%s] %s' % (Player(player).level,
                                                     es.getplayername(player)))
     # Sort from highest to lowest

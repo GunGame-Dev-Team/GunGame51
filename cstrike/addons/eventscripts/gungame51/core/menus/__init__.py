@@ -14,7 +14,6 @@ from os import listdir
 from os import path
 
 # Eventscripts
-import es
 import popuplib
 from playerlib import getUseridList
 
