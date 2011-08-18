@@ -18,7 +18,7 @@ from exceptions import ESEventError
 # =============================================================================
 info = es.AddonInfo()
 info.name = "Eventlib - EventScripts python library"
-info.version = "Eventlib Draft 12"
+info.version = "Eventlib Draft 14"
 info.url = "http://www.eventscripts.com/pages/Eventlib/"
 info.basename = "eventlib"
 info.author = "XE_ManUp"
@@ -35,16 +35,28 @@ DATATYPES = {float: 'setfloat', int: 'setint', str: 'setstring'}
 # =============================================================================
 class EventContextManager(object):
     """Inspired from http://forums.eventscripts.com/viewtopic.php?p=367772"""
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, event_name):
+        event_name = str(event_name)
+
+        # The maximum event name length according to VALVe is 32 characters
+        if len(event_name) > 32:
+            raise ESEventError('The event name "%s" exceeds ' % event_name +
+                               'the maximum length of 32 characters.')
+
+        # No spaces are allowed in event names
+        elif event_name.count(' '):
+            raise ESEventError('Event names are not allowed to contain ' +
+                               'spaces: "%s".' % event_name)
+
+        self._name = str(event_name)
 
     def __enter__(self):
         """Utilized when the EventContextManager is entered. Used to initialize
         the event.
 
         """
-        #print "es.event('initialize', '%s')" % self.name
-        es.event('initialize', self.name)
+        es.dbgmsg(1, "es.event('initialize', '%s')" % self._name)
+        es.event('initialize', self._name)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -57,24 +69,116 @@ class EventContextManager(object):
         # Check if there is a traceback, then fire or cancel the event
         if not traceback:
             # Fire the event
-            #print "es.event('fire', '%s')" % self.name
-            es.event('fire', self.name)
+            es.dbgmsg(1, "es.event('fire', '%s')" % self._name)
+            es.event('fire', self._name)
             return True
-        else:
-            # Cancel the event
-            #print "es.event('cancel', '%s')" % self.name
-            es.event('cancel', self.name)
-            return False
+
+        # Cancel the event
+        es.dbgmsg(1, "es.event('cancel', '%s')" % self._name)
+        es.event('cancel', self._name)
+        return False
 
     def set(self, field, value):
         """Sets the event variable values dynamically for es.event()."""
-        if type(value) in DATATYPES:
-            #print "es.event('%s', '%s', '%s', %s)" % (DATATYPES[type(value)],
-            #    self.name, field, value)
-            es.event(DATATYPES[type(value)], self.name, field, value)
+        if not type(value) in DATATYPES:
+            raise ESEventError('Unsupported type: %s. Expected'
+                               % type(value).__name__ + ' float, int, or str' +
+                               ' type.')
+
+        # Set the event variable
+        es.dbgmsg(1, ("es.event('%s', '%s', '%s', %s)"
+                      % (DATATYPES[type(value)], self._name, field, value)))
+        es.event(DATATYPES[type(value)], self._name, field, value)
+
+
+class QuickEvent(object):
+    """Class that can be used to fire an event without any error-checking or
+    restrictions. It can also be used as a context manager using the with
+    statement.
+
+    Args:
+        name (str): The name of the event.
+
+    Kwargs:
+        event_var_name (str)=event_var_value (int, float, str)
+
+    Example Usage:
+        # Example 1 (using a context manager)
+        with QuickEvent('player_say') as event:
+            event.userid = 2
+            event.text = 'This is a test.'
+
+        # Example 2 (directly firing using keyword arguments and fire() method)
+        QuickEvent('player_say', userid=2, text='This is a test.').fire()
+
+        # Example 3 (creating an instance, then firing)
+        event = QuickEvent('player_say', userid=2, text='This is a test.')
+        event.fire() # Fire using the fire() method
+        event() # Fire using the __call__ method
+
+    """
+    def __init__(self, name, **kw):
+        # Set the event name attribute
+        super(QuickEvent, self).__setattr__('name', name)
+
+        # Initialize the event
+        es.event('initialize', name)
+
+        # Iterate through keyword arguments and set the event variable/value
+        for name, value in kw.iteritems():
+            self.set_event_var(name, value)
+
+    def __call__(self):
+        self.fire()
+
+    def __enter__(self):
+        """Utilized when the QuickEvent is entered."""
+        return self
+
+    def __exit__(self, *a):
+        """Utilized when the QuickEvent is exited. Used to fire the event if
+        there were no errors while setting the values. If any tracebacks were
+        generated between the entering of the QuickEvent and the exit, the
+        event will be cancelled.
+
+        """
+        # Check if there is a traceback, then fire or cancel the event
+        if not any(a):
+            # Fire the event
+            self.fire()
+            return True
+
+        # Cancel the event
+        self.cancel()
+        return False
+
+    def __setattr__(self, name, value):
+        # Override to set the event variable, not the attribute
+        self.set_event_var(name, value)
+
+    def __setitem__(self, name, value):
+        # Override to set the event variable, not the dictionary
+        self.set_event_var(name, value)
+
+    def set_event_var(self, item, value):
+        """Sets the event variable by its type. If the type is not found, the
+        type is assumed to be string.
+
+        """
+        if isinstance(value, int):
+            es.event('setint', self.name, item, value)
+        elif isinstance(value, float):
+            es.event('setfloat', self.name, item, value)
         else:
-            raise TypeError('Unsupported type: %s. Expected'
-                % type(value).__name__ + ' float, int, or str type.')
+            es.event('setstring', self.name, item, str(value))
+
+    def cancel(self):
+        """Cancels the event."""
+        es.event('cancel', self.name)
+
+    def fire(self):
+        """Fires the event."""
+        es.event('fire', self.name)
 
 
 class EventManager(object):
