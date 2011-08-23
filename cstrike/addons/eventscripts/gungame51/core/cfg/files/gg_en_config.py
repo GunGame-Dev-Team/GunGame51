@@ -120,46 +120,6 @@ def load():
         # Create the Map Settings section
         config.cfg_section('MAP SETTINGS')
 
-        # Create the gg_multi_round instance
-        with config.cfg_cvar('gg_multi_round') as cvar:
-
-            cvar.name = 'MULTI-ROUND'
-            cvar.notes.append('Only set this variable ' +
-                'if you want more than one round per map change.')
-            cvar.notes.append('The map vote ' +
-                'will only trigger on the final round.')
-            cvar.options.append('0 = Disabled.')
-            cvar.options.append('# = The number of rounds ' +
-                'that need to be played before a map change.')
-            cvar.default = 0
-            cvar.text = ('The number of rounds that ' +
-                'need to be played before a map change.')
-
-        # Create the gg_multi_round_intermission instance
-        with config.cfg_cvar('gg_multi_round_intermission') as cvar:
-
-            cvar.name = 'MULTI-ROUND INTERMISSION'
-            cvar.notes.append([
-                'This option is only valid if ' +
-                    '"gg_multi_round" is set to a value',
-                'higher than "0".',
-                ])
-            cvar.notes.append([
-                'This will load "gg_warmup_round" ' +
-                    'based off of the "gg_warmup timer"',
-                'between rounds.',
-                ])
-            cvar.notes.append([
-                'Without an intermission, the ' +
-                    'next GunGame round will start',
-                'immediately after a win.',
-                ])
-            cvar.options.append('0 = Do not have an intermission.')
-            cvar.options.append('1 = Enable the intermission.')
-            cvar.default = 0
-            cvar.text = ('The amount of time (in seconds) ' +
-                'that the intermission lasts between rounds.')
-
         # Create the gg_dynamic_chattime instance
         with config.cfg_cvar('gg_dynamic_chattime') as cvar:
 

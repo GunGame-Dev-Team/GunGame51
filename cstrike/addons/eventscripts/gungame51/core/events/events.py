@@ -142,8 +142,6 @@ class GG_Win(ESEvent):
                         '"gave up" the win')
     loser = ShortField(min_value=2, comment='The userid of the victim that ' +
                        '"gave up" the win')
-    round = BooleanField(comment='1 if the winner of the round, 0 if the ' +
-                         'winner of the map')
 
 
 class GG_Map_End(ESEvent):

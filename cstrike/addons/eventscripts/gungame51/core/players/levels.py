@@ -33,7 +33,6 @@ from gungame51.core.events import GG_Win as _GG_Win
 # =============================================================================
 _LEADERS = _LeaderManager()
 recentWinner = False
-gg_multi_round = _es.ServerVar('gg_multi_round')
 
 
 # =============================================================================
@@ -107,18 +106,10 @@ class PlayerLevels(_PlayerMeta):
             # In 3 seconds, remove the recentWinner
             _gamethread.delayed(3, _remove_recent_winner, ())
 
-            # If "gg_multi_round" is disabled
-            if not int(gg_multi_round):
-                # Set up the gg_win event
-                gg_win = _GG_Win(attacker=self.userid, winner=self.userid,
-                                 userid=victim, loser=victim, round=0)
-            else:
-                # If "gg_multi_round" is enabled
-                from gungame51.gungame51 import RoundInfo
-                # Set up the gg_win event
-                gg_win = _GG_Win(attacker=self.userid, winner=self.userid,
-                                 userid=victim, loser=victim,
-                                 round=int(RoundInfo().remaining))
+            # Set up the gg_win event
+            gg_win = _GG_Win(attacker=self.userid, winner=self.userid,
+                             userid=victim, loser=victim)
+
             # Fire the gg_win event
             return gg_win.fire()
 

@@ -89,8 +89,6 @@ gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
-gg_multi_round = es.ServerVar('gg_multi_round')
-gg_multi_round_intermission = es.ServerVar('gg_multi_round_intermission')
 gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
 gg_map_obj = es.ServerVar('gg_map_obj')
@@ -137,23 +135,6 @@ credits = {
         'counter-strike.com',
         'The Cheebs']
 }
-
-
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-class RoundInfo(object):
-    def __new__(cls, *p, **k):
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = object.__new__(cls)
-            # Set round information variables
-            cls._the_instance.round = 1
-        return cls._the_instance
-
-    @property
-    def remaining(self):
-        total = int(gg_multi_round) - self.round
-        return total if total > 0 else 0
 
 
 # =============================================================================
@@ -341,10 +322,6 @@ def finishInitialize():
     es.dbgmsg(0, langstring("Load_SoundSystem"))
     make_downloadable(True)
 
-    # Set up "gg_multi_round"
-    if int(gg_multi_round):
-        RoundInfo().round = 1
-
     es.dbgmsg(0, langstring("Load_Completed"))
 
     # Change the value of gg_weapon_order_file to make sure we call
@@ -398,10 +375,6 @@ def es_map_start(event_var):
     # Update players in winner's database
     for userid in getUseridList('#human'):
         Player(userid).database_update()
-
-    # Set up "gg_multi_round"
-    if int(gg_multi_round):
-        RoundInfo().round = 1
 
     # Make sure gungameorder is set as the "current" order
     # This fixes an issue that caused gg_nade_bonus order to be
@@ -639,65 +612,15 @@ def gg_win(event_var):
     if not es.isbot(userid):
         Player(userid).wins += 1
 
-    if event_var['round'] == '0':
-        # =====================================================================
-        # MAP WIN
-        # =====================================================================
-        # End game
-        es.server.queuecmd("es_xgive %s game_end" % userid)
-        es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
+    es.server.queuecmd("es_xgive %s game_end" % userid)
+    es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
 
-        # Play the winner sound
-        for userid in getUseridList('#human'):
-            Player(userid).playsound('winner')
-
-    else:
-        # =====================================================================
-        # ROUND WIN
-        # =====================================================================
-        # Calculate round number
-        RoundInfo().round += 1
-
-        # Reset the players
-        resetPlayers()
-
-        # Freeze players and put them in god mode
-        for playerid in es.getUseridList():
-            getPlayer(playerid).freeze = True
-            getPlayer(playerid).godmode = True
-
-        # End the GunGame Round
-        es.server.queuecmd('mp_restartgame 2')
-
-        # Check to see if the warmup round needs to be activated
-        if int(es.ServerVar('gg_multi_round_intermission')):
-            if not int(gg_warmup_round):
-                # Back up gg_warmup_round's value
-                global gg_warmup_round_backup
-                gg_warmup_round_backup = int(gg_warmup_round)
-
-                # Load gg_warmup_round - loading will start the warmup timer
-                es.server.queuecmd('gg_warmup_round 1')
-            else:
-                # Import and execute "do_warmup()" - starts the warmup timer
-                from scripts.included.gg_warmup_round import do_warmup
-                do_warmup()
-        else:
-            gamethread.delayed(2, GG_Start().fire())
-
-        # Play the winner sound
-        for userid in getUseridList('#human'):
-            Player(userid).playsound('winner')
+    # Play the winner sound
+    for userid in getUseridList('#human'):
+        Player(userid).playsound('winner')
 
     # Update DB
     gamethread.delayed(1.5, Database().commit)
-
-
-def gg_start(event_var):
-    # Disable warmup due to "gg_multi_round"?
-    if gg_warmup_round_backup != int(gg_warmup_round) and \
-        gg_warmup_round_backup:
-            es.server.queuecmd('gg_warmup_round 0')
 
 
 def gg_addon_loaded(event_var):

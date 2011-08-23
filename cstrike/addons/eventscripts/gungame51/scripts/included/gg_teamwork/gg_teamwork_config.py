@@ -62,9 +62,9 @@ def load():
                 'the team started the round when joining a team')
 
         # Create the gg_teamwork_messages instance
-        with config.cfg_cvar('gg_teamwork_messages') as cvar:
+        with config.cfg_cvar('gg_teamwork_round_messages') as cvar:
 
-            cvar.name = 'TEAMWORK MESSAGES'
+            cvar.name = 'TEAMWORK ROUND MESSAGES'
             cvar.description.append('Send messages on ' +
                 'round_end about what level each team was set to.')
             cvar.options.append(
@@ -73,3 +73,31 @@ def load():
             cvar.default = 1
             cvar.text = ('Enable/Disable sending messages on ' +
                 'round_end about what level each team is now on')
+
+        # Create the gg_teamwork_leader_messages instance
+        with config.cfg_cvar('gg_teamwork_leader_messages') as cvar:
+
+            cvar.name = 'TEAMPLAY LEADER MESSAGES'
+            cvar.description.append('Send messages when the ' +
+                'leader on each team increases their level.')
+            cvar.options.append('0 = (Disabled) Do not ' +
+                "send messages when the team's level increases")
+            cvar.options.append('1 = (Enabled) Send ' +
+                "messages when the team's level increases")
+            cvar.default = 1
+            cvar.text = ('Enable/Disable sending messages ' +
+                "when a player increases the team's level")
+
+        # Create the gg_teamwork_winner_messages instance
+        with config.cfg_cvar('gg_teamwork_winner_messages') as cvar:
+
+            cvar.name = 'TEAMPLAY WINNER MESSAGES'
+            cvar.description.append(
+                'Send messages when a team wins the match.')
+            cvar.options.append('0 = (Disabled) Do not ' +
+                'send messages when a team wins the match')
+            cvar.options.append('1 = (Enabled) Send ' +
+                'messages when a team wins the match')
+            cvar.default = 1
+            cvar.text = ('Enable/Disable sending ' +
+                'messages when a team wins the match')

@@ -63,6 +63,7 @@ info.translations = ['gg_teamplay']
 # =============================================================================
 gg_teamplay_roundend_messages = ServerVar('gg_teamplay_roundend_messages')
 gg_teamplay_level_info = ServerVar('gg_teamplay_level_info')
+gg_teamplay_winner_messages = ServerVar('gg_teamplay_winner_messages')
 gg_teamplay_end_on_first_kill = ServerVar('gg_teamplay_end_on_first_kill')
 
 
@@ -77,9 +78,6 @@ class GG_Team_Win(ESEvent):
 
     loser = ShortField(
         min_value=2, max_value=3, comment='Team that lost the match')
-
-    round = BooleanField(comment='1 if the winner of the round, 0 if the ' +
-                         'winner of the map')
 
 
 class GG_Team_LevelUp(ESEvent):
@@ -110,17 +108,20 @@ class GGTeams(dict):
     def __new__(cls):
         '''Creates the new object and adds the teams to the dictionary'''
 
-        # Get the new object
-        self = dict.__new__(cls)
+        # Make sure there is only one instance of the class
+        if not '_the_instance' in cls.__dict__:
 
-        # Loop through both teams
-        for team in (2, 3):
+            # Get the new object
+            cls._the_instance = dict.__new__(cls)
 
-            # Add the team to the dictionary
-            self[team] = TeamManagement(team)
+            # Loop through both teams
+            for team in (2, 3):
+
+                # Add the team to the dictionary
+                cls._the_instance[team] = TeamManagement(team)
 
         # Return the dictionary
-        return self
+        return cls._the_instance
 
     def clear(self):
         '''Resets the team level and multikill values'''
@@ -326,7 +327,7 @@ class TeamManagement(object):
 
             # Send the message to the player
             Player(userid).saytext2(index, message,
-                {'team': teamname, 'multikill': self.multikill,
+                {'teamname': teamname, 'multikill': self.multikill,
                  'total': get_level_multikill(self.level), 'levels': levels,
                  'level': self.level, 'other': other.level})
 
@@ -389,7 +390,7 @@ class TeamManagement(object):
 
             # Send the message to the player
             Player(userid).saytext2(index, message,
-                {'team': teamname, 'levels': levels, 'level': self.level})
+                {'teamname': teamname, 'levels': levels, 'level': self.level})
 
     def send_hudhint_info(self, userid):
         '''Sends level info on player_spawn'''
@@ -440,6 +441,45 @@ class TeamManagement(object):
         # Send the player the hudhint
         Player(userid).hudhint(text)
 
+    def send_winner_messages(self):
+        '''Sends Winner Messages to all players'''
+
+        # Store a team player's index
+        index = self.index
+
+        # Store the team's color
+        color = self.color
+
+        # Loop through all players on the server
+        for userid in getUseridList():
+
+            # Is the current player a bot?
+            if isbot(userid):
+
+                # Do not send messages to bots
+                continue
+
+            # Get the player's Player() instance
+            ggPlayer = Player(userid)
+
+            # Get the team's name
+            teamname = langstring(self.teamname, userid=userid)
+
+            # Send chat message for team winning the match
+            ggPlayer.saytext2(index,
+                'TeamPlay_Winner', {'teamname': teamname})
+
+            # We want to loop, so we send a message every second for 3 seconds
+            for x in xrange(4):
+
+                # Send centermsg about the winner
+                delayed(x, ggPlayer.centermsg,
+                    ('TeamPlay_Winner_Center', {'teamname': teamname}))
+
+            # Send toptext message about the winner
+            ggPlayer.toptext(10, color,
+                'TeamPlay_Winner_Center', {'teamname': teamname})
+
     @property
     def team_players(self):
         '''Returns all userid's on the team'''
@@ -465,7 +505,23 @@ class TeamManagement(object):
 
     @property
     def teamname(self):
+        '''Returns the team's name for use with langstring'''
+
+        # Return the team's langstring name
         return 'TeamPlay_%s' % self.team
+
+    @property
+    def color(self):
+        '''Returns the team's color'''
+
+        # Is this the Terrorist team?
+        if self.team == 2:
+
+            # Return red for Terrorist color
+            return '#red'
+
+        # Return blue for Counter-Terrorist color
+        return '#blue'
 
 # Get the GGTeams instance
 gg_teams = GGTeams()
@@ -501,9 +557,8 @@ def pre_gg_win(event_var):
     winning_team = getplayerteam(event_var['winner'])
 
     # Fire the gg_teamwin event instead with the
-    # winning team, losing team, and round event variables
-    GG_Team_Win(winner=winning_team,
-        loser=5 - winning_team, round=int(event_var['round'])).fire()
+    # winning team and losing team event variables
+    GG_Team_Win(winner=winning_team, loser=5 - winning_team).fire()
 
     # Always return False so that gg_win never fires
     return False
@@ -578,6 +633,7 @@ def player_death(event_var):
         gg_teams[attackerteam].check_final_kill(
             int(event_var['attacker']), event_var['weapon'])
 
+
 def gg_start(event_var):
     '''Fired when the match is about to start'''
 
@@ -590,3 +646,28 @@ def gg_teamwin(event_var):
 
     # Reset team level and multikill values
     gg_teams.clear()
+
+    # Send Winner Messages?
+    if int(gg_teamplay_winner_messages):
+
+        # Send Winner Messages
+        gg_teams[int(event_var['winner'])].send_winner_messages()
+
+    # Get a random player from the server
+    userid = getuserid()
+
+    # End the match
+    ServerCommand('es_xgive %s game_end' % userid)
+    ServerCommand('es_xfire %s game_end EndGame' % userid)
+
+    # Loop through all players on the server
+    for userid in getUseridList():
+
+        # Is the player a bot?
+        if isbot(userid):
+
+            # If so, don't play the sound
+            continue
+
+        # Play the winner sound to the player
+        Player(userid).playsound('winner')

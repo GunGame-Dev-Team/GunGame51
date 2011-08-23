@@ -17,6 +17,7 @@ from path import path
 #   ES
 from es import getindexfromhandle
 from es import getplayerhandle
+from es import getplayername
 from es import getplayerteam
 from es import getUseridList
 from es import isbot
@@ -59,7 +60,9 @@ info.translations = ['gg_teamwork']
 # >> GLOBAL VARIABLES
 # =============================================================================
 gg_teamwork_jointeam_level = ServerVar('gg_teamwork_jointeam_level')
-gg_teamwork_messages = ServerVar('gg_teamwork_messages')
+gg_teamwork_round_messages = ServerVar('gg_teamwork_round_messages')
+gg_teamwork_leader_messages = ServerVar('gg_teamwork_leader_messages')
+gg_teamwork_winner_messages = ServerVar('gg_teamwork_winner_messages')
 
 
 # =============================================================================
@@ -73,9 +76,6 @@ class GG_Team_Win(ESEvent):
 
     loser = ShortField(
         min_value=2, max_value=3, comment='Team that lost the match')
-
-    round = BooleanField(comment='1 if the winner of the round, 0 if the ' +
-                         'winner of the map')
 
 # Get the ResourceFile instance to create the .res file
 gg_teamwork_resource = ResourceFile(
@@ -94,17 +94,20 @@ class GGTeams(dict):
     def __new__(cls):
         '''Creates the new object and adds the teams to the dictionary'''
 
-        # Get the new object
-        self = dict.__new__(cls)
+        # Make sure there is only one instance of the class
+        if not '_the_instance' in cls.__dict__:
 
-        # Loop through both teams
-        for team in (2, 3):
+            # Get the new object
+            cls._the_instance = dict.__new__(cls)
 
-            # Add the team to the dictionary
-            self[team] = TeamManagement(team)
+            # Loop through both teams
+            for team in (2, 3):
+
+                # Add the team to the dictionary
+                cls._the_instance[team] = TeamManagement(team)
 
         # Return the dictionary
-        return self
+        return cls._the_instance
 
     def clear(self):
         '''Resets the team level value'''
@@ -112,8 +115,8 @@ class GGTeams(dict):
         # Loop through both teams
         for team in self:
 
-            # Reset the level value
-            self[team].level = 1
+            # Reset the team's level and leader values
+            gg_teams[team].reset_values()
 
 
 class TeamManagement(object):
@@ -125,29 +128,24 @@ class TeamManagement(object):
         # Store the team
         self.team = team
 
-        # Set the team's level value
+        # Set the team's level and leader values
+        self.reset_values()
+
+    def reset_values(self):
+        '''Resets the team's level and leader values'''
+
+        # Set the values back to start
         self.level = 1
+        self.leader = None
 
     def set_all_player_levels(self):
         '''Sets all players on the team to the highest level'''
 
-        # Get the highest level on the team
-        self.level = max(self.get_team_levels)
-
         # Loop through all players on the team
         for userid in self.team_players:
 
-            # Get the Player() instance for the current player
-            ggPlayer = Player(userid)
-
-            # Get the number of levels to increase the player
-            levels = self.level - ggPlayer.level
-
-            # Does the player need leveled up?
-            if levels > 0:
-
-                # Level the player up to the highest level
-                ggPlayer.levelup(levels, reason=info.name)
+            # Level the player up to the highest level
+            Player(userid).level = self.level
 
     def set_player_level(self, userid):
         '''Sets a player that just joined the team's level'''
@@ -194,11 +192,128 @@ class TeamManagement(object):
                 # Level the player down to the team's level
                 ggPlayer.leveldown(-levels, reason=info.name)
 
+    def check_old_leader(self, userid):
+        '''Checks to see if the player was the team's leader'''
+
+        # Was the player the team's leader?
+        if userid != self.leader:
+
+            # If not, return
+            return
+
+        # Get the team's highest level
+        player, level = self.leader_level
+
+        # Store the new player as the team's leader
+        self.leader = player
+
+        # Is there a leader?
+        if self.leader is None:
+
+            # If not, just return
+            return
+
+        # Is the new level the same as the previous?
+        if level == self.level:
+
+            # If they are the same, just return
+            return
+
+        # Store the new level
+        self.level = level
+
+        # Does a message need sent?
+        if int(gg_teamwork_leader_messages):
+
+            # Send a message to all players
+            self.send_all_players_a_message(
+                'TeamWork_LostLeader', {'level': self.level})
+
+    def check_team_leader(self, userid, level):
+        '''Checks to see if the player increased the team's level'''
+
+        # Is the new level higher than the team's level?
+        if level <= self.level:
+
+            # If not, return
+            return
+
+        # Set the team's new level
+        self.level = level
+
+        # Set the team's new leader
+        self.leader = userid
+
+        # Does a leader message need printed?
+        if int(gg_teamwork_leader_messages):
+
+            # Send the message to all players
+            self.send_all_players_a_message('TeamWork_NewLeader',
+                {'player': getplayername(self.leader), 'level': self.level})
+
     def send_level_message(self):
         '''Sends a message to all players about the teams new level'''
 
-        # Store a team member's index
+        # Send the message to all players
+        self.send_all_players_a_message('TeamWork_TeamLevel',
+            {'level': self.level, 'weapon': get_level_weapon(self.level)})
+
+    def send_winner_messages(self):
+        '''Sends Winner Messages to all players'''
+
+        # Store a team player's index
         index = self.index
+
+        # Is there an index?
+        if index is None:
+
+            # If not, return
+            return
+
+        # Store the team's color
+        color = self.color
+
+        # Loop through all players on the server
+        for userid in getUseridList():
+
+            # Is the current player a bot?
+            if isbot(userid):
+
+                # Do not send messages to bots
+                continue
+
+            # Get the player's Player() instance
+            ggPlayer = Player(userid)
+
+            # Get the team's name
+            teamname = langstring(self.teamname, userid=userid)
+
+            # Send chat message for team winning the match
+            ggPlayer.saytext2(index,
+                'TeamWork_Winner_Match', {'teamname': teamname})
+
+            # We want to loop, so we send a message every second for 3 seconds
+            for x in xrange(4):
+
+                # Send centermsg about the winner
+                delayed(x, ggPlayer.centermsg,
+                    ('TeamWork_Winner_Center', {'teamname': teamname}))
+
+            # Send toptext message about the winner
+            ggPlayer.toptext(10, color,
+                'TeamWork_Winner_Center', {'teamname': teamname})
+
+    def send_all_players_a_message(self, message, tokens):
+        '''Sends all players on the server a message'''
+
+        # Store a team members index
+        index = self.index
+
+        # Is there an index?
+        if index is None:
+
+            # If not, don't send any messages
+            return
 
         # Loop through all players on the server
         for userid in getUseridList():
@@ -209,29 +324,39 @@ class TeamManagement(object):
                 # If so, don't send a message
                 continue
 
-            # Get the leveling team's name
+            # Get the team's name
             teamname = langstring(self.teamname, userid=userid)
 
+            # Update the tokens with the teamname
+            tokens.update({'teamname': teamname})
+
             # Send the message to the player
-            Player(userid).saytext2(index,
-                'TeamWork_TeamLevel', {'team': teamname,
-                'level': self.level, 'weapon': get_level_weapon(self.level)})
+            Player(userid).saytext2(index, message, tokens)
 
     @property
-    def get_team_levels(self):
+    def leader_level(self):
         '''Returns a list of all player levels on the team'''
 
         # Create a list to store player levels
-        levels = []
+        levels = {}
 
         # Loop through all players on the team
         for userid in self.team_players:
 
             # Add the player's level to the list
-            levels.append(Player(userid).level)
+            levels[userid] = Player(userid).level
 
-        # Return the list of levels
-        return levels
+        # Are there any values?
+        if not levels:
+
+            # If not, return None values
+            return None, None
+
+        # Get a player on the highest level for the team
+        player = max(levels, key=lambda userid: levels[userid])
+
+        # Return the the player and the highest level
+        return player, levels[player]
 
     @property
     def team_players(self):
@@ -256,11 +381,27 @@ class TeamManagement(object):
             # Return the index of the first team player found
             return getindexfromhandle(getplayerhandle(userid))
 
+        # If no team members, return None
+        return None
+
     @property
     def teamname(self):
         return 'TeamWork_%s' % self.team
 
-# Gett he GGTeams instance
+    @property
+    def color(self):
+        '''Returns the team's color'''
+
+        # Is this the Terrorist team?
+        if self.team == 2:
+
+            # Return red for Terrorist color
+            return '#red'
+
+        # Return blue for Counter-Terrorist color
+        return '#blue'
+
+# Get the GGTeams instance
 gg_teams = GGTeams()
 
 
@@ -294,9 +435,8 @@ def pre_gg_win(event_var):
     winning_team = getplayerteam(event_var['winner'])
 
     # Fire the gg_teamwin event instead with the
-    # winning team, losing team, and round event variables
-    GG_Team_Win(winner=winning_team,
-        loser=5 - winning_team, round=int(event_var['round'])).fire()
+    # winning team and losing team event variables
+    GG_Team_Win(winner=winning_team, loser=5 - winning_team).fire()
 
     # Always return False so that gg_win never fires
     return False
@@ -326,7 +466,7 @@ def round_start(event_var):
     '''Fired when the round starts'''
 
     # Do messages need sent for what level each team is on?
-    if not int(gg_teamwork_messages):
+    if not int(gg_teamwork_round_messages):
 
         # If not, return
         return
@@ -341,6 +481,18 @@ def round_start(event_var):
 def player_team(event_var):
     '''Fired any time a player changes teams'''
 
+    # Store the userid
+    userid = int(event_var['userid'])
+
+    # Get the old team
+    old_team = int(event_var['oldteam'])
+
+    # Was the player on a "living" team?
+    if old_team in gg_teams:
+
+        # Check to see if the player was leading on their team
+        gg_teams[old_team].check_old_leader(userid)
+
     # Get the team the player switched to
     team = int(event_var['team'])
 
@@ -348,7 +500,18 @@ def player_team(event_var):
     if team in gg_teams:
 
         # Set the player's level
-        gg_teams[team].set_player_level(event_var['userid'])
+        gg_teams[team].set_player_level(userid)
+
+
+def gg_levelup(event_var):
+    '''Fired when a player levels up'''
+
+    # Get the leveler's team
+    team = int(event_var['es_attackerteam'])
+
+    # Check to see if the player increased the team's level
+    gg_teams[team].check_team_leader(
+        int(event_var['leveler']), int(event_var['new_level']))
 
 
 def gg_start(event_var):
@@ -363,3 +526,28 @@ def gg_teamwin(event_var):
 
     # Reset team level and multikill values
     gg_teams.clear()
+
+    # Send Winner Messages?
+    if int(gg_teamwork_winner_messages):
+
+        # Send Winner Messages
+        gg_teams[int(event_var['winner'])].send_winner_messages()
+
+    # Get a random player from the server
+    userid = getuserid()
+
+    # End the match
+    ServerCommand('es_xgive %s game_end' % userid)
+    ServerCommand('es_xfire %s game_end EndGame' % userid)
+
+    # Loop through all players on the server
+    for userid in getUseridList():
+
+        # Is the player a bot?
+        if isbot(userid):
+
+            # If so, don't play the sound
+            continue
+
+        # Play the winner sound to the player
+        Player(userid).playsound('winner')

@@ -46,9 +46,9 @@ def load():
             cvar.name = 'TEAMPLAY ROUNDEND MESSAGES'
             cvar.description.append('Send messages on ' +
                 'round_end when a team earns a multikill or level')
-            cvar.options.append('0 = (Disable) Do not show chat messages ' +
+            cvar.options.append('0 = (Disabled) Do not show chat messages ' +
                 'when a team levels up or earns a multikill on round_end')
-            cvar.options.append('1 = (Enable) Show chat messages ' +
+            cvar.options.append('1 = (Enabled) Show chat messages ' +
                 'when a team levels up or earns a multikill on round_end')
             cvar.default = 1
             cvar.text = ('Enables/Disables showing chat messages ' +
@@ -61,11 +61,21 @@ def load():
             cvar.description.append('Show team level ' +
                 'info in player hudhint on player_spawn')
             cvar.options.append(
-                '0 = (Disable) Do not show hudhint level info messages')
+                '0 = (Disabled) Do not show hudhint level info messages')
             cvar.options.append(
-                '1 = (Enable) Show hudhint level info messages')
+                '1 = (Enabled) Show hudhint level info messages')
             cvar.default = 1
             cvar.text = 'Enables/Disables showing hudhint level info messages'
+
+        # Create the gg_teamplay_winner_messages instance
+        with config.cfg_cvar('gg_teamplay_winner_messages') as cvar:
+
+            cvar.name = 'TEAMPLAY WINNER MESSAGES'
+            cvar.description.append('Send Winner Messages when a team wins')
+            cvar.options.append('0 = (Disabled) Do not show Winner Messages')
+            cvar.options.append('1 = (Enabled) Show Winner Messages')
+            cvar.default = 1
+            cvar.text = 'Enables/Disables showing Winner Messages'
 
         # Create the gg_teamplay_end_on_first_kill instance
         with config.cfg_cvar('gg_teamplay_end_on_first_kill') as cvar:

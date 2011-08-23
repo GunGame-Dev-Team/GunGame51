@@ -42,17 +42,8 @@ def gg_win(event_var):
     # Store the winner's index
     index = int(event_var['es_attackerindex'])
 
-    # Is there only one round?
-    if event_var['round'] == '0':
-
-        # Send chat message for player winning the match
-        saytext2('#human', index, 'PlayerWon', {'player': name})
-
-    # Are there multiple rounds?
-    else:
-
-        # Send chat message for player winning the round
-        saytext2('#human', index, 'PlayerWonRound', {'player': name})
+    # Send chat message for player winning the match
+    saytext2('#human', index, 'PlayerWon', {'player': name})
 
     # We want to loop, so we send a message every second for 3 seconds
     for x in xrange(4):
@@ -74,8 +65,3 @@ def gg_win(event_var):
 
     # Send toptext message to players about the winner
     toptext('#human', 10, color, 'PlayerWon_Center', {'player': name})
-
-
-# =============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# =============================================================================
