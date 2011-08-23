@@ -324,10 +324,17 @@ class _BasePlayer(_ExtendedPlayerBase, _PlayerMeta):
     # =========================================================================
     # Special class methods
     # =========================================================================
-    def __init__(self, userid):
+    def __new__(cls, userid):
+        self = object.__new__(cls, userid)
         self._userid = int(userid)
         self._steamid = _getPlayer(self.userid).uniqueid(True)
         self._index = _getPlayer(self.userid).index
+        return self
+
+    def __init__(self, userid):
+        #self._userid = int(userid)
+        #self._steamid = _getPlayer(self.userid).uniqueid(True)
+        #self._index = _getPlayer(self.userid).index
         self._afk = AFK(self.userid)
         self.multikill = 0
         self.stripexceptions = StripExceptions()
