@@ -30,6 +30,7 @@ info.name = 'gg_handicap'
 info.title = 'GG Handicap'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.conflicts = ['gg_teamplay', 'gg_teamwork']
 info.translations = ['gg_handicap']
 
 
