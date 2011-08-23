@@ -30,8 +30,6 @@ from gungame51.core.addons import dependencies
 from gungame51.core.addons import conflicts
 #   Messaging
 from gungame51.core.messaging.shortcuts import langstring
-#   Base
-from gungame51.core import get_game_dir
 
 # =============================================================================
 # >> GLOBAL VARIABLES

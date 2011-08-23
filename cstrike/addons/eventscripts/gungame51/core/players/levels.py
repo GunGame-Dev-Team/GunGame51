@@ -125,6 +125,9 @@ class PlayerLevels(_PlayerMeta):
         # Set the new level
         self.level = newLevel
 
+        # Play the levelup sound
+        self.playsound('levelup')
+
         # Reset multikill
         self.multikill = 0
 

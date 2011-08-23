@@ -9,17 +9,12 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
 import es
 
 # GunGame Imports
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
-#   Messaging
-from gungame51.core.messaging.shortcuts import msg
 #   Players
 from gungame51.core.players.shortcuts import Player
 #   Weapons
@@ -55,12 +50,10 @@ def bomb_exploded(event_var):
     levels = 1
 
     # If they shouldn't be skipping their current level, stop here
-    if (not int(gg_bomb_exploded_skip_nade) and ggPlayer.weapon == '' +
-      'hegrenade') \
-      or (not int(gg_bomb_exploded_skip_knife) and ggPlayer.weapon == '' +
-        'knife'):
-        msg(ggPlayer.userid, 'CannotSkipLevel_ByPlanting',
-            {'level': ggPlayer.weapon})
+    if ((not int(gg_bomb_exploded_skip_knife) and ggPlayer.weapon == 'knife')
+      or (not int(gg_bomb_exploded_skip_nade) and
+      ggPlayer.weapon == 'hegrenade')):
+        ggPlayer.msg('CannotSkipLevel_ByPlanting', {'level': ggPlayer.weapon})
         return
 
     # Loop through weapons of the levels we plan to level the player up past
@@ -68,10 +61,9 @@ def bomb_exploded(event_var):
       ggPlayer.level + int(gg_bomb_exploded_levels)):
         # If gg_bomb_exploded_skip_knife or gg_bomb_exploded_skip_nade are
         # disabled, make sure the player will not skip that level
-        if (not int(gg_bomb_exploded_skip_knife) and weapon == 'knife') or \
-            (not int(gg_bomb_exploded_skip_nade) and weapon == 'hegrenade'):
-            msg(ggPlayer.userid, 'CannotSkipLevel_ByPlanting',
-                {'level': weapon})
+        if ((not int(gg_bomb_exploded_skip_knife) and weapon == 'knife') or
+          (not int(gg_bomb_exploded_skip_nade) and weapon == 'hegrenade')):
+            ggPlayer.msg('CannotSkipLevel_ByPlanting', {'level': weapon})
             break
 
         # Add to the number of levels they will gain

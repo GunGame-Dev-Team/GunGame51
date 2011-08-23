@@ -33,9 +33,6 @@ except ImportError:
 
 # GunGame Imports
 
-#   Core Function Imports
-from core import get_game_dir
-
 #    Error Logging Function Imports
 from core.logs import make_log_file
 
@@ -601,9 +598,6 @@ def player_death(event_var):
         # Level them up
         ggAttacker.levelup(1, userid, 'kill')
 
-        # Play the levelup sound
-        ggAttacker.playsound('levelup')
-
         return
 
     # Multikill value is > 1 ... add 1 to the multikill attribute
@@ -613,9 +607,6 @@ def player_death(event_var):
     if ggAttacker.multikill >= multiKill:
         # Level them up
         ggAttacker.levelup(1, userid, 'kill')
-
-        # Play the levelup sound
-        ggAttacker.playsound('levelup')
 
     # Increment their current multikill value
     else:
