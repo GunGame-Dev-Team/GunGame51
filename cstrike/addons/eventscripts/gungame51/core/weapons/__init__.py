@@ -144,7 +144,7 @@ class _BaseWeaponOrder(object):
 
     def get_weapon(self, level):
         totalLevels = self.get_total_levels()
-        if not level in xrange(1, totalLevels):
+        if not self.is_valid_level(level):
             raise WeaponOrderError('Can not get weapon for level: "%s".'
                                    % level + ' Level is out of range (1-%s).'
                                    % totalLevels)
@@ -152,7 +152,7 @@ class _BaseWeaponOrder(object):
 
     def get_multikill(self, level):
         totalLevels = self.get_total_levels()
-        if not level in xrange(1, totalLevels):
+        if not self.is_valid_level(level):
             raise WeaponOrderError('Can not get multikill value for level: ' +
                                    '"%s".' % level + ' Level is out of range '
                                    '(1-%s).' % totalLevels)
@@ -160,6 +160,10 @@ class _BaseWeaponOrder(object):
 
     def get_total_levels(self):
         return len(self.active)
+
+    def is_valid_level(self, level):
+        totalLevels = self.get_total_levels() 
+        return level in xrange(1, totalLevels + 1)
 
 
 class WeaponOrderTXT(_BaseWeaponOrder):
@@ -309,8 +313,14 @@ class _WeaponOrderManager(object):
             raise WeaponOrderError('The specified weapon order "%s" ' % name +
                                    'does not exist.')
 
-        # Activate the weapon order
-        self._active = weaponOrderStorage[name]
+        # No weapon order?
+        if not self._active:
+            # Activate the weapon order
+            self._active = weaponOrderStorage[name]
+        else:
+            # Do not set to the same name if it already exists
+            if self._active.name == name:
+                return
 
         # Restart the game
         self.restart_game()
@@ -341,7 +351,17 @@ class _WeaponOrderManager(object):
             if not cvarvalue in ('#default', '#random'):
                 return
 
+            # Make sure we have a weapon order
             if self.active:
+                # If the values are set, do not allow them to be set again
+                if cvarvalue == '#default':
+                    if self.active.default == self.active.active:
+                        return
+
+                elif cvarvalue == '#random':
+                    if self.active.random == self.active.active:
+                        return
+
                 # Set the sort type in the _BaseWeaponOrder.active
                 self.active._set_active_order_type()
 

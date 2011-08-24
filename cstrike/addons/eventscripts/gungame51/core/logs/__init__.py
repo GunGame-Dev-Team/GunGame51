@@ -24,7 +24,6 @@ import es
 # GunGame Imports
 from gungame51.core import get_game_dir
 from gungame51.core.addons.shortcuts import AddonInfo
-#from gungame51.core.addons import gungame_info
 from gungame51.core import gungame_info
 
 # =============================================================================

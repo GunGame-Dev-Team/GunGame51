@@ -291,7 +291,7 @@ class _BasePlayer(_ExtendedPlayerBase, _PlayerMeta):
         # Check for valid team values
         try:
             value = int(value)
-            if value not in xrange(1, 3):
+            if value not in xrange(1, 4):
                 raise ValueError
         except (TypeError, ValueError):
             raise ValueError('"%s" is an invalid team' % value)
