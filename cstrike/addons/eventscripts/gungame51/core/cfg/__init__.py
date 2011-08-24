@@ -896,3 +896,5 @@ def generate_header(config):
     config.text('*' * 76)
     config.text('')
     config.text('')
+
+ConfigManager().load_configs()

@@ -32,15 +32,18 @@ except ImportError:
 
 
 # GunGame Imports
-
+from core import gungame_info
 #    Error Logging Function Imports
 from core.logs import make_log_file
 
+#   Messaging Function Imports
+from core.messaging.shortcuts import langstring
+from core.messaging.shortcuts import unloadTranslation
+from core.messaging.shortcuts import msg
+es.dbgmsg(0, langstring("Load_Start",
+        {'version': gungame_info('version')}))
 #    Weapon Function Imports
-from core.weapons.shortcuts import set_weapon_order
 from core.weapons.shortcuts import get_level_multikill
-from core.weapons import WeaponManager
-from core.weapons import load_weapon_orders
 
 #    Config Function Imports
 from core.cfg.shortcuts import ConfigManager
@@ -48,7 +51,7 @@ from core.cfg.shortcuts import ConfigManager
 #    Addon Function Imports
 from core.addons import AddonManager
 from core.addons import PriorityAddon
-from core.addons import gungame_info
+#from core.addons import gungame_info
 
 #    Player Function Imports
 from core.players.players import _PlayerContainer
@@ -59,11 +62,7 @@ from core.players.shortcuts import setAttribute
 #    Leaders Function Imports
 from core.leaders.shortcuts import LeaderManager
 
-#   Messaging Function Imports
-from core.messaging.shortcuts import langstring
-from core.messaging.shortcuts import loadTranslation
-from core.messaging.shortcuts import unloadTranslation
-from core.messaging.shortcuts import msg
+
 
 #   Event Function Imports
 from core.events import ggResourceFile
@@ -89,6 +88,8 @@ gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
+gg_multi_round = es.ServerVar('gg_multi_round')
+gg_multi_round_intermission = es.ServerVar('gg_multi_round_intermission')
 gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
 gg_map_obj = es.ServerVar('gg_map_obj')
@@ -138,6 +139,23 @@ credits = {
 
 
 # =============================================================================
+# >> CLASSES
+# =============================================================================
+class RoundInfo(object):
+    def __new__(cls, *p, **k):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            # Set round information variables
+            cls._the_instance.round = 1
+        return cls._the_instance
+
+    @property
+    def remaining(self):
+        total = int(gg_multi_round) - self.round
+        return total if total > 0 else 0
+
+
+# =============================================================================
 # >> ADDON REGISTRATION
 # =============================================================================
 info = es.AddonInfo()
@@ -160,9 +178,6 @@ info.Website = ('\n' + '\t' * 4 + 'http://forums.gungame.net/\n')
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    # Load translations
-    loadTranslation('gungame', 'gungame')
-
     # Exec server.cfg before gungame loads.  If gungame is loaded from autoexec
     # this is needed so that the correct values are stored.
     es.server.cmd('exec server.cfg')
@@ -265,15 +280,11 @@ def initialize():
     # Load custom events
     ggResourceFile.declare_and_load()
 
-    es.dbgmsg(0, langstring("Load_Start",
-        {'version': gungame_info('version')}))
+    #es.dbgmsg(0, langstring("Load_Start",
+    #    {'version': gungame_info('version')}))
 
     # Load all configs
-    ConfigManager().load_configs()
-
-    # Parse Weapon Order Files
-    es.dbgmsg(0, langstring("Load_WeaponOrders"))
-    load_weapon_orders()
+    #ConfigManager().load_configs()
 
     # Pause a moment for the configs to be loaded (OB engine requires this)
     gamethread.delayed(0.1, completeInitialize)
@@ -321,6 +332,10 @@ def finishInitialize():
     # Make the sounds downloadable
     es.dbgmsg(0, langstring("Load_SoundSystem"))
     make_downloadable(True)
+
+    # Set up "gg_multi_round"
+    if int(gg_multi_round):
+        RoundInfo().round = 1
 
     es.dbgmsg(0, langstring("Load_Completed"))
 
@@ -376,14 +391,13 @@ def es_map_start(event_var):
     for userid in getUseridList('#human'):
         Player(userid).database_update()
 
-    # Make sure gungameorder is set as the "current" order
-    # This fixes an issue that caused gg_nade_bonus order to be
-    # re-randomized instead of the gungame weapon_order
-    WeaponManager().currentorder = WeaponManager().gungameorder
+    # Set up "gg_multi_round"
+    if int(gg_multi_round):
+        RoundInfo().round = 1
 
     # If gg_weapon_order_sort_type is #random, re-randomize it
     if str(gg_weapon_order_sort_type) == "#random":
-        WeaponManager().type = "#random"
+        get_weapon_order().randomize()
 
     # See if we need to fire event gg_start after everything is loaded
     gamethread.delayed(2, check_priority)
@@ -612,15 +626,65 @@ def gg_win(event_var):
     if not es.isbot(userid):
         Player(userid).wins += 1
 
-    es.server.queuecmd("es_xgive %s game_end" % userid)
-    es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
+    if event_var['round'] == '0':
+        # =====================================================================
+        # MAP WIN
+        # =====================================================================
+        # End game
+        es.server.queuecmd("es_xgive %s game_end" % userid)
+        es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
 
-    # Play the winner sound
-    for userid in getUseridList('#human'):
-        Player(userid).playsound('winner')
+        # Play the winner sound
+        for userid in getUseridList('#human'):
+            Player(userid).playsound('winner')
+
+    else:
+        # =====================================================================
+        # ROUND WIN
+        # =====================================================================
+        # Calculate round number
+        RoundInfo().round += 1
+
+        # Reset the players
+        resetPlayers()
+
+        # Freeze players and put them in god mode
+        for playerid in es.getUseridList():
+            getPlayer(playerid).freeze = True
+            getPlayer(playerid).godmode = True
+
+        # End the GunGame Round
+        es.server.queuecmd('mp_restartgame 2')
+
+        # Check to see if the warmup round needs to be activated
+        if int(es.ServerVar('gg_multi_round_intermission')):
+            if not int(gg_warmup_round):
+                # Back up gg_warmup_round's value
+                global gg_warmup_round_backup
+                gg_warmup_round_backup = int(gg_warmup_round)
+
+                # Load gg_warmup_round - loading will start the warmup timer
+                es.server.queuecmd('gg_warmup_round 1')
+            else:
+                # Import and execute "do_warmup()" - starts the warmup timer
+                from scripts.included.gg_warmup_round import do_warmup
+                do_warmup()
+        else:
+            gamethread.delayed(2, GG_Start().fire())
+
+        # Play the winner sound
+        for userid in getUseridList('#human'):
+            Player(userid).playsound('winner')
 
     # Update DB
     gamethread.delayed(1.5, Database().commit)
+
+
+def gg_start(event_var):
+    # Disable warmup due to "gg_multi_round"?
+    if gg_warmup_round_backup != int(gg_warmup_round) and \
+        gg_warmup_round_backup:
+            es.server.queuecmd('gg_warmup_round 0')
 
 
 def gg_addon_loaded(event_var):
@@ -635,31 +699,18 @@ def gg_addon_unloaded(event_var):
 
 def server_cvar(event_var):
     cvarName = event_var['cvarname']
+    cvarValue = event_var['cvarvalue']
 
-    # Make sure we have both set before setting the weapon order
-    if cvarName == 'gg_weapon_order_file' and str(gg_weapon_order_sort_type) \
-                == "0":
+    if cvarValue == '0':
         return
 
-    # Added just in case for print weapon order fix
-    if cvarName == 'gg_weapon_order_file' and event_var['cvarvalue'] == '0':
-        return
-
-    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type',
-                                                    'gg_multikill_override']:
+    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
         # For weapon order file and sort type,
         # reset player's levels and multikills to 1
         # and call gg_start again
         if cvarName != "gg_multikill_override":
             resetPlayers()
             check_priority()
-
-        # Set the weapon order and set the weapon order type
-        currentOrder = set_weapon_order(str(gg_weapon_order_file),
-                                      str(gg_weapon_order_sort_type))
-
-        # Set multikill override
-        currentOrder.set_multikill_override(int(gg_multikill_override))
 
 
 def player_changename(event_var):

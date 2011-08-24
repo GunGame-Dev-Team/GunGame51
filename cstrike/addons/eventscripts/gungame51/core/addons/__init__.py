@@ -17,6 +17,7 @@ import es
 import gamethread
 
 # GunGame Imports
+from gungame51.core import gungame_info
 from gungame51.core import get_game_dir
 from gungame51.core import get_file_list
 from gungame51.core.events import GG_Addon_Loaded
@@ -628,6 +629,7 @@ class AddonManager(object):
 # =============================================================================
 # >> FUNCTIONS
 # =============================================================================
+"""
 def gungame_info(info, _info=None):
     '''
     Fetches the head revision number from all of gungame's files
@@ -733,7 +735,7 @@ def gungame_info(info, _info=None):
 
         # Collect custom addons w/ versions
         _gg_info.Custom_Addons = gungame_info('custom')
-
+"""
 '''
 This wrapper makes it possible to use key addon functions
 without interacting with the AddonManager directly

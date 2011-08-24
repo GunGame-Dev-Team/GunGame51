@@ -20,7 +20,8 @@ import popuplib
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.addons import gungame_info
+#from gungame51.core.addons import gungame_info
+from gungame51.core import gungame_info
 from gungame51.core.addons.shortcuts import get_loaded_addon_list
 
 

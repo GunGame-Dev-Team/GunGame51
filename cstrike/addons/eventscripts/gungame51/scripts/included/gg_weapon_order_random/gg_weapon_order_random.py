@@ -20,6 +20,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core import get_game_dir
 from gungame51.core.weapons.shortcuts import get_weapon_order
 from gungame51.core.weapons.shortcuts import set_weapon_order
+from gungame51.core.weapons import weaponOrderFilesTXT
 
 
 # =============================================================================
@@ -35,8 +36,7 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-# Get the es.ServerVar() instance of "gg_weapon_order_random"
-gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
+# Get the es.ServerVar() instance of "gg_weapon_order_random_excluded"
 gg_weapon_order_random_excluded = \
                                 es.ServerVar("gg_weapon_order_random_excluded")
 
@@ -45,13 +45,11 @@ gg_weapon_order_random_excluded = \
 # >> GAME EVENTS
 # =============================================================================
 def es_map_start(event_var):
-    # Get a list of files names ([:-4] to remove .txt extensions) in the
-    # weapon_orders directory
-    files = [x.namebase for x in
-        get_game_dir('cfg/gungame51/weapon_orders').files("*.txt")]
+    # Get a list of files names in the weapon_orders directory
+    files = [x.namebase for x in weaponOrderFilesTXT]
 
     # Get the current weapon order's file name
-    currentFile = get_weapon_order().file
+    currentFile = get_weapon_order().name
 
     # Remove the current weapon order's file name
     files.remove(str(currentFile))
@@ -70,7 +68,7 @@ def es_map_start(event_var):
     newFile = random.choice(files)
 
     # Set the new file
-    currentOrder = set_weapon_order(newFile, str(gg_weapon_order_sort_type))
+    currentOrder = set_weapon_order(newFile)
 
     # Echo the new weapon order
     currentOrder.echo()

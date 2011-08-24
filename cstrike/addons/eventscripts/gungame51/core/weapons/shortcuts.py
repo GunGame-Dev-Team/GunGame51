@@ -13,62 +13,39 @@ $LastChangedDate$
 from weaponlib import getWeaponList
 
 # GunGame Imports
-from gungame51.core.weapons import WeaponManager
-
-
+from gungame51.core.weapons import weaponOrderManager
+from gungame51.core.weapons import weaponOrderStorage
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
 def get_weapon_order(name=None):
-    '''
-    Returns the named weapon order instance if a name is provided as an
+    """Returns the named weapon order instance if a name is provided as an
     argument. If no argument is provided, it will return the current GunGame
-    weapon order instance that is in use. If no weapon order has been set for
-    GunGame and no argument has been provided, "None" is returned.
-    '''
+    weapon order instance that is in use.
+    """
     if name:
-        return WeaponManager().load(name)
+        return weaponOrderStorage[name]
 
-    elif WeaponManager().gungameorder:
-        return WeaponManager().__weaponorders__[WeaponManager().gungameorder]
-
-    return None
+    return weaponOrderManager.active
 
 
-def set_weapon_order(name, type='#default'):
-    '''
-    Sets the weapon order to be used by GunGame.
+def set_weapon_order(name):
+    """Sets the weapon order to be used by GunGame.
 
     Notes:
         * name: (required)
             The name of the weapon order file as found in
                 "../<MOD>/cfg/gungame51/weapon_orders/"
             minus the ".txt" extension.
-        * type: (optional)
-            The weapon order type:
-                - "#default"
-                    The same order as it is listed in the weapon order's file.
-                - "#reversed"
-                    The reverse of the order as it is listed in the weapon
-                    order's file.
-                - "#random"
-                    Uses the weapons as they are listed in the weapon order's
-                    file, but randomizes the order of the weapons.
+
     Usage:
         from gungame.core.weapons.shortcuts import set_weapon_order
 
         # Use the default weapon order
         set_weapon_order('default_weapon_order')
-
-        # Use the default weapon order, but randomize the order
-        set_weapon_order('default_weapon_order', '#random')
-
-        # Use the default weapon order, but reverse the order
-        set_weapon_order('default_weapon_order', '#reversed')
-    '''
-    WeaponManager().load(name)
-    WeaponManager().set_order(name)
-    WeaponManager().type = type
+    """
+    weaponOrderManager.activate(name)
+    weaponOrderManager.active._set_active_order_type()
     return get_weapon_order()
 
 
