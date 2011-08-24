@@ -21,6 +21,8 @@ from es import getplayerteam
 from es import getUseridList
 from es import isbot
 from es import ServerVar
+#   Gamethread
+from gamethread import delayed
 
 # GunGame Imports
 #   Addons
@@ -34,8 +36,6 @@ from gungame51.core.events.eventlib.resource import ResourceFile
 from gungame51.core.events.eventlib.fields import BooleanField
 from gungame51.core.events.eventlib.fields import ByteField
 from gungame51.core.events.eventlib.fields import ShortField
-#   Events
-from gungame51.core.events import GG_Win
 #   Messaging
 from gungame51.core.messaging.shortcuts import langstring
 #   Players
@@ -184,17 +184,19 @@ class TeamManagement(object):
         GG_Team_LevelUp(team=self.team,
             old_level=self.level - 1, new_level=self.level).fire()
 
+        # Did the team just win?
+        if self.level == get_total_levels():
+
+            GG_Team_Win(winner=self.team, loser=5 - self.team).fire()
+
+            # Do not send messages or increase player levels
+            return
+
         # Loop through all team members
         for userid in self.team_players:
 
             # Set the player's level to the team level
             self.set_player_level(userid)
-
-        # Did the team just win?
-        if self.level == get_total_levels():
-
-            # Do not send messages
-            return
 
         # Does a message need sent?
         if int(gg_teamplay_roundend_messages):
@@ -208,35 +210,17 @@ class TeamManagement(object):
         # Get the Player instance
         ggPlayer = Player(userid)
 
-        # Get the number of levels to change the player
-        levels = self.level - ggPlayer.level
+        # Is the player prevented from leveling?
+        if info.name in ggPlayer.preventlevel.levelup:
 
-        # Does the player's level need changed?
-        if levels:
+            # Remove the prevention
+            ggPlayer.preventlevel.levelup.remove(info.name)
 
-            # Is the addon in the player's levelup preventlevel?
-            if info.name in ggPlayer.preventlevel.levelup:
+        # Set the player's level to the team's level
+        ggPlayer.level = self.level
 
-                # Remove the addon from the player's levelup preventlevel
-                ggPlayer.preventlevel.levelup.remove(info.name)
-
-            # Does the player need leveled up?
-            if levels > 0:
-
-                # Level the player up to the team's level
-                ggPlayer.levelup(levels, reason=info.name)
-
-            # Does the player need leveled down?
-            else:
-
-                # Level the player down to the team's level
-                ggPlayer.leveldown(-levels, reason=info.name)
-
-        # Is the addon in the player's levelup preventlevel?
-        if not info.name in ggPlayer.preventlevel.levelup:
-
-            # Add the addon to the player's levelup preventlevel
-            ggPlayer.preventlevel.levelup.append(info.name)
+        # Add the addon to the player's levelup preventlevel
+        ggPlayer.preventlevel.levelup.append(info.name)
 
     def check_final_kill(self, userid, weapon):
         '''Checks to see if the kill should end the match'''
@@ -268,14 +252,8 @@ class TeamManagement(object):
             # If not, return
             return
 
-        # Is the addon in the player's levelup preventlevel?
-        if info.name in ggPlayer.preventlevel.levelup:
-
-            # Remove the addon from the player's levelup preventlevel
-            ggPlayer.preventlevel.levelup.remove(info.name)
-
-        # Level the player up ftw!!!
-        ggPlayer.levelup(1, reason=info.name)
+        # End the match
+        GG_Team_Win(winner=self.team, loser=5 - self.team).fire()
 
     def send_increase_multikill_message(self):
         '''Sends information to chat when a team's multikill increases'''
@@ -533,9 +511,6 @@ gg_teams = GGTeams()
 def load():
     '''Fired when the script is loaded'''
 
-    # Register a callback for the gg_win event
-    GG_Win().register_prefire_callback(pre_gg_win)
-
     # Declare and load the resource file
     gg_teamplay_resource.declare_and_load()
 
@@ -543,25 +518,17 @@ def load():
 def unload():
     '''Fired when the script is unloaded'''
 
-    # Unregister the gg_win event callback
-    GG_Win().unregister_prefire_callback(pre_gg_win)
+    # Loop through all players on the server
+    for userid in getUseridList():
 
+        # Get the Player() instance
+        ggPlayer = Player(userid)
 
-# =============================================================================
-# >> REGISTERED CALLBACKS
-# =============================================================================
-def pre_gg_win(event_var):
-    '''Fired prior to gg_win event being fired'''
+        # Does the player have gg_teamplay in preventlevel?
+        if info.name in ggPlayer.preventlevel.levelup:
 
-    # Get the team the winner is one
-    winning_team = getplayerteam(event_var['winner'])
-
-    # Fire the gg_teamwin event instead with the
-    # winning team and losing team event variables
-    GG_Team_Win(winner=winning_team, loser=5 - winning_team).fire()
-
-    # Always return False so that gg_win never fires
-    return False
+            # Remove the addon from the player's levelup preventlevel
+            ggPlayer.preventlevel.levelup.remove(info.name)
 
 
 # =============================================================================
@@ -569,6 +536,9 @@ def pre_gg_win(event_var):
 # =============================================================================
 def es_map_start(event_var):
     '''Fired when a new map starts'''
+
+    # Reset team level and multikill values
+    gg_teams.clear()
 
     # Load the resource file
     gg_teamplay_resource.load()

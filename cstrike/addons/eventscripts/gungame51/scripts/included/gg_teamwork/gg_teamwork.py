@@ -22,6 +22,8 @@ from es import getplayerteam
 from es import getUseridList
 from es import isbot
 from es import ServerVar
+#   Gamethread
+from gamethread import delayed
 
 # GunGame Imports
 #   Addons
@@ -156,41 +158,14 @@ class TeamManagement(object):
         # Does the player get set to level 1?
         if not int(gg_teamwork_jointeam_level):
 
-            # Does the player need leveled down to level 1?
-            if ggPlayer.level <= 1:
-
-                # The player is on level 1, so return
-                return
-
-            # Get the number of levels to level the player down
-            levels = ggPlayer.level - 1
-
-            # Level the player down to level 1
-            ggPlayer.leveldown(levels, reason=info.name)
+            # Set the player to level 1
+            ggPlayer.level = 1
 
         # Does the player need set to the teams start level for this round?
         else:
 
-            # Get the number of levels to change the player
-            levels = self.level - ggPlayer.level
-
-            # Does the player's level need changed?
-            if not levels:
-
-                # If not, return
-                return
-
-            # Does the player need leveled up?
-            if levels > 0:
-
-                # Level the player up to the team's level
-                ggPlayer.levelup(levels, reason=info.name)
-
-            # Does the player need leveled down?
-            else:
-
-                # Level the player down to the team's level
-                ggPlayer.leveldown(-levels, reason=info.name)
+            # Set the player to the team's level
+            ggPlayer.level = self.level
 
     def check_old_leader(self, userid):
         '''Checks to see if the player was the team's leader'''
@@ -448,6 +423,9 @@ def pre_gg_win(event_var):
 def es_map_start(event_var):
     '''Fired when a new map starts'''
 
+    # Reset the team's level and leader values
+    gg_teams.clear()
+
     # Load the resource file
     gg_teamwork_resource.load()
 
@@ -458,8 +436,8 @@ def round_end(event_var):
     # Loop through both teams
     for team in gg_teams:
 
-        # Set all players on the team to the highest level
-        gg_teams[team].set_all_player_levels()
+        # Delay 1 tick so that the level is set properly
+        delayed(0, gg_teams[team].set_all_player_levels)
 
 
 def round_start(event_var):
@@ -517,14 +495,14 @@ def gg_levelup(event_var):
 def gg_start(event_var):
     '''Fired when the match is about to start'''
 
-    # Reset team level and multikill values
+    # Reset the team's level and leader values
     gg_teams.clear()
 
 
 def gg_teamwin(event_var):
     '''Fired when a team wins the match'''
 
-    # Reset team level and multikill values
+    # Reset the team's level and leader values
     gg_teams.clear()
 
     # Send Winner Messages?
