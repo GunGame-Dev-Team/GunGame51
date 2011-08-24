@@ -313,14 +313,17 @@ class _WeaponOrderManager(object):
             raise WeaponOrderError('The specified weapon order "%s" ' % name +
                                    'does not exist.')
 
-        # No weapon order?
-        if not self._active:
-            # Activate the weapon order
-            self._active = weaponOrderStorage[name]
-        else:
+        # Do we have an active weapon order yet? If so, check the name.
+        if self._active:
             # Do not set to the same name if it already exists
-            if self._active.name == name:
+            if self.active.name == name:
                 return
+
+        # Activate the weapon order
+        self._active = weaponOrderStorage[name]
+
+        # Set the sort type
+        self.active._set_active_order_type()
 
         # Restart the game
         self.restart_game()
