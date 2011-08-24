@@ -288,26 +288,11 @@ class TeamManagement(object):
             # Set the level difference
             levels = 0
 
-        # Store a team member's index
-        index = self.index
-
-        # Loop through all players on the server
-        for userid in getUseridList():
-
-            # Is the player a bot?
-            if isbot(userid):
-
-                # If so, do not send the message
-                continue
-
-            # Get the leveling team's name
-            teamname = langstring(self.teamname, userid=userid)
-
-            # Send the message to the player
-            Player(userid).saytext2(index, message,
-                {'teamname': teamname, 'multikill': self.multikill,
-                 'total': get_level_multikill(self.level), 'levels': levels,
-                 'level': self.level, 'other': other.level})
+        # Send the message to all players
+        self.send_all_players_a_message(message,
+            {'multikill': self.multikill,
+             'total': get_level_multikill(self.level), 'levels': levels,
+             'level': self.level, 'other': other.level})
 
     def send_increase_level_message(self):
         '''Sends information to chat when a team increases their level'''
@@ -351,24 +336,9 @@ class TeamManagement(object):
             # Get the level difference
             levels = other.level - self.level
 
-        # Store a team member's index
-        index = self.index
-
-        # Loop through all players on the server
-        for userid in getUseridList():
-
-            # Is the player a bot?
-            if isbot(userid):
-
-                # If so, do not send the message
-                continue
-
-            # Get the leveling team's name
-            teamname = langstring(self.teamname, userid=userid)
-
-            # Send the message to the player
-            Player(userid).saytext2(index, message,
-                {'teamname': teamname, 'levels': levels, 'level': self.level})
+        # Send all players the message
+        self.send_all_players_a_message(message,
+            {'levels': levels, 'level': self.level})
 
     def send_hudhint_info(self, userid):
         '''Sends level info on player_spawn'''
@@ -457,6 +427,36 @@ class TeamManagement(object):
             # Send toptext message about the winner
             ggPlayer.toptext(10, color,
                 'TeamPlay_Winner_Center', {'teamname': teamname})
+
+    def send_all_players_a_message(self, message, tokens):
+        '''Sends all players on the server a message'''
+
+        # Store a team members index
+        index = self.index
+
+        # Is there an index?
+        if index is None:
+
+            # If not, don't send any messages
+            return
+
+        # Loop through all players on the server
+        for userid in getUseridList():
+
+            # Is the player a bot?
+            if isbot(userid):
+
+                # If so, don't send a message
+                continue
+
+            # Get the team's name
+            teamname = langstring(self.teamname, userid=userid)
+
+            # Update the tokens with the teamname
+            tokens.update({'teamname': teamname})
+
+            # Send the message to the player
+            Player(userid).saytext2(index, message, tokens)
 
     @property
     def team_players(self):

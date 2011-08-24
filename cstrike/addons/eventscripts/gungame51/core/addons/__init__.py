@@ -344,6 +344,8 @@ class AddonManager(object):
         # Remove the module from the order of called events
         self.__order__.remove(name)
 
+        from gungame51.core.players.shortcuts import Player
+
         # Remove custom attribute callbacks associated with this addon
         Player.remove_callbacks_for_addon(name)
 
@@ -626,116 +628,6 @@ class AddonManager(object):
             addon_globals[blockname](*a, **kw)
 
 
-# =============================================================================
-# >> FUNCTIONS
-# =============================================================================
-"""
-def gungame_info(info, _info=None):
-    '''
-    Fetches the head revision number from all of gungame's files
-    '''
-    global ggVersion
-    global _gg_info_quiet
-    global _gg_info
-
-    if info == 'version':
-        # Stop here if we already have done this, and return the version.
-        if ggVersion:
-            return ggVersion
-
-        # This files revision is our starting point
-        rev = int(__doc__.split('$Rev: ')[1].split()[0])
-
-        # Our generator which walks through the files
-        gen = get_file_list()
-
-        # Loop until an exception is raised
-        while True:
-            # See if we can get the next file
-            try:
-                files = gen.next()
-
-            # Exception raised, we are out of files. Return the version.
-            except:
-                ggVersion = '5.1.%s' % rev
-                return ggVersion
-
-            # Folder name
-            base_name = files[0]
-
-            # Don't look for the GG version in custom scripts
-            if 'gungame51/scripts/custom' in base_name:
-                continue
-
-            # Look through all the files in the folder
-            for fileName in files[1]:
-                # Try to open the file, then grab it's version
-                try:
-                    with open(base_name + "/" + fileName, 'r') as pyfile:
-                        ver = int(pyfile.read().split('$Rev: ')[1].split()[0])
-
-                    # Is this the new high version?
-                    if ver > rev:
-                        rev = ver
-
-                    continue
-
-                # File could not be read for version, continue..
-                except:
-                    continue
-
-    '''
-    Fetches a list of addons and it's version number in str format for
-    es.AddonInfo()
-    '''
-    if info in ('included', 'custom'):
-        # Stop here if this is the initial load
-        if _gg_info_quiet:
-            return
-
-        # Retrieve the AddonManager
-        AM = AddonManager()
-
-        # Format our output
-        addonlist = ['\t' * 4 + '%s (v%s)\n' % (
-            AM.get_addon_info()[addon].name,
-            AM.get_addon_info()[addon].version) for addon in
-            AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
-
-        # If no addons, output is None
-        if not addonlist:
-            return 'None\n'
-
-        # Add a line return to the beginning of our output
-        addonlist.insert(0, '\n')
-
-        # Return the list as one string
-        return ' '.join(addonlist)
-
-    '''
-    Lets gungame51.py pass it's instance of es.AddonInfo into this file
-    so we can update it. (stored as _gg_info global)
-    '''
-    if info == 'addoninfo':
-        _gg_info = _info
-        _gg_info_quiet = False
-        gungame_info('update')
-
-    '''
-    Updates es.AddonInfo instance for gungame51
-    '''
-    if info == 'update':
-        # If this is the inital load, or we don't have a es.AddonInfo()
-        # instance then stop here.
-        if _gg_info_quiet or not _gg_info:
-            return
-
-        # Collect included addons w/ versions
-        _gg_info.Included_Addons = gungame_info('included')
-
-        # Collect custom addons w/ versions
-        _gg_info.Custom_Addons = gungame_info('custom')
-"""
 '''
 This wrapper makes it possible to use key addon functions
 without interacting with the AddonManager directly
@@ -784,5 +676,3 @@ def get_valid_addons():
                 custom_addons_cache.append(item.namebase)
             valid_addons_cache.append(item.namebase)
     return valid_addons_cache
-
-from gungame51.core.players.shortcuts import Player
