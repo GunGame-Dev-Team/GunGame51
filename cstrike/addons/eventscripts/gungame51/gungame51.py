@@ -64,8 +64,6 @@ from core.players.shortcuts import setAttribute
 #    Leaders Function Imports
 from core.leaders.shortcuts import LeaderManager
 
-
-
 #   Event Function Imports
 from core.events import ggResourceFile
 from core.events import GG_Load

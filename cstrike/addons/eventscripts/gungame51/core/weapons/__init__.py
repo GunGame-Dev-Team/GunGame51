@@ -28,7 +28,7 @@ gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 
 # Weapons
-VALID_WEAPONS = (getWeaponList('#primary') + getWeaponList('#secondary') + 
+VALID_WEAPONS = (getWeaponList('#primary') + getWeaponList('#secondary') +
                 ['weapon_hegrenade', 'weapon_knife'])
 
 
@@ -108,6 +108,12 @@ class _BaseWeaponOrder(object):
 
         # If we found a knife or nade at the end of the order alter the order
         if knifeOrNade:
+
+            # Reverse knifeOrNade, so that we get them in the proper order
+            # This only needs done if we have knife or nade levels to add
+            knifeOrNade = reversed(knifeOrNade)
+
+            # Remove the levels from the weapon order
             weapons = weapons[:-len(knifeOrNade)]
 
         # Randomize the weapons
@@ -162,7 +168,7 @@ class _BaseWeaponOrder(object):
         return len(self.active)
 
     def is_valid_level(self, level):
-        totalLevels = self.get_total_levels() 
+        totalLevels = self.get_total_levels()
         return level in xrange(1, totalLevels + 1)
 
 
@@ -190,7 +196,7 @@ class WeaponOrderTXT(_BaseWeaponOrder):
             # Backwards-compatibility niceness (skip lines with these)
             if line.startswith(('@', '=>')):
                 import warnings
-                warnings.warn('Please remove the "@" or "=>" line from the ' + 
+                warnings.warn('Please remove the "@" or "=>" line from the ' +
                               'weapon order "%s". ' % self.name + 'This is ' +
                               'no longer supported.', DeprecationWarning,
                               stacklevel=2)
@@ -330,7 +336,7 @@ class _WeaponOrderManager(object):
 
     @classmethod
     def load_orders(self):
-        for orderPath in weaponOrderFilesTXT:# + weaponOrderFilesINI
+        for orderPath in weaponOrderFilesTXT:  # + weaponOrderFilesINI
             weaponOrderStorage.add(orderPath)
 
     def server_cvar(self, event_var):
@@ -393,7 +399,7 @@ def refresh_weapon_order_files():
         * GunGame retrieves the list of weapon orders when it first loads.
 
     """
-    global weaponOrderFilesTXT#, weaponOrderFilesINI
+    global weaponOrderFilesTXT  # , weaponOrderFilesINI
     weaponOrderFilesTXT = weaponOrdersPath.files("*.txt")
     #weaponOrderFilesINI = weaponOrdersPath.files("*.ini")
 
@@ -407,4 +413,3 @@ weaponOrderManager.load_orders()
 # Register for the server_cvar event
 es.addons.registerForEvent(__import__(__name__), 'server_cvar',
                            weaponOrderManager.server_cvar)
-

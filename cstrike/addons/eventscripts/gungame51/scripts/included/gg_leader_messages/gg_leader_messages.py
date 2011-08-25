@@ -52,7 +52,7 @@ def gg_tied_leader(event_var):
             {'player': event_var['es_username'],
             'level': event_var['leader_level']})
 
-    # Do we have a tie of 3 or more players?
+    # Is there a tie of 3 or more players?
     else:
 
         # Send message that the player just tied the other leaders
@@ -77,7 +77,7 @@ def gg_leader_disconnect(event_var):
         if not es.exists('userid', leaders[0]):
             return
 
-        # Send message about our new leader
+        # Send message about the new leader
         saytext2('#human', getPlayer(leaders[0]).index, 'NewLeader',
             {'player': es.getplayername(leaders[0]),
             'level': event_var['leader_level']})
@@ -85,8 +85,17 @@ def gg_leader_disconnect(event_var):
     # Are there multiple leaders currently?
     else:
 
-        # Send message about all our current leaders
+        # Get a list of leader names
+        leader_names = [es.getplayername(userid) for
+            userid in leaders if es.exists('userid', userid)]
+
+        # Are there any leaders?
+        if not leader_names:
+
+            # If not, return
+            return
+
+        # Send message about all the current leaders
         msg('#human', 'NewLeaders',
-            {'players': ', '.join([es.getplayername(userid)
-                for userid in leaders if es.exists('userid', userid)]),
-            'level': event_var['leader_level']})
+            {'players': ', '.join(leader_names),
+             'level': event_var['leader_level']})
