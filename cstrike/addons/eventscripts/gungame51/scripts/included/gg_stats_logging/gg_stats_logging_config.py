@@ -30,11 +30,9 @@ def load():
         with config.cfg_cvar('gg_stats_logging') as cvar:
 
             cvar.name = 'STATS LOGGING'
-            cvar.description.append([
-                ' When enabled, this addon will log ' +
-                    'game events for stats tracking for',
-                'HLstatsX, Psychostats, and etc.',
-                ])
+            cvar.description.append(
+                'When enabled, this addon will log game events ' +
+                'for stats tracking for HLstatsX, Psychostats, and etc.')
             cvar.notes.append(
                 'Other options available in "gg_stats_logging.txt".')
             cvar.notes.append(

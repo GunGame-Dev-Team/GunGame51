@@ -30,11 +30,8 @@ def load():
         with config.cfg_cvar('gg_spawnpoints') as cvar:
 
             cvar.name = 'SPAWNPOINT MANAGER'
-            cvar.description.append([
-                'This addon adds server (RCON) ' +
-                    'commands to allow admins to manage',
-                'spawnpoints on the current map.',
-                ])
+            cvar.description.append('This addon adds server (RCON) commands ' +
+                'to allow admins to manage spawnpoints on the current map.')
             cvar.extra.append('Commands:')
             cvar.extra.append(' spawn_add <userid>')
             cvar.extra.append('   - Adds a spawnpoint at the users location.')

@@ -21,7 +21,7 @@ from gungame51.core.players.shortcuts import add_attribute_callback
 from gungame51.core.players.shortcuts import remove_callbacks_for_addon
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_total_levels
-from gungame51.scripts.included.gg_nade_bonus.gg_nade_bonus import get_weapon
+from ..gg_nade_bonus.gg_nade_bonus import get_weapon
 
 # =============================================================================
 # >> GLOBALS

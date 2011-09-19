@@ -30,11 +30,9 @@ def load():
         with config.cfg_cvar('gg_earn_nade') as cvar:
 
             cvar.name = 'EARN GRENADES'
-            cvar.description.append([
-                'When a player reaches grenade level, ' +
-                    'they can earn extra grenades by',
-                'killing enemies with another weapon.',
-                ])
+            cvar.description.append(
+                'When a player reaches grenade level, they can earn ' +
+                'extra grenades by killing enemies with another weapon.')
             cvar.notes.append(
                 'Players can only carry one hegrenade at a time.')
             cvar.options.append('0 = (Disabled) Do not load gg_earn_nade.')

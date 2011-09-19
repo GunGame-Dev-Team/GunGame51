@@ -234,16 +234,11 @@ def load():
             cvar.notes.append('Requires "gg_map_obj 0" or "gg_map_obj 2"')
             cvar.notes.append('Requires ' +
                 '"gg_hostage_stopped_levels 1" or higher')
-            cvar.options.append([
-                '0 = Do not allow players to level ' +
-                'up when they stop hostages from ',
-                'being rescued while on hegrenade level.',
-                ])
-            cvar.options.append([
-                '1 = Allow players to level up when ' +
-                'they stop hostages from being ',
-                'rescued while on hegrenade level.',
-                ])
+            cvar.options.append(
+                '0 = Do not allow players to level up when they stop ' +
+                'hostages from being rescued while on hegrenade level.')
+            cvar.options.append('1 = Allow players to level up when they ' +
+                'stop hostages from being rescued while on hegrenade level.')
             cvar.default = 0
             cvar.text = ('Allow players to level ' +
                 'up when they are on hegrenade level.')

@@ -32,16 +32,12 @@ def load():
             cvar.name = 'TEAMWORK'
             cvar.description.append('Level-up to the highest ' +
                 '"team" level at the end of every round')
-            cvar.notes.append([
-                'Work together to get 1 player to ' +
-                    'level up as much as possible during the round,',
-                'so that your team achieves ' +
-                    'the highest level it can each round',
-                ])
-            cvar.notes.append(['To have even more fun with this mod, ' +
-                'it is highly recommended you use gg_assist at the same time:',
-                'http://forums.gungame.net/viewtopic.php?f=74&t=1294',
-                ])
+            cvar.notes.append('Work together to get 1 player to level up ' +
+                'as much as possible during the round, so that your team ' +
+                'achieves the highest level it can each round.')
+            cvar.notes.append('To have even more fun with this mod, it is ' +
+                'highly recommended you use gg_assist at the same ' +
+                'time:\n\thttp://forums.gungame.net/viewtopic.php?f=74&t=1294')
             cvar.options.append('0 = (Disabled) Do not load gg_teamwork.')
             cvar.options.append('1 = (Enabled) Load gg_teamwork.')
             cvar.default = 0

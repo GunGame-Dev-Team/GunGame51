@@ -30,11 +30,9 @@ def load():
         with config.cfg_cvar('gg_multi_level') as cvar:
 
             cvar.name = 'MULTI-LEVEL'
-            cvar.description.append([
-                'The number of times a player has ' +
-                    'to level up without dying prior to',
-                'recieving the multi-level bonus:',
-                ])
+            cvar.description.append(
+                'The number of times a player has to level up without ' +
+                'dying prior to recieving the multi-level bonus:')
             cvar.extra.append('      * The attacker will be ' +
                 'given a speed boost.')
             cvar.extra.append('      * The attacker will have ' +
@@ -43,11 +41,8 @@ def load():
                 'music emitted from their location.')
             cvar.notes.append('Formally knows as Triple Level Bonus.')
             cvar.options.append('0 = (Disabled) Do not load gg_multi_level.')
-            cvar.options.append([
-                '# = (Enabled) The number of levels ' +
-                    'a player must get before',
-                'achieving the multi-level bonus.',
-                ])
+            cvar.options.append('# = (Enabled) The number of levels a ' +
+                'player must get before achieving the multi-level bonus.')
             cvar.default = 0
             cvar.text = ('The # of levels it takes ' +
                 'to get the multi-level bonus.')

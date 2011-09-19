@@ -30,11 +30,9 @@ def load():
         with config.cfg_cvar('gg_multi_nade') as cvar:
 
             cvar.name = 'MULTIPLE GRENADES'
-            cvar.description.append([
-                'When a player reaches grenade level, ' +
-                    'they are given another grenade',
-                'when their thrown grenade detonates.',
-                ])
+            cvar.description.append(
+                'When a player reaches grenade level, they are given ' +
+                'another grenade when their thrown grenade detonates.')
             cvar.options.append('0 = (Disabled) Do not load gg_multi_nade.')
             cvar.options.append('1 = (Enabled) Load gg_multi_nade.')
             cvar.default = 0
@@ -44,12 +42,9 @@ def load():
         with config.cfg_cvar('gg_multi_nade_max_nades') as cvar:
 
             cvar.name = 'MAX GRENADES'
-            cvar.description.append([
-                'Defines the maximum number of grenades ' +
-                    'that a player can be given during',
-                'one life. (This includes the ' +
-                    'hegrenade the player spawns with)'
-                ])
+            cvar.description.append('Defines the maximum number of grenades ' +
+                'that a player can be given during one life. ' +
+                '(This includes the hegrenade the player spawns with)')
             cvar.options.append(
                 '0 = Unlimited - Always give the player another nade.')
             cvar.options.append(

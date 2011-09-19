@@ -24,9 +24,8 @@ import spe
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.addons import PriorityAddon
 from gungame51.core.players.shortcuts import Player
-from gungame51.scripts.included.gg_warmup_round.gg_warmup_round import \
-    get_warmup_weapon
-from gungame51.scripts.included.gg_nade_bonus.gg_nade_bonus import get_weapon
+from ..gg_warmup_round.gg_warmup_round import get_warmup_weapon
+from ..gg_nade_bonus.gg_nade_bonus import get_weapon
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION

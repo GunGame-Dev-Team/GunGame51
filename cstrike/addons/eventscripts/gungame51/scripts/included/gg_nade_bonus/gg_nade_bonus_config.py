@@ -30,29 +30,19 @@ def load():
         with config.cfg_cvar('gg_nade_bonus') as cvar:
 
             cvar.name = 'GRENADE BONUS'
-            cvar.description.append([
-                'Players on grenade level will ' +
-                    'receive weapons along with',
-                'the hegrenade.',
-                ])
+            cvar.description.append('Players on grenade level ' +
+                'will receive weapons along with the hegrenade.')
             cvar.notes.append('You can have multiple weapons ' +
                 'by separating them with commas.')
-            cvar.notes.append([
-                'If you choose to have multiple ' +
-                    'weapons, you can only have one primary',
-                'weapon, one secondary weapon, and ' +
-                    'one grenade (not an hegrenade).',
-                ])
-            cvar.notes.append([
-                'You can list a weapon order file that ' +
-                    'players will will progress through',
-                'while remaining on hegrenade level.',
-                ])
-            cvar.notes.append([
+            cvar.notes.append('If you choose to have multiple weapons, you ' +
+                'can only have one primary weapon, one secondary ' +
+                'weapon, and one grenade (not an hegrenade).')
+            cvar.notes.append(
+                'You can list a weapon order file that players will ' +
+                'progress through while remaining on hegrenade level.')
+            cvar.notes.append(
                 '/cfg/gungame51/weapon_orders/nade_bonus_order.txt ' +
-                    'has examples and',
-                'more information on this feature.',
-                ])
+                'has examples and more information on this feature.')
             cvar.examples.append('gg_nade_bonus aug')
             cvar.examples.append('gg_nade_bonus glock,aug')
             cvar.examples.append('gg_nade_bonus nade_bonus_order')
@@ -74,11 +64,9 @@ def load():
         with config.cfg_cvar('gg_nade_bonus_mode') as cvar:
 
             cvar.name = 'NADE BONUS MODE'
-            cvar.description.append([
-                'Defines how gg_nade_bonus will function ' +
-                    'when a weapon order is given and,',
-                'the player makes it through the entire order.',
-                ])
+            cvar.description.append('Defines how gg_nade_bonus will ' +
+                'function when a weapon order is given and ' +
+                'the player makes it through the entire order.')
             cvar.notes.append('Not necessary to change unless ' +
                 'you are using a weapon order above.')
             cvar.options.append('0 = (Enabled) Keep ' +
@@ -94,11 +82,9 @@ def load():
         with config.cfg_cvar('gg_nade_bonus_reset') as cvar:
 
             cvar.name = 'NADE BONUS DEATH RESET'
-            cvar.description.append([
-                'When enabled, every time a player ' +
-                    'spawns on nade level they will start',
-                'over on the first weapon in the order.',
-                ])
+            cvar.description.append(
+                'When enabled, every time a player spawns on nade level ' +
+                'they will start over on the first weapon in the order.')
             cvar.notes.append('Not necessary to change ' +
                 'unless you are using a weapon order above.')
             cvar.options.append('0 = (Disabled) Players ' +

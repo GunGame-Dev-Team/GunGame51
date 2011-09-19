@@ -61,13 +61,10 @@ def load():
         with config.cfg_cvar('gg_handicap_no_reconnect') as cvar:
 
             cvar.name = 'HANDICAP NO RECONNECT'
-            cvar.description.append([
-                'gg_handicap will only process a handicap ' +
-                    'level for the first time',
-                'a player joins a team.  This prevents ' +
-                    'players from abusing the',
-                'handicap system. (reconnecting to level up)',
-                ])
+            cvar.description.append(
+                'gg_handicap will only process a handicap level for the ' +
+                'first time a player joins a team.  This prevents players ' +
+                'from abusing the handicap system. (reconnecting to level up)')
             cvar.notes.append('If you are running ' +
                 'handicap update, this setting is pointless.')
             cvar.options.append('0 = (Disabled)')
@@ -80,12 +77,9 @@ def load():
         with config.cfg_cvar('gg_handicap_update') as cvar:
 
             cvar.name = 'HANDICAP UPDATE'
-            cvar.description.append([
-                'A timer (in seconds) that updates ' +
-                    'players with the lowest level to the',
-                'lowest level of the other players. ' +
-                    'Basically "catching them up".',
-                ])
+            cvar.description.append('A timer (in seconds) that updates ' +
+                'players with the lowest level to the lowest level of the ' +
+                'other players. Basically "catching them up".')
             cvar.options.append(
                 '0 = (Disabled) Do not load gg_handicap_update.')
             cvar.options.append('180 = (Enabled) Update the ' +
@@ -98,13 +92,10 @@ def load():
         with config.cfg_cvar('gg_handicap_legacy_mode') as cvar:
 
             cvar.name = 'LEGACY MODE'
-            cvar.description.append([
-                'This enables the old method of ' +
-                    'handicap adjustment, which is',
-                'based on when a player joins the ' +
-                    'server. Instead of the new method,',
-                'which is when the player joins a team for the first time.',
-                ])
+            cvar.description.append('This enables the old method of ' +
+                'handicap adjustment, which is based on when a player ' +
+                'joins the server. Instead of the new method, which is ' +
+                'when the player joins a team for the first time.')
             cvar.options.append('0 = (Disabled)')
             cvar.options.append('1 = (Enabled)')
             cvar.default = 0

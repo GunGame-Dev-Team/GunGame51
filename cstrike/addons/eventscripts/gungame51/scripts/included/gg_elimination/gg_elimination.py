@@ -26,6 +26,7 @@ from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import msg
 from gungame51.core.messaging.shortcuts import saytext2
 #   Players
+from gungame51.core.players.players import UseridError
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import setAttribute
 

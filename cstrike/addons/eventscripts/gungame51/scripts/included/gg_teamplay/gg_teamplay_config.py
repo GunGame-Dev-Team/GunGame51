@@ -85,11 +85,9 @@ def load():
                 'multikill of the last level will win the match')
             cvar.options.append('0 = (Disabled) Only end match ' +
                 'when a team wins the final round')
-            cvar.options.append([
-                '1 = (Enabled) First player to get a ' +
-                    'kill with the last level weapon ',
-                '(if the team is on the last multikill) will win the match',
-                ])
+            cvar.options.append('1 = (Enabled) First player to get a kill ' +
+                'with the last level weapon (if the team is ' +
+                'on the last multikill) will win the match')
             cvar.default = 0
             cvar.text = ('Enables/Disables team winning with ' +
                 'the first kill on the last weapon')

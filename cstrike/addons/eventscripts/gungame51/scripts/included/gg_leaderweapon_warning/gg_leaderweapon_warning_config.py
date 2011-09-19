@@ -30,11 +30,9 @@ def load():
         with config.cfg_cvar('gg_leaderweapon_warning') as cvar:
 
             cvar.name = 'GUNGAME LEADER WEAPON WARNING'
-            cvar.description.append([
-                'Announces via sound at the beginning ' +
-                    'of each round when a player',
-                'has reached either "hegrenade" or "knife" level.'
-                ])
+            cvar.description.append(
+                'Announces via sound at the beginning of each round when ' +
+                'a player has reached either "hegrenade" or "knife" level.')
             cvar.options.append('0 = (Disabled)')
             cvar.options.append('1 = (Enabled)')
             cvar.default = 0

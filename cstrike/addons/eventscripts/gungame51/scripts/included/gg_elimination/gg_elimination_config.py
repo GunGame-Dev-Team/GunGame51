@@ -43,10 +43,8 @@ def load():
         with config.cfg_cvar('gg_elimination_spawn') as cvar:
 
             cvar.name = 'ELIMINATION SPAWN'
-            cvar.description.append([
-                "Allow players to spawn when they join, if they didn't ",
-                'spawn already that round.',
-                ])
+            cvar.description.append('Allow players to spawn when ' +
+                "they join, if they didn't spawn already that round.")
             cvar.options.append('0 = (Disabled) Have ' +
                 'players wait until the round ends to spawn.')
             cvar.options.append(

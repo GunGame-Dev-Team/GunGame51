@@ -62,16 +62,12 @@ def load():
         with config.cfg_cvar('gg_weapon_order_random_excluded') as cvar:
 
             cvar.name = 'RANDOM WEAPON ORDER EXCLUDED FILES'
-            cvar.options.append([
-                '"" = (Disabled) No weapon orders ' +
-                    'are excluding when choosing a random',
-                'weapon order with gg_weapon_order_random enabled above.',
-                ])
-            cvar.options.append([
-                '"name1,name2" = (Enabled) Exclude ' +
-                    'these orders when choosing a random',
-                'weapon order with gg_weapon_order_random enabled above.',
-                ])
+            cvar.options.append('"" = (Disabled) No weapon orders are ' +
+                'excluding when choosing a random weapon order ' +
+                'with gg_weapon_order_random enabled above.')
+            cvar.options.append('"name1,name2" = (Enabled) Exclude these ' +
+                'orders when choosing a random weapon order ' +
+                'with gg_weapon_order_random enabled above.')
             cvar.default = 'weapon_short,nade_bonus_order'
             cvar.text = ('Excluded orders when choosing ' +
                 'a random order with gg_weapon_order_random.')
@@ -84,11 +80,8 @@ def load():
             cvar.options.append('#default  = Order will go Top -> Bottom.')
             cvar.options.append('#reversed = Order will go Bottom -> Top.')
             cvar.options.append('#random   = Order will be randomly shuffled.')
-            cvar.notes.append([
-                '#reversed and #random sort types ' +
-                    'will move hegrenade and knife levels',
-                'to the end of the order.'
-                ])
+            cvar.notes.append('#reversed and #random sort types will move ' +
+                'hegrenade and knife levels to the end of the order.')
             cvar.default = '#default'
             cvar.text = ('The order in which ' +
                 'the weapons and levels will be sorted.')
@@ -98,10 +91,9 @@ def load():
         with config.cfg_cvar('gg_multikill_override') as cvar:
 
             cvar.name = 'MULTIKILL OVERRIDE'
-            cvar.notes.append([
-                'Keep this variable set to 0 unless you want to override the',
-                'values you have set in your weapon order file.',
-                ])
+            cvar.notes.append(
+                'Keep this variable set to 0 unless you want to ' +
+                'override the values you have set in your weapon order file.')
             cvar.notes.append('This will not override ' +
                 'hegrenade and knife, these are always 1.')
             cvar.default = 0
@@ -126,10 +118,8 @@ def load():
             cvar.name = 'DYNAMIC END OF MAP CHAT TIME'
             cvar.notes.append('Dynamic chat time is ' +
                 'based on the end of round winner music.')
-            cvar.notes.append([
-                'When enabled, the players will be able to chat for the',
-                'length of the winner music.',
-                ])
+            cvar.notes.append('When enabled, the players will be able to ' +
+                'chat for the length of the winner music.')
             cvar.notes.append('If disabled, the ' +
                 '"mp_chattime" variable will be used.')
             cvar.options.append("0 = (Disabled) Use " +
@@ -173,13 +163,9 @@ def load():
             cvar.name = 'SOUND PACK'
             cvar.notes.append('Sound packs are located in ' +
                 '"../cstrike/cfg/gungame51/sound_packs".')
-            cvar.notes.append([
-                'The INI file names located in ' +
-                    'the "sound_packs" directory minus',
-                'the ".ini" extension are what you ' +
-                    'would use when declaring the',
-                'default sound pack that players will ' +
-                    'hear when sounds are played.',
-                ])
+            cvar.notes.append('The INI file names located in the ' +
+                '"sound_packs" directory minus the ".ini" extension are ' +
+                'what you would use when declaring the default sound pack ' +
+                'that players will hear when sounds are played.')
             cvar.default = 'default'
             cvar.text = 'Controls which sound pack will be used by default.'

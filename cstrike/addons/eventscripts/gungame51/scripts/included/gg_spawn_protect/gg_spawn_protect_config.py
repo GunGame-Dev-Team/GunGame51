@@ -30,12 +30,9 @@ def load():
         with config.cfg_cvar('gg_spawn_protect') as cvar:
 
             cvar.name = 'SPAWN PROTECTION'
-            cvar.description.append([
-                'The number of seconds to allow spawn ' +
-                    'protection, in which they will be',
-                'immune to other players fire but ' +
-                    'cannot levelup if they kill a player.',
-                ])
+            cvar.description.append('The number of seconds to allow spawn ' +
+                'protection, in which they will be immune to other players ' +
+                'fire but cannot levelup if they kill a player.')
             cvar.options.append('0 = (Disabled) Do not load gg_spawn_protect.')
             cvar.options.append('# = Time (in seconds) ' +
                 'for players to be spawn protected.')
@@ -48,17 +45,12 @@ def load():
             cvar.name = 'SPAWN PROTECTION COLORS'
             cvar.description.append(
                 "The player's color while under spawn protection.")
-            cvar.notes.append([
-                'Colors are set via the RGB (red/green/blue) ' +
-                    'model. For more information',
-                'on how to get the color you want, visit:',
-                '\thttp://www.tayloredmktg.com/rgb/',
-                ])
-            cvar.notes.append([
-                'Alpha is the transparency of the player. ' +
-                    'The lower the number, the more',
-                'transparent the player becomes.',
-                ])
+            cvar.notes.append('Colors are set via the RGB (red/green/blue) ' +
+                'model. For more information on how to get the color you ' +
+                'want, visit:\n\thttp://www.tayloredmktg.com/rgb/')
+            cvar.notes.append(
+                'Alpha is the transparency of the player.  The lower ' +
+                'the number, the more transparent the player becomes.')
             cvar.options.append('0-255')
             cvar.default = 255
             cvar.default_text = [
@@ -98,11 +90,9 @@ def load():
         with config.cfg_cvar('gg_spawn_protect_cancelonfire') as cvar:
 
             cvar.name = 'SPAWN PROTECTION "CANCEL-ON-FIRE"'
-            cvar.description.append([
-                'Cancels the spawn protection timer ' +
-                    'when the player fires their weapon',
-                'and allows the player to level up.',
-                ])
+            cvar.description.append(
+                'Cancels the spawn protection timer when the player ' +
+                'fires their weapon and allows the player to level up.')
             cvar.notes.append(
                 'Uses "eventscripts_noisy", which "may" cause lag.')
             cvar.options.append(

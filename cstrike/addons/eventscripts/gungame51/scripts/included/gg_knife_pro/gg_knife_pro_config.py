@@ -30,16 +30,11 @@ def load():
         with config.cfg_cvar('gg_knife_pro') as cvar:
 
             cvar.name = 'KNIFE PRO'
-            cvar.description.append([
-                'When you kill a player with a ' +
-                    'knife, you will level up,',
-                'and the victim will level down.',
-                ])
-            cvar.description.append([
-                'The attacker will not steal a level ' +
-                    'if they are on hegrenade or knife level,',
-                "or if the victim can't level down.",
-                ])
+            cvar.description.append('When you kill a player with a knife, ' +
+                'you will level up, and the victim will level down.')
+            cvar.description.append(
+                'The attacker will not steal a level if they are on ' +
+                "hegrenade or knife level, or if the victim can't level down.")
             cvar.options.append('0 = (Disabled) Do not load gg_knife_pro.')
             cvar.options.append('1 = (Enabled) Load gg_knife_pro.')
             cvar.default = 0
@@ -51,11 +46,8 @@ def load():
             cvar.name = 'KNIFE PRO LIMIT'
             cvar.description.append('Limits level stealing to ' +
                 'players close to your own level.')
-            cvar.examples.append([
-                'If this is set to 3, you will ' +
-                    'not gain a level if you knife',
-                'someone more than 3 levels below you.',
-                ])
+            cvar.examples.append('If this is set to 3, you will not gain a ' +
+                'level if you knife someone more than 3 levels below you.')
             cvar.options.append(
                 '0 = (Disabled) Do not enable the knife pro limit.')
             cvar.options.append('# = (Enabled) Limit level ' +
@@ -75,11 +67,8 @@ def load():
                 'gg_knife_pro_limit still prevents leveling if enabled.')
             cvar.options.append(
                 '0 = (Disabled) Conform to logical gg_knife_pro ruling')
-            cvar.options.append([
-                '1 = (Enabled) Always affect levels ' +
-                    'with exception to the situations',
-                'in the description above.',
-                ])
+            cvar.options.append('1 = (Enabled) Always affect levels with ' +
+                'exception to the situations in the description above.')
             cvar.default = 0
             cvar.text = 'Enables/Disables always stealing levels.'
 

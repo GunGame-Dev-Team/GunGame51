@@ -77,10 +77,8 @@ def load():
         with config.cfg_cvar('gg_warmup_deathmatch') as cvar:
 
             cvar.name = 'WARMUP ROUND DEATHMATCH MODE'
-            cvar.notes.append([
-                'Please check the gg_deathmatch.cfg for information regarding',
-                'running gg_deathmatch.',
-                ])
+            cvar.notes.append('Please check the gg_deathmatch.cfg ' +
+                'for information regarding running gg_deathmatch.')
             cvar.options.append('0 = Disabled.')
             cvar.options.append('1 = Enabled.')
             cvar.default = 0
@@ -90,12 +88,9 @@ def load():
         with config.cfg_cvar('gg_warmup_elimination') as cvar:
 
             cvar.name = 'WARMUP ROUND ELIMINATION MODE'
-            cvar.notes.append([
-                'Please check the gg_elimination.cfg ' +
-                    'for information regarding what is',
-                'required to be enabled and disabled ' +
-                    'when running gg_elimination.',
-                ])
+            cvar.notes.append('Please check the gg_elimination.cfg for ' +
+                'information regarding what is required to be ' +
+                'enabled and disabled when running gg_elimination.')
             cvar.options.append('0 = Disabled.')
             cvar.options.append('1 = Enabled.')
             cvar.default = 0

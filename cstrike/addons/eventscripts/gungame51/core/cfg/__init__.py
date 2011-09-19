@@ -297,8 +297,7 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if self.cfg_executing and cvar_name in conflicts.keys():
-                if str(self.__cvardefaults__[cvar_name]) == \
-                  str(cvar_value):
+                if str(self.__cvardefaults__[cvar_name]) == str(cvar_value):
                     return
 
             # Load the addon
@@ -314,8 +313,7 @@ class ConfigManager(object):
             # Check to see if the user has tried to disable the addon, or if it
             # was executed by a config
             if self.cfg_executing and cvar_name in dependencies.keys():
-                if str(self.__cvardefaults__[cvar_name]) == \
-                  str(cvar_value):
+                if str(self.__cvardefaults__[cvar_name]) == str(cvar_value):
                     return
 
             # Unload the addon
@@ -357,23 +355,76 @@ class ListManagement(list):
         # Loop through all items in the list
         for section in self:
 
-            # Is the item a string?
-            if isinstance(section, str):
+            for line in self.get_all_lines(section):
 
-                # Add the text to the cfg file
-                self.config.text(self.first + section)
+                self.config.text(line)
 
-            # Is the item a list?
-            elif isinstance(section, list):
+    def get_all_lines(self, section):
+        '''Gets all lines for the given section'''
 
-                # Add the first item to the cfg file
-                self.config.text(self.first + section[0])
+        # Is the line already less than 80 characters?
+        if len(self.first + section) + self.config.indention < 80:
 
-                # Loop through the remaining items in the list
-                for line in section[1:]:
+            # If so, simply return the section
+            return [self.first + section]
 
-                    # Add the text after the indent amount
-                    self.config.text(' ' * self.indent + line)
+        # Create a list to store the sections
+        lines = []
+
+        # Get the first line.  This is done separately since
+        # the indention is different for the remaining lines
+        first_line, remainder = self.get_line(self.first + section)
+
+        # Add the first line to the list
+        lines.append(first_line)
+
+        # Use a "while" statement to get remaining lines under 80 characters
+        while (len(remainder) + self.indent + self.config.indention > 80
+          or '\n' in remainder):
+
+            # Get the current line
+            current_line, remainder = self.get_line(
+                            ' ' * self.indent + remainder)
+
+            # Add the current line to the list
+            lines.append(current_line)
+
+        # Add the last line to the list
+        lines.append(' ' * self.indent + remainder)
+
+        # Return the list of lines
+        return lines
+
+    def get_line(self, message):
+        '''Gets the current line so that it is under 80 characters'''
+
+        # Get the starting point to find the closest <space> to 80 characters
+        start = message[:80 - self.config.indention]
+
+        # Use a "while" statement to find the last <space> before 80 characters
+        while start[~0] != ' ':
+
+            # Move the end of the line 1 character
+            # to the left until a <space> is found
+            start = start[:~0]
+
+        # Is there any remaining text in "start"?
+        if not start.strip(' '):
+
+            # Set start back to the original message
+            start = str(message)
+
+        # Is there a newline character in the start text?
+        if '\n' in start:
+
+            # If so, split the text at the newline character
+            start, remainder = start.split('\n', 1)
+
+            # Return the start and remainder
+            return start.rstrip(), remainder.lstrip(' ')
+
+        # Return the current line and the remainder
+        return start[:~0], message.replace(start, '').lstrip(' ')
 
 
 class ListDescription(ListManagement):
@@ -508,19 +559,20 @@ class ConfigContextManager(object):
             if self.name is None:
 
                 # Raise an error
-                raise NameError
+                raise ValueError('No "name" set for "' + self.cvarname + '"')
 
             # Does the cvar have a default value?
             if self.default is None:
 
                 # Raise an error
-                raise NameError
+                raise ValueError(
+                    'No default value set for "' + self.cvarname + '"')
 
             # Does the cvar have a text value?
             if self.text is None:
 
                 # Raise an error
-                raise NameError
+                raise ValueError('No "text" set for "' + self.cvarname + '"')
 
             # Add the cvar with it's default value to ConfigManager
             ConfigManager().__cvardefaults__[self.cvarname] = self.default
@@ -626,7 +678,8 @@ class ConfigContextManager(object):
         if self.description is None:
 
             # Raise an error
-            raise NameError
+            raise ValueError(
+                'No description set for .cfg file "' + self.filename + '"')
 
         # Create the first line of the header
         self.config.text('*' * 76)
@@ -708,11 +761,11 @@ class ConfigContextManager(object):
                 # Print the instructions
                 section.instructions.print_to_text()
 
-                # Print the notes
-                section.notes.print_to_text()
-
                 # Print any extra text
                 section.extra.print_to_text()
+
+                # Print the notes
+                section.notes.print_to_text()
 
                 # Print the examples
                 section.examples.print_to_text()

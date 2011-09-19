@@ -30,11 +30,8 @@ def load():
         with config.cfg_cvar('gg_welcome_msg') as cvar:
 
             cvar.name = 'GUNGAME WELCOME MESSAGE'
-            cvar.description.append([
-                'A menu displayed to newly connected ' +
-                    'players displaying',
-                'server and addon information',
-                ])
+            cvar.description.append('A menu displayed to newly connected ' +
+                'players displaying server and addon information.')
             cvar.description.append(
                 'Players can type !welcome to bring this menu back up.')
             cvar.notes.append('The configureable message ' +

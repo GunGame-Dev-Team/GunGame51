@@ -46,11 +46,8 @@ def load():
         with config.cfg_cvar('gg_map_vote_command') as cvar:
 
             cvar.name = '3RD PARTY VOTE COMMAND'
-            cvar.description.append([
-                'If gg_map_vote is set to 2, this ' +
-                    'is the command that will be issued',
-                'when the vote is triggered.',
-                ])
+            cvar.description.append('If gg_map_vote is set to 2, this is ' +
+                'the command that will be issued when the vote is triggered.')
             cvar.examples.append('Mani:        gg_map_vote_command ' +
                 '"ma_voterandom end 4"')
             cvar.examples.append('BeetlesMod:  gg_map_vote_command ' +
@@ -64,11 +61,8 @@ def load():
         with config.cfg_cvar('gg_map_vote_size') as cvar:
 
             cvar.name = 'MAP VOTE SIZE'
-            cvar.description.append([
-                'This variable controls the number ' +
-                    'of maps that will be displayed',
-                'as options in the vote menu.',
-                ])
+            cvar.description.append('This variable controls the number of ' +
+                'maps that will be displayed as options in the vote menu.')
             cvar.notes.append('It is recommended not to set this too high.')
             cvar.options.append('0 = (Enabled) Use entire map list.')
             cvar.options.append('# = (Enabled) Use # amount of options.')
@@ -83,11 +77,9 @@ def load():
                 'level the GunGame Vote is fired on.')
             cvar.description.append('The value will be subtracted ' +
                 'from the total number of levels.')
-            cvar.notes.append([
-                'If there are 23 levels, and ' +
-                    '"gg_vote_trigger" is set to "3",',
-                'voting will start on level 20.',
-                ])
+            cvar.notes.append(
+                'If there are 23 levels, and "gg_vote_trigger" ' +
+                'is set to "3", voting will start on level 20.')
             cvar.options.append(
                 '# = (Enabled) # from the last level to start the voting.')
             cvar.default = 4
@@ -111,11 +103,8 @@ def load():
         with config.cfg_cvar('gg_map_vote_dont_show_last_maps') as cvar:
 
             cvar.name = 'EXCLUDE RECENTLY PLAYED MAPS'
-            cvar.description.append([
-                'This variable will exclude the ' +
-                    'selected number of recently',
-                'played maps from the vote menu.',
-                ])
+            cvar.description.append('This variable will exclude the ' +
+                'selected number of recently played maps from the vote menu.')
             cvar.notes.append(
                 'Make sure you have enough maps listed in your source.')
             cvar.options.append('0 = (Disabled) Do not exclude recent maps.')
@@ -191,11 +180,8 @@ def load():
                 'This will only send the vote menu to dead players.')
             cvar.description.append(
                 'Players will receive the menu once they die.')
-            cvar.notes.append([
-                'Players can use the player vote ' +
-                    'command to load the menu if they',
-                'wish to vote while alive.',
-                ])
+            cvar.notes.append('Players can use the player vote command ' +
+                'to load the menu if they wish to vote while alive.')
             cvar.options.append(
                 '0 = (Disabled) Send the vote menu to everyone.')
             cvar.options.append(
@@ -231,16 +217,11 @@ def load():
         with config.cfg_cvar('gg_map_vote_rtv_levels_required') as cvar:
 
             cvar.name = 'ROCK THE VOTE DISABLE LEVEL'
-            cvar.description.append([
-                'The percentage of total number ' +
-                    'of levels which, when the leader reaches',
-                'it, disables RTV for that map.',
-                ])
-            cvar.examples.append([
-                '60 = (If there are 24 total levels, ' +
-                    'when the leader hits level 15',
-                '(we round down), RTV is disabled)',
-                ])
+            cvar.description.append(
+                'The percentage of total number of levels which, when ' +
+                'the leader reaches it, disables RTV for that map.')
+            cvar.examples.append('60 = (If there are 24 total levels, when ' +
+                'the leader hits level 15 (we round down), RTV is disabled)')
             cvar.default = 60
             cvar.text = 'Level percentage when RTV gets disabled.'
 
