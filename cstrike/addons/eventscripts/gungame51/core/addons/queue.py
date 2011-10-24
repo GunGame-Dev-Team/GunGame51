@@ -17,6 +17,7 @@ from gamethread import delayed
 #   Addons
 from conflicts import AddonConflicts
 from conflicts import ConflictError
+from dependency import DependentAddons
 from instance import AddonInstances
 from loaded import LoadedAddons
 from manager import AddonManager
@@ -143,6 +144,12 @@ class AddonQueue(dict):
         # Everything went well if getting to this point
         # Loop through all addons in the load queue
         for addon in self.load:
+
+            # Has the addon been loaded as a dependency?
+            if addon in DependentAddons():
+
+                # If so, do not re-attempt to load the addon
+                continue
 
             # Load the addon
             AddonManager()._load_addon(addon)
