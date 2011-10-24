@@ -51,7 +51,7 @@ class DependentAddons(dict):
         self.recently_added.add(dependee)
 
         # In 1 tick, remove the addon from recently_added
-        delayed(0, self.recently_added.discard, dependee)
+        delayed(0.01, self.recently_added.discard, dependee)
 
         # Return the dependee's instance
         return value

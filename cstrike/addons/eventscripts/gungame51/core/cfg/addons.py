@@ -96,7 +96,7 @@ class AddonCvars(object):
                 DependentAddons()[cvarname]._remain_loaded = False
 
                 # Force the value back to 1
-                es.forceval(cvarname, 1)
+                es.forcevalue(cvarname, 1)
 
                 # Return, since we do not want to unload the dependent addon
                 return

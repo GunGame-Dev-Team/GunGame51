@@ -43,14 +43,14 @@ class AddonManager(object):
         # Loop through all of the addon's dependencies
         for dependee in instance.info.requires:
 
+            # Add the dependency
+            DependentAddons()._add_dependency(dependee, instance.basename)
+
             # Is the dependee in LoadedAddons?
             if not dependee in LoadedAddons():
 
                 # Load the dependee
                 self._load_addon(dependee)
-
-            # Add the dependency
-            DependentAddons()._add_dependency(dependee, instance.basename)
 
         # Loop through all of the addon's conflicts
         for conflict in instance.info.conflicts:
