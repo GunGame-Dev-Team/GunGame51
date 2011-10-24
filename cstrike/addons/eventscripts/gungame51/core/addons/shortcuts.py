@@ -12,6 +12,7 @@ $LastChangedDate$
 # GunGame Imports
 #   Addons
 from info import AddonInfo
+from instance import AddonInstances
 from loaded import LoadedAddons
 from manager import AddonManager
 from valid import ValidAddons
@@ -51,7 +52,7 @@ def get_addon_info(name=None):
     if name:
 
         # Get the addon's instance
-        addon = InstanceDictionary()[str(name).lower()]
+        addon = AddonInstances()[str(name).lower()]
 
         # Return the addon's info
         return addon.info

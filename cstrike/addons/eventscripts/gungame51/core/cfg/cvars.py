@@ -9,6 +9,9 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
+# EventScripts Imports
+import es
+
 # GunGame Imports
 #   Cfg
 from attributes import *

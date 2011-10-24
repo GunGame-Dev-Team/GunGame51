@@ -16,6 +16,7 @@ from gamethread import delayed
 # GunGame Imports
 #   Addons
 from conflicts import AddonConflicts
+from conflicts import ConflictError
 from instance import AddonInstances
 from loaded import LoadedAddons
 from manager import AddonManager
@@ -118,7 +119,9 @@ class AddonQueue(dict):
             if addon in AddonConflicts():
 
                 # If so, raise an error about the conflict
-                raise
+                raise ConflictError('"%s" can not be loaded.' % addon +
+                    '  Sub-addon is listed as a conflict with ' +
+                    '"%s"' % '", "'.join(list(AddonConflicts()[addon])))
 
             # Loop through all conflicts for the current addon
             for conflict in self._current_instances[addon].info.conflicts:
@@ -127,13 +130,15 @@ class AddonQueue(dict):
                 if conflict in LoadedAddons():
 
                     # If so, raise an error
-                    raise
+                    raise ConflictError('Sub-addon "%s" is ' % conflict +
+                        'already loaded and is a conflict with "%s"' % addon)
 
                 # Is the conflict going to be loaded?
                 if conflict in self._current_instances:
 
                     # If so, raise an error
-                    raise
+                    raise ConflictError('Sub-addon "%s" is set ' % conflict +
+                        'to be loaded and is a conflict with "%s"' % addon)
 
         # Everything went well if getting to this point
         # Loop through all addons in the load queue

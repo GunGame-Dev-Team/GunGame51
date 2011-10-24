@@ -14,6 +14,7 @@ $LastChangedDate$
 from info import AddonInfo
 from valid import ValidAddons
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -41,6 +42,7 @@ class AddonInstances(dict):
 
         # Return the instance
         return value
+
 
 class _AddonInstance(object):
     '''Class that stores the instance of an included/custom addon'''

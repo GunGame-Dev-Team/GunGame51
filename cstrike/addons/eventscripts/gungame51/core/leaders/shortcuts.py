@@ -37,7 +37,8 @@ def get_leader_list():
 
 def get_leader_names():
     """Returns the names of the current leader(s)."""
-    return [remove_return_chars(es.getplayername(x)) for x in get_leader_list()]
+    return [
+        remove_return_chars(es.getplayername(x)) for x in get_leader_list()]
 
 
 def get_leader_level():

@@ -38,7 +38,7 @@ class ConfigTypeDictionary(dict):
             return super(ConfigTypeDictionary, self).__getitem__(item)
 
         # Add the item to the dictionary and get a list of cfg files
-        values = self[item] = self.get_configs_by_type(item)
+        values = self[item] = self._get_configs_by_type(item)
 
         # Return the list of cfg files
         return values
@@ -49,7 +49,7 @@ class ConfigTypeDictionary(dict):
         # Return the item
         return self.__getitem__(attr)
 
-    def get_config_list(self, cfg_type=None):
+    def _get_config_list(self, cfg_type=None):
         '''Returns a list of configs for the given type'''
 
         # Was there a given type?
@@ -63,7 +63,7 @@ class ConfigTypeDictionary(dict):
         return [item.namebase for item in self[cfg_type]]
 
     @staticmethod
-    def get_configs_by_type(cfg_type):
+    def _get_configs_by_type(cfg_type):
         '''Returns a set of cfg files by type'''
 
         # Is cfg_type a proper type of cfg?

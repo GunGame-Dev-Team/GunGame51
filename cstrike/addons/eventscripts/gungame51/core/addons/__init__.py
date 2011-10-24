@@ -18,11 +18,6 @@ from manager import AddonManager
 # =============================================================================
 # >> FUNCTIONS
 # =============================================================================
-'''
-This wrapper makes it possible to use key addon functions
-without interacting with the AddonManager directly
-'''
-
 def load(*a, **kw):
     AddonManager()._load_addon(*a, **kw)
 load.__doc__ = AddonManager._load_addon.__doc__

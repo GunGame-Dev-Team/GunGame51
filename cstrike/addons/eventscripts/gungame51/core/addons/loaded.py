@@ -83,7 +83,6 @@ class _LoadedAddonInstance(object):
         # Load the addon
         self._load_addon()
 
-
     def _load_addon(self):
         '''Method that loads the addon'''
 

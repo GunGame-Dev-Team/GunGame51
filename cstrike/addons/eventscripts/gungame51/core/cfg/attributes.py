@@ -6,6 +6,7 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
+
 # =============================================================================
 # >> CLASSES
 # =============================================================================
@@ -41,11 +42,11 @@ class ListManagement(list):
         # Loop through all items in the list
         for section in self:
 
-            for line in self.get_all_lines(section):
+            for line in self._get_all_lines(section):
 
                 self.config.text(line)
 
-    def get_all_lines(self, section):
+    def _get_all_lines(self, section):
         '''Gets all lines for the given section'''
 
         # Is the line already less than 80 characters?
@@ -59,7 +60,7 @@ class ListManagement(list):
 
         # Get the first line.  This is done separately since
         # the indention is different for the remaining lines
-        first_line, remainder = self.get_line(self.first + section)
+        first_line, remainder = self._get_line(self.first + section)
 
         # Add the first line to the list
         lines.append(first_line)
@@ -69,7 +70,7 @@ class ListManagement(list):
           or '\n' in remainder):
 
             # Get the current line
-            current_line, remainder = self.get_line(
+            current_line, remainder = self._get_line(
                             ' ' * self.indent + remainder)
 
             # Add the current line to the list
@@ -81,7 +82,7 @@ class ListManagement(list):
         # Return the list of lines
         return lines
 
-    def get_line(self, message):
+    def _get_line(self, message):
         '''Gets the current line so that it is under 80 characters'''
 
         # Get the starting point to find the closest <space> to 80 characters

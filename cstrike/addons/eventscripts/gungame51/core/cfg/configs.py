@@ -13,6 +13,8 @@ $LastChangedDate$
 from path import path
 
 # EventScripts Imports
+# ES
+import es
 #   Cfglib
 from cfglib import AddonCFG
 
@@ -27,6 +29,7 @@ from manager import ConfigManager
 # =============================================================================
 base_config_path = path(
     path(__file__).parent.rsplit('addons', 1)[0]).joinpath('cfg/gungame51')
+
 
 # =============================================================================
 # >> CLASSES

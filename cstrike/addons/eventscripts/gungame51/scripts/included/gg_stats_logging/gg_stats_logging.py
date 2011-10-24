@@ -95,7 +95,7 @@ class StatsLogging(object):
 
         # Log the event with the necessary information
         es.server.queuecmd('es_xlogq "%s<%s><%s><%s>" triggered "%s"'
-            % (playerName, userid, steamid, teamName, event))
+            % (player_name, userid, steamid, team_name, event))
 
     @staticmethod
     def get_team_name(userid):

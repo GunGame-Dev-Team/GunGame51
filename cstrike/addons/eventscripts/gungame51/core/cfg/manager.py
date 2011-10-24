@@ -181,8 +181,9 @@ class ConfigManager(object):
         if cfg_type == 'main':
 
             # Import the file
-            self._loaded_configs[name] = __import__('gungame51.core.cfg.files.%s'
-                % name, globals(), locals(), [''])
+            self._loaded_configs[name] = __import__(
+                'gungame51.core.cfg.files.%s' % name,
+                globals(), locals(), [''])
 
         # Is the current file an included/custom addon *_config.py file?
         else:
@@ -191,8 +192,9 @@ class ConfigManager(object):
             addon = name.replace('_config', '')
 
             # Import the addon's *_config.py file
-            self._loaded_configs[name] = __import__('gungame51.scripts.%s.%s.%s'
-                % (cfg_type, addon, name), globals(), locals(), [''])
+            self._loaded_configs[name] = __import__(
+                'gungame51.scripts.%s.%s.%s' % (cfg_type, addon, name),
+                globals(), locals(), [''])
 
         # Reload the file to make sure the correct instance is returned
         reload(self._loaded_configs[name])

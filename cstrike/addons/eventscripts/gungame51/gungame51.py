@@ -272,7 +272,8 @@ class EventsManager(object):
 
                 spe.removeEntityByIndex(index)
 
-        # Equip players with a knife and possibly item_kevlar or item_assaultsuit
+        # Equip players with a knife and
+        # possibly item_kevlar or item_assaultsuit
         equip_player()
 
     @staticmethod
@@ -369,7 +370,8 @@ class EventsManager(object):
                 # Is AFK ?
                 if ggVictim.afk():
 
-                    # Is their weapon an hegrenade and do we allow AFK leveling?
+                    # Is their weapon an hegrenade
+                    # and do we allow AFK leveling?
                     if (ggAttacker.weapon == 'hegrenade' and
                       int(gg_allow_afk_levels_nade)):
 
@@ -395,9 +397,9 @@ class EventsManager(object):
                             'PlayerAFK', {'player': event_var['es_username']})
                         return
 
-        # =========================================================================
+        # =====================================================================
         # MULTIKILL CHECK
-        # =========================================================================
+        # =====================================================================
 
         # Get the current level's multikill value
         multiKill = get_level_multikill(ggAttacker.level)
@@ -439,8 +441,8 @@ class EventsManager(object):
         if int(event_var['disconnect']) == 1:
             return
 
-        # If the player joined from a non-active team to an active team, play the
-        # welcome sound
+        # If the player joined from a non-active
+        # team to an active team, play the welcome sound
         if int(event_var['oldteam']) < 2 and int(event_var['team']) > 1:
             Player(int(event_var['userid'])).playsound('welcome')
 

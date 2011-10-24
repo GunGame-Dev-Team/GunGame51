@@ -10,6 +10,13 @@ $LastChangedDate$
 # =============================================================================
 # >> CLASSES
 # =============================================================================
+class ConflictError(Exception):
+    '''
+        Error to be raised when there is a
+        conflicting addon trying to be loaded
+    '''
+
+
 class AddonConflicts(dict):
     '''Class used to store any Conflicting Addons'''
 
