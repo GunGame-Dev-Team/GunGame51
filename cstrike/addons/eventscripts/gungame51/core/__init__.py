@@ -11,7 +11,7 @@ $LastChangedDate$
 # =============================================================================
 # Python Imports
 from __future__ import with_statement
-from os import name as platform
+from os import name as os_name
 from path import path
 
 # Eventscripts Imports
@@ -21,10 +21,11 @@ import es
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-ggVersion = None
+gg_version = None
 _gg_info_quiet = True
 _gg_info = None
-gamePath = path(path(__file__).parent.rsplit('addons', 1)[0][:~0])
+game_path = path(path(
+    __file__).parent.rsplit('addons', 1)[0][:~0].replace('\\', '/'))
 
 
 # =============================================================================
@@ -47,15 +48,15 @@ def get_game_dir(folder=None):
     @return An absolute path to the game directory plus \p dir.'''
     if folder:
         folder = str(folder).replace('\\', '/')
-        return gamePath.joinpath(folder)
-    return gamePath
+        return game_path.joinpath(folder)
+    return game_path
 
 
-def getOS():
-    return platform
+def get_os():
+    return os_name
 
 
-def inMap():
+def in_map():
     '''!Checks to see if the server is currently in a map.
 
     @retval True The server is in a map.
@@ -63,7 +64,7 @@ def inMap():
     return (str(es.ServerVar('eventscripts_currentmap')) != '')
 
 
-def removeReturnChars(text):
+def remove_return_chars(text):
     text = text.replace('\\r', '')
     return text.replace('\\n', '')
 
@@ -121,55 +122,49 @@ def gungame_info(info, _info=None):
     '''
     Fetches the head revision number from all of gungame's files
     '''
-    global ggVersion
+    global gg_version
     global _gg_info_quiet
     global _gg_info
 
     if info == 'version':
+
         # Stop here if we already have done this, and return the version.
-        if ggVersion:
-            return ggVersion
+        if gg_version:
+            return gg_version
 
         # This files revision is our starting point
-        rev = int(__doc__.split('$Rev: ')[1].split()[0])
+        revision = int(__doc__.split('$Rev: ')[1].split()[0])
 
-        # Our generator which walks through the files
-        gen = get_file_list()
+        # Use the generator to walk through the files
+        for file_path in get_game_dir(
+          'addons/eventscripts/gungame51').walkfiles('*.py'):
 
-        # Loop until an exception is raised
-        while True:
-            # See if we can get the next file
-            try:
-                files = gen.next()
-
-            # Exception raised, we are out of files. Return the version.
-            except:
-                ggVersion = '5.1.%s' % rev
-                return ggVersion
-
-            # Folder name
-            base_name = files[0]
-
-            # Don't look for the GG version in custom scripts
-            if 'gungame51/scripts/custom' in base_name:
+            # Do not use custom addons to get the version
+            if 'custom' in file_path.splitall():
                 continue
 
-            # Look through all the files in the folder
-            for fileName in files[1]:
-                # Try to open the file, then grab it's version
-                try:
-                    with open(base_name + "/" + fileName, 'r') as pyfile:
-                        ver = int(pyfile.read().split('$Rev: ')[1].split()[0])
+            # Use "try" in case of an IndexError or ValueError
+            try:
 
-                    # Is this the new high version?
-                    if ver > rev:
-                        rev = ver
+                # Open the current file to get its revision
+                with file_path.open() as pyfile:
 
-                    continue
+                    # Get the current file's revision
+                    version = int(pyfile.read().split('$Rev: ')[1].split()[0])
 
-                # File could not be read for version, continue..
-                except:
-                    continue
+                # Check to see if this file's revision is newer
+                if version > revision:
+
+                    # Set the revision to the current value
+                    revision = version
+
+            except:
+
+                # If an error is encountered, just continue
+                continue
+
+        gg_version = '5.1.%s' % revision
+        return gg_version
 
     '''
     Fetches a list of addons and it's version number in str format for
@@ -181,14 +176,13 @@ def gungame_info(info, _info=None):
             return
 
         # Retrieve the AddonManager
-        from addons import AddonManager
-        AM = AddonManager()
+        from addons.loaded import LoadedAddons
 
         # Format our output
         addonlist = ['\t' * 4 + '%s (v%s)\n' % (
-            AM.get_addon_info()[addon].name,
-            AM.get_addon_info()[addon].version) for addon in
-            AM.get_addon_info().keys() if AM.get_addon_type(addon) == info]
+            LoadedAddons()[addon].info.name,
+            LoadedAddons()[addon].info.version) for addon in
+            LoadedAddons() if LoadedAddons()[addon].addon_type == info]
 
         # If no addons, output is None
         if not addonlist:

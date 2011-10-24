@@ -37,8 +37,8 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 # >> GLOBAL VARIABLES
 # =============================================================================
 # Get the es.ServerVar() instance of "gg_weapon_order_random_excluded"
-gg_weapon_order_random_excluded = \
-                                es.ServerVar("gg_weapon_order_random_excluded")
+gg_weapon_order_random_excluded = (
+    es.ServerVar("gg_weapon_order_random_excluded"))
 
 
 # =============================================================================

@@ -3,7 +3,7 @@
 '''
 $Rev$
 $LastChangedBy$
-$LastChangedBy$
+$LastChangedDate$
 '''
 """
 This module provides a unified logging and debugging interface for gungame51.

@@ -144,8 +144,9 @@ class GravityManager(object):
                     newaval = 0
                     newmval = 2
 
-                if self.gravityList[player]['lastairvalue'] != newaval or \
-                self.gravityList[player]['lastmovementvalue'] != newmval:
+                if (self.gravityList[player]['lastairvalue'] != newaval or
+                  self.gravityList[player]['lastmovementvalue'] != newmval):
+
                     # Player has jumped or come off of a ladder
                     self._resetGravity(player,
                                        self.gravityList[player]['gravity'])
@@ -370,10 +371,8 @@ def do_multi_level(userid):
     getPlayer(userid).speed = int(gg_multi_level_speed) / 100.0
 
     # If gg_multi_level_gravity is enabled, ajust the player's gravity
-    if int(gg_multi_level_gravity) != 100 and \
-    int(gg_multi_level_gravity) >= 0:
-        gravity.addGravityChange(userid,
-                                 int(gg_multi_level_gravity) * 0.01)
+    if int(gg_multi_level_gravity) != 100 and int(gg_multi_level_gravity) >= 0:
+        gravity.addGravityChange(userid, int(gg_multi_level_gravity) * 0.01)
 
     # Append the spark's index to this player's list
     if spark_index:

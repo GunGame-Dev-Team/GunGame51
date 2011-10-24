@@ -110,16 +110,16 @@ def update_winner(columnTuple, valueTuple, name=None, uniqueid=None, wins=None,
 def get_rank(uniqueid):
     ggDB = Database()
     # Get the current number of wins for the uniqueid
-    currentWins = ggDB.select('gg_wins', 'wins', 'where uniqueid = "%s"' % \
-                                                                    uniqueid)
+    currentWins = ggDB.select(
+        'gg_wins', 'wins', 'where uniqueid = "%s"' % uniqueid)
 
     # Return -1 if the player has no wins
     if currentWins == None:
         return -1
 
     # Return the count + 1 of players who have more wins than the uniqueid
-    return ggDB.select("gg_wins", ("COUNT(*)"), "WHERE ABS(wins) > %s" % \
-                                                            currentWins) + 1
+    return ggDB.select(
+        "gg_wins", ("COUNT(*)"), "WHERE ABS(wins) > %s" % currentWins) + 1
 
 
 def get_winner_count():

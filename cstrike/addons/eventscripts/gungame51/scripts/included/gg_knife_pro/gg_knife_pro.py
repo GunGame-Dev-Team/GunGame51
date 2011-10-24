@@ -122,8 +122,8 @@ def player_death(event_var):
             return
 
     # If the level difference is higher than the limit, stop here
-    if (attackerLevel - ggVictim.level) > int(gg_knife_pro_limit) and \
-                                            int(gg_knife_pro_limit) != 0:
+    if ((attackerLevel - ggVictim.level) >
+      int(gg_knife_pro_limit) and int(gg_knife_pro_limit) != 0):
         msg(attacker, 'LevelDifferenceLimit',
             {'limit': int(gg_knife_pro_limit)}, prefix=True)
         return

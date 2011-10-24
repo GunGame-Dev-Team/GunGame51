@@ -14,7 +14,7 @@ from __future__ import with_statement
 from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import ConfigContextManager
+from gungame51.core.cfg.configs import ConfigContextManager
 
 
 # =============================================================================
@@ -123,7 +123,7 @@ def load():
             cvar.notes.append('If disabled, the ' +
                 '"mp_chattime" variable will be used.')
             cvar.options.append("0 = (Disabled) Use " +
-                "the server\'s mp_chattime variable.")
+                "the server's mp_chattime variable.")
             cvar.options.append('1 = (Enabled) Use the ' +
                 'length of the individual audio file.')
             cvar.default = 0

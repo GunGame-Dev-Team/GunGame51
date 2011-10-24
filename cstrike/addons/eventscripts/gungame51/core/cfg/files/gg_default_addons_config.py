@@ -14,7 +14,7 @@ from __future__ import with_statement
 from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import ConfigContextManager
+from gungame51.core.cfg.configs import ConfigContextManager
 
 
 # =============================================================================
@@ -23,7 +23,8 @@ from gungame51.core.cfg import ConfigContextManager
 def load():
 
     # Create the .cfg file
-    with ConfigContextManager(path(__file__).namebase) as config:
+    with ConfigContextManager(
+      path(__file__).namebase.replace('_config', '')) as config:
 
         # Add the config file base attributes
         config.name = 'Default Addon Configuration'

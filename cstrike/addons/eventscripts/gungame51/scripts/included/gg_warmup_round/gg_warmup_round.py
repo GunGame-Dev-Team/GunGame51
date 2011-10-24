@@ -10,7 +10,6 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
-from os import name as platform
 from random import shuffle
 
 # Eventscripts Imports
@@ -395,8 +394,8 @@ def load_warmup_addons():
         # If elimination is not enabled, or deathmatch is enabled due to
         # both dm and elim set to 1 and dm overruling elim, we need to load
         # it now.
-        if (not int(gg_elimination_backup) or (int(gg_deathmatch_backup) \
-            and int(gg_elimination_backup))) and not int(gg_elimination):
+        if (not int(gg_elimination_backup) or (int(gg_deathmatch_backup)
+          and int(gg_elimination_backup))) and not int(gg_elimination):
             gg_elimination.set(1)
             addon_load("gg_elimination")
 

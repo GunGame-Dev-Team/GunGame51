@@ -10,15 +10,12 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
-from os import listdir
-from os import path
 
 # Eventscripts
 import popuplib
 from playerlib import getUseridList
 
 # GunGame Imports
-from gungame51.core import get_file_list
 from gungame51.core import get_game_dir
 
 
@@ -44,22 +41,16 @@ class MenuManager(object):
 
         if name == '#all':
             menu_files = []
-            for file_name in listdir(menu_folder):
+            for file_name in menu_folder.files('*.py'):
 
-                if path.isdir(file_name):
-                    continue
-                file_name = file_name.split('.')
-
-                if file_name[0] == '__init__':
+                if file_name.namebase == '__init__':
                     continue
 
-                if file_name[-1] != 'py':
-                    continue
+                if not file_name.namebase in self.__loaded__.keys():
+                    self.load(file_name.namebase)
 
-                if file_name[0] not in self.__loaded__.keys():
-                    self.load(file_name[0])
+        elif menu_folder.joinpath(name + '.py').isfile():
 
-        elif path.isfile(menu_folder + '/%s.py' % name):
             menuInstance = self.get_menu_by_name(name)
             self.__loaded__[name] = menuInstance
             self.call_block(menuInstance, 'load')
@@ -135,8 +126,8 @@ class OrderedMenu(object):
         self.items = items
         self.options = options
         self.highlightIndex = highlightIndex
-        self.totalPages = (len(items) / options) + (1 if len(items) % options \
-                                                                    > 0 else 0)
+        self.totalPages = (
+            (len(items) / options) + (1 if len(items) % options > 0 else 0))
 
     def send_page(self, page):
         # If a page less than 1 is requested, send page 1

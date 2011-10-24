@@ -14,7 +14,7 @@ from __future__ import with_statement
 from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import ConfigContextManager
+from gungame51.core.cfg.configs import ConfigContextManager
 
 
 # =============================================================================

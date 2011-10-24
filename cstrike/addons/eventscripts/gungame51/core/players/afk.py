@@ -44,9 +44,9 @@ class AFK(object):
         # Get the player's location
         x, y, z = es.getplayerlocation(self.userid)
 
-        return int(x) + int(y) + int(es.getplayerprop(self.userid,
-           'CCSPlayer.m_angEyeAngles[0]')) + \
-            int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[1]'))
+        return (int(x) + int(y) +
+            int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[0]')) +
+            int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[1]')))
 
     def isActive(self):
         '''

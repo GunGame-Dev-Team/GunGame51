@@ -18,7 +18,7 @@ from eventlib.resource import ResourceFile
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-ggResourceFile = ResourceFile('%s/core/events/data/gungame_events.res' % (
+gg_resource_file = ResourceFile('%s/core/events/data/gungame_events.res' % (
                          es.getAddonPath('gungame51')))
 
 
@@ -32,4 +32,4 @@ events = [GG_LevelUp, GG_LevelDown, GG_Knife_Steal, GG_Multi_Level,
           GG_Unload, GG_Addon_Loaded, GG_Addon_Unloaded]
 
 # Write the events to the resource file
-ggResourceFile.write(events, overwrite=True)
+gg_resource_file.write(events, overwrite=True)

@@ -31,78 +31,107 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 
 # =============================================================================
-# >> GLOBAL VARIABLES
+# >> CLASSES
 # =============================================================================
-list_events = []
+class StatsLogging(object):
+    '''Class used to store and log GunGame Events'''
+
+    def __new__(cls):
+        '''Method used to make sure we have a singleton object'''
+
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
+
+    def register_for_events(self):
+        '''Method used to register events to be logged'''
+
+        # Open the file that lists the events to log
+        with get_game_dir('cfg/gungame51/' +
+          'included_addon_configs/gg_stats_logging.txt').open() as f:
+
+            # Store all events listed in the file
+            self.list_events = [
+              x.strip() for x in f.readlines() if not x.startswith('//') and x]
+
+        # Loop through all events to be logged
+        for event in self.list_events:
+
+            # Register the event to be logged
+            es.addons.registerForEvent(self, event, self.log_event)
+
+    def unregister_for_events(self):
+        '''Method used to unregister events that were being logged'''
+
+        # Loop through all events that were being logged
+        for event in self.list_events:
+
+            # Unregister the event
+            es.addons.unregisterForEvent(self, event)
+
+    def log_event(self, event_var):
+        '''Method used to log the given event'''
+
+        # Store the event and userid Event Variables
+        event = event_var['es_event']
+        userid = event_var['userid']
+
+        # Is this an event that needs to log the "attacker" instead?
+        if event in ('gg_levelup', 'gg_knife_steal', 'gg_win'):
+
+            # Store the attacker's userid
+            userid = event_var['attacker']
+
+        # Is the player still on the server?
+        if not es.exists('userid', userid) and userid != 0:
+
+            # If not, return
+            return
+
+        # Get all other information to be logged
+        player_name = es.getplayername(userid)
+        steamid = es.getplayersteamid(userid)
+        team_name = self.get_team_name(userid)
+
+        # Log the event with the necessary information
+        es.server.queuecmd('es_xlogq "%s<%s><%s><%s>" triggered "%s"'
+            % (playerName, userid, steamid, teamName, event))
+
+    @staticmethod
+    def get_team_name(userid):
+        '''Method used to get the name of a player's team'''
+
+        # Get the player's team number
+        team = es.getplayerteam(userid)
+
+        # Is the player on the Terrorist team?
+        if team == 2:
+
+            # Return the string
+            return 'TERRORIST'
+
+        # Is the player on the Counter-Terrorist team?
+        if team == 3:
+
+            # Return the string
+            return 'CT'
+
+        # If not on a team, return UNKNOWN
+        return 'UNKNOWN'
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    global list_events
+    '''Fired when the script is first loaded'''
 
-    this = __import__(__name__)
-
-    # Get the file
-    with open(get_game_dir('cfg/gungame51/included_addon_configs/' + \
-        'gg_stats_logging.txt'), 'r') as f:
-
-        # Create a list of lines in the file
-        list_lines = [x.strip() for x in f.readlines()]
-
-        # Remove commented out and blank lines
-        list_lines = filter(lambda x: not x.startswith('//') and x, list_lines)
-
-        # Loop through all lines in the file
-        for line in list_lines:
-            # Register this addon for the specified event
-            es.addons.registerForEvent(this, line, logEvent)
-
-            # Add the event to the list of events
-            list_events.append(line)
+    # Register the events to be logged
+    StatsLogging().register_for_events()
 
 
 def unload():
-    global list_events
+    '''Fires when the script is unloaded'''
 
-    this = __import__(__name__)
-
-    # Loop through each named event in the list of events
-    for event in list_events:
-        # Unregister for the event
-        es.addons.unregisterForEvent(this, event)
-
-
-# =============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# =============================================================================
-def logEvent(event_var):
-    # Get event info
-    event = event_var['es_event']
-    userid = event_var['userid']
-
-    if event in ('gg_levelup', 'gg_knife_steal', 'gg_win'):
-        userid = event_var['attacker']
-
-    # Make sure the player exists
-    if not es.exists('userid', userid) and userid != 0:
-        return
-
-    # Get player data
-    playerName = es.getplayername(userid)
-    steamid = es.getplayersteamid(userid)
-    teamName = getTeamName(es.getplayerteam(userid))
-
-    # Log it
-    es.server.queuecmd('es_xlogq "%s<%s><%s><%s>" triggered "%s"'
-        % (playerName, userid, steamid, teamName, event))
-
-
-def getTeamName(team):
-    if team == 2:
-        return 'TERRORIST'
-    elif team == 3:
-        return 'CT'
-    else:
-        return 'UNKNOWN'
+    # Unregister the events
+    StatsLogging().unregister_for_events()

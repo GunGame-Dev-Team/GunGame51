@@ -12,8 +12,6 @@ $LastChangedDate$
 # Python Imports
 from __future__ import with_statement
 from time import strftime
-from os import path
-from os import name as OS
 import sys
 import traceback
 import gamethread
@@ -25,6 +23,7 @@ import es
 from gungame51.core import get_game_dir
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core import gungame_info
+from gungame51.core import get_os
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -41,10 +40,12 @@ mani_admin_plugin_version = es.ServerVar('mani_admin_plugin_version')
 est_version = es.ServerVar('est_version')
 
 # Other vars
-file_name = (get_game_dir('cfg/gungame51/logs') +
+file_name = get_game_dir('cfg/gungame51/logs' +
               '/GunGame%s_Log.txt' % gungame_info('version').replace('.', '_'))
 
 file_created = False
+
+OS = get_os()
 
 
 # =============================================================================
@@ -67,8 +68,8 @@ def gungame_except_hook(tb_type, value, trace_back, mute_console=False):
     for i in range(len(tb)):
 
         # Remove long file names ?
-        if tb[i].strip().startswith('File \"'):
-            tb[i] = (tb[i].replace(tb[i][(tb[i].find('File \"') +
+        if tb[i].strip().startswith('File "'):
+            tb[i] = (tb[i].replace(tb[i][(tb[i].find('File "') +
                     6):tb[i].find('eventscripts')], '../')).replace('\\', '/')
     tb[-2] = tb[-2] + '\n'
 
@@ -104,7 +105,8 @@ def gungame_except_hook(tb_type, value, trace_back, mute_console=False):
         return
 
     # Use Log File
-    with open(file_name, 'r+') as log_file:
+    with file_name.open('r+') as log_file:
+
         # Get contents
         log_contents = log_file.read()
 
@@ -176,10 +178,11 @@ def make_log_file():
                '*' + ' ' * 77 + '*\n', '*' * 79 + '\n', '\n', '\n']
 
     # Does the file allready exists ?
-    if path.isfile(file_name):
+    if file_name.isfile():
 
         # Read the file
-        with open(file_name, 'r') as log_file:
+        with file_name.open() as log_file:
+
             readlines = log_file.readlines()
 
         # Does the header match ?
@@ -201,15 +204,15 @@ def make_log_file():
             new_file_name = (get_game_dir('cfg/gungame51/logs') +
                 '/GunGame%s' % gungame_info('version').replace('.', '_') +
                 '_Log_Old[%01i].txt' % n)
-            if not path.isfile(new_file_name):
+            if not new_file_name.isfile():
                 break
 
         # Make new file w/ old errors
-        with open(new_file_name, 'w') as log_file:
+        with new_file_name.open('w') as log_file:
             log_file.writelines(readlines)
 
     # Start new log file
-    with open(file_name, 'w') as log_file:
+    with file_name.open('w') as log_file:
         log_file.writelines(header)
 
     global file_created

@@ -253,13 +253,13 @@ class _BasePlayer(_ExtendedPlayerBase, _PlayerMeta):
     # Player().userid (read-only)
     @property
     def userid(self):
-        """Returns the player\'s userid."""
+        """Returns the player's userid."""
         return self._userid
 
     # Player().steamid (read-only)
     @property
     def steamid(self):
-        """Returns the player\'s UniqueID value from playerlib."""
+        """Returns the player's UniqueID value from playerlib."""
         return self._steamid
 
     # Player().index (read-only)
@@ -280,13 +280,13 @@ class _BasePlayer(_ExtendedPlayerBase, _PlayerMeta):
 
     # Player().team (read and write)
     def _get_team(self):
-        """Returns the player\'s current team."""
+        """Returns the player's current team."""
         return _es.getplayerteam(self.userid)
 
     def _set_team(self, value):
         # Does the player still exist?
         if not _es.exists('userid', self.userid):
-            raise ValueError('userid (%s) doesn\'t exist.' % self.userid)
+            raise ValueError("userid (%s) doesn't exist." % self.userid)
 
         # Check for valid team values
         try:

@@ -12,9 +12,6 @@ $LastChangedDate$
 # Python Imports
 from __future__ import with_statement
 import random
-from os import listdir
-from os.path import splitext
-from os.path import exists
 from operator import itemgetter
 
 # Eventscripts Imports
@@ -85,9 +82,9 @@ player_command_backup = str(gg_map_vote_player_command)
 # Dictionary to store the location of the source of the map files
 dict_mapListSource = {1: get_game_dir('mapcycle.txt'),
                       2: get_game_dir('maplist.txt'),
-                      3: get_game_dir('%s.txt' % str(gg_map_vote_file) if not \
-                                   '.txt' in str(gg_map_vote_file) else \
-                                   str(gg_map_vote_file)),
+                      3: get_game_dir(str(gg_map_vote_file) + '.txt' if not
+                        str(gg_map_vote_file).endswith('.txt')
+                        else str(gg_map_vote_file)),
                       4: get_game_dir('maps')}
 
 # List to store the maps previously voted for "gg_map_vote_dont_show_last_maps"
@@ -398,24 +395,24 @@ def mapFileClean(fromLoad=False):
     # Skip this part on initial load
     if not fromLoad:
         # Current source file
-        current_file = get_game_dir('%s.txt' % str(gg_map_vote_file) if not \
-                    '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
+        current_file = get_game_dir(str(gg_map_vote_file) if not
+            str(gg_map_vote_file).endswith('.txt') else str(gg_map_vote_file))
 
         # Did it change ?
         if dict_mapListSource[3] != current_file:
             dict_mapListSource[3] = current_file
 
     # Look for it in /cstrike
-    if exists(dict_mapListSource[3]):
+    if dict_mapListSource[3].isfile():
         return
 
     # Look for file in other common folders
     for folder in ('cfg/', 'cfg/gungame51/'):
         possible_path = get_game_dir(folder + '%s.txt' % str(gg_map_vote_file)
-             if not '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
+            if not '.txt' in str(gg_map_vote_file) else str(gg_map_vote_file))
 
         # File exists in the other location ?
-        if exists(possible_path):
+        if possible_path.isfile():
             dict_mapListSource[3] = possible_path
             es.dbgmsg(0, '>>>> GunGame has found "%s" ' % gg_map_vote_file +
                     'in (%s) Please change your config file to ' % folder +
@@ -701,14 +698,14 @@ def voteCountDown():
 
 def getMapList(allMaps=False, showLastMaps=False, excludeNominations=False):
     # Check to make sure the value of "gg_map_vote" is 1-4
-    if int(gg_map_vote_list_source) not in range(1, 5):
+    if not int(gg_map_vote_list_source) in dict_mapListSource:
+
         raise ValueError('"gg_map_vote_list_source" must be 1-4: current ' +
             'value "%s"' % gg_map_vote)
 
     # Get the map files to check through later to make sure our capitalization
     # is correct and that all the files exist
-    files = listdir(dict_mapListSource[4])
-    mapFiles = [str(x)[:-4] for x in files if splitext(x)[1] == '.bsp']
+    mapFiles = [x.namebase for x in dict_mapListSource[4].files('*.bsp')]
 
     # Check the maps directory for a list of all maps (option 4)
     if int(gg_map_vote_list_source) == 4:

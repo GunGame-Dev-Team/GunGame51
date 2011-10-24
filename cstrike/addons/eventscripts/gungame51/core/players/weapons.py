@@ -123,12 +123,11 @@ class PlayerWeapons(object):
                     weapToStrip = None
 
                     # Strip secondary weapon ?
-                    if 'weapon_%s' % self.weapon in list_sWeapons and sWeapon:
+                    if 'weapon_' + self.weapon in list_sWeapons and sWeapon:
                         weapToStrip = sWeapon.pop()
 
                     # Strip primary weapon ?
-                    elif 'weapon_%s' % self.weapon in list_pWeapons and \
-                                                                    pWeapon:
+                    elif 'weapon_' + self.weapon in list_pWeapons and pWeapon:
                         weapToStrip = pWeapon.pop()
 
                     if weapToStrip:
@@ -172,8 +171,8 @@ class PlayerWeapons(object):
         weapon = 'weapon_%s' % str(weapon).replace('weapon_', '')
 
         # Check if weapon is valid
-        if weapon not in list_pWeapons + list_sWeapons + \
-        ['weapon_hegrenade', 'weapon_flashbang', 'weapon_smokegrenade']:
+        if weapon not in list_pWeapons + list_sWeapons + [
+          'weapon_hegrenade', 'weapon_flashbang', 'weapon_smokegrenade']:
             raise ValueError('Unable to give "%s": ' % weapon[7:] +
                              'is not a valid weapon')
 
@@ -188,9 +187,9 @@ class PlayerWeapons(object):
 
         # If the player owns the weapon and the player is not being given a
         # second flashbang, stop here
-        if _spe.ownsWeapon(self.userid, weapon) and not (weapon == \
-                    "weapon_flashbang" and _getPlayer(
-                        self.userid).getFB() < 2):
+        if (_spe.ownsWeapon(self.userid, weapon) and not
+          (weapon == "weapon_flashbang" and
+          _getPlayer(self.userid).getFB() < 2)):
             return
 
         # Strip the weapon ?
@@ -266,7 +265,7 @@ class PlayerWeapons(object):
         playerWeapons = _spe.getWeaponDict(self.userid)
 
         # Format the stripWeapons list for all names to start with "weapon_"
-        stripWeapons = [w if w.startswith("weapon_") else \
+        stripWeapons = [w if w.startswith("weapon_") else
             "weapon_%s" % w for w in stripWeapons]
 
         # Insure that the player owns the weapons by using 2 sets intersection

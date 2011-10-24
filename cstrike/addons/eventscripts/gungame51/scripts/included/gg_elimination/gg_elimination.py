@@ -19,7 +19,7 @@ import gamethread
 
 # GunGame Imports
 #    Core
-from gungame51.core import inMap
+from gungame51.core import in_map
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Messaging
@@ -64,7 +64,7 @@ roundInfo = RoundInfo()
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    if inMap():
+    if in_map():
         roundInfo.active = True
 
     # Get userids of all connected players

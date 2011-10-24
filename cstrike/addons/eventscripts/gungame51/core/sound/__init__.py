@@ -10,6 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
+from __future__ import with_statement
 from configobj import ConfigObj
 from path import path
 from random import choice
@@ -21,21 +22,21 @@ from wave import open as wave_open
 import es
 import gamethread
 
+# GunGame Imports
+from gungame51.core import get_game_dir
+from gungame51.core import in_map
+
+
 # =============================================================================
 # >> GLOBALS
 # =============================================================================
-# Get the es.ServerVar() instance of "eventscripts_gamedir"
-eventscripts_gamedir = es.ServerVar('eventscripts_gamedir')
-# Get the es.ServerVar() instance of "eventscripts_currentmap"
-eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 # Get the es.ServerVar() instance of "gg_dynamic_chattime"
 gg_dynamic_chattime = es.ServerVar("gg_dynamic_chattime")
 # Get the es.ServerVar() instance of "mp_chattime"
 mp_chattime = es.ServerVar("mp_chattime")
 
-soundDir = path('%s/sound' % str(eventscripts_gamedir).replace('\\', '/'))
-iniDir = path('%s/cfg/gungame51/sound_packs'
-    % str(eventscripts_gamedir).replace('\\', '/'))
+soundDir = get_game_dir('sound')
+iniDir = get_game_dir('cfg/gungame51/sound_packs')
 
 # winnerSounds stores a shuffled list of winner sounds to come if random winner
 # sounds is enabled
@@ -86,31 +87,28 @@ class SoundPack(object):
         else:
             return None
 
-    def _is_random(self, name):
-        return (name.endswith('.txt'))
-
-    def _random_exists(self, name):
-        return (path.isfile(iniDir.joinpath('random_sound_files/%s' % name)))
-
     def get_random_sound(self, name):
         # Make sure the random sound file exists
         if not self._random_exists(name):
             return None
 
         # Open the random sound file
-        randomFile = open(iniDir.joinpath('random_sound_files/%s' % name))
+        with iniDir.joinpath('random_sound_files', name).open() as randomFile:
 
-        # Select a random sound from the list
-        randomSounds = [x.strip('\\n').strip() for x in randomFile.readlines()]
-
-        # Filter out all commented lines
-        randomSounds = filter(lambda x: not x.startswith('//'), randomSounds)
-
-        # Close the random file
-        randomFile.close()
+            # Select a random sound from the list
+            randomSounds = [x.strip() for x in
+                randomFile.readlines() if not x.startswith('//')]
 
         # Return the randomly selected sound if the list is not empty
         return choice(randomSounds) if randomSounds else None
+
+    @staticmethod
+    def _is_random(name):
+        return name.endswith('.txt')
+
+    @staticmethod
+    def _random_exists(name):
+        return iniDir.joinpath('random_sound_files', name).isfile()
 
 
 def make_downloadable(gg_loading=False):
@@ -119,11 +117,12 @@ def make_downloadable(gg_loading=False):
     global winnerSounds
 
     # Make sure we are in a map
-    if str(eventscripts_currentmap) == '':
+    if not in_map():
         return
 
     # Loop through all files in the sound_pack directory
     for f in iniDir.walkfiles():
+
         # Make sure the extension is ".ini"
         if not f.ext.lower() == '.ini':
             continue
@@ -133,24 +132,23 @@ def make_downloadable(gg_loading=False):
 
         # Loop through all names (keys) in the INI
         for name in config:
+
             # Make sure the name isn't "title"
             if name.lower() == 'title':
                 continue
 
             # Make sure that the sound file exists at the given path
             if sound_exists(config[name]):
+
                 # Make the sound downloadable
                 es.stringtable('downloadables', 'sound/%s' % config[name])
+
             else:
+
                 # See if the file is a random sound text file
-                if not path.isfile(iniDir.joinpath('random_sound_files/%s'
-                    % config[name])):
-
+                if not iniDir.joinpath(
+                  'random_sound_files', config[name]).isfile():
                     continue
-
-                # Open the random sound file
-                randomFile = open(iniDir.joinpath('random_sound_files/%s'
-                    % config[name]))
 
                 # If we are on a random winner sound, and we have more sounds
                 # in the current list of random sounds, choose one and make it
@@ -162,8 +160,8 @@ def make_downloadable(gg_loading=False):
                         winnerSounds.pop(0)
                         # Make the new random winner sound downloadable
                         if sound_exists(winnerSounds[0]):
-                            es.stringtable('downloadables', 'sound/%s' % \
-                                                            winnerSounds[0])
+                            es.stringtable(
+                                'downloadables', 'sound/%s' % winnerSounds[0])
                         # If gg_dynamic_chattime is enabled, set the chattime
                         if int(gg_dynamic_chattime):
                             set_chattime()
@@ -173,8 +171,14 @@ def make_downloadable(gg_loading=False):
                     # clear the list so that we can fill it below
                     winnerSounds = []
 
+                # Open the random sound file
+                with iniDir.joinpath(
+                  'random_sound_files', config[name]).open() as randomFile:
+
+                    randomSounds = randomFile.readlines()
+
                 # Loop through all sounds in the file
-                for sound in randomFile.readlines():
+                for sound in randomSounds:
                     # Remove the line return character and whitespace,
                     sound = sound.strip('\\n').strip()
 
@@ -203,14 +207,11 @@ def make_downloadable(gg_loading=False):
                     shuffle(winnerSounds)
                     # Make the new random winner sound downloadable
                     if sound_exists(winnerSounds[0]):
-                        es.stringtable('downloadables', 'sound/%s' % \
-                                                            winnerSounds[0])
+                        es.stringtable(
+                            'downloadables', 'sound/%s' % winnerSounds[0])
                     # If gg_dynamic_chattime is enabled, set the chattime
                     if int(gg_dynamic_chattime):
                         set_chattime()
-
-                # Close the random sound file
-                randomFile.close()
 
 
 def set_chattime():
@@ -260,4 +261,4 @@ def set_chattime():
 
 
 def sound_exists(sound):
-    return (path.isfile(soundDir.joinpath(sound)))
+    return soundDir.joinpath(sound).isfile()

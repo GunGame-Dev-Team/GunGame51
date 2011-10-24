@@ -14,7 +14,7 @@ from __future__ import with_statement
 from path import path
 
 # GunGame Imports
-from gungame51.core.cfg import ConfigContextManager
+from gungame51.core.cfg.configs import ConfigContextManager
 
 
 # =============================================================================
@@ -37,7 +37,7 @@ def load():
             cvar.notes.append('This does not require any additional plug-ins.')
             cvar.options.append('0 = (Disabled) Do not use voting.')
             cvar.options.append(
-                '1 = (Enabled) Use GunGame\'s map voting system.')
+                "1 = (Enabled) Use GunGame's map voting system.")
             cvar.options.append('2 = (Enabled) Use a 3rd-party voting system.')
             cvar.default = 0
             cvar.text = "Controls GunGame's map voting."
@@ -248,7 +248,7 @@ def load():
             cvar.notes.append('Only takes effect with "gg_map_vote 1" set.')
             cvar.notes.append('Only gg_map_vote_size nominations can be made.')
             cvar.notes.append(
-                'gg_map_vote_dont_show_last_maps can\'t be nominated.')
+                "gg_map_vote_dont_show_last_maps can't be nominated.")
             cvar.options.append('0 = (Disabled)')
             cvar.options.append('1 = (Enabled)')
             cvar.default = 1

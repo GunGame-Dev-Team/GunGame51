@@ -179,12 +179,14 @@ class WeaponOrderTXT(_BaseWeaponOrder):
 
     def _parse(self):
         try:
-            with open(self.filepath, 'r') as weaponOrderFile:
+            with self.filepath.open() as weaponOrderFile:
+
                 # Clean and format the lines
                 lines = [x.strip() for x in weaponOrderFile.readlines()]
                 lines = filter(lambda x: x and (not x.startswith('//')), lines)
                 lines = [x.split('//')[0].lower() for x in lines]
                 lines = [' '.join(x.split()) for x in lines]
+
         except IOError, e:
             raise WeaponOrderError('Cannot parse weapon order file ' +
                 '(%s): IOError: %s' % (self.filepath, e))

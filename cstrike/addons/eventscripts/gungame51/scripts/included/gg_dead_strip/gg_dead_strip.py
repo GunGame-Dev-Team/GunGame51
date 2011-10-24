@@ -142,10 +142,9 @@ def item_pickup(event_var):
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
 def removeIdleLoop():
-    list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
-                    'weapon_%s' % x.strip()) for x in \
-                    str(gg_map_strip_exceptions).split(',') if x.strip() != \
-                    '']
+    list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else
+        'weapon_%s' % x.strip()) for x in
+        str(gg_map_strip_exceptions).split(',') if x.strip() != '']
 
     for weapon in getWeaponList('#all'):
         # Make sure that the admin doesn't want the weapon left on the map
@@ -166,7 +165,7 @@ def removeIdleLoop():
 def set_spawn_flags(userid, weapon, flag):
     # Adjusts the ability for weapons to be picked up
     es.server.queuecmd('es_xfire %s weapon_%s ' % (userid, weapon) +
-        'addoutput \"spawnflags %s\"' % flag)
+        'addoutput "spawnflags %s"' % flag)
 
 
 def remove_weapon(userid, item):

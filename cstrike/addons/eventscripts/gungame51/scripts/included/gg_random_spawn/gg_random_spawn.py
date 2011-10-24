@@ -10,7 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 #Python Imports
-import os
+from __future__ import with_statement
 import random
 
 # SPE Imports
@@ -20,6 +20,7 @@ import spe
 import es
 
 # GunGame Imports
+from gungame51.core import get_game_dir
 from gungame51.core.addons.shortcuts import AddonInfo
 
 # =============================================================================
@@ -37,7 +38,6 @@ info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
 spawnPoints = []
 pointsLoaded = False
-es_gamedir = es.ServerVar('eventscripts_gamedir')
 
 
 # =============================================================================
@@ -95,17 +95,15 @@ def loadSpawnFile(mapName):
     pointsLoaded = False
 
     # Get spawnpoint file
-    spawnFile = (str(es_gamedir).replace('\\', '/') +
-                 '/cfg/gungame51/spawnpoints/%s.txt' % mapName)
+    spawnFile = get_game_dir('cfg/gungame51/spawnpoints/%s.txt' % mapName)
 
     # Does the file exist?
-    if not os.path.isfile(spawnFile):
+    if not spawnFile.isfile():
         return
 
     # Get spawnpoint lines
-    spawnPointFile = open(spawnFile, 'r')
-    fileLines = [x.strip() for x in spawnPointFile.readlines()]
-    spawnPointFile.close()
+    with spawnFile.open() as spawnPointFile:
+        fileLines = [x.strip() for x in spawnPointFile.readlines()]
 
     # Set up spawnpoints
     spawnPoints = [x.split(' ', 6) for x in fileLines]

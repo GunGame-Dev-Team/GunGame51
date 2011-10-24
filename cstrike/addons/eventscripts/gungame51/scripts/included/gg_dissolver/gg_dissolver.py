@@ -54,10 +54,10 @@ def setupDissolver():
     userid = es.getuserid()
 
     #Give the dissolver entity and set some keyvalues
-    cmd = 'es_xgive %s env_entity_dissolver;' % userid + \
-          'es_xfire %s env_entity_dissolver ' % userid + \
-          'AddOutput "target cs_ragdoll";' + \
-          'es_xfire %s env_entity_dissolver AddOutput "magnitude 1"' % userid
+    cmd = ('es_xgive %s env_entity_dissolver;' % userid +
+          'es_xfire %s env_entity_dissolver ' % userid +
+          'AddOutput "target cs_ragdoll";' +
+          'es_xfire %s env_entity_dissolver AddOutput "magnitude 1"' % userid)
 
     # Run the command
     es.server.queuecmd(cmd)
@@ -75,11 +75,13 @@ def dissolveRagdoll(userid):
 
     # Check to see what effect to use and set up the command
     if effect == 6:
-        cmd = 'es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' \
-            % (userid, random.randint(0, 3))
+        cmd = (
+            'es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' %
+            (userid, random.randint(0, 3)))
     else:
-        cmd = 'es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' \
-            % (userid, int(effect) - 2)
+        cmd = (
+            'es_xfire %s env_entity_dissolver AddOutput "dissolvetype %s"' %
+            (userid, int(effect) - 2))
 
     # Run the command
     es.server.queuecmd(cmd)

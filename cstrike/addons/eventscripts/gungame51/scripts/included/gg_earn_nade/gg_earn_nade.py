@@ -29,6 +29,10 @@ from gungame51.core.weapons.shortcuts import get_level_weapon
 # and store the userid who just got on hegrenade to check on in player_death
 recentlyOnHegrenade = []
 
+gg_multi_nade_max_nades = es.ServerVar('gg_multi_nade_max_nades')
+gg_multi_nade = es.ServerVar('gg_multi_nade')
+
+
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
 # =============================================================================
@@ -120,14 +124,13 @@ def give_nade(userid):
         es.server.queuecmd('es_xgive %s weapon_hegrenade' % userid)
 
     # If the player had a grenade, and gg_multi_nade is enabled
-    elif int(es.ServerVar("gg_multi_nade")):
+    elif int(gg_multi_nade):
         ggPlayer = Player(userid)
 
         # If the player has already used up their multi-nades, subtract two
         # from the number of detonations because gg_earn_nade gave them a
         # grenade to detonate which gg_multi_nade didn't account for
-        if int(ggPlayer.grenades_detonated) == \
-                                int(es.ServerVar("gg_multi_nade_max_nades")):
+        if int(ggPlayer.grenades_detonated) == int(gg_multi_nade_max_nades):
             ggPlayer.grenades_detonated -= 2
 
         # If the player has yet to use up their multi-nades, subtract one

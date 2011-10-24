@@ -54,7 +54,7 @@ info.name = 'gg_teamplay'
 info.title = 'GG Teamplay'
 info.author = 'GG Dev Team'
 info.version = '5.1.%s' % '$Rev$'.split('$Rev: ')[1].split()[0]
-info.conflicts = ['gg_deathmatch', 'gg_ffa', 'gg_handicap', 'gg_teamwork']
+info.conflicts = ['gg_deathmatch', 'gg_handicap', 'gg_teamwork']
 info.translations = ['gg_teamplay']
 
 

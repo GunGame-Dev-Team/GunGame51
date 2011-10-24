@@ -14,7 +14,8 @@ import sys
 
 # EventScripts Imports
 import es
-import gamethread
+from gamethread import delayed
+from gamethread import cancelDelayed
 from playerlib import getPlayer
 from playerlib import getUseridList
 from weaponlib import getWeaponList
@@ -42,18 +43,19 @@ es.dbgmsg(0, langstring("Load_Start",
         {'version': gungame_info('version')}))
 
 #    Config Function Imports
-from core.cfg.shortcuts import ConfigManager
+from core.cfg.manager import ConfigManager
 
 #    Weapon Function Imports
 from core.weapons.shortcuts import get_level_multikill
+from core.weapons.shortcuts import get_weapon_order
 
 #    Error Logging Function Imports
 from core.logs import make_log_file
 
 #    Addon Function Imports
-from core.addons import AddonManager
-from core.addons import PriorityAddon
-#from core.addons import gungame_info
+from core.addons.manager import AddonManager
+from core.addons.events import EventRegistry
+from core.addons.priority import PriorityAddon
 
 #    Player Function Imports
 from core.players.players import _PlayerContainer
@@ -65,7 +67,7 @@ from core.players.shortcuts import setAttribute
 from core.leaders.shortcuts import LeaderManager
 
 #   Event Function Imports
-from core.events import ggResourceFile
+from core.events import gg_resource_file
 from core.events import GG_Load
 from core.events import GG_Unload
 from core.events import GG_Start
@@ -156,6 +158,376 @@ info.Website = ('\n' + '\t' * 4 + 'http://forums.gungame.net/\n')
 
 
 # =============================================================================
+# >> CLASSES
+# =============================================================================
+class EventsManager(object):
+    '''
+        Class used to register events so that
+        they are called prior to any sub-addons
+
+        When adding any new events:
+
+            Simply use the event's name as the method name
+            Use @staticmethod if no class attributes/methods are needed
+            Always have the event_var argument
+
+        When adding any "helper" methods:
+
+            The method should "always" start with an underscore: "_"
+    '''
+
+    def __new__(cls):
+        '''Method used to ensure the class is a singleton'''
+
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
+
+    def _load_events(self):
+        '''Registers all events'''
+
+        # Loop through all methods of the class
+        for event in dir(self):
+
+            # Is the method supposed to be registered for an event?
+            if not event.startswith('_'):
+
+                # Register the method for the event
+                EventRegistry().register_for_event(
+                    event, self.__getattribute__(event))
+
+    def _unload_events(self):
+        '''Unregisters all events'''
+
+        # Loop through all methods of the class
+        for event in dir(self):
+
+            # Unregister the method for the event
+            if not event.startswith('_'):
+                EventRegistry().unregister_for_event(
+                    event, self.__getattribute__(event))
+
+    @staticmethod
+    def es_map_start(event_var):
+        '''Method to be ran on es_map_start event'''
+
+        # Make the sounds downloadable
+        make_downloadable()
+
+        # Load custom GunGame events
+        gg_resource_file.load()
+
+        # Execute GunGame's server.cfg file
+        es.delayed(1, 'exec gungame51/gg_server.cfg')
+
+        # Reset all players
+        resetPlayers()
+
+        # Reset current leaders
+        LeaderManager().reset()
+
+        # Prune the Database
+        prune_winners_db()
+
+        # Loop through all human players
+        for userid in getUseridList('#human'):
+
+            # Update players in winner's database
+            Player(userid).database_update()
+
+        # Is the weapon order sort type set to #random?
+        if str(gg_weapon_order_sort_type) == '#random':
+
+            # Re-randomize the weapon order
+            get_weapon_order().randomize()
+
+        # Check to see if gg_start needs fired after everything is loaded
+        delayed(2, check_priority)
+
+    @staticmethod
+    def round_start(event_var):
+        '''Called at the start of every round'''
+
+        # Retrieve a random userid
+        userid = es.getuserid()
+
+        # Disable Buyzones
+        es.server.queuecmd('es_xfire %s func_buyzone Disable' % userid)
+
+        # Remove weapons from the map
+        list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else
+            'weapon_%s' % x.strip()) for x in str(
+            gg_map_strip_exceptions).split(',') if x.strip() != '']
+
+        for weapon in getWeaponList('#all'):
+            # Make sure that the admin doesn't want the weapon left on the map
+            if weapon in list_noStrip:
+                continue
+
+            # Remove all weapons of this type from the map
+            for index in weapon.indexlist:
+                # If the weapon has an owner, stop here
+                if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') != -1:
+                    continue
+
+                spe.removeEntityByIndex(index)
+
+        # Equip players with a knife and possibly item_kevlar or item_assaultsuit
+        equip_player()
+
+    @staticmethod
+    def player_spawn(event_var):
+        '''Called any time a player spawns'''
+
+        # Check for priority addons
+        if PriorityAddon():
+            return
+
+        userid = int(event_var['userid'])
+
+        # Is a spectator?
+        if int(event_var['es_userteam']) < 2:
+            return
+
+        # Is player dead?
+        if getPlayer(userid).isdead:
+            return
+
+        ggPlayer = Player(userid)
+
+        # Do we need to give the player a defuser?
+        if int(gg_player_defuser):
+
+            # Is the player a CT?
+            if int(event_var['es_userteam']) == 3:
+
+                # Are we removing bomb objectives from map?
+                if not int(gg_map_obj) in (1, 2):
+
+                    # Does the map have a bombsite?
+                    if len(es.getEntityIndexes('func_bomb_target')):
+
+                        # Does the player already have a defuser?
+                        if not getPlayer(userid).defuser:
+
+                            # Give the player a defuser:
+                            getPlayer(userid).defuser = 1
+
+        # Strip bots (sometimes they keep previous weapons)
+        if es.isbot(userid):
+            delayed(0.25, give_weapon_check, (userid))
+            delayed(0.35, ggPlayer.strip)
+
+        # Player is human
+        else:
+            # Reset AFK
+            delayed(0.60, ggPlayer.afk.reset)
+
+            # Give the player their weapon
+            delayed(0.05, give_weapon_check, (userid))
+
+    @staticmethod
+    def player_death(event_var):
+        '''Called every time a player dies'''
+
+        # Check for priority addons
+        if PriorityAddon():
+            return
+
+        # Set player ids
+        userid = int(event_var['userid'])
+        attacker = int(event_var['attacker'])
+
+        # Is the attacker on the server?
+        if not es.exists('userid', attacker):
+            return
+
+        # Suicide check
+        if (attacker == 0 or attacker == userid):
+            return
+
+        # TEAM-KILL CHECK
+        if (event_var['es_userteam'] == event_var['es_attackerteam']):
+            return
+
+        # Get victim object
+        ggVictim = Player(userid)
+
+        # Get attacker object
+        ggAttacker = Player(attacker)
+
+        # Check the weapon was correct (Normal Kill)
+        if event_var['weapon'] != ggAttacker.weapon:
+            return
+
+        # Don't continue if the victim is AFK
+        if not int(gg_allow_afk_levels):
+
+            # Make sure the victim is not a bot
+            if not es.isbot(userid):
+
+                # Is AFK ?
+                if ggVictim.afk():
+
+                    # Is their weapon an hegrenade and do we allow AFK leveling?
+                    if (ggAttacker.weapon == 'hegrenade' and
+                      int(gg_allow_afk_levels_nade)):
+
+                        # Pass if we are allowing AFK leveling on nade level
+                        pass
+
+                    # Is their weapon a knife and do we allow AFK leveling?
+                    elif (ggAttacker.weapon == 'knife' and
+                      int(gg_allow_afk_levels_knife)):
+
+                        # Pass if we are allowing AFK leveling on knife level
+                        pass
+
+                    # None of the above checks apply --- continue with hudhint
+                    else:
+
+                        # Make sure the attacker is not a bot
+                        if es.isbot(attacker):
+                            return
+
+                        # Tell the attacker they victim was AFK
+                        ggAttacker.hudhint(
+                            'PlayerAFK', {'player': event_var['es_username']})
+                        return
+
+        # =========================================================================
+        # MULTIKILL CHECK
+        # =========================================================================
+
+        # Get the current level's multikill value
+        multiKill = get_level_multikill(ggAttacker.level)
+
+        # If set to 1, level the player up
+        if multiKill == 1:
+            # Level them up
+            ggAttacker.levelup(1, userid, 'kill')
+
+            return
+
+        # Multikill value is > 1 ... add 1 to the multikill attribute
+        ggAttacker.multikill += 1
+
+        # Finished the multikill
+        if ggAttacker.multikill >= multiKill:
+
+            # Level them up
+            ggAttacker.levelup(1, userid, 'kill')
+
+        # Increment their current multikill value
+        else:
+
+            # Play the multikill sound
+            ggAttacker.playsound('multikill')
+
+    @staticmethod
+    def player_disconnect(event_var):
+        '''Called any time a player disconnects from the server'''
+
+        # Check to see if player was the leader
+        LeaderManager()._disconnected_leader(int(event_var['userid']))
+
+    @staticmethod
+    def player_team(event_var):
+        '''Called any time a player changes teams'''
+
+        # If it was a disconnect, stop here
+        if int(event_var['disconnect']) == 1:
+            return
+
+        # If the player joined from a non-active team to an active team, play the
+        # welcome sound
+        if int(event_var['oldteam']) < 2 and int(event_var['team']) > 1:
+            Player(int(event_var['userid'])).playsound('welcome')
+
+    @staticmethod
+    def gg_win(event_var):
+        '''Called when a player wins the GunGame round'''
+
+        # Get player info
+        userid = int(event_var['winner'])
+        if not es.isbot(userid):
+            Player(userid).wins += 1
+
+        es.server.queuecmd("es_xgive %s game_end" % userid)
+        es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
+
+        # Play the winner sound
+        for userid in getUseridList('#human'):
+            Player(userid).playsound('winner')
+
+        # Update DB
+        delayed(1.5, Database().commit)
+
+    @staticmethod
+    def gg_addon_loaded(event_var):
+        '''Called when a sub-addon is loaded'''
+
+        es.dbgmsg(0, langstring('Addon_Loaded',
+            {'addon': event_var['addon'], 'type': event_var['type']}))
+
+    @staticmethod
+    def gg_addon_unloaded(event_var):
+        '''Called when a sub-addon is unloaded'''
+
+        es.dbgmsg(0, langstring('Addon_UnLoaded',
+            {'addon': event_var['addon'], 'type': event_var['type']}))
+
+    @staticmethod
+    def server_cvar(event_var):
+        '''Called when a cvar is set to any value'''
+
+        cvarName = event_var['cvarname']
+        cvarValue = event_var['cvarvalue']
+
+        if cvarValue == '0':
+            return
+
+        if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
+            # For weapon order file and sort type,
+            # reset player's levels and multikills to 1
+            # and call gg_start again
+            if cvarName != "gg_multikill_override":
+                resetPlayers()
+                check_priority()
+
+    @staticmethod
+    def player_changename(event_var):
+        '''Called when a player changes their name while on the server'''
+
+        # Update the player's name in the winners database if they are in it
+        if Player(int(event_var['userid'])).wins:
+            update_winner('name', event_var['newname'],
+                uniqueid=event_var['es_steamid'])
+
+    @staticmethod
+    def player_activate(event_var):
+        '''Called when a player is activated on the current map'''
+
+        # Update the player in the database
+        userid = int(event_var['userid'])
+        Player(userid).database_update()
+
+        if event_var['es_steamid'] in (
+          'STEAM_0:1:5021657', 'STEAM_0:1:5244720',
+          'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):
+            msg('#human', 'GGThanks', {'name': event_var['es_username']})
+
+        # Is player returning and in the lead?
+        LeaderManager().check(Player(userid))
+
+        # Hopefully temporary code to allow es_fire commands
+        # All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
+        disable_auto_kick(userid)
+
+EventsManager()._load_events()
+
+
+# =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
@@ -209,6 +581,8 @@ def unload():
     es.ServerVar('eventscripts_gg5').removeFlag('notify')
     es.ServerVar('eventscripts_gg5').removeFlag('replicated')
 
+    EventsManager()._unload_events()
+
     from core.addons import dependencies
     # Create a copy of the dependencies dictionary
     dict_dependencies = dependencies.copy()
@@ -217,8 +591,8 @@ def unload():
     MenuManager().unload('#all')
 
     # Loop through addons that have required dependencies
-    for addon in list(set(map((lambda (x, y): y), [(x, y) for x in \
-        dict_dependencies for y in dict_dependencies[x]]))):
+    for addon in list(set(map((lambda (x, y): y), [(x, y) for x in
+      dict_dependencies for y in dict_dependencies[x]]))):
 
         # If an addon we just unloaded unloaded this addon, skip it
         if not addon in AddonManager().__loaded__:
@@ -259,10 +633,10 @@ def unload():
 
 def initialize():
     # Load custom events
-    ggResourceFile.declare_and_load()
+    gg_resource_file.declare_and_load()
 
     # Pause a moment for the configs to be loaded (OB engine requires this)
-    gamethread.delayed(0.1, completeInitialize)
+    delayed(0.1, completeInitialize)
 
 
 def completeInitialize():
@@ -292,7 +666,7 @@ def finishInitialize():
     gungame_info('addoninfo', info)
 
     # Load error logging
-    gamethread.delayed(3.50, make_log_file)
+    delayed(3.50, make_log_file)
 
     # Load menus
     es.dbgmsg(0, langstring("Load_Commands"))
@@ -311,7 +685,7 @@ def finishInitialize():
     gg_weapon_order_file.set(gg_weapon_order_file_backup)
 
     # See if we need to fire event gg_start after everything is loaded
-    gamethread.delayed(2, first_gg_start)
+    delayed(2, first_gg_start)
 
 
 def unload_on_error():
@@ -319,51 +693,13 @@ def unload_on_error():
     es.excepter(*sys.exc_info())
     es.dbgmsg(0, '[GunGame51] %s' % ('=' * 79))
     for delayname in ('gg_mp_restartgame',):
-        gamethread.cancelDelayed(delayname)
+        cancelDelayed(delayname)
     es.unload('gungame51')
 
 
 # =============================================================================
-# >> GAME EVENTS
+# >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
-def es_map_start(event_var):
-    # Set firstPlayerSpawned to False, so player_spawn will know when the first
-    # spawn is
-    """
-    global firstPlayerSpawned
-    firstPlayerSpawned = False
-    """
-
-    # Make the sounds downloadable
-    make_downloadable()
-
-    # Load custom GunGame events
-    ggResourceFile.load()
-
-    # Execute GunGame's autoexec.cfg
-    es.delayed('1', 'exec gungame51/gg_server.cfg')
-
-    # Reset the GunGame players
-    resetPlayers()
-
-    # Reset the GunGame leaders
-    LeaderManager().reset()
-
-    # Prune the DB
-    prune_winners_db()
-
-    # Update players in winner's database
-    for userid in getUseridList('#human'):
-        Player(userid).database_update()
-
-    # If gg_weapon_order_sort_type is #random, re-randomize it
-    if str(gg_weapon_order_sort_type) == "#random":
-        get_weapon_order().randomize()
-
-    # See if we need to fire event gg_start after everything is loaded
-    gamethread.delayed(2, check_priority)
-
-
 def first_gg_start():
     global firstGGStart
     firstGGStart = True
@@ -377,280 +713,6 @@ def check_priority():
             GG_Start().fire()
 
 
-def round_start(event_var):
-    # Retrieve a random userid
-    userid = es.getuserid()
-
-    # Disable Buyzones
-    es.server.queuecmd('es_xfire %s func_buyzone Disable' % userid)
-
-    # Remove weapons from the map
-    list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else \
-                    'weapon_%s' % x.strip()) for x in \
-                    str(gg_map_strip_exceptions).split(',') if x.strip() != \
-                    '']
-
-    for weapon in getWeaponList('#all'):
-        # Make sure that the admin doesn't want the weapon left on the map
-        if weapon in list_noStrip:
-            continue
-
-        # Remove all weapons of this type from the map
-        for index in weapon.indexlist:
-            # If the weapon has an owner, stop here
-            if es.getindexprop(index, 'CBaseEntity.m_hOwnerEntity') != -1:
-                continue
-
-            spe.removeEntityByIndex(index)
-
-    # Equip players with a knife and possibly item_kevlar or item_assaultsuit
-    equip_player()
-
-
-def player_spawn(event_var):
-    """
-    # This should not matter any longer if my theory is correct:
-    # When _PlayerContainer().reset() is called, old userids are removed.
-    global firstPlayerSpawned
-
-    if not firstPlayerSpawned:
-        # Replace this with whatever _PlayerContainer() uses to remove
-        # non-existant players
-        _PlayerContainer().remove_old()
-
-        # The first player has spawned
-        firstPlayerSpawned = True
-
-    """
-    # Check for priority addons
-    if PriorityAddon():
-        return
-
-    userid = int(event_var['userid'])
-
-    # Is a spectator?
-    if int(event_var['es_userteam']) < 2:
-        return
-
-    # Is player dead?
-    if getPlayer(userid).isdead:
-        return
-
-    ggPlayer = Player(userid)
-
-    # Do we need to give the player a defuser?
-    if int(gg_player_defuser):
-
-        # Is the player a CT?
-        if int(event_var['es_userteam']) == 3:
-
-            # Are we removing bomb objectives from map?
-            if not int(gg_map_obj) in (1, 2):
-
-                # Does the map have a bombsite?
-                if len(es.getEntityIndexes('func_bomb_target')):
-
-                    # Does the player already have a defuser?
-                    if not getPlayer(userid).defuser:
-
-                        # Give the player a defuser:
-                        getPlayer(userid).defuser = 1
-
-    # Strip bots (sometimes they keep previous weapons)
-    if es.isbot(userid):
-        gamethread.delayed(0.25, give_weapon_check, (userid))
-        gamethread.delayed(0.35, ggPlayer.strip)
-
-    # Player is human
-    else:
-        # Reset AFK
-        gamethread.delayed(0.60, ggPlayer.afk.reset)
-
-        # Give the player their weapon
-        gamethread.delayed(0.05, give_weapon_check, (userid))
-
-
-def player_death(event_var):
-    # Check for priority addons
-    if PriorityAddon():
-        return
-
-    # Set player ids
-    userid = int(event_var['userid'])
-    attacker = int(event_var['attacker'])
-
-    # Is the attacker on the server?
-    if not es.exists('userid', attacker):
-        return
-
-    # Suicide check
-    if (attacker == 0 or attacker == userid):
-        return
-
-    # TEAM-KILL CHECK
-    if (event_var['es_userteam'] == event_var['es_attackerteam']):
-        return
-
-    # Get victim object
-    ggVictim = Player(userid)
-
-    # Get attacker object
-    ggAttacker = Player(attacker)
-
-    # Check the weapon was correct (Normal Kill)
-    if event_var['weapon'] != ggAttacker.weapon:
-        return
-
-    # Don't continue if the victim is AFK
-    if not int(gg_allow_afk_levels):
-
-        # Make sure the victim is not a bot
-        if not es.isbot(userid):
-
-            # Is AFK ?
-            if ggVictim.afk():
-
-                # Is their weapon an hegrenade and do we allow AFK leveling?
-                if ggAttacker.weapon == 'hegrenade' and \
-                    int(gg_allow_afk_levels_nade):
-
-                        # Pass if we are allowing AFK leveling on nade level
-                        pass
-
-                # Is their weapon a knife and do we allow AFK leveling?
-                elif ggAttacker.weapon == 'knife' and \
-                    int(gg_allow_afk_levels_knife):
-                        # Pass if we are allowing AFK leveling on knife level
-                        pass
-
-                # None of the above checks apply --- continue with hudhint
-                else:
-                    # Make sure the attacker is not a bot
-                    if es.isbot(attacker):
-                        return
-
-                    # Tell the attacker they victim was AFK
-                    ggAttacker.hudhint('PlayerAFK', {'player':
-                                                     event_var['es_username']})
-                    return
-
-    # =========================================================================
-    # MULTIKILL CHECK
-    # =========================================================================
-
-    # Get the current level's multikill value
-    multiKill = get_level_multikill(ggAttacker.level)
-
-    # If set to 1, level the player up
-    if multiKill == 1:
-        # Level them up
-        ggAttacker.levelup(1, userid, 'kill')
-
-        return
-
-    # Multikill value is > 1 ... add 1 to the multikill attribute
-    ggAttacker.multikill += 1
-
-    # Finished the multikill
-    if ggAttacker.multikill >= multiKill:
-        # Level them up
-        ggAttacker.levelup(1, userid, 'kill')
-
-    # Increment their current multikill value
-    else:
-
-        # Play the multikill sound
-        ggAttacker.playsound('multikill')
-
-
-def player_disconnect(event_var):
-    userid = int(event_var['userid'])
-
-    # Check to see if player was the leader
-    LeaderManager()._disconnected_leader(userid)
-
-
-def player_team(event_var):
-    # If it was a disconnect, stop here
-    if int(event_var['disconnect']) == 1:
-        return
-
-    # If the player joined from a non-active team to an active team, play the
-    # welcome sound
-    if int(event_var['oldteam']) < 2 and int(event_var['team']) > 1:
-        Player(int(event_var['userid'])).playsound('welcome')
-
-
-def gg_win(event_var):
-    # Get player info
-    userid = int(event_var['winner'])
-    if not es.isbot(userid):
-        Player(userid).wins += 1
-
-    es.server.queuecmd("es_xgive %s game_end" % userid)
-    es.server.queuecmd("es_xfire %s game_end EndGame" % userid)
-
-    # Play the winner sound
-    for userid in getUseridList('#human'):
-        Player(userid).playsound('winner')
-
-    # Update DB
-    gamethread.delayed(1.5, Database().commit)
-
-
-def gg_addon_loaded(event_var):
-    es.dbgmsg(0, langstring('Addon_Loaded',
-        {'addon': event_var['addon'], 'type': event_var['type']}))
-
-
-def gg_addon_unloaded(event_var):
-    es.dbgmsg(0, langstring('Addon_UnLoaded',
-        {'addon': event_var['addon'], 'type': event_var['type']}))
-
-
-def server_cvar(event_var):
-    cvarName = event_var['cvarname']
-    cvarValue = event_var['cvarvalue']
-
-    if cvarValue == '0':
-        return
-
-    if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
-        # For weapon order file and sort type,
-        # reset player's levels and multikills to 1
-        # and call gg_start again
-        if cvarName != "gg_multikill_override":
-            resetPlayers()
-            check_priority()
-
-
-def player_changename(event_var):
-    # Update the player's name in the winners database if they are in it
-    if Player(int(event_var['userid'])).wins:
-        update_winner('name', event_var['newname'],
-            uniqueid=event_var['es_steamid'])
-
-
-def player_activate(event_var):
-    # Update the player in the database
-    userid = int(event_var['userid'])
-    Player(userid).database_update()
-
-    if event_var['es_steamid'] in ('STEAM_0:1:5021657', 'STEAM_0:1:5244720',
-      'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):
-        msg('#human', 'GGThanks', {'name': event_var['es_username']})
-
-    # Is player returning and in the lead?
-    LeaderManager().check(Player(userid))
-
-    # Hopefully temporary code to allow es_fire commands
-    # All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
-    disable_auto_kick(userid)
-
-
-# =============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# =============================================================================
 def thanks(userid, args):
     msg(userid, 'CheckConsole')
     es.cexec(userid, 'echo [GG Thanks] ')
@@ -669,23 +731,22 @@ def thanks(userid, args):
 
 def equip_player():
     userid = es.getuserid()
-    cmd = 'es_xremove game_player_equip;' + \
-          'es_xgive %s game_player_equip;' % userid + \
-          'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' % userid
+    cmd = ('es_xremove game_player_equip;' +
+          'es_xgive %s game_player_equip;' % userid +
+          'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' % userid)
 
     # Retrieve the armor type
     armorType = int(gg_player_armor)
 
     # Give the player full armor
     if armorType == 2:
-        cmd = cmd + \
-            'es_xfire %s game_player_equip AddOutput "item_assaultsuit 1";' \
-                % userid
+        cmd = (cmd + 'es_xfire ' +
+            '%s game_player_equip AddOutput "item_assaultsuit 1";' % userid)
 
     # Give the player kevlar only
     elif armorType == 1:
-        cmd = cmd + \
-            'es_xfire %s game_player_equip AddOutput "item_kevlar 1";' % userid
+        cmd = (cmd + 'es_xfire ' +
+            '%s game_player_equip AddOutput "item_kevlar 1";' % userid)
 
     es.server.queuecmd(cmd)
 

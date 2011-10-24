@@ -10,6 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
+from __future__ import with_statement
 import time
 
 # Eventscripts Imports
@@ -20,6 +21,7 @@ import popuplib
 
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core import get_game_dir
 from gungame51.core import gungame_info
 from gungame51.core.addons.shortcuts import get_loaded_addon_list
 
@@ -100,10 +102,9 @@ def player_team(event_var):
 # =============================================================================
 def buildPopups():
     # Get the custom text for the popup
-    customFile = open(es.ServerVar('eventscripts_gamedir') + '/cfg/gungame51' +
-        '/included_addon_configs/gg_welcome_msg.txt', 'r')
-    customText = customFile.readlines()
-    customFile.close()
+    with get_game_dir('cfg/gungame51/' +
+      'included_addon_configs/gg_welcome_msg.txt').open() as customFile:
+        customText = customFile.readlines()
 
     # Remove unnecessary characters
     customText = [x.strip() for x in customText]

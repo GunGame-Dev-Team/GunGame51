@@ -92,13 +92,13 @@ class AddonStrings(object):
             return get_game_dir("addons/eventscripts/gungame51/gungame.ini")
 
         # The INI must be either included or custom at this point
-        from gungame51.core.addons import AddonManager
+        from gungame51.core.addons.valid import ValidAddons
 
         # Get the addon type
-        addon_type = AddonManager().get_addon_type(addon)
+        addon_type = ValidAddons().get_addon_type(addon)
 
         # Return the path to the addon INI
-        return get_game_dir("addons/eventscripts/gungame51/scripts/" + \
+        return get_game_dir("addons/eventscripts/gungame51/scripts/" +
             "%s/%s/%s.ini" % (addon_type, addon, addon))
 
 

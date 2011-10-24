@@ -10,9 +10,11 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # GunGame Imports
-from gungame51.core.addons import AddonInfo
-from gungame51.core.addons import AddonManager
-from gungame51.core.addons import PriorityAddon
+#   Addons
+from info import AddonInfo
+from loaded import LoadedAddons
+from manager import AddonManager
+from valid import ValidAddons
 
 
 # =============================================================================
@@ -44,11 +46,21 @@ def get_addon_info(name=None):
         # Set the title of this addon in one line using the dictionary method
         getAddon('example_addon')['title'] = 'Example Addon'
     '''
-    # Standardize the addon name to be a lower-case string
-    if name:
-        name = str(name).lower()
 
-    return AddonManager().get_addon_info(name)
+    # Was a specific addon wanted?
+    if name:
+
+        # Get the addon's instance
+        addon = InstanceDictionary()[str(name).lower()]
+
+        # Return the addon's info
+        return addon.info
+
+    # Get a list of all loaded addons
+    addons = list(LoadedAddons())
+
+    # Return a dictionary of loaded addons and their info
+    return dict(zip((addon, LoadedAddons()[addon].info) for addon in addons))
 
 
 def get_addon_type(name):
@@ -57,7 +69,9 @@ def get_addon_type(name):
         "custom"
         "included"
     '''
-    return AddonManager.get_addon_type(name)
+
+    # Return the type of addon
+    return ValidAddons().get_addon_type(str(name).lower())
 
 
 def addon_exists(name):
@@ -79,13 +93,23 @@ def addon_exists(name):
     USAGE:
         from core.addons.shortcuts import addon_exists
     '''
-    return AddonManager.addon_exists(name)
+
+    # Is the given name a valid addon
+    return str(name).lower() in ValidAddons().all
 
 
-def get_loaded_addon_list(type=None):
-    addons = AddonManager().get_addon_info().keys()
+def get_loaded_addon_list(addon_type=None):
+    '''Returns a list of loaded addons for the given type'''
 
-    if type in ['custom', 'included']:
-        return [x for x in addons if get_addon_type(x) == type]
+    # Get all addons
+    addons = LoadedAddons()
 
-    return addons
+    # Was a specific type needed?
+    if addon_type in ('custom', 'included'):
+
+        # Return a list of loaded addons for the given type
+        return [addon for addon in addons
+            if addons[addon].addon_type == addon_type]
+
+    # Return a list of all loaded addons
+    return list(addons)

@@ -83,9 +83,9 @@ class GG_New_Leader(ESEvent):
                         'became the new leader')
     leveler = ShortField(min_value=2, comment='The userid of the player that' +
                          ' leveled up to become the new leader')
-    leaders = StringField(comment='String of current leaders\' userids ' +
+    leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
-    leader_level = ByteField(comment='The current leader\'s level')
+    leader_level = ByteField(comment="The current leader's level")
 
 
 class GG_Tied_Leader(ESEvent):
@@ -94,9 +94,9 @@ class GG_Tied_Leader(ESEvent):
                         'tied the leader(s)')
     leveler = ShortField(min_value=2, comment='The userid of the player that' +
                          ' leveled up to tie the leader(s)')
-    leaders = StringField(comment='String of current leaders\' userids ' +
+    leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
-    leader_level = ByteField(comment='The current leader\'s level')
+    leader_level = ByteField(comment="The current leader's level")
 
 
 class GG_Leader_LostLevel(ESEvent):
@@ -105,18 +105,18 @@ class GG_Leader_LostLevel(ESEvent):
                         'lost a level')
     leveler = ShortField(min_value=2, comment='The userid of the player that' +
                          ' is leveling')
-    leaders = StringField(comment='String of current leaders\' userids ' +
+    leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
-    leader_level = ByteField(comment='The current leader\'s level')
+    leader_level = ByteField(comment="The current leader's level")
 
 
 class GG_Leader_Disconnect(ESEvent):
     """Fires when a leader disconnects"""
     userid = ShortField(min_value=2, comment='The userid of the leader that ' +
                         'disconnected')
-    leaders = StringField(comment='String of current leaders\' userids ' +
+    leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
-    leader_level = ByteField(comment='The current leader\'s level')
+    leader_level = ByteField(comment="The current leader's level")
 
 
 class GG_Start(ESEvent):

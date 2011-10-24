@@ -10,7 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
-from os import path
+from __future__ import with_statement
 
 # Eventscripts Imports
 import es
@@ -21,6 +21,7 @@ from playerlib import getPlayer
 # GunGame Imports
 from gungame51.core.addons.shortcuts import AddonInfo
 from gungame51.core.messaging.shortcuts import langstring
+from gungame51.core import get_game_dir
 
 
 # =============================================================================
@@ -37,11 +38,12 @@ info.translations = ["gg_spawnpoints"]
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-filePath = None
 # Used to store prop information for spawn_show
 propIndexes = {}
 # The model used for spawn_show
 propModel = "player/ct_gign.mdl"
+
+current_map = es.ServerVar('eventscripts_currentmap')
 
 
 # =============================================================================
@@ -92,8 +94,8 @@ def get_map_file():
     Stores the spawnpoint file for the current map in filePath
     '''
     global filePath
-    filePath = es.ServerVar("eventscripts_gamedir") + "/cfg/gungame51/" + \
-    "spawnpoints/" + str(es.ServerVar("eventscripts_currentmap")) + ".txt"
+    filePath = get_game_dir(
+        'cfg/gungame51/spawnpoints/' + str(current_map) + '.txt')
 
 
 def invalid_syntax(syntax):
@@ -122,8 +124,7 @@ def cmd_spawn_add(args):
     location = es.getplayerlocation(userid)
     angle = pPlayer.get("viewangle")
 
-    spawnPoint = "%s %s %s %s %s %s\n" % (location[0], location[1], \
-    location[2], angle[0], angle[1], angle[2])
+    spawnPoint = "%s %s %s %s %s %s\n" % (location + angle)
     currentSpawnPoints = read_spawn_points()
 
     # If the spawnpoint already exists, stop here
@@ -136,8 +137,8 @@ def cmd_spawn_add(args):
     currentSpawnPoints.append(spawnPoint)
 
     write_spawn_points(currentSpawnPoints)
-    es.dbgmsg(0, langstring("AddedSpawnpoint", {"point": \
-                                                    spawnPoint.strip("\n")}))
+    es.dbgmsg(
+        0, langstring("AddedSpawnpoint", {"point": spawnPoint.strip("\n")}))
 
     # If spawnpoints are currently being shown, toggle spawn_show off and on to
     # update the spawnpoints shown
@@ -205,8 +206,8 @@ def cmd_spawn_remove(args):
     spawnPoint = currentSpawnPoints.pop(index)
 
     write_spawn_points(currentSpawnPoints)
-    es.dbgmsg(0, langstring("RemovedSpawnpoint", {"point": \
-                                                    spawnPoint.strip("\n")}))
+    es.dbgmsg(
+        0, langstring("RemovedSpawnpoint", {"point": spawnPoint.strip("\n")}))
 
     # If spawnpoints are currently being shown, toggle spawn_show off and on to
     # update the spawnpoints shown
@@ -227,8 +228,7 @@ def cmd_spawn_remove_all(args):
 
 
 def cmd_spawn_print(args):
-    es.dbgmsg(0, langstring("SpawnpointsFor", {"map": \
-                                str(es.ServerVar("eventscripts_currentmap"))}))
+    es.dbgmsg(0, langstring("SpawnpointsFor", {"map": str(current_map)}))
 
     # Loop through all spawnpoints
     index = 0
@@ -303,17 +303,17 @@ def cmd_spawn_show(args=None):
 
 
 def read_spawn_points():
-    if not path.isfile(filePath):
+    if filePath.isfile():
         return []
 
-    spawnPointFile = open(filePath, "r")
-    spawnPoints = spawnPointFile.readlines()
-    spawnPointFile.close()
+    with filePath.open() as spawnPointFile:
+
+        spawnPoints = spawnPointFile.readlines()
 
     return spawnPoints
 
 
 def write_spawn_points(spawnpoints):
-    spawnPointFile = open(filePath, "w")
-    spawnPointFile.writelines(spawnpoints)
-    spawnPointFile.close()
+    with filePath.open('w') as spawnPointFile:
+
+        spawnPointFile.writelines(spawnpoints)
