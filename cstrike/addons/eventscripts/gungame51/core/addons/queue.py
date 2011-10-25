@@ -170,7 +170,11 @@ class AddonQueue(dict):
             # Has the addon been loaded as a dependency?
             if addon in DependentAddons():
 
-                # If so, do not re-attempt to load the addon
+                # Make sure the addon is set to remain
+                # loaded when no more dependers exist
+                DependentAddons()[addon]._remain_loaded = True
+
+                # Do not re-attempt to load the addon
                 continue
 
             # Load the addon

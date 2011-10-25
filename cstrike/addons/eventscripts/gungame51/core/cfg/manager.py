@@ -169,7 +169,7 @@ class ConfigManager(object):
                 es.forcevalue(cvar, 0)
 
                 # Set the value back to the current setting
-                es.server.queuecmd('%s %s' % (cvar, value))
+                es.set(cvar, value)
 
     def _import_config(self, name, cfg_type):
         '''Imports a *_config.py and returns its instance'''
