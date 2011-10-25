@@ -10,6 +10,8 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # EventScripts Imports
+#   ES
+import es
 #   Gamethread
 from gamethread import delayed
 
@@ -113,33 +115,53 @@ class AddonQueue(dict):
             # Add the addons instance to the dictionary
             self._add_addon_instance(addon)
 
-        # Loop through all addon instances
-        for addon in self._current_instances:
+        # Added using a try/except to reset all cvars back to 0
+        try:
 
-            # Is the addon listed as a conflict?
-            if addon in AddonConflicts():
+            # Loop through all addon instances
+            for addon in self._current_instances:
 
-                # If so, raise an error about the conflict
-                raise ConflictError('"%s" can not be loaded.' % addon +
-                    '  Sub-addon is listed as a conflict with ' +
-                    '"%s"' % '", "'.join(list(AddonConflicts()[addon])))
+                # Is the addon listed as a conflict?
+                if addon in AddonConflicts():
 
-            # Loop through all conflicts for the current addon
-            for conflict in self._current_instances[addon].info.conflicts:
+                    # If so, raise an error about the conflict
+                    raise ConflictError('"%s" can not be loaded.' % addon +
+                        '  Sub-addon is listed as a conflict with ' +
+                        '"%s"' % '", "'.join(list(AddonConflicts()[addon])))
 
-                # Is the conflict already loaded?
-                if conflict in LoadedAddons():
+                # Loop through all conflicts for the current addon
+                for conflict in self._current_instances[addon].info.conflicts:
 
-                    # If so, raise an error
-                    raise ConflictError('Sub-addon "%s" is ' % conflict +
-                        'already loaded and is a conflict with "%s"' % addon)
+                    # Is the conflict already loaded?
+                    if conflict in LoadedAddons():
 
-                # Is the conflict going to be loaded?
-                if conflict in self._current_instances:
+                        # If so, raise an error
+                        raise ConflictError(
+                            'Sub-addon "%s" is already ' % conflict +
+                            'loaded and is a conflict with "%s"' % addon)
 
-                    # If so, raise an error
-                    raise ConflictError('Sub-addon "%s" is set ' % conflict +
-                        'to be loaded and is a conflict with "%s"' % addon)
+                    # Is the conflict going to be loaded?
+                    if conflict in self._current_instances:
+
+                        # If so, raise an error
+                        raise ConflictError(
+                            'Sub-addon "%s" is set to be ' % conflict +
+                            'loaded and is a conflict with "%s"' % addon)
+
+        # Did an exception occur?
+        except:
+
+            # Loop through all addons in the queue
+            for addon in self.load:
+
+                # Force the cvar back to 0
+                es.forcevalue(addon, 0)
+
+            # Clear the dictionary
+            self.clear()
+
+            # Finish by raising the error
+            raise
 
         # Everything went well if getting to this point
         # Loop through all addons in the load queue

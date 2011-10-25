@@ -16,7 +16,7 @@ from weaponlib import getWeaponList
 from gungame51.core.weapons import WeaponOrderManager
 from gungame51.core.weapons import weaponOrderStorage
 
-import es
+
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
