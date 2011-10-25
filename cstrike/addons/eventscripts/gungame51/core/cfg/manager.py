@@ -138,35 +138,38 @@ class ConfigManager(object):
     def _execute_cfg_files(self):
         '''Executes all .cfg files on load'''
 
+        # Loop through all config files
+        for cfg in self._config_files.values():
+
+            # Execute the configs
+            es.mexec('gungame51' + cfg.cfgpath.rsplit('gungame51', 1)[1])
+
+        # Delay 1 tick to allow all cfg files to be executed
+        delayed(0, self._reload_addons)
+
+    def _reload_addons(self):
+        '''Reloads addons on GunGame load'''
+
         # Allow server_cvar to be called
         self._files_have_been_executed = True
 
         # Get a list of all valid addons
         valid_addons = ValidAddons().all
 
-        # Loop through all stored cfg files
-        for cfg in self._config_files.values():
+        # Loop through all valid addons
+        for cvar in valid_addons:
 
-            # Execute the cfg file
-            es.mexec('gungame51' + cfg.cfgpath.rsplit('gungame51', 1)[1] + '"')
+            # Get the current value
+            value = str(es.ServerVar(cvar))
 
-            # Loop through all cvar's for the cfg file
-            for cvar, value, description in cfg.getCvars().values():
+            # Does the cvar need reloaded?
+            if value != '0':
 
-                # Is the cvar the base cvar for an included/custom addon?
-                if cvar in valid_addons:
+                # Force the value back to 0 without calling server_cvar
+                es.forcevalue(cvar, 0)
 
-                    # Get the current value
-                    value = str(es.ServerVar(cvar))
-
-                    # Does the cvar need reloaded?
-                    if value != '0':
-
-                        # Set the value to 0 without calling server_cvar
-                        es.forcevalue(cvar, 0)
-
-                        # Set the value back to the current setting
-                        es.server.queuecmd('%s %s' % (cvar, value))
+                # Set the value back to the current setting
+                es.server.queuecmd('%s %s' % (cvar, value))
 
     def _import_config(self, name, cfg_type):
         '''Imports a *_config.py and returns its instance'''
