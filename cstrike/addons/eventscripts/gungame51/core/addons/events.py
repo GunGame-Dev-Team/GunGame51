@@ -69,19 +69,6 @@ class EventRegistry(dict):
                 del self[event]
 
 
-class _CallBacks(object):
-    '''Class that holds callbacks and their addon'''
-
-    def __init__(self, callback):
-        '''Called when the class is initialized'''
-
-        # Store the callback
-        self.callback = callback
-
-        # Get the addon the callback is from
-        self.addon = self.callback.__module__.rsplit('.')[~0]
-
-
 class _EventManager(object):
     '''Class that registers an event and stores callbacks for the event'''
 
@@ -101,21 +88,21 @@ class _EventManager(object):
         '''Overrides the append method to make
             sure each callback is only added once'''
 
-        # Get the _CallBacks instance
-        callback = _CallBacks(callback)
+        # Get the callback instance
+        callback = self._get_callback(callback)
 
         # Is the callback already in the list?
         if not callback in self.callbacks:
 
-            # Append the _CallBacks instance for the given callback
+            # Append the callback instance for the given callback
             self.callbacks.append(callback)
 
     def remove(self, callback):
         '''Overrides the remove method to make sure the
             callback is in the list before removing'''
 
-        # Get the _CallBacks instance
-        callback = _CallBacks(callback)
+        # Get the callback instance
+        callback = self._get_callback(callback)
 
         # Is the callback in the list?
         if callback in self.callbacks:
@@ -133,7 +120,7 @@ class _EventManager(object):
             if PriorityAddon():
 
                 # Is the callback in a Priority Addon?
-                if not callback.addon in PriorityAddon():
+                if not callback['addon'] in PriorityAddon():
 
                     # Is the event supposed to fire anyway?
                     if not self.event in _priority_events:
@@ -142,10 +129,15 @@ class _EventManager(object):
                         continue
 
             # Call the callback with the SourceEventVariable argument
-            callback.callback(event_var)
+            callback['callback'](event_var)
 
     def _unregister(self):
         '''Unregisters the event'''
 
         # Unregister the event
         es.addons.unregisterForEvent(self, self.event)
+
+    @staticmethod
+    def _get_callback(callback):
+        return {'callback': callback,
+            'addon': callback.__module__.rsplit('.')[~0]}

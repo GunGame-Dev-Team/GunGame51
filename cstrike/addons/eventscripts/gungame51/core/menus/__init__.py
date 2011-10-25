@@ -10,13 +10,22 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
+from path import path
 
-# Eventscripts
-import popuplib
+# Eventscripts Imports
+import es
+from popuplib import Popup_popup
 from playerlib import getUseridList
 
 # GunGame Imports
-from gungame51.core import get_game_dir
+#   Messaging
+from gungame51.core.messaging.shortcuts import langstring
+
+
+# =============================================================================
+# >> GLOBAL VARIABLES
+# =============================================================================
+menu_folder = path(__file__).parent
 
 
 # =============================================================================
@@ -33,43 +42,31 @@ class MenuManager(object):
 
         return cls._gg_menus
 
-    def load(self, name):
+    def load_menus(self):
+        es.dbgmsg(0, langstring('Load_Commands'))
+        for file_path in menu_folder.files('*_menu.py'):
+            self._load(file_path)
+
+    def _load(self, file_path):
+        name = file_path.namebase
         if name in self.__loaded__:
             raise NameError('GunGame menu "%s" is already loaded' % name)
 
-        menu_folder = get_game_dir('addons/eventscripts/gungame51/core/menus')
-
-        if name == '#all':
-            menu_files = []
-            for file_name in menu_folder.files('*.py'):
-
-                if file_name.namebase == '__init__':
-                    continue
-
-                if not file_name.namebase in self.__loaded__.keys():
-                    self.load(file_name.namebase)
-
-        elif menu_folder.joinpath(name + '.py').isfile():
-
-            menuInstance = self.get_menu_by_name(name)
-            self.__loaded__[name] = menuInstance
-            self.call_block(menuInstance, 'load')
-
-        else:
+        if not file_path.isfile():
             raise NameError('"%s" is not a valid menu name.' % name)
 
-    def unload(self, name):
-        if name == '#all':
-            for menu_name in self.__loaded__.keys():
-                self.unload(menu_name)
+        menuInstance = self.get_menu_by_name(name)
+        self.__loaded__[name] = menuInstance
+        self.call_block(menuInstance, 'load')
 
-        elif name not in self.__loaded__:
-            raise NameError('GunGame menu "%s" is not loaded' % name)
+    def unload_menus(self):
+        for name in self.__loaded__.keys():
+            self._unload(name)
 
-        else:
-            menu_instance = self.get_menu_by_name(name)
-            self.call_block(menu_instance, 'unload')
-            del self.__loaded__[name]
+    def _unload(self, name):
+        menu_instance = self.get_menu_by_name(name)
+        self.call_block(menu_instance, 'unload')
+        del self.__loaded__[name]
 
     def send(self, name, filter_type):
         if name not in self.__loaded__:
@@ -139,7 +136,7 @@ class OrderedMenu(object):
             page = self.totalPages
 
         # Create a popup
-        popup = popuplib.Popup_popup("OrderedMenu_p%s" % page)
+        popup = Popup_popup("OrderedMenu_p%s" % page)
         # Get the index of the first item on the current page
         startIndex = (page - 1) * self.options
         # Add the title

@@ -13,10 +13,10 @@ $LastChangedDate$
 from weaponlib import getWeaponList
 
 # GunGame Imports
-from gungame51.core.weapons import weaponOrderManager
+from gungame51.core.weapons import WeaponOrderManager
 from gungame51.core.weapons import weaponOrderStorage
 
-
+import es
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
@@ -28,7 +28,7 @@ def get_weapon_order(name=None):
     if name:
         return weaponOrderStorage[name]
 
-    return weaponOrderManager.active
+    return WeaponOrderManager().active
 
 
 def set_weapon_order(name):
@@ -46,8 +46,8 @@ def set_weapon_order(name):
         # Use the default weapon order
         set_weapon_order('default_weapon_order')
     """
-    weaponOrderManager.activate(name)
-    weaponOrderManager.active._set_active_order_type()
+    WeaponOrderManager().activate(name)
+    WeaponOrderManager().active._set_active_order_type()
     return get_weapon_order()
 
 

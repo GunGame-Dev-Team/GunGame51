@@ -19,14 +19,24 @@ from manager import ConfigManager
 # =============================================================================
 # >> FUNCTIONS
 # =============================================================================
+def load_configs():
+    '''Loads all configs and registers the server_cvar event'''
+
+    # Load all configs
+    ConfigManager()._load_configs()
+
+    # Register the server_cvar event
+    AddonCvars()._register_cvar_event()
+
+
 def unload_configs():
     '''Unloads and cleans up the configuration structure'''
 
-    # Unload configuration files
-    ConfigManager()._unload_configs()
-
     # Unregister the server cvar hooking
     AddonCvars()._unregister_cvar_event()
+
+    # Unload configuration files
+    ConfigManager()._unload_configs()
 
 
 def generate_header(config):
@@ -63,9 +73,3 @@ def generate_header(config):
     config.text('*' * 76)
     config.text('')
     config.text('')
-
-# Load all configs
-ConfigManager()._load_configs()
-
-# Register the server_cvar event
-AddonCvars()._register_cvar_event()

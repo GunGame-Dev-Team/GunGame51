@@ -314,9 +314,12 @@ class _WeaponOrderEntry(object):
         return self._weapon
 
 
-class _WeaponOrderManager(object):
-    def __init__(self):
-        self._active = None
+class WeaponOrderManager(object):
+    def __new__(cls):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+            cls._the_instance._active = None
+        return cls._the_instance
 
     @property
     def active(self):
@@ -344,8 +347,10 @@ class _WeaponOrderManager(object):
         # Restart the game
         self.restart_game()
 
-    @classmethod
     def load_orders(self):
+        es.dbgmsg(0, langstring("Load_WeaponOrders"))
+        # Register for the server_cvar event
+        es.addons.registerForEvent(self, 'server_cvar', self.server_cvar)
         for orderPath in weaponOrderFilesTXT:  # + weaponOrderFilesINI
             weaponOrderStorage.add(orderPath)
 
@@ -393,9 +398,6 @@ class _WeaponOrderManager(object):
         es.ServerCommand('mp_restartgame 2')
 
 
-weaponOrderManager = _WeaponOrderManager()
-
-
 # =============================================================================
 # >> FUNCTIONS
 # =============================================================================
@@ -412,14 +414,3 @@ def refresh_weapon_order_files():
     global weaponOrderFilesTXT  # , weaponOrderFilesINI
     weaponOrderFilesTXT = weaponOrdersPath.files("*.txt")
     #weaponOrderFilesINI = weaponOrdersPath.files("*.ini")
-
-# =============================================================================
-# INITIALIZATION
-# =============================================================================
-# Load the weapon orders
-es.dbgmsg(0, langstring("Load_WeaponOrders"))
-weaponOrderManager.load_orders()
-
-# Register for the server_cvar event
-es.addons.registerForEvent(__import__(__name__), 'server_cvar',
-                           weaponOrderManager.server_cvar)

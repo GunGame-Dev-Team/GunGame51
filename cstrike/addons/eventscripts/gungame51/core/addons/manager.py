@@ -106,6 +106,21 @@ class AddonManager(object):
             # If not, update GunGame info
             gungame_info('update')
 
+    def unload_all_addons(self):
+        '''Method used to remove all addons on unload'''
+
+        # Remove all dependencies
+        DependentAddons().clear()
+
+        # Remove all conflicts
+        AddonConflicts().clear()
+
+        # Loop through all loaded addons
+        for addon in LoadedAddons().keys():
+
+            # Unload the addon
+            del LoadedAddons()[addon]
+
     @staticmethod
     def call_block(instance, blockname, *a, **kw):
         '''

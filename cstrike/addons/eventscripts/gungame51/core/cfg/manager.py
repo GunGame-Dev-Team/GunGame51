@@ -231,3 +231,5 @@ class ConfigManager(object):
 
             # Remove the instance from the storage dictionary
             del self._loaded_configs[name]
+
+        self._config_files.clear()

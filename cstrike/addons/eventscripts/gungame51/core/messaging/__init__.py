@@ -418,9 +418,3 @@ class MessageManager(object):
         # Return the formatted language string
         return '%s%s' % (prefix,
             self.__clean_string(self.__format_string(string, tokens, userid)))
-
-
-# =============================================================================
-# INITIALIZATION
-# =============================================================================
-MessageManager().load('gungame', 'gungame')

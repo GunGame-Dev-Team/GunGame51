@@ -25,6 +25,8 @@ import gamethread
 # GunGame Imports
 from gungame51.core import get_game_dir
 from gungame51.core import in_map
+#   Messaging
+from gungame51.core.messaging.shortcuts import langstring
 
 
 # =============================================================================
@@ -115,6 +117,12 @@ def make_downloadable(gg_loading=False):
     # Make the global variable winnerSounds global to this function in case we
     # use it below
     global winnerSounds
+
+    # Is GunGame loading?
+    if gg_loading:
+
+        # Print message to server console
+        es.dbgmsg(0, langstring('Load_SoundSystem'))
 
     # Make sure we are in a map
     if not in_map():

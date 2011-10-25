@@ -13,14 +13,19 @@ $LastChangedDate$
 import sys
 
 # EventScripts Imports
+#   ES
 import es
-from gamethread import delayed
-from gamethread import cancelDelayed
-from playerlib import getPlayer
-from playerlib import getUseridList
-from weaponlib import getWeaponList
+#   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
+#   Gamethread
+from gamethread import delayed
+from gamethread import cancelDelayed
+#   Playerlib
+from playerlib import getPlayer
+from playerlib import getUseridList
+#   Weaponlib
+from weaponlib import getWeaponList
 
 # SPE Imports
 try:
@@ -33,55 +38,44 @@ except ImportError:
 
 # GunGame Imports
 from core import gungame_info
-
-#   Messaging Function Imports
-from core.messaging.shortcuts import langstring
-from core.messaging.shortcuts import unloadTranslation
-from core.messaging.shortcuts import msg
-
-es.dbgmsg(0, langstring("Load_Start",
-        {'version': gungame_info('version')}))
-
-#    Config Function Imports
-from core.cfg.manager import ConfigManager
-
-#    Weapon Function Imports
-from core.weapons.shortcuts import get_level_multikill
-from core.weapons.shortcuts import get_weapon_order
-
-#    Error Logging Function Imports
-from core.logs import make_log_file
-
-#    Addon Function Imports
+#   Addons
 from core.addons.manager import AddonManager
 from core.addons.events import EventRegistry
 from core.addons.priority import PriorityAddon
-
-#    Player Function Imports
-from core.players.players import _PlayerContainer
-from core.players.shortcuts import Player
-from core.players.shortcuts import resetPlayers
-from core.players.shortcuts import setAttribute
-
-#    Leaders Function Imports
-from core.leaders.shortcuts import LeaderManager
-
-#   Event Function Imports
+#   Cfg
+from core.cfg import load_configs
+from core.cfg import unload_configs
+#   Events
 from core.events import gg_resource_file
 from core.events import GG_Load
 from core.events import GG_Unload
 from core.events import GG_Start
-
-#   Sound Function Imports
+#   Logs
+from core.logs import make_log_file
+#   Leaders
+from core.leaders.shortcuts import LeaderManager
+#   Menus
+from core.menus import MenuManager
+#   Messaging
+from core.messaging.shortcuts import langstring
+from core.messaging.shortcuts import loadTranslation
+from core.messaging.shortcuts import unloadTranslation
+from core.messaging.shortcuts import msg
+#   Players
+from core.players.players import _PlayerContainer
+from core.players.shortcuts import Player
+from core.players.shortcuts import resetPlayers
+#   Sounds
 from core.sound import make_downloadable
-
-#   Database
+#   Sql
 from core.sql.shortcuts import prune_winners_db
 from core.sql.shortcuts import update_winner
 from core.sql.shortcuts import Database
+#   Weapons
+from core.weapons import WeaponOrderManager
+from core.weapons.shortcuts import get_level_multikill
+from core.weapons.shortcuts import get_weapon_order
 
-#   Menus
-from core.menus import MenuManager
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -202,8 +196,10 @@ class EventsManager(object):
         # Loop through all methods of the class
         for event in dir(self):
 
-            # Unregister the method for the event
+            # Is the method supposed to be unregistered?
             if not event.startswith('_'):
+
+                # Unregister the method for the event
                 EventRegistry().unregister_for_event(
                     event, self.__getattribute__(event))
 
@@ -583,33 +579,14 @@ def unload():
     es.ServerVar('eventscripts_gg5').removeFlag('notify')
     es.ServerVar('eventscripts_gg5').removeFlag('replicated')
 
+    # Unregister events
     EventsManager()._unload_events()
 
-    from core.addons import dependencies
-    # Create a copy of the dependencies dictionary
-    dict_dependencies = dependencies.copy()
-
     # Unload Menus
-    MenuManager().unload('#all')
+    MenuManager().unload_menus()
 
-    # Loop through addons that have required dependencies
-    for addon in list(set(map((lambda (x, y): y), [(x, y) for x in
-      dict_dependencies for y in dict_dependencies[x]]))):
-
-        # If an addon we just unloaded unloaded this addon, skip it
-        if not addon in AddonManager().__loaded__:
-            continue
-
-        # Unload the addons that have required dependencies
-        AddonManager().unload(addon, True)
-
-    # Unload any remaining addons now that dependencies are handled
-    for addon in AddonManager().__order__[:]:
-        # If an addon we just unloaded unloaded this addon, skip it
-        if not addon in AddonManager().__loaded__:
-            continue
-
-        AddonManager().unload(addon, True)
+    # Unload all sub-addons
+    AddonManager().unload_all_addons()
 
     # Unload translations
     unloadTranslation('gungame', 'gungame')
@@ -621,7 +598,7 @@ def unload():
     Database().close()
 
     # Unload configs (removes flags from CVARs)
-    ConfigManager().unload_configs()
+    unload_configs()
 
     # Enable Buyzones
     es.server.queuecmd('es_xfire %s func_buyzone Enable' % es.getuserid())
@@ -633,22 +610,38 @@ def unload():
     unregisterSayCommand('!thanks')
 
 
+# =============================================================================
+# >> LOAD HELPER FUNCTIONS
+# =============================================================================
 def initialize():
     # Load custom events
     gg_resource_file.declare_and_load()
 
+    # Load the base translations
+    loadTranslation('gungame', 'gungame')
+
+    # Send message about GunGame loading
+    es.dbgmsg(0, langstring("Load_Start",
+            {'version': gungame_info('version')}))
+
+    # Load config files
+    load_configs()
+
+    # Load weapon orders
+    WeaponOrderManager().load_orders()
+
     # Pause a moment for the configs to be loaded (OB engine requires this)
-    delayed(0.1, completeInitialize)
+    delayed(0.1, _complete_initialization)
 
 
-def completeInitialize():
+def _complete_initialization():
     try:
-        finishInitialize()
+        _finish_initialization()
     except:
         unload_on_error()
 
 
-def finishInitialize():
+def _finish_initialization():
     # Fire the gg_server.cfg
     es.server.cmd('exec gungame51/gg_server.cfg')
 
@@ -671,11 +664,9 @@ def finishInitialize():
     delayed(3.50, make_log_file)
 
     # Load menus
-    es.dbgmsg(0, langstring("Load_Commands"))
-    MenuManager().load('#all')
+    MenuManager().load_menus()
 
     # Make the sounds downloadable
-    es.dbgmsg(0, langstring("Load_SoundSystem"))
     make_downloadable(True)
 
     es.dbgmsg(0, langstring("Load_Completed"))
@@ -738,15 +729,15 @@ def equip_player():
           'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' % userid)
 
     # Retrieve the armor type
-    armorType = int(gg_player_armor)
+    armor_type = int(gg_player_armor)
 
     # Give the player full armor
-    if armorType == 2:
+    if armor_type == 2:
         cmd = (cmd + 'es_xfire ' +
             '%s game_player_equip AddOutput "item_assaultsuit 1";' % userid)
 
     # Give the player kevlar only
-    elif armorType == 1:
+    elif armor_type == 1:
         cmd = (cmd + 'es_xfire ' +
             '%s game_player_equip AddOutput "item_kevlar 1";' % userid)
 
