@@ -146,8 +146,17 @@ class TeamManagement(object):
         # Loop through all players on the team
         for userid in self.team_players:
 
-            # Level the player up to the highest level
-            Player(userid).level = self.level
+            # Get the Player instance
+            ggPlayer = Player(userid)
+
+            # Does this player need to level up?
+            if ggPlayer.level != self.level:
+
+                # Level the player up to the highest level
+                Player(userid).level = self.level
+
+                # Set the player's multikill to 0
+                ggPlayer.multikill = 0
 
     def set_player_level(self, userid):
         '''Sets a player that just joined the team's level'''
@@ -166,6 +175,9 @@ class TeamManagement(object):
 
             # Set the player to the team's level
             ggPlayer.level = self.level
+
+        # Either way, reset the player's multikill value
+        ggPlayer.multikill = 0
 
     def check_old_leader(self, userid):
         '''Checks to see if the player was the team's leader'''
