@@ -50,4 +50,3 @@ def load():
             cvar.default = 0
             cvar.text = ('Only play a sound when a player ' +
                 'reaches the "last" hegrenade or knife level.')
-            cvar.notify = True

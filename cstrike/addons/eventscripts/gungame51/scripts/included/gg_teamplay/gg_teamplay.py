@@ -611,7 +611,7 @@ def gg_start(event_var):
     gg_teams.clear()
 
 
-def gg_teamwin(event_var):
+def gg_team_win(event_var):
     '''Fired when a team wins the match'''
 
     # Reset team level and multikill values
