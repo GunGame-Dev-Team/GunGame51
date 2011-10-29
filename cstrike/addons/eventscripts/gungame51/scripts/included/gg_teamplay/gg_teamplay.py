@@ -18,8 +18,10 @@ from path import path
 from es import getindexfromhandle
 from es import getplayerhandle
 from es import getplayerteam
+from es import getuserid
 from es import getUseridList
 from es import isbot
+from es import ServerCommand
 from es import ServerVar
 #   Gamethread
 from gamethread import delayed

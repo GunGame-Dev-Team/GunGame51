@@ -19,8 +19,10 @@ from es import getindexfromhandle
 from es import getplayerhandle
 from es import getplayername
 from es import getplayerteam
+from es import getuserid
 from es import getUseridList
 from es import isbot
+from es import ServerCommand
 from es import ServerVar
 #   Gamethread
 from gamethread import delayed
@@ -511,7 +513,7 @@ def gg_start(event_var):
     gg_teams.clear()
 
 
-def gg_teamwin(event_var):
+def gg_team_win(event_var):
     '''Fired when a team wins the match'''
 
     # Reset the team's level and leader values
