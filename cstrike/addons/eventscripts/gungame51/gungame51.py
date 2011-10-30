@@ -581,6 +581,9 @@ def unload():
     es.ServerVar('eventscripts_gg5').removeFlag('notify')
     es.ServerVar('eventscripts_gg5').removeFlag('replicated')
 
+    # Unregister server_cvar for core.weapons
+    WeaponOrderManager().unregister()
+
     # Unregister events
     EventsManager()._unload_events()
 

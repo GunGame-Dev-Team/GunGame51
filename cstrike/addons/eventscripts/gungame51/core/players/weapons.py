@@ -19,6 +19,8 @@ from weaponlib import getWeaponNameList as _getWeaponNameList
 import spe as _spe
 
 # GunGame Imports
+from gungame51.core import GunGameError
+#   Weapons
 from gungame51.core.weapons.shortcuts import get_level_weapon as _level_weapon
 
 # =============================================================================

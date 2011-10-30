@@ -397,6 +397,10 @@ class WeaponOrderManager(object):
         es.msg(langstring('WeaponOrder:ChangedTo', {'to': self.active.title}))
         es.ServerCommand('mp_restartgame 2')
 
+    def unregister(self):
+        # Unregister the server_cvar event
+        es.addons.unregisterForEvent(self, 'server_cvar')
+
 
 # =============================================================================
 # >> FUNCTIONS
