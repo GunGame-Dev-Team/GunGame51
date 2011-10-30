@@ -21,9 +21,6 @@ import es
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-gg_version = None
-_gg_info_quiet = True
-_gg_info = None
 game_path = path(path(
     __file__).parent.rsplit('addons', 1)[0][:~0].replace('\\', '/'))
 
@@ -34,6 +31,54 @@ game_path = path(path(
 class GunGameError(Exception):
     pass
 
+
+class GunGameInfo(object):
+    def __new__(cls):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
+
+    def __init__(self):
+        if not hasattr(self, '_version'):
+            self._version = self._get_version()
+
+    def _get_info(self):
+        if hasattr(self, '_info'):
+            return self._info
+        return None
+
+    def _set_info(self, info):
+        if isinstance(info, es.AddonInfo):
+            self._info = info
+
+    info = property(fget=_get_info, fset=_set_info)
+
+    @property
+    def version(self):
+        return self._version
+
+    @staticmethod
+    def _get_version():
+        revision = int(__doc__.split('$Rev: ')[1].split()[0])
+        for file_path in get_game_dir(
+          'addons/eventscripts/gungame51').walkfiles('*.py'):
+            if 'custom' in file_path.splitall():
+                continue
+            try:
+                with file_path.open() as pyfile:
+                    version = int(pyfile.read().split('$Rev: ')[1].split()[0])
+                if version > revision:
+                    revision = version
+            except:
+                continue
+        return '5.1.%s' % revision
+'''
+    version +
+    addoninfo +
+    update
+    included
+    custom
+'''
 
 # =============================================================================
 # >> FILES, DIRECTORIES, & OS FUNCTIONS
@@ -122,60 +167,26 @@ def gungame_info(info, _info=None):
     '''
     Fetches the head revision number from all of gungame's files
     '''
-    global gg_version
-    global _gg_info_quiet
-    global _gg_info
 
     if info == 'version':
+        return GunGameInfo().version
 
-        # Stop here if we already have done this, and return the version.
-        if gg_version:
-            return gg_version
+    if info == 'addoninfo':
+        GunGameInfo().info = _info
+        gungame_info('update')
 
-        # This files revision is our starting point
-        revision = int(__doc__.split('$Rev: ')[1].split()[0])
-
-        # Use the generator to walk through the files
-        for file_path in get_game_dir(
-          'addons/eventscripts/gungame51').walkfiles('*.py'):
-
-            # Do not use custom addons to get the version
-            if 'custom' in file_path.splitall():
-                continue
-
-            # Use "try" in case of an IndexError or ValueError
-            try:
-
-                # Open the current file to get its revision
-                with file_path.open() as pyfile:
-
-                    # Get the current file's revision
-                    version = int(pyfile.read().split('$Rev: ')[1].split()[0])
-
-                # Check to see if this file's revision is newer
-                if version > revision:
-
-                    # Set the revision to the current value
-                    revision = version
-
-            except:
-
-                # If an error is encountered, just continue
-                continue
-
-        gg_version = '5.1.%s' % revision
-        return gg_version
-
-    '''
-    Fetches a list of addons and it's version number in str format for
-    es.AddonInfo()
-    '''
-    if info in ('included', 'custom'):
-        # Stop here if this is the initial load
-        if _gg_info_quiet:
+    elif info == 'update':
+        if GunGameInfo().info is None:
             return
+        GunGameInfo().info.__setattr__(
+            'Included Addons', gungame_info('included'))
+        GunGameInfo().info.__setattr__(
+            'Custom Addons', gungame_info('custom'))
 
-        # Retrieve the AddonManager
+    if info in ('included', 'custom'):
+        if GunGameInfo().info is None:
+            return
+        # Retrieve the Loaded Addons
         from addons.loaded import LoadedAddons
 
         # Format our output
@@ -193,27 +204,3 @@ def gungame_info(info, _info=None):
 
         # Return the list as one string
         return ' '.join(addonlist)
-
-    '''
-    Lets gungame51.py pass it's instance of es.AddonInfo into this file
-    so we can update it. (stored as _gg_info global)
-    '''
-    if info == 'addoninfo':
-        _gg_info = _info
-        _gg_info_quiet = False
-        gungame_info('update')
-
-    '''
-    Updates es.AddonInfo instance for gungame51
-    '''
-    if info == 'update':
-        # If this is the inital load, or we don't have a es.AddonInfo()
-        # instance then stop here.
-        if _gg_info_quiet or not _gg_info:
-            return
-
-        # Collect included addons w/ versions
-        _gg_info.Included_Addons = gungame_info('included')
-
-        # Collect custom addons w/ versions
-        _gg_info.Custom_Addons = gungame_info('custom')

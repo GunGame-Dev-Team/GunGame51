@@ -13,7 +13,13 @@ $LastChangedDate$
 from __future__ import with_statement
 from path import path
 
+# EventScripts Imports
+#   Cfglib
+from cfglib import AddonCFG
+
 # GunGame Imports
+from gungame51.core import get_game_dir
+#   Cfg
 from gungame51.core.cfg.configs import ConfigContextManager
 
 
@@ -73,25 +79,103 @@ def load():
             cvar.text = ('The weapon that players ' +
                 'will use during the warmup round.')
 
-        # Create the gg_warmup_deathmatch instance
-        with config.cfg_cvar('gg_warmup_deathmatch') as cvar:
+        # Create the cfg section
+        config.cfg_section('WARMUP START AND END CFG SETTINGS')
 
-            cvar.name = 'WARMUP ROUND DEATHMATCH MODE'
-            cvar.notes.append('Please check the gg_deathmatch.cfg ' +
-                'for information regarding running gg_deathmatch.')
-            cvar.options.append('0 = Disabled.')
-            cvar.options.append('1 = Enabled.')
+        # Create the gg_warmup_start_file instance
+        with config.cfg_cvar('gg_warmup_start_file') as cvar:
+
+            cvar.name = 'WARMUP ROUND START CFG FILE'
+            cvar.description.append('Set to the .cfg ' +
+                'file to be executed when Warmup Round starts.')
+            cvar.notes.append('The cfg file should contain the ' +
+                'GunGame values you wish to use for the current map.')
+            cvar.notes.append('Make sure to turn off addons that should ' +
+                'not be used during Warmup Round "prior" to turning on ' +
+                'any addons that should be used during Warmup Round.')
+            cvar.default = 'gungame51/included_addon_configs/warmup_start'
+            cvar.text = 'CFG file to be executed when Warmup Round starts.'
+
+        # Create the gg_warmup_end_file instance
+        with config.cfg_cvar('gg_warmup_end_file') as cvar:
+
+            cvar.name = 'WARMUP ROUND END CFG FILE'
+            cvar.description.append('Set to the .cfg ' +
+                'file to be executed when Warmup Round ends.')
+            cvar.notes.append('The cfg file should contain the ' +
+                'GunGame values you wish to use for the current map.')
+            cvar.notes.append('Make sure to turn off any addons that ' +
+                'were used during Warmup Round and are not needed for ' +
+                'the current match, "prior" to turning on any addons ' +
+                'that are needed for the current match.')
+            cvar.default = 'gungame51/included_addon_configs/warmup_end'
+            cvar.text = 'CFG file to be executed when Warmup Round ends.'
+
+        # Create the extension section
+        config.cfg_section('WARMUP ROUND EXTENSION SETTINGS')
+
+        with config.cfg_cvar('gg_warmup_round_min_players') as cvar:
+
+            cvar.name = 'MINUMUM HUMAN PLAYERS'
+            cvar.description.append('Set to the minimum ' +
+                'number of players needed for Warmup Round to end.')
             cvar.default = 0
-            cvar.text = 'Enable deathmatch during warmup round only.'
+            cvar.text = (
+                'Number of human players needed for Warmup Round to end.')
 
-        # Create the gg_warmup_elimination instance
-        with config.cfg_cvar('gg_warmup_elimination') as cvar:
+        with config.cfg_cvar('gg_warmup_round_max_extensions') as cvar:
 
-            cvar.name = 'WARMUP ROUND ELIMINATION MODE'
-            cvar.notes.append('Please check the gg_elimination.cfg for ' +
-                'information regarding what is required to be ' +
-                'enabled and disabled when running gg_elimination.')
-            cvar.options.append('0 = Disabled.')
-            cvar.options.append('1 = Enabled.')
+            cvar.name = 'MAX EXTENSIONS'
+            cvar.description.append('Number of extensions '
+                'allowed before Warmup Round automatically ends.')
+            cvar.default = 1
+            cvar.text = ('Maximum number of '
+                'extensions allowed before Warmup Round ends.')
+
+        with config.cfg_cvar('gg_warmup_round_players_reached') as cvar:
+
+            cvar.name = 'MIN HUMAN PLAYERS REACHED'
+            cvar.description.append(
+                'Determines whether or not to end Warmup Round ' +
+                'when the minimum number of players has been reached.')
+            cvar.options.append(
+                '0 = Never end Warmup as soon as min players is reached.')
+            cvar.options.append('1 = Only end Warmup ' +
+                'if in "extended" time when min players is reached.')
+            cvar.options.append(
+                '2 = End Warmup Round as soon as min players is reached.')
             cvar.default = 0
-            cvar.text = 'Enable elimination during warmup round only.'
+            cvar.text = (
+                'Allows Warmup Round to end when min players is reached.')
+
+    # Get the path to the default Warmup Round Start cfg file
+    start_path = path(get_game_dir(
+        'cfg/gungame51/included_addon_configs/warmup_round_start_default.cfg'))
+
+    # Does the file exist?
+    if not start_path.isfile():
+
+        # Create the AddonCFG instance
+        start = AddonCFG(start_path)
+
+        # Add basic description of how to use the file
+        start.text('Description to be added later')
+
+        # Write the file
+        start.write()
+
+    # Get the path to the default Warmup Round End cfg file 
+    end_path = path(get_game_dir(
+        'cfg/gungame51/included_addon_configs/warmup_round_end_default.cfg'))
+
+    # Does the file exist?
+    if not end_path.isfile():
+
+        # Create the AddonCFG instance
+        end = AddonCFG(end_path)
+
+        # Add basic description of how to use the file
+        end.text('Description to be added later')
+
+        # Write the file
+        end.write()

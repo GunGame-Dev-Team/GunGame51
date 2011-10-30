@@ -182,9 +182,11 @@ class QuickEvent(object):
 
 
 class EventManager(object):
-    def __init__(self):
-        # Create a list to store callbacks
-        self._callbacks = []
+    def __new__(cls, *a, **kw):
+        if not '_the_instance' in cls.__dict__:
+            cls._the_instance = object.__new__(cls, *a, **kw)
+            cls._the_instance._callbacks = []
+        return cls._the_instance
 
     def fire(self):
         """Handles the firing of ESEvent instances by initializing the

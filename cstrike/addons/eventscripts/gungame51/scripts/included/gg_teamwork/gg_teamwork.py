@@ -279,7 +279,7 @@ class TeamManagement(object):
 
             # Send chat message for team winning the match
             ggPlayer.saytext2(index,
-                'TeamWork_Winner_Match', {'teamname': teamname})
+                'TeamWork_Winner', {'teamname': teamname})
 
             # We want to loop, so we send a message every second for 3 seconds
             for x in xrange(4):
@@ -417,7 +417,7 @@ def unload():
 # =============================================================================
 # >> REGISTERED CALLBACKS
 # =============================================================================
-def pre_gg_win(event_var):
+def pre_gg_win(**event_var):
     '''Fired prior to gg_win event being fired'''
 
     # Get the team the winner is one
@@ -451,7 +451,7 @@ def round_end(event_var):
     for team in gg_teams:
 
         # Delay 1 tick so that the level is set properly
-        delayed(0, gg_teams[team].set_all_player_levels)
+        delayed(0.1, gg_teams[team].set_all_player_levels)
 
 
 def round_start(event_var):

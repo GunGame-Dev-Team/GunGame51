@@ -9,29 +9,38 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
+#Python Imports
 from random import shuffle
 
-# Eventscripts Imports
+# EventScripts Imports
+#   ES
 import es
-import cmdlib
-import repeat
-import gamethread
+#   Cmdlib
+from cmdlib import registerServerCommand
+from cmdlib import unregisterServerCommand
+#   Gamethread
+from gamethread import delayed
+#   Playerlib
 from playerlib import getPlayer
 from playerlib import getPlayerList
-from playerlib import getUseridList
-from weaponlib import getWeaponNameList
+#   Weaponlib
+from weaponlib import getWeaponList
 
 # GunGame Imports
-from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core.addons import AddonManager
-from gungame51.core.addons import PriorityAddon
-from gungame51.core.addons import load as addon_load
-from gungame51.core.addons import unload as addon_unload
-from gungame51.core.players.shortcuts import Player
+#   Addons
+from gungame51.core.addons.info import AddonInfo
+from gungame51.core.addons.loaded import LoadedAddons
+from gungame51.core.addons.priority import PriorityAddon
+#   Events
+from gungame51.core.events import GG_Start
+#   Messaging
 from gungame51.core.messaging.shortcuts import hudhint
 from gungame51.core.messaging.shortcuts import msg
-from gungame51.core.events import GG_Start
+#   Players
+from gungame51.core.players.shortcuts import Player
+#   Repeat
+from gungame51.core.repeat import Repeat
+#   Weapons
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
 
@@ -50,491 +59,500 @@ info.translations = ['gg_warmup_round']
 # >> GLOBAL VARIABLES
 # =============================================================================
 mp_freezetime = es.ServerVar('mp_freezetime')
-gg_warmup_round = es.ServerVar('gg_warmup_round')
-gg_warmup_timer = es.ServerVar('gg_warmup_timer')
-gg_warmup_weapon = es.ServerVar('gg_warmup_weapon')
-gg_warmup_deathmatch = es.ServerVar('gg_warmup_deathmatch')
-gg_warmup_elimination = es.ServerVar('gg_warmup_elimination')
-gg_dead_strip = es.ServerVar('gg_dead_strip')
-gg_deathmatch = es.ServerVar('gg_deathmatch')
-gg_elimination = es.ServerVar('gg_elimination')
+warmup_timer = es.ServerVar('gg_warmup_timer')
+warmup_weapon = es.ServerVar('gg_warmup_weapon')
+warmup_start_file = es.ServerVar('gg_warmup_start_file')
+warmup_end_file = es.ServerVar('gg_warmup_end_file')
+warmup_round_min_players = es.ServerVar('gg_warmup_round_min_players')
+warmup_round_max_extensions = es.ServerVar('gg_warmup_round_max_extensions')
+warmup_round_players_reached = es.ServerVar('gg_warmup_round_players_reached')
 
-# possible_random_weapons includes all primaries, secondaries, and hegrenade
-possible_random_weapons = getWeaponNameList("#primary")
-possible_random_weapons.extend(getWeaponNameList("#secondary"))
-possible_random_weapons.append("hegrenade")
+possible_weapons = [
+    weapon.basename for weapon in getWeaponList('#primary')]
+possible_weapons.extend(
+    weapon.basename for weapon in getWeaponList('#secondary'))
+possible_weapons.append('hegrenade')
 
-# Used to make sure we don't set the warmup weapon twice on load
-warmupWeaponSetOnLoad = False
 
-priority_addons_added = []
-random_warmup_weapons = []
-warmup_weapon = None
+# =============================================================================
+# >> CLASSES
+# =============================================================================
+class WarmupRoundRepeat(Repeat):
+    '''Class that extends the Repeat functionality for use by Warmup Round'''
 
-# If we are in the middle of the overlap from warmup ending to gg_start, give
-# newly spawned players godmode
-giveGodMode = False
+    def extend_warmup_time(self):
+        # Send message to players about extension
 
-# Approximates the number of seconds from round start to play beginning
-GG_WARMUP_EXTRA_TIME = 3
+        # Extend Warmup Time
+        self.extend(int(warmup_timer))
 
-# Backup variables
-mp_freezetime_backup = 0
-gg_dead_strip_backup = 0
-gg_deathmatch_backup = 0
-gg_elimination_backup = 0
+    def end_warmup_time(self):
+        # Send message that there are enough players and game is commencing
+
+        # Get the time remaining
+        remaining = self.timeleft
+
+        # Reduce the time to 1 second
+        self.reduce(remaining - 1)
+
+
+class Priorities(set):
+    '''Set to manager Priority Addons used in Warmup'''
+
+    def add(self, addon):
+        '''Overriding method that also adds all addons to PriorityAddon'''
+
+        # Is the addon already set as a Priority?
+        if not addon in PriorityAddon():
+
+            # Add the addon as a Priority
+            PriorityAddon().add(addon)
+
+            # Add the addon to Warmup's priorities
+            super(Priorities, self).add(addon)
+
+    def clear(self):
+        '''Overriding method that also removes addons from PriorityAddon'''
+
+        # Loop through all addons in the set
+        for addon in self:
+
+            # Remove the addon from PriorityAddon
+            PriorityAddon().discard(addon)
+
+        # Clear Warmup's priorities
+        super(Priorities, self).clear()
+
+
+class WarmupRound(object):
+    '''Class used to manage Warmup Round'''
+
+    def first_load(self):
+        '''Called when Warmup Round is loaded'''
+
+        # Create a set to store Priority Addons
+        self.priorities = Priorities()
+
+        # Create the Repeat instance
+        self.repeat = WarmupRoundRepeat('gg_warmup_round', self.count_down)
+
+        # Create set_on_load variable
+        self.set_on_load = False
+
+        # Create the godmode variable
+        self.godmode = False
+
+        # Create extensions variable
+        self.extensions = 0
+
+        # Create weapon variable
+        # If another script calls get_warmup_weapon
+        # too quickly, it will return None
+        self.weapon = None
+
+        # Register a server command to end Warmup Round
+        registerServerCommand('gg_end_warmup',
+            self.end_warmup_cmd, 'Server Command to end Warmup Round')
+
+        # Create a list of weapons to be used each Warmup Round
+        self.list_of_weapons = []
+
+        # Start Warmup Round
+        self.start_warmup()
+
+        # The weapon only needs set once on first load
+        self.set_on_load = True
+
+        # After a delay, allow the weapon to be set again in the future
+        delayed(1, self.__setattr__, ('set_on_load', False))
+
+    def end_warmup_cmd(seld, args):
+        '''Callback for command to end Warmup Round'''
+
+        # Set the message to be sent to Warmup_End_Forced
+        self.message = 'Warmup_End_Forced'
+
+        # End the current Warmup Round
+        self.end_warmup()
+
+    def unload_warmup(self):
+        '''Unloads Warmup Round'''
+
+        # Remove the repeat
+        self.repeat.delete()
+
+        # Unregister the server command used to end Warmup Round
+        unregisterServerCommand('gg_end_warmup')
+
+        # Set the message to be sent to Warmup_End_Forced
+        self.message = 'Warmup_End_Forced'
+
+        # End Warmup Round if it is still active
+        self.end_warmup()
+
+    def start_warmup(self):
+        '''Called when Warmup Round needs to start'''
+
+        # Add Warmup Round to PriorityAddon
+        self.priorities.add(info.name)
+
+        # Set the Warmup Message
+        self.message = 'Timer_Ended'
+
+        # Store a backup of mp_freezetime
+        self.freezetime = int(mp_freezetime)
+
+        # Set Freeze Time to 0
+        mp_freezetime.set(0)
+
+        # Execute the Start Warmup Round cfg
+        es.mexec(str(warmup_start_file))
+
+        # Get the Warmup Weapon
+        self.weapon = self.set_warmup_weapon()
+
+        # Start the count down
+        self.repeat.start(1, int(warmup_timer))
+
+        # Loop through all living players
+        for player in getPlayerList('#alive'):
+
+            # Give the player the warmup weapon
+            self.give_warmup_weapon(player.userid)
+
+        # Wait until adding other PriortyAddons
+        delayed(0.1, self.add_priority_addons)
+
+    def add_priority_addons(self):
+        '''Adds all Loader Addons to Priority'''
+
+        # Loop through all loaded addons
+        for addon in LoadedAddons():
+
+            # Add the addon as a Priority
+            self.priorities.add(info.name)
+
+    def count_down(self):
+        '''
+            Finds how many seconds are left and how many
+            human players are active, then determines whether
+            to extend, end, or continue the count down.
+        '''
+
+        # Get the time remaining
+        remaining = self.repeat.timeleft
+
+        # Is the countdown over?
+        if remaining == 0:
+
+            # End Warmup
+            self.end_warmup()
+
+            # No need to go any further
+            return
+
+        # Get the number of human players on teams
+        players = self.get_human_players
+
+        # Are there enough players to start the game?
+        if players >= int(warmup_round_min_players):
+
+            # Get the players reached value
+            players_reached = int(warmup_round_players_reached)
+
+            # Does the warmup need to end now?
+            if players_reached == 2 or (
+              self.extensions and players_reached == 1):
+
+                # Set the message to be sent on
+                # Warmup End to Players_Reached
+                self.message = 'Players_Reached'
+
+                # Reduce the Warmup Round to end in 1 second
+                self.repeat.end_warmup_time()
+
+                # No need to go any further
+                return
+
+        # Is the timer at 1?
+        if remaining == 1:
+
+            # Does the count down need extended?
+            if self.extensions < int(warmup_round_max_extensions):
+
+                # Increase extensions used
+                self.extensions += 1
+
+                # Send message to players that Warmup has been extended
+                hudhint('#human', 'Timer_Extended')
+
+                # Extend the count down
+                self.repeat.extend_warmup_time()
+
+                # No need to go any further
+                return
+
+            # Send hudhint message to all players
+            hudhint('#human', 'Timer_Singular')
+
+        # Is there more than 1 second left?
+        else:
+
+            # Send hudhint message to all players
+            hudhint('#human', 'Timer_Plural', {'time': int(remaining)})
+
+        # Does a beep sound need to be played?
+        if remaining <= 5:
+
+            # Play the beep
+            self.play_beep()
+
+    def set_warmup_weapon(self):
+        '''Used to set the Warmup Weapon'''
+
+        # Did the weapon just get set on load?
+        if self.set_on_load:
+
+            # Return the weapon that was already selected
+            return self.weapon
+
+        # Is the variable set to a specific weapon?
+        if str(warmup_weapon) in possible_weapons:
+
+            # Return the weapon
+            return str(warmup_weapon)
+
+        # Are there weapons in the weapon list?
+        if len(self.list_of_weapons):
+
+            # Return the next weapon
+            return self.list_of_weapons.pop(0)
+
+        # Is the weapon supposed to be random?
+        if str(warmup_weapon) == '#random':
+
+            # Get all weapons
+            self.list_of_weapons = list(possible_weapons)
+
+            # Randomize the weapons
+            shuffle(self.list_of_weapons)
+
+            # Return the first weapon
+            return self.list_of_weapons.pop(0)
+
+        # Is there a specific list of weapons?
+        if ',' in str(warmup_weapon):
+
+            # Create a list of the weapons
+            self.list_of_weapons = str(warmup_weapon).split(',')
+
+            # Return the first weapon
+            return self.list_of_weapons.pop(0)
+
+        # If all else fails, return the first level weapon
+        return get_level_weapon(1)
+
+    def end_warmup(self):
+        '''Ends the current Warmup Round'''
+
+        # Is Warmup Round currently active?
+        if not info.name in PriorityAddon():
+
+            # If not, there is no need to end the Warmup Round
+            return
+
+        # Send hudhint to players that Warmup has ended
+        hudhint('#human', self.message)
+
+        # Remove Priority Addons
+        self.priorities.clear()
+
+        # Reset the number of extensions
+        self.extensions = 0
+
+        # Reset mp_freezetime
+        mp_freezetime.set(self.freezetime)
+
+        # Execute the End Warmup Round cfg file
+        es.mexec(str(warmup_end_file))
+
+        # Restart the game
+        es.server.queuecmd('mp_restartgame 1')
+
+        # Set all living players godmode value to True
+        self.set_all_players_godmode(True)
+
+        # After a 1 second delay, clean up this Warmup Round
+        delayed(1, self.clean_up)
+
+    def set_all_players_godmode(self, value):
+        '''Sets all players GodMode to the given value'''
+
+        # Store the value to be used on player_spawn
+        self.godmode = value
+
+        # Loop through all living players
+        for player in getPlayerList('#alive'):
+
+            # Give the player GodMode
+            player.godmode = value
+
+    def clean_up(self):
+        '''Cleans up any residuals at the time that GunGame round should start
+        '''
+
+        # Set all players back to no godmode
+        self.set_all_players_godmode(False)
+
+        # Call GG_Start event
+        # This should also cause player levels and multikills 
+        # to be reset as soon as the GunGame match starts
+        GG_Start().fire()
+
+    def player_spawn(self, userid):
+        # Is Warmup Round in PriorityAddon?
+        if info.name in PriorityAddon():
+
+            # Give player the warmup weapon
+            self.give_warmup_weapon(userid)
+
+        # Does the player need GodMode set?
+        if self.godmode:
+
+            # Give player weapon
+            getPlayer(userid).godmode = True
+
+    def give_warmup_weapon(self, userid):
+        '''Gives the player the warmup weapon'''
+
+        # Is the player on the server?
+        if not es.exists('userid', userid):
+
+            # If not, no need to give them a weapon
+            return
+
+        # Is the player on a team?
+        if es.getplayerteam(userid) < 2:
+
+            # If not, no need to give them a weapon
+            return
+
+        # Is the player alive?
+        if getPlayer(userid).isdead:
+
+            # If not, no need to give them a weapon
+            return
+
+        # Get the player's Player instance
+        ggPlayer = Player(userid)
+
+        # Set the delay time
+        delay = 0.05
+
+        # Is the player a bot?
+        if es.isbot(userid):
+
+            # Increase bot delay to make sure they get the proper weapon
+            delay += 0.2
+
+        # Strip the player's weapons (split second delay)
+        delayed(delay, ggPlayer.strip, (True, [warmup_weapon]))
+
+        # Give the player the Warmup Weapon
+        delayed(delay, ggPlayer.give, (self.weapon, True, True))
+
+    def give_hegrenade(self, event_var):
+        '''Checks to see if a player needs to recieve another hegrenade'''
+
+        # Is Warmup Round active?
+        if not info.name in PriorityAddon():
+
+            # If not, return
+            return
+
+        # Is Warmup Weapon set to hegrenade
+        if self.weapon != 'hegrenade':
+
+            # If not, return
+            return
+
+        # Get the player's userid
+        userid = int(event_var['userid'])
+
+        # Is the client still on the server?
+        if not es.exists('userid', userid) and userid != 0:
+
+            # If not, return
+            return
+
+        # Is the player on a team?
+        if int(event_var['es_userteam']) < 2:
+
+            # If not, return
+            return
+
+        # Is the player alive?
+        if getPlayer(userid).isdead:
+
+            # If not, return
+            return
+
+        # Give the player another hegrenade
+        Player(userid).give('hegrenade')
+
+    @staticmethod
+    def play_beep():
+        '''Plays a beep sound to all players'''
+
+        # Loop through all players
+        for player in getPlayerList('#human'):
+
+            # Play the sound
+            Player(player.userid).playsound('countDownBeep')
+
+    @property
+    def get_human_players(self):
+        '''Returns the number of human players on a team'''
+
+        # Return the number of human players on either team
+        return len(getPlayerList('#human,!spec,!un'))
+
+# Get the WarmupRound instance
+warmup = WarmupRound()
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    global warmupWeaponSetOnLoad
-
-    # Set the warmup weapon
-    set_warmup_weapon()
-
-    # Make sure we don't set the warmup weapon twice on load
-    warmupWeaponSetOnLoad = True
-
-    # Load warmup round (delayed)
-    gamethread.delayedname(1, "gg_do_warmup", do_warmup)
-
-    # Register a server command to to cancel an in-progress warmup round
-    cmdlib.registerServerCommand('gg_end_warmup', servercmd_end_warmup,
-        "Immediately ends the warmup round if there is one in progress.")
+    warmup.first_load()
 
 
 def unload():
-    # Cancel any do_warmup delays
-    gamethread.cancelDelayed("gg_do_warmup")
-
-    # Deleting warmup timer
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-
-    # If the warmup timer exists, stop and delete it
-    if warmupCountDown:
-        warmupCountDown.stop()
-        warmupCountDown.delete()
-
-    # Reset server vars
-    reset_server_vars()
-
-    # Unregister the server command that cancels an in-progress warmup round
-    cmdlib.unregisterServerCommand('gg_end_warmup')
-
-
-# =============================================================================
-# >> COMMAND CALLBACKS
-# =============================================================================
-def servercmd_end_warmup(args):  # args are ignored, but needed for server cmd
-    # Get the timer/repeat instance
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-
-    # Break out if the timer is invalid (implies warmup is not in progress)
-    if not warmupCountDown:
-        return
-
-    # Restart the round ourselves in 1 second
-    es.server.queuecmd('mp_restartgame 1')
-
-    # Before the round ends up restarting, prepare gungame to be ready
-    # for the first round of play
-    gamethread.delayed(0.7, prepare_game)
-
-    # Make sure that during the first round nobody has godmode
-    gamethread.delayed(1.4, remove_godmode)
-
-    # End the warmup round
-    # Delayed to allow mp_restartgame to strip all weapons before gg gives them
-    # (Emulating behavior of call to mp_restartgame in count_down() below)
-    gamethread.delayed(1, end_warmup, ('Warmup_End_Forced'))
-
-    # Display a chat message with the same message
-    msg("#human", 'Warmup_End_Forced', prefix=True)
+    warmup.unload_warmup()
 
 
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
 def es_map_start(event_var):
-    # Cancel any do_warmup delays
-    gamethread.cancelDelayed("gg_do_warmup")
-
-    # Looking for running warmup timer
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-    if warmupCountDown:
-
-        # We are comming in from another warmup round ?
-        if warmupCountDown.status() == 2:
-
-            # Stop timer
-            warmupCountDown.stop()
-
-            gamethread.delayedname(1, "gg_do_warmup", do_warmup, False)
-            return
-
-    # Start warmup timer. This is delayed to ensure that all addons get to fire
-    # es_map_start events before priority addons are set.
-    gamethread.delayedname(1, "gg_do_warmup", do_warmup)
-
-
-def hegrenade_detonate(event_var):
-    # Making sure warmup round is running
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-
-    if not warmupCountDown:
-        return
-
-    # Is the warmup weapon hegrenade?
-    if warmup_weapon != 'hegrenade':
-        return
-
-    # Get player userid and player object
-    userid = int(event_var['userid'])
-
-    # Is the client on the server?
-    if not es.exists('userid', userid) and userid != 0:
-        return
-
-    # Is spectator?
-    if int(event_var['es_userteam']) < 2:
-        return
-
-    # Is player dead?
-    if getPlayer(userid).isdead:
-        return
-
-    Player(userid).give('hegrenade')
+    warmup.start_warmup()
 
 
 def player_spawn(event_var):
-    # Is spectator?
-    if int(event_var['es_userteam']) < 2:
-        return
+    warmup.player_spawn(event_var['userid'])
 
-    # Set player's id
-    userid = int(event_var['userid'])
 
-    # Is player dead?
-    if getPlayer(userid).isdead:
-        return
+def hegrenade_detonate(event_var):
+    warmup.give_hegrenade(event_var)
 
-    # If it is the last split second before mp_restartgame fires, protect the
-    # player
-    if giveGodMode:
-        getPlayer(userid).godmode = 1
 
-    # Making sure warmup round is running
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-
-    if not warmupCountDown:
-        return
-
-    # Get player object
-    ggPlayer = Player(userid)
-
-    # Check if the warmup weapon is a knife
-    if warmup_weapon == 'knife':
-        es.sexec(userid, 'use weapon_knife')
-        return
-
-    delay = 0.05
-
-    if es.isbot(userid):
-        delay += 0.2
-
-    # Strip the player's weapons (split second delay)
-    gamethread.delayed(delay, ggPlayer.strip, (True, [warmup_weapon]))
-
-    # Delay giving the weapon by a split second, because the code in round
-    #   start removes all weapons
-    gamethread.delayed((delay), ggPlayer.give, (warmup_weapon, True, True))
+def cs_win_panel_match(event_var):
+    warmup.repeat.stop()
 
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
 def get_warmup_weapon():
-    '''
-    Used to get the warmup weapon from other addons.
-    '''
-    return warmup_weapon
-
-
-def set_warmup_weapon():
-    global warmup_weapon, random_warmup_weapons, warmupWeaponSetOnLoad
-
-    # If the warmup weapon was just set when gg_warmup_round was loaded, do not
-    # set it again
-    if warmupWeaponSetOnLoad:
-        warmupWeaponSetOnLoad = False
-        return
-
-    # If the random weapons list has more than one item in it
-    if len(random_warmup_weapons) > 1:
-        # Remove the first item and set the warmup weapon to the next in line
-        random_warmup_weapons.pop(0)
-        warmup_weapon = random_warmup_weapons[0]
-        # If the warmup weapon includes weapon_, remove the prefix
-        if warmup_weapon[:7] == "weapon_":
-            warmup_weapon = warmup_weapon[7:]
-    # If there is nothing in the random weapons list
-    else:
-        # If the warmup weapon is set to #random
-        if str(gg_warmup_weapon) == "#random":
-            # Make a random list, and select the first one
-            random_warmup_weapons = possible_random_weapons
-            shuffle(random_warmup_weapons)
-            warmup_weapon = random_warmup_weapons[0][7:]
-        # If the warmup weapon is set to a list of possible weapons
-        elif "," in str(gg_warmup_weapon):
-            # Get the list of possible weapons, shuffle it, and select the
-            # first one
-            random_warmup_weapons = str(gg_warmup_weapon).split(",")
-            shuffle(random_warmup_weapons)
-            warmup_weapon = random_warmup_weapons[0]
-        # If the warmup weapon is neither #random or a list
-        else:
-            # If the warmup weapon is 0, , or 0.0, set it to the first level
-            # weapon
-            if str(gg_warmup_weapon) in ('0', '', '0.0'):
-                warmup_weapon = get_level_weapon(1)
-            # The warmup weapon must be the name of a single weapon
-            else:
-                warmup_weapon = str(gg_warmup_weapon)
-
-
-def add_priority_addon(name):
-    priority_addons_added.append(name)
-    PriorityAddon().append(name)
-
-
-def do_warmup(useBackupVars=True):
-    # Set the new warmup weapon
-    set_warmup_weapon()
-
-    # Looking for warmup timer
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-
-    if useBackupVars:
-        # Setting globals for backup variables
-        global mp_freezetime_backup
-        global gg_dead_strip_backup
-        global gg_deathmatch_backup
-        global gg_elimination_backup
-
-        # Setting backup variables
-        mp_freezetime_backup = int(mp_freezetime)
-        gg_dead_strip_backup = int(gg_dead_strip)
-        gg_deathmatch_backup = int(gg_deathmatch)
-        gg_elimination_backup = int(gg_elimination)
-
-    # Setting mp_freezetime
-    mp_freezetime.set(0)
-
-    # Added priority addons list
-    del priority_addons_added[:]
-
-    # Adding warmup and dead strip, and other addons we don't mind running
-    # during gg_warmup_round to the priority addons list
-    add_priority_addon('gg_warmup_round')
-    add_priority_addon("gg_dead_strip")
-    add_priority_addon("gg_noblock")
-    add_priority_addon("gg_dissolver")
-
-    # If gg_dead_strip is not loaded, load it
-    if not int(gg_dead_strip):
-        gg_dead_strip.set(1)
-        addon_load("gg_dead_strip")
-
-    # If deathmatch is enabled on the server, and elimination is not
-    if int(gg_deathmatch_backup) and not int(gg_elimination_backup):
-        # If we have no warmup deathmatch, we need to unload deathmatch
-        if not int(gg_warmup_deathmatch) and int(gg_deathmatch):
-            gg_deathmatch.set(0)
-            check_unload("gg_deathmatch")
-    # Otherwise, if elimination is on the server
-    elif int(gg_elimination_backup):
-        # If we have no warmup elimination, we need to unload elimination
-        if not int(gg_warmup_elimination) and int(gg_elimination):
-            gg_elimination.set(0)
-            check_unload("gg_elimination")
-
-    # If only one warmup mode is selected, proceed
-    if not (int(gg_warmup_deathmatch) and int(gg_warmup_elimination)):
-
-        # Added a delay, so we don't encounter an error when loading
-        # one right after unloading the other (due to dependencies)
-        gamethread.delayed(0, load_warmup_addons)
-
-    # Start it up if it exists
-    if warmupCountDown:
-        warmupCountDown.stop()
-        warmupCountDown.start(1, int(gg_warmup_timer) + GG_WARMUP_EXTRA_TIME)
-        return
-
-    # Create a timer
-    warmupCountDown = repeat.create('gungameWarmupTimer', count_down)
-    warmupCountDown.start(1, int(gg_warmup_timer) + GG_WARMUP_EXTRA_TIME)
-
-
-def load_warmup_addons():
-    # If warmup deathmatch is enabled, add it to priority addons
-    if int(gg_warmup_deathmatch):
-        add_priority_addon('gg_deathmatch')
-        # If deathmatch is not enabled, we need to load it now
-        if not int(gg_deathmatch_backup) and not int(gg_deathmatch):
-            gg_deathmatch.set(1)
-            addon_load("gg_deathmatch")
-    # Otherwise, if warmup elimination is enabled, add it to priority
-    # addons
-    elif int(gg_warmup_elimination):
-        add_priority_addon('gg_elimination')
-        # If elimination is not enabled, or deathmatch is enabled due to
-        # both dm and elim set to 1 and dm overruling elim, we need to load
-        # it now.
-        if (not int(gg_elimination_backup) or (int(gg_deathmatch_backup)
-          and int(gg_elimination_backup))) and not int(gg_elimination):
-            gg_elimination.set(1)
-            addon_load("gg_elimination")
-
-
-def count_down():
-    warmupCountDown = repeat.find('gungameWarmupTimer')
-
-    # Making sure the count-down is going
-    if not warmupCountDown:
-        return
-
-    # If the remaining time is greater than 1
-    if warmupCountDown['remaining'] >= 1:
-        # Send hint
-        if warmupCountDown['remaining'] > 1:
-            hudhint('#human', 'Timer_Plural',
-            {'time': warmupCountDown['remaining']})
-        else:
-            hudhint('#human', 'Timer_Singular')
-
-        # Countdown 5 or less?
-        if warmupCountDown['remaining'] <= 5:
-            # Play beep
-            play_beep()
-
-        # 1 second left in warmup
-        if warmupCountDown['remaining'] == 1:
-            # Restart the round ourselves in 1 second
-            es.server.queuecmd('mp_restartgame 1')
-
-            # Before the round ends up restarting, prepare gungame to be ready
-            # for the first round of play
-            gamethread.delayed(0.7, prepare_game)
-
-            # Make sure that during the first round nobody has godmode
-            gamethread.delayed(1.4, remove_godmode)
-
-    # No time left
-    elif warmupCountDown['remaining'] == 0:
-        end_warmup('Timer_Ended')
-
-
-def prepare_game():
-    global giveGodMode
-    # For newly spawning players, give them godMode
-    giveGodMode = True
-
-    # Give players godmode so that they can't level up
-    for player in getPlayerList("#alive"):
-        player.godmode = 1
-
-    # Remove addons added to priority_addons
-    for addedAddon in priority_addons_added:
-        PriorityAddon().remove(addedAddon)
-
-    # Fire gg_start event
-    GG_Start().fire()
-
-
-def remove_godmode():
-    '''
-    Ran during the first round to make sure no players have godmode.
-    '''
-    global giveGodMode
-    # No longer give godMode to newly spawning players
-    giveGodMode = False
-
-    for player in getPlayerList("#alive"):
-        player.godmode = 0
-
-
-def end_warmup(message):
-    # Send hint
-    hudhint('#human', message)
-
-    # Play beep
-    play_beep()
-
-    # Delete the timer
-    repeat.delete('gungameWarmupTimer')
-
-    # Reset server vars back
-    reset_server_vars()
-
-
-def play_beep():
-    for userid in getUseridList('#human'):
-        Player(userid).playsound('countDownBeep')
-
-
-def reset_server_vars():
-    # If both warmup addons were loaded, we did no loading, so do no unloading
-    if not (int(gg_warmup_deathmatch) and int(gg_warmup_elimination)):
-        # If warmup deathmatch was enabled
-        if int(gg_warmup_deathmatch):
-            # Unload gg_deathmatch if we are not going into deathmatch gameplay
-            # now
-            if not int(gg_deathmatch_backup) and int(gg_deathmatch):
-                gg_deathmatch.set(0)
-                check_unload("gg_deathmatch")
-        # If warmup elimination was enabled
-        elif int(gg_warmup_elimination):
-            # Unload gg_elimination if we are not going into elimination
-            # gameplay now
-            if not int(gg_elimination_backup) and int(gg_elimination):
-                gg_elimination.set(0)
-                check_unload("gg_elimination")
-
-    # Check if deathmatch or elimination needs loaded
-    if int(gg_deathmatch_backup) or int(gg_elimination_backup):
-
-        # Added delay due to sharing dependency errors
-        gamethread.delayed(0, load_gg_addons)
-
-    # If gg_dead_strip disabled before warmup, disable it again
-    if not gg_dead_strip_backup and int(gg_dead_strip):
-        gg_dead_strip.set(0)
-        check_unload("gg_dead_strip")
-
-    # Changing mp_freezetime back
-    if int(mp_freezetime) != mp_freezetime_backup:
-        mp_freezetime.set(mp_freezetime_backup)
-
-
-def load_gg_addons():
-    # If we are going into deathmatch gameplay
-    if int(gg_deathmatch_backup):
-        # If we didn't already choose to leave deathmatch on above, load it
-        if not int(gg_warmup_deathmatch) and not int(gg_deathmatch):
-            gg_deathmatch.set(1)
-            addon_load("gg_deathmatch")
-    # If we are going into elimination gameplay
-    elif int(gg_elimination_backup):
-        # If we didn't already choose to leave elimination on above, load it
-        if not int(gg_warmup_elimination) and not int(gg_elimination):
-            gg_elimination.set(1)
-            addon_load("gg_elimination")
-
-
-def check_unload(addon):
-    if addon in AddonManager().__loaded__:
-        addon_unload(addon)
+    return warmup.weapon

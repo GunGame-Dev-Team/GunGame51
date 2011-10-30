@@ -99,17 +99,17 @@ sv_tags = es.ServerVar('sv_tags')
 
 # Credits used for the !thanks command
 credits = {
-    'Project Leaders':
+    'Core Team':
         ['XE_ManUp',
+        'cagemonkey',
         'Warren Alpert',
         'your-name-here',
-        'Monday'],
+        'Monday',
+        'RideGuy',
+        'satoon101'],
 
-    'Developers':
-        ['satoon101',
-        'cagemonkey',
-        'llamaelite',
-        'RideGuy'],
+    'Contributers':
+        ['llamaelite'],
 
     'Beta Testers':
         ['Sir_Die',
@@ -146,7 +146,8 @@ info.Authors = ('\n' +
              '\t' * 4 + 'Luke Robinson (Monday)\n' +
              '\t' * 4 + 'Warren Alpert\n' +
              '\t' * 4 + 'Paul Smith (RideGuy)\n' +
-             '\t' * 4 + 'Deniz Sezen (your-name-here)\n\n')
+             '\t' * 4 + 'Deniz Sezen (your-name-here)\n' +
+             '\t' * 4 + 'Stephen Toon (satoon101)\n\n')
 
 info.Website = ('\n' + '\t' * 4 + 'http://forums.gungame.net/\n')
 
@@ -443,6 +444,11 @@ class EventsManager(object):
             Player(int(event_var['userid'])).playsound('welcome')
 
     @staticmethod
+    def gg_start(event_var):
+        # Reset all player levels and multikills when GG Starts
+        resetPlayers()
+
+    @staticmethod
     def gg_win(event_var):
         '''Called when a player wins the GunGame round'''
 
@@ -486,12 +492,8 @@ class EventsManager(object):
             return
 
         if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
-            # For weapon order file and sort type,
-            # reset player's levels and multikills to 1
-            # and call gg_start again
-            if cvarName != "gg_multikill_override":
-                resetPlayers()
-                check_priority()
+            # For weapon order file and sort type, call gg_start again
+            check_priority()
 
     @staticmethod
     def player_changename(event_var):
@@ -511,8 +513,8 @@ class EventsManager(object):
         Player(userid).database_update()
 
         if event_var['es_steamid'] in (
-          'STEAM_0:1:5021657', 'STEAM_0:1:5244720',
-          'STEAM_0:0:11051207', 'STEAM_0:0:2641607'):
+          'STEAM_0:1:5021657', 'STEAM_0:1:5244720', 'STEAM_0:0:11051207',
+          'STEAM_0:0:2641607', 'STEAM_0:0:5183707'):
             msg('#human', 'GGThanks', {'name': event_var['es_username']})
 
         # Is player returning and in the lead?
@@ -651,9 +653,6 @@ def _finish_initialization():
     # Restart map
     msg('#human', 'Loaded')
 
-    # Fire gg_load event
-    GG_Load().fire()
-
     # Prune the DB
     prune_winners_db()
 
@@ -669,6 +668,11 @@ def _finish_initialization():
     # Make the sounds downloadable
     make_downloadable(True)
 
+
+    # Fire gg_load event
+    GG_Load().fire()
+
+    # Send message that loading has completed
     es.dbgmsg(0, langstring("Load_Completed"))
 
     # Change the value of gg_weapon_order_file to make sure we call

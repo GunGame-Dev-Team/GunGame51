@@ -21,8 +21,8 @@ from priority import PriorityAddon
 # >> GLOBAL VARIABLES
 # =============================================================================
 # These events should always fire, even if there are Priority Addons
-_priority_events = ['es_map_start', 'player_activate',
-    'es_player_validated', 'player_disconnect']
+_priority_events = ['es_map_start', 'player_activate', 'es_player_validated',
+    'player_disconnect', 'gg_addon_loaded', 'gg_addon_unloaded']
 
 
 # =============================================================================

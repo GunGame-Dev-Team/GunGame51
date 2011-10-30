@@ -182,17 +182,17 @@ class TeamManagement(object):
         # Increase the team's level
         self.level += 1
 
-        # Fire GG_Team_LevelUp
-        GG_Team_LevelUp(team=self.team,
-            old_level=self.level - 1, new_level=self.level).fire()
-
         # Did the team just win?
-        if self.level == get_total_levels():
+        if self.level > get_total_levels():
 
             GG_Team_Win(winner=self.team, loser=5 - self.team).fire()
 
             # Do not send messages or increase player levels
             return
+
+        # Fire GG_Team_LevelUp
+        GG_Team_LevelUp(team=self.team,
+            old_level=self.level - 1, new_level=self.level).fire()
 
         # Loop through all team members
         for userid in self.team_players:
