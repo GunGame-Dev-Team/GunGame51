@@ -93,7 +93,8 @@ def load():
             cvar.notes.append('Make sure to turn off addons that should ' +
                 'not be used during Warmup Round "prior" to turning on ' +
                 'any addons that should be used during Warmup Round.')
-            cvar.default = 'gungame51/included_addon_configs/warmup_start'
+            cvar.default = (
+                'gungame51/included_addon_configs/warmup_round_start_default')
             cvar.text = 'CFG file to be executed when Warmup Round starts.'
 
         # Create the gg_warmup_end_file instance
@@ -108,7 +109,8 @@ def load():
                 'were used during Warmup Round and are not needed for ' +
                 'the current match, "prior" to turning on any addons ' +
                 'that are needed for the current match.')
-            cvar.default = 'gungame51/included_addon_configs/warmup_end'
+            cvar.default = (
+                'gungame51/included_addon_configs/warmup_round_end_default')
             cvar.text = 'CFG file to be executed when Warmup Round ends.'
 
         # Create the extension section
