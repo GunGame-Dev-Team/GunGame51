@@ -93,8 +93,10 @@ def load():
             cvar.notes.append('Make sure to turn off addons that should ' +
                 'not be used during Warmup Round "prior" to turning on ' +
                 'any addons that should be used during Warmup Round.')
+            cvar.notes.append('The path to the file "must" ' +
+                'be relative to the "../cfg/gungame51/" folder')
             cvar.default = (
-                'gungame51/included_addon_configs/warmup_round_start_default')
+                'included_addon_configs/warmup_round_start_default')
             cvar.text = 'CFG file to be executed when Warmup Round starts.'
 
         # Create the gg_warmup_end_file instance
@@ -109,8 +111,10 @@ def load():
                 'were used during Warmup Round and are not needed for ' +
                 'the current match, "prior" to turning on any addons ' +
                 'that are needed for the current match.')
+            cvar.notes.append('The path to the file "must" ' +
+                'be relative to the "../cfg/gungame51/" folder')
             cvar.default = (
-                'gungame51/included_addon_configs/warmup_round_end_default')
+                'included_addon_configs/warmup_round_end_default')
             cvar.text = 'CFG file to be executed when Warmup Round ends.'
 
         # Create the extension section
@@ -161,7 +165,33 @@ def load():
         start = AddonCFG(start_path)
 
         # Add basic description of how to use the file
-        start.text('Description to be added later')
+        start.text('-' * 74 + '//')
+        start.text('//'.rjust(76))
+        start.text('warmup_round_start_default.cfg'.center(74) + '//')
+        start.text('//'.rjust(76))
+        start.text(('This is the default file (using the ' +
+            'value of gg_warmup_start_file)').center(74) + '//')
+        start.text(('used to determine the gameplay ' +
+            '"during" Warmup Round').center(74) + '//')
+        start.text('//'.rjust(76))
+        start.text(('As an example, if the server should ' +
+            'have gg_deathmatch during Warmup').center(74) + '//')
+        start.text(('and gg_elimination, gg_turbo, and ' +
+            'gg_teamwork for the actual match,').center(74) + '//')
+        start.text(
+            'the contents could look like the following'.center(74) + '//')
+        start.text('//'.rjust(76))
+        start.text((' // Turn off any addons that ' +
+            'should not be ran during warmup').ljust(74) + '//')
+        start.text(' gg_elimination 0'.ljust(74) + '//')
+        start.text(' gg_turbo 0'.ljust(74) + '//')
+        start.text(' gg_teamwork 0'.ljust(74) + '//')
+        start.text('//'.rjust(76))
+        start.text((' // Turn on any addons that ' +
+            'should be ran during warmup').ljust(74) + '//')
+        start.text(' gg_deathmatch 1'.ljust(74) + '//')
+        start.text('//'.rjust(76))
+        start.text('-' * 74 + '//')
 
         # Write the file
         start.write()
@@ -177,7 +207,34 @@ def load():
         end = AddonCFG(end_path)
 
         # Add basic description of how to use the file
-        end.text('Description to be added later')
+        end.text('-' * 74 + '//')
+        end.text('//'.rjust(76))
+        end.text('warmup_round_end_default.cfg'.center(74) + '//')
+        end.text('//'.rjust(76))
+        end.text(('This is the default file (using the ' +
+            'value of gg_warmup_end_file)').center(74) + '//')
+        end.text(('used to change the gameplay from ' +
+            'Warmup to the actual match').center(74) + '//')
+        end.text('//'.rjust(76))
+        end.text(('As an example, if the server should ' +
+            'have gg_deathmatch during Warmup').center(74) + '//')
+        end.text(('and gg_elimination, gg_turbo, and ' +
+            'gg_teamwork for the actual match,').center(74) + '//')
+        end.text(
+            'the contents could look like the following'.center(74) + '//')
+        end.text('//'.rjust(76))
+        end.text((' // Turn off any addons that ' +
+            'were ran during warmup,').ljust(74) + '//')
+        end.text(' //   but need to be off during the match'.ljust(74) + '//')
+        end.text(' gg_deathmatch 0'.ljust(74) + '//')
+        end.text('//'.rjust(76))
+        end.text((' // Turn on any addons that ' +
+            'should be ran for the match').ljust(74) + '//')
+        end.text(' gg_elimination 1'.ljust(74) + '//')
+        end.text(' gg_turbo 1'.ljust(74) + '//')
+        end.text(' gg_teamwork 1'.ljust(74) + '//')
+        end.text('//'.rjust(76))
+        end.text('-' * 74 + '//')
 
         # Write the file
         end.write()

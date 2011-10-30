@@ -206,7 +206,7 @@ class WarmupRound(object):
         mp_freezetime.set(0)
 
         # Execute the Start Warmup Round cfg
-        es.mexec(str(warmup_start_file))
+        es.mexec('gungame51/' + str(warmup_start_file))
 
         # Get the Warmup Weapon
         self.weapon = self.set_warmup_weapon()
@@ -374,7 +374,7 @@ class WarmupRound(object):
         mp_freezetime.set(self.freezetime)
 
         # Execute the End Warmup Round cfg file
-        es.mexec(str(warmup_end_file))
+        es.mexec('gungame51/' + str(warmup_end_file))
 
         # Restart the game
         es.server.queuecmd('mp_restartgame 1')
