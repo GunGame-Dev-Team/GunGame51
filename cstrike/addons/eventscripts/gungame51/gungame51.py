@@ -181,28 +181,35 @@ class EventsManager(object):
     def _load_events(self):
         '''Registers all events'''
 
-        # Loop through all methods of the class
-        for event in dir(self):
+        # Loop through all event methods of the class
+        for event in self._class_events:
 
-            # Is the method supposed to be registered for an event?
-            if not event.startswith('_'):
-
-                # Register the method for the event
-                EventRegistry().register_for_event(
-                    event, self.__getattribute__(event))
+            # Register the method for the event
+            EventRegistry().register_for_event(
+                event, self.__getattribute__(event))
 
     def _unload_events(self):
         '''Unregisters all events'''
 
+        # Loop through all event methods of the class
+        for event in self._class_events:
+
+            # Unregister the method for the event
+            EventRegistry().unregister_for_event(
+                event, self.__getattribute__(event))
+
+    @property
+    def _class_events(self):
+        '''Property that returns all events within the class'''
+
         # Loop through all methods of the class
         for event in dir(self):
 
-            # Is the method supposed to be unregistered?
+            # Is the method an event?
             if not event.startswith('_'):
 
-                # Unregister the method for the event
-                EventRegistry().unregister_for_event(
-                    event, self.__getattribute__(event))
+                # Yield the event
+                yield event
 
     @staticmethod
     def es_map_start(event_var):
@@ -252,13 +259,13 @@ class EventsManager(object):
         es.server.queuecmd('es_xfire %s func_buyzone Disable' % userid)
 
         # Remove weapons from the map
-        list_noStrip = [(x.strip() if x.strip().startswith('weapon_') else
+        do_not_strip = [(x.strip() if x.strip().startswith('weapon_') else
             'weapon_%s' % x.strip()) for x in str(
             gg_map_strip_exceptions).split(',') if x.strip() != '']
 
         for weapon in getWeaponList('#all'):
             # Make sure that the admin doesn't want the weapon left on the map
-            if weapon in list_noStrip:
+            if weapon in do_not_strip:
                 continue
 
             # Remove all weapons of this type from the map
@@ -752,6 +759,10 @@ def equip_player():
 
 
 def give_weapon_check(userid):
+    # Is there an active weapon order?
+    if WeaponOrderManager().active is None:
+        return
+
     # Is spectator?
     if es.getplayerteam(userid) < 2:
         return

@@ -61,7 +61,7 @@ class AddonManager(object):
         # Update GunGame info
         gungame_info('update')
 
-    def _unload_addon(self, addon, unloading_gg=False):
+    def _unload_addon(self, addon):
         '''Method used to unload a GunGame sub-addon'''
 
         # Is the addon not currently loaded?
@@ -100,11 +100,8 @@ class AddonManager(object):
         # Remove the addon from LoadedAddons
         del LoadedAddons()[addon]
 
-        # Is GunGame unloading?
-        if not unloading_gg:
-
-            # If not, update GunGame info
-            gungame_info('update')
+        # If not, update GunGame info
+        gungame_info('update')
 
     def unload_all_addons(self):
         '''Method used to remove all addons on unload'''

@@ -72,13 +72,7 @@ class GunGameInfo(object):
             except:
                 continue
         return '5.1.%s' % revision
-'''
-    version +
-    addoninfo +
-    update
-    included
-    custom
-'''
+
 
 # =============================================================================
 # >> FILES, DIRECTORIES, & OS FUNCTIONS

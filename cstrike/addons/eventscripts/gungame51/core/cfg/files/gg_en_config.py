@@ -78,9 +78,8 @@ def load():
 
             cvar.name = 'WEAPON ORDER SORT TYPE'
             cvar.options.append('#default  = Order will go Top -> Bottom.')
-            cvar.options.append('#reversed = Order will go Bottom -> Top.')
             cvar.options.append('#random   = Order will be randomly shuffled.')
-            cvar.notes.append('#reversed and #random sort types will move ' +
+            cvar.notes.append('#random sort type will move ' +
                 'hegrenade and knife levels to the end of the order.')
             cvar.default = '#default'
             cvar.text = ('The order in which ' +

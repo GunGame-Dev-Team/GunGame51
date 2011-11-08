@@ -278,8 +278,8 @@ class TeamManagement(object):
             teamname = langstring(self.teamname, userid=userid)
 
             # Send chat message for team winning the match
-            ggPlayer.saytext2(index,
-                'TeamWork_Winner', {'teamname': teamname})
+            ggPlayer.saytext2(
+                index, 'TeamWork_Winner', {'teamname': teamname}, True)
 
             # We want to loop, so we send a message every second for 3 seconds
             for x in xrange(4):
@@ -320,7 +320,7 @@ class TeamManagement(object):
             tokens.update({'teamname': teamname})
 
             # Send the message to the player
-            Player(userid).saytext2(index, message, tokens)
+            Player(userid).saytext2(index, message, tokens, True)
 
     @property
     def leader_level(self):

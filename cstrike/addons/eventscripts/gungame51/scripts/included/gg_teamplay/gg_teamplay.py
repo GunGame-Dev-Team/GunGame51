@@ -125,6 +125,20 @@ class GGTeams(dict):
         # Return the dictionary
         return cls._the_instance
 
+    def __getitem__(self, item):
+        '''Makes sure an interger value of 2 or 3 is requested'''
+
+        # Get the integer value
+        item = int(item)
+
+        # Is the item 2 or 3?
+        if not item in (2, 3):
+
+            raise KeyError('Team must be either 2 or 3 not "%s"' % item)
+
+        # Return the team
+        return super(GGTeams, self).__getitem__(item)
+
     def clear(self):
         '''Resets the team level and multikill values'''
 
@@ -199,12 +213,6 @@ class TeamManagement(object):
 
             # Set the player's level to the team level
             self.set_player_level(userid)
-
-        # Does a message need sent?
-        if int(gg_teamplay_roundend_messages):
-
-            # Send the message
-            self.send_increase_level_message()
 
     def set_player_level(self, userid):
         '''Sets the player's level to the team's level'''
@@ -342,54 +350,30 @@ class TeamManagement(object):
         self.send_all_players_a_message(message,
             {'levels': levels, 'level': self.level})
 
-    def send_hudhint_info(self, userid):
-        '''Sends level info on player_spawn'''
+    def send_round_start_messages(self):
+        '''Sends level info for both teams on round_start'''
 
-        # Get the total levels
-        total_levels = get_total_levels()
+        # Set the message type
+        message = 'TeamPlay_Round'
 
-        # Create text showing team's level
-        text = langstring('TeamPlay_LevelInfo_TeamLevel',
-            {'teamname': langstring(self.teamname, userid=userid),
-            'level': self.level, 'total': total_levels}, userid)
+        # Get the team's weapon
+        weapon = get_level_weapon(self.level)
 
-        # Add the teams weapon to the text
-        text += langstring('TeamPlay_LevelInfo_TeamWeapon',
-            {'weapon': get_level_weapon(self.level)}, userid)
+        tokens = {'level': self.level, 'weapon': weapon}
 
         # Get the team's current level's multikill
         multikill = get_level_multikill(self.level)
 
-        # Is more than 1 round required for this level?
+        # Is the needed multikill > 1?
         if multikill > 1:
 
-            # Add Required Rounds to the text
-            text += langstring('TeamPlay_LevelInfo_RequiredRounds',
-                {'rounds': self.multikill, 'total': multikill}, userid)
+            # Set the message type to use multikill
+            message += '_Multikill'
 
-        # Add a new-line character
-        text += '\n'
+            # Add multikill values to the tokens
+            tokens.update({'multikill': self.multikill, 'needed': multikill})
 
-        # Get the other team's instance
-        other = gg_teams[5 - self.team]
-
-        # Add the other team's level information
-        text += langstring('TeamPlay_LevelInfo_TeamLevel',
-            {'teamname': langstring(other.teamname, userid=userid),
-            'level': other.level, 'total': total_levels}, userid)
-
-        # Get the other team's current level's multikill
-        multikill = get_level_multikill(other.level)
-
-        # Is more than 1 round required for this level?
-        if multikill > 1:
-
-            # Add Required Rounds to the text
-            text += langstring('TeamPlay_LevelInfo_RequiredRounds',
-                {'rounds': self.multikill, 'total': multikill}, userid)
-
-        # Send the player the hudhint
-        Player(userid).hudhint(text)
+        self.send_all_players_a_message(message, tokens)
 
     def send_winner_messages(self):
         '''Sends Winner Messages to all players'''
@@ -416,8 +400,8 @@ class TeamManagement(object):
             teamname = langstring(self.teamname, userid=userid)
 
             # Send chat message for team winning the match
-            ggPlayer.saytext2(index,
-                'TeamPlay_Winner', {'teamname': teamname})
+            ggPlayer.saytext2(
+                index, 'TeamPlay_Winner', {'teamname': teamname}, True)
 
             # We want to loop, so we send a message every second for 3 seconds
             for x in xrange(4):
@@ -458,7 +442,7 @@ class TeamManagement(object):
             tokens.update({'teamname': teamname})
 
             # Send the message to the player
-            Player(userid).saytext2(index, message, tokens)
+            Player(userid).saytext2(index, message, tokens, True)
 
     @property
     def team_players(self):
@@ -546,6 +530,22 @@ def es_map_start(event_var):
     gg_teamplay_resource.load()
 
 
+def round_start(event_var):
+    '''Fired every time the round starts'''
+
+    # Do the round start messages need sent?
+    if not int(gg_teamplay_level_info):
+
+        # If not, return
+        return
+
+    # Loop through both teams
+    for team in gg_teams:
+
+        # Send round start messages
+        gg_teams[team].send_round_start_messages()
+
+
 def round_end(event_var):
     '''Fired every time the round ends'''
 
@@ -571,17 +571,8 @@ def player_spawn(event_var):
         # If not, return
         return
 
-    # Store the userid
-    userid = int(event_var['userid'])
-
     # Set the player's level to the team's level
-    gg_teams[team].set_player_level(userid)
-
-    # Does the player need the level info sent?
-    if int(gg_teamplay_level_info):
-
-        # Send the player their team's level info
-        gg_teams[team].send_hudhint_info(userid)
+    gg_teams[team].set_player_level(event_var['userid'])
 
 
 def player_death(event_var):
@@ -611,6 +602,19 @@ def gg_start(event_var):
 
     # Reset team level and multikill values
     gg_teams.clear()
+
+
+def gg_team_levelup(event_var):
+    '''Fired when a team levels up'''
+
+    # Does a message need sent?
+    if not int(gg_teamplay_roundend_messages):
+
+        # Return if no messages need sent
+        return
+
+    # Send the message
+    gg_teams[int(event_var['team'])].send_increase_level_message()
 
 
 def gg_team_win(event_var):
