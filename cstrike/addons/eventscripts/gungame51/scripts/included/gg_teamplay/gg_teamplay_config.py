@@ -59,13 +59,13 @@ def load():
 
             cvar.name = 'TEAMPLAY LEVEL INFO'
             cvar.description.append('Show team level ' +
-                'info in player hudhint on player_spawn')
+                'info in chat at the start of each round')
             cvar.options.append(
-                '0 = (Disabled) Do not show hudhint level info messages')
+                '0 = (Disabled) Do not show level info messages')
             cvar.options.append(
-                '1 = (Enabled) Show hudhint level info messages')
+                '1 = (Enabled) Show level info messages')
             cvar.default = 1
-            cvar.text = 'Enables/Disables showing hudhint level info messages'
+            cvar.text = 'Enables/Disables showing level info messages'
 
         # Create the gg_teamplay_winner_messages instance
         with config.cfg_cvar('gg_teamplay_winner_messages') as cvar:

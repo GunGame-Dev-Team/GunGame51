@@ -42,7 +42,7 @@ class AddonConflicts(dict):
         # Return the set
         return value
 
-    def _add_conflict(self, loading_addon, conflict):
+    def _add_conflict(self, conflict, loading_addon):
         '''Adds a conflict between addons'''
 
         # Add the addon that is loading to the conflicting addon's set
