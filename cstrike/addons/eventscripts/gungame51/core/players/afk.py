@@ -48,7 +48,7 @@ class AFK(object):
             int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[0]')) +
             int(es.getplayerprop(self.userid, 'CCSPlayer.m_angEyeAngles[1]')))
 
-    def isActive(self):
+    def is_active(self):
         '''
         Sets the player to a state that is NOT AFK.
         Only used when we know that the player is active and NOT AFK.

@@ -36,11 +36,11 @@ class PlayerCallbacks(object):
               certain ranges/specifications.
 
         Usage:
-            Player.add_attribute_callback('attributeName', callbackFunction,
+            Player.add_attribute_callback('attribute_name', callback_function,
                                         'gg_addon_name')
 
-            def callbackFunction(name_of_the_attribute, value_to_be_checked):
-                if name_of_the_attribute == 'attributeName':
+            def callback_function(name_of_the_attribute, value_to_be_checked):
+                if name_of_the_attribute == 'attribute_name':
                     if value_to_be_checked > 0 and value_to_be_checked < 10:
                         pass
                     else:
@@ -60,7 +60,7 @@ class PlayerCallbacks(object):
             raise an exception.
 
         Usage:
-            Player.remove_attribute_callback('attributeName')
+            Player.remove_attribute_callback('attribute_name')
 
         """
         # Remove the callback from the CustomAttributeCallbacks instance

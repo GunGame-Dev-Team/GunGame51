@@ -37,9 +37,9 @@ def langstring(string, tokens={}, userid=0, prefix=False):
     return MessageManager().langstring(string, tokens, userid, prefix)
 
 
-def loadTranslation(name, addon):
+def load_translation(name, addon):
     MessageManager().load(name, addon)
 
 
-def unloadTranslation(name, addon):
+def unload_translation(name, addon):
     MessageManager().unload(name, addon)

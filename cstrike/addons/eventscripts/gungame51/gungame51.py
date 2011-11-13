@@ -20,7 +20,6 @@ from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 #   Gamethread
 from gamethread import delayed
-from gamethread import cancelDelayed
 #   Playerlib
 from playerlib import getPlayer
 from playerlib import getUseridList
@@ -58,13 +57,13 @@ from core.leaders.shortcuts import LeaderManager
 from core.menus import MenuManager
 #   Messaging
 from core.messaging.shortcuts import langstring
-from core.messaging.shortcuts import loadTranslation
-from core.messaging.shortcuts import unloadTranslation
+from core.messaging.shortcuts import load_translation
+from core.messaging.shortcuts import unload_translation
 from core.messaging.shortcuts import msg
 #   Players
 from core.players.players import _PlayerContainer
 from core.players.shortcuts import Player
-from core.players.shortcuts import resetPlayers
+from core.players.shortcuts import reset_players
 #   Sounds
 from core.sound import make_downloadable
 #   Sql
@@ -84,16 +83,13 @@ gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
-gg_multikill_override = es.ServerVar('gg_multikill_override')
 gg_player_armor = es.ServerVar('gg_player_armor')
 gg_map_obj = es.ServerVar('gg_map_obj')
 gg_player_defuser = es.ServerVar('gg_player_defuser')
-gg_warmup_round = es.ServerVar('gg_warmup_round')
-gg_warmup_round_backup = None
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
 #firstPlayerSpawned = False
-firstGGStart = False
+first_gg_start = False
 
 sv_tags = es.ServerVar('sv_tags')
 
@@ -225,7 +221,7 @@ class EventsManager(object):
         es.delayed(1, 'exec gungame51/gg_server.cfg')
 
         # Reset all players
-        resetPlayers()
+        reset_players()
 
         # Reset current leaders
         LeaderManager().reset()
@@ -435,7 +431,7 @@ class EventsManager(object):
         '''Called any time a player disconnects from the server'''
 
         # Check to see if player was the leader
-        LeaderManager()._disconnected_leader(int(event_var['userid']))
+        LeaderManager().disconnected_leader(int(event_var['userid']))
 
     @staticmethod
     def player_team(event_var):
@@ -453,7 +449,7 @@ class EventsManager(object):
     @staticmethod
     def gg_start(event_var):
         # Reset all player levels and multikills when GG Starts
-        resetPlayers()
+        reset_players()
 
     @staticmethod
     def gg_win(event_var):
@@ -601,7 +597,7 @@ def unload():
     AddonManager().unload_all_addons()
 
     # Unload translations
-    unloadTranslation('gungame', 'gungame')
+    unload_translation('gungame', 'gungame')
 
     # Remove all player instances
     _PlayerContainer().clear()
@@ -630,7 +626,7 @@ def initialize():
     gg_resource_file.declare_and_load()
 
     # Load the base translations
-    loadTranslation('gungame', 'gungame')
+    load_translation('gungame', 'gungame')
 
     # Send message about GunGame loading
     es.dbgmsg(0, langstring("Load_Start",
@@ -658,7 +654,7 @@ def _finish_initialization():
     es.server.cmd('exec gungame51/gg_server.cfg')
 
     # Clear out the GunGame system
-    resetPlayers()
+    reset_players()
 
     # Restart map
     msg('#human', 'Loaded')
@@ -677,7 +673,6 @@ def _finish_initialization():
 
     # Make the sounds downloadable
     make_downloadable(True)
-
 
     # Fire gg_load event
     GG_Load().fire()
@@ -699,8 +694,6 @@ def unload_on_error():
     es.dbgmsg(0, '[GunGame51] %s' % ('=' * 79))
     es.excepter(*sys.exc_info())
     es.dbgmsg(0, '[GunGame51] %s' % ('=' * 79))
-    for delayname in ('gg_mp_restartgame',):
-        cancelDelayed(delayname)
     es.unload('gungame51')
 
 
@@ -708,15 +701,15 @@ def unload_on_error():
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
 def first_gg_start():
-    global firstGGStart
-    firstGGStart = True
+    global first_gg_start
+    first_gg_start = True
     check_priority()
 
 
 def check_priority():
     # If there is nothing in priority addons, fire event gg_start
     if not PriorityAddon():
-        if firstGGStart:
+        if first_gg_start:
             GG_Start().fire()
 
 

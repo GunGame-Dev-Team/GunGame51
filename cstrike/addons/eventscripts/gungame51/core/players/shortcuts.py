@@ -90,7 +90,7 @@ def deleteAttribute(filter, attribute):
     del Player(filter)[attribute]
 
 
-def resetPlayers():
+def reset_players():
     '''
     Resets the BasePlayer instances, setting their attributes back to default.
 

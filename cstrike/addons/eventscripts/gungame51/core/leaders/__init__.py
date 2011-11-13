@@ -151,7 +151,7 @@ class LeaderManager(dict):
         # Fire the "gg_new_leader" event
         return gg_new_leader.fire()
 
-    def _disconnected_leader(self, userid):
+    def disconnected_leader(self, userid):
         """Handles the disconnection of players."""
         import es
         # Make sure the userid no longer exists on the server

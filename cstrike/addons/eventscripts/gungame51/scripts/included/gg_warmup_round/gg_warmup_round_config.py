@@ -196,7 +196,7 @@ def load():
         # Write the file
         start.write()
 
-    # Get the path to the default Warmup Round End cfg file 
+    # Get the path to the default Warmup Round End cfg file
     end_path = path(get_game_dir(
         'cfg/gungame51/included_addon_configs/warmup_round_end_default.cfg'))
 

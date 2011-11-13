@@ -405,7 +405,7 @@ class WarmupRound(object):
         self.set_all_players_godmode(False)
 
         # Call GG_Start event
-        # This should also cause player levels and multikills 
+        # This should also cause player levels and multikills
         # to be reset as soon as the GunGame match starts
         GG_Start().fire()
 

@@ -1,32 +1,32 @@
-# ==============================================================================
+# =============================================================================
 # MODULE IMPORTS
-# ==============================================================================
+# =============================================================================
 import es
 import gamethread
 
 
-# ==============================================================================
+# =============================================================================
 # MODULE INFORMATION
-# ==============================================================================
-info = es.AddonInfo() 
-info.name     = "Repeat2 - EventScripts python library" 
-info.version  = "sushi01" 
-info.url      = "http://www.eventscripts.com/pages/Repeat2/" 
-info.basename = "repeat2" 
-info.author   = "SumGuy14 (Aka SoccerDude) & XE_ManUp"
+# =============================================================================
+info = es.AddonInfo()
+info.name = "Repeat2 - EventScripts python library"
+info.version = "sushi01"
+info.url = "http://www.eventscripts.com/pages/Repeat2/"
+info.basename = "repeat2"
+info.author = "SumGuy14 (Aka SoccerDude) & XE_ManUp"
 
 
-# ==============================================================================
+# =============================================================================
 # MODULE GLOBAL VARIABLES
-# ==============================================================================
+# =============================================================================
 STATUS_STOPPED = 1
 STATUS_RUNNING = 2
 STATUS_PAUSED = 3
 
 
-# ==============================================================================
+# =============================================================================
 # MODULE CLASSES
-# ==============================================================================
+# =============================================================================
 class RepeatError(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -43,14 +43,14 @@ class RepeatContainer(dict):
     """
     def add(self, name, instance):
         """Adds a repeat instance by name to the dictionary."""
-        if not self.has_key(name):
+        if not name in self:
             # Add the repeat instance to the dictionary
             self[name] = instance
         else:
-            raise RepeatError('The repeat name "%s" already exists! If' %name +
-                ' you are creating a new repeat, please use a different ' +
-                'name. If you are updating the repeat, please use ' \
-                'repeat.find("%s").' %name)
+            raise RepeatError('The repeat name "%s" already exists! ' % name +
+                'If you are creating a new repeat, please use a different ' +
+                'name. If you are updating the repeat, please use ' +
+                'repeat.find("%s").' % name)
 
     def delete(self, name):
         """Deletes a repeat instance by name from the container."""
@@ -68,7 +68,7 @@ repeatContainer = RepeatContainer()
 class RepeatManager(object):
     """Class that controls interaction with the repeat such as starting,
     stopping, pausing, resuming, etc.
-    
+
     Arguments:
         instance_or_name: This can be either a Repeat() instance, or the name
                           given to the instance.
@@ -82,10 +82,10 @@ class RepeatManager(object):
         if not isinstance(instance_or_name, Repeat):
             # Find the instance
             instance = find(str(instance_or_name))
-            
+
             if instance is None:
-                raise RepeatError('The repeat name "%s" can not be found' \
-                                  %instance_or_name)
+                raise RepeatError(
+                    'The repeat name "%s" can not be found' % instance_or_name)
             self.repeat = find(instance_or_name)
         else:
             self.repeat = instance_or_name
@@ -132,8 +132,8 @@ class RepeatManager(object):
             return self._interval * self._limit
 
         # Return the adjusted value
-        return (self._interval * self._limit) + \
-               (self._adjusted * self._interval)
+        return ((self._interval * self._limit) +
+            (self._adjusted * self._interval))
 
     @property
     def remaining(self):
@@ -207,7 +207,7 @@ class RepeatManager(object):
     def restart(self):
         """Restarts the repeat based on the stored interval and limit
         arguments.
-        
+
         Note:
             * It is assumed that the start() method was used prior to utilizing
               this method. If both the interval and limit have values of 0,
@@ -224,7 +224,7 @@ class RepeatManager(object):
 
     def stop(self):
         """Stops the execution of the repeat.
-        
+
         Note:
             * By stopping the repeat, it effectly cancels all pending actions.
             * Once stopped, the repeat must be started using the start() or
@@ -274,7 +274,7 @@ class RepeatManager(object):
         if self._status == STATUS_RUNNING:
             return
 
-        # Make sure that we can resume the repeat 
+        # Make sure that we can resume the repeat
         if ((self._interval != 0 and self.remaining > 0) or
             self._interval == 0):
 
@@ -301,7 +301,7 @@ class RepeatManager(object):
 
     def extend(self, seconds):
         """Extends the amount of time (in seconds) that the repeat will run.
-        
+
         Note:
             * Time can not be extended if limit is set to 0.
 
@@ -325,7 +325,7 @@ class RepeatManager(object):
 
     def reduce(self, seconds):
         """Reduces the amount of time (in seconds) that the repeat will run.
-        
+
         Note:
             * Time can not be extended if limit is set to 0.
 
@@ -363,7 +363,8 @@ class RepeatManager(object):
                                        es.server.queuecmd, self.repeat.command)
 
             # Re-call the self._fire() loop
-            gamethread.delayedname(self._interval, self.repeat.name,self._fire)
+            gamethread.delayedname(
+                self._interval, self.repeat.name, self._fire)
         else:
             self.stop()
 
@@ -406,25 +407,29 @@ class Repeat(RepeatManager):
 
     def __str__(self):
         return repr(self.name)
+
+
 # =============================================================================
 # MODULE FUNCTIONS
 # =============================================================================
 def find(name):
     """Finds and returns a repeat by its name.
-    
+
     Note:
         * Returns a Repeat() class instance if the name is found.
         * Returns None if a Repeat() class instance is not found.
 
     """
-    if repeatContainer.has_key(name):
+    if name in repeatContainer:
         return repeatContainer[name]
 
     return None
 
+
 def delete(name):
     """Deletes a repeat by name."""
     repeatContainer.delete(name)
+
 
 def get_repeat_names():
     """Returns a list of all existing/stored repeat names."""
