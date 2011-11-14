@@ -79,6 +79,9 @@ from core.weapons.shortcuts import get_weapon_order
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
+eventscripts_gg = es.ServerVar('eventscripts_gg')
+eventscripts_gg5 = es.ServerVar('eventscripts_gg5')
+
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
@@ -88,7 +91,7 @@ gg_map_obj = es.ServerVar('gg_map_obj')
 gg_player_defuser = es.ServerVar('gg_player_defuser')
 gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
-#firstPlayerSpawned = False
+
 first_gg_start = False
 
 sv_tags = es.ServerVar('sv_tags')
@@ -116,7 +119,8 @@ credits = {
         'Evil_SNipE',
         'k@rma',
         'tnarocks',
-        'Warbucks'],
+        'Warbucks',
+        'daggersarge'],
 
     'Special Thanks':
         ['gameservers.pro',
@@ -488,13 +492,13 @@ class EventsManager(object):
     def server_cvar(event_var):
         '''Called when a cvar is set to any value'''
 
-        cvarName = event_var['cvarname']
-        cvarValue = event_var['cvarvalue']
+        cvar_name = event_var['cvarname']
+        cvar_value = event_var['cvarvalue']
 
-        if cvarValue == '0':
+        if cvar_value == '0':
             return
 
-        if cvarName in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
+        if cvar_name in ['gg_weapon_order_file', 'gg_weapon_order_sort_type']:
             # For weapon order file and sort type, call gg_start again
             check_priority()
 
@@ -545,17 +549,17 @@ def load():
 
     # If the public variables exist, remove them
     if not es.exists('variable', 'eventscripts_gg'):
-        es.ServerVar('eventscripts_gg').removeFlag('notify')
-        es.ServerVar('eventscripts_gg').removeFlag('replicated')
+        eventscripts_gg.removeFlag('notify')
+        eventscripts_gg.removeFlag('replicated')
     if not es.exists('variable', 'eventscripts_gg5'):
-        es.ServerVar('eventscripts_gg5').removeFlag('notify')
-        es.ServerVar('eventscripts_gg5').removeFlag('replicated')
+        eventscripts_gg5.removeFlag('notify')
+        eventscripts_gg5.removeFlag('replicated')
 
     # Create the public variables
-    es.ServerVar('eventscripts_gg').set(gungame_info('version'))
-    es.ServerVar('eventscripts_gg').makepublic()
-    es.ServerVar('eventscripts_gg5').set(gungame_info('version'))
-    es.ServerVar('eventscripts_gg5').makepublic()
+    eventscripts_gg.set(gungame_info('version'))
+    eventscripts_gg.makepublic()
+    eventscripts_gg5.set(gungame_info('version'))
+    eventscripts_gg5.makepublic()
 
     # Register !thanks command
     registerSayCommand('!thanks', thanks, 'Displays a list of those involved' +
@@ -579,10 +583,10 @@ def unload():
     sv_tags.set(','.join(tags))
 
     # Remove the public variables
-    es.ServerVar('eventscripts_gg').removeFlag('notify')
-    es.ServerVar('eventscripts_gg').removeFlag('replicated')
-    es.ServerVar('eventscripts_gg5').removeFlag('notify')
-    es.ServerVar('eventscripts_gg5').removeFlag('replicated')
+    eventscripts_gg.removeFlag('notify')
+    eventscripts_gg.removeFlag('replicated')
+    eventscripts_gg5.removeFlag('notify')
+    eventscripts_gg5.removeFlag('replicated')
 
     # Unregister server_cvar for core.weapons
     WeaponOrderManager().unregister()
@@ -687,7 +691,7 @@ def _finish_initialization():
     gg_weapon_order_file.set(gg_weapon_order_file_backup)
 
     # See if we need to fire event gg_start after everything is loaded
-    delayed(2, first_gg_start)
+    delayed(2, check_first_gg_start)
 
 
 def unload_on_error():
@@ -700,7 +704,7 @@ def unload_on_error():
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
-def first_gg_start():
+def check_first_gg_start():
     global first_gg_start
     first_gg_start = True
     check_priority()
@@ -719,6 +723,7 @@ def thanks(userid, args):
 
     # Loop through the credits
     for x in credits.keys():
+
         # Print category
         es.cexec(userid, 'echo [GG Thanks] %s:' % (x))
 

@@ -48,7 +48,7 @@ class AddonConflicts(dict):
         # Add the addon that is loading to the conflicting addon's set
         self[conflict].add(loading_addon)
 
-    def _remove_conflict(self, unloading_addon, conflict):
+    def _remove_conflict(self, conflict, unloading_addon):
         '''Removes a conflict between addons'''
 
         # Remove the unloading addon from the conflicting addon's set
