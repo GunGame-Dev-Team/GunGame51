@@ -17,7 +17,7 @@ from gungame51.core import get_game_dir
 # >> GLOBAL VARIABLES
 # =============================================================================
 # Store the path to the scripts directory
-main_addon_path = get_game_dir('addons/eventscripts/gungame51/scripts')
+_main_addon_path = get_game_dir('addons/eventscripts/gungame51/scripts')
 
 
 # =============================================================================
@@ -104,4 +104,4 @@ class ValidAddons(dict):
 
         # Return the set of addons
         return set([addon.namebase for addon in
-            main_addon_path.joinpath(addon_type).dirs()])
+            _main_addon_path.joinpath(addon_type).dirs()])

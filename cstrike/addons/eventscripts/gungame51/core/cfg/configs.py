@@ -1,4 +1,4 @@
-# ../core/cfg/context.py
+# ../core/cfg/configs.py
 
 '''
 $Rev$
@@ -27,7 +27,7 @@ from manager import ConfigManager
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-base_config_path = path(
+_base_config_path = path(
     path(__file__).parent.rsplit('addons', 1)[0]).joinpath('cfg/gungame51')
 
 
@@ -75,7 +75,7 @@ class ConfigContextManager(object):
             self.cfgpath = self.filename
 
         # Set the path to the .cfg file
-        self.filepath = base_config_path.joinpath(self.cfgpath)
+        self.filepath = _base_config_path.joinpath(self.cfgpath)
 
     def __enter__(self):
         '''Returns the class instance to use for Context Management'''

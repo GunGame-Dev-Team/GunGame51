@@ -178,6 +178,9 @@ class EventsManager(object):
             cls._the_instance = object.__new__(cls)
         return cls._the_instance
 
+    # =========================================================================
+    # >> REGISTER/UNREGISTER METHODS
+    # =========================================================================
     def _load_events(self):
         '''Registers all events'''
 
@@ -211,6 +214,9 @@ class EventsManager(object):
                 # Yield the event
                 yield event
 
+    # =========================================================================
+    # >> CLASS EVENTS
+    # =========================================================================
     @staticmethod
     def es_map_start(event_var):
         '''Method to be ran on es_map_start event'''
@@ -248,8 +254,7 @@ class EventsManager(object):
         # Check to see if gg_start needs fired after everything is loaded
         delayed(2, check_priority)
 
-    @staticmethod
-    def round_start(event_var):
+    def round_start(self, event_var):
         '''Called at the start of every round'''
 
         # Retrieve a random userid
@@ -278,10 +283,9 @@ class EventsManager(object):
 
         # Equip players with a knife and
         # possibly item_kevlar or item_assaultsuit
-        equip_player()
+        self._equip_player()
 
-    @staticmethod
-    def player_spawn(event_var):
+    def player_spawn(self, event_var):
         '''Called any time a player spawns'''
 
         # Check for priority addons
@@ -320,7 +324,7 @@ class EventsManager(object):
 
         # Strip bots (sometimes they keep previous weapons)
         if es.isbot(userid):
-            delayed(0.25, give_weapon_check, (userid))
+            delayed(0.25, self._give_weapon_check, (userid))
             delayed(0.35, ggPlayer.strip)
 
         # Player is human
@@ -329,7 +333,7 @@ class EventsManager(object):
             delayed(0.60, ggPlayer.afk.reset)
 
             # Give the player their weapon
-            delayed(0.05, give_weapon_check, (userid))
+            delayed(0.05, self._give_weapon_check, (userid))
 
     @staticmethod
     def player_death(event_var):
@@ -530,6 +534,49 @@ class EventsManager(object):
         # Hopefully temporary code to allow es_fire commands
         # All credits to http://forums.eventscripts.com/viewtopic.php?t=42620
         disable_auto_kick(userid)
+
+    # =========================================================================
+    # >> HELPER METHODS
+    # =========================================================================
+    @staticmethod
+    def _give_weapon_check(userid):
+        # Is there an active weapon order?
+        if WeaponOrderManager().active is None:
+            return
+
+        # Is spectator?
+        if es.getplayerteam(userid) < 2:
+            return
+
+        # Is player dead?
+        if getPlayer(userid).isdead:
+            return
+
+        # Give the weapon
+        Player(userid).give_weapon()
+
+    @staticmethod
+    def _equip_player():
+        userid = es.getuserid()
+        cmd = ('es_xremove game_player_equip;' +
+              'es_xgive %s game_player_equip;' % userid +
+              'es_xfire %s game_player_equip ' % userid +
+              'AddOutput "weapon_knife 1";')
+
+        # Retrieve the armor type
+        armor_type = int(gg_player_armor)
+
+        # Give the player full armor
+        if armor_type == 2:
+            cmd = (cmd + 'es_xfire %s ' % userid +
+                'game_player_equip AddOutput "item_assaultsuit 1";')
+
+        # Give the player kevlar only
+        elif armor_type == 1:
+            cmd = (cmd + 'es_xfire ' +
+                '%s game_player_equip AddOutput "item_kevlar 1";' % userid)
+
+        es.server.queuecmd(cmd)
 
 EventsManager()._load_events()
 
@@ -732,45 +779,6 @@ def thanks(userid, args):
             es.cexec(userid, 'echo [GG Thanks]    %s' % y)
 
         es.cexec(userid, 'echo [GG Thanks] ')
-
-
-def equip_player():
-    userid = es.getuserid()
-    cmd = ('es_xremove game_player_equip;' +
-          'es_xgive %s game_player_equip;' % userid +
-          'es_xfire %s game_player_equip AddOutput "weapon_knife 1";' % userid)
-
-    # Retrieve the armor type
-    armor_type = int(gg_player_armor)
-
-    # Give the player full armor
-    if armor_type == 2:
-        cmd = (cmd + 'es_xfire ' +
-            '%s game_player_equip AddOutput "item_assaultsuit 1";' % userid)
-
-    # Give the player kevlar only
-    elif armor_type == 1:
-        cmd = (cmd + 'es_xfire ' +
-            '%s game_player_equip AddOutput "item_kevlar 1";' % userid)
-
-    es.server.queuecmd(cmd)
-
-
-def give_weapon_check(userid):
-    # Is there an active weapon order?
-    if WeaponOrderManager().active is None:
-        return
-
-    # Is spectator?
-    if es.getplayerteam(userid) < 2:
-        return
-
-    # Is player dead?
-    if getPlayer(userid).isdead:
-        return
-
-    # Give the weapon
-    Player(userid).give_weapon()
 
 
 # Hopefully temporary code to allow es_fire commands

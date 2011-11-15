@@ -230,7 +230,7 @@ class WarmupRound(object):
         for addon in LoadedAddons():
 
             # Add the addon as a Priority
-            self.priorities.add(info.name)
+            self.priorities.add(addon)
 
     def count_down(self):
         '''
