@@ -16,16 +16,9 @@ from path import path
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class ConfigTypeDictionary(dict):
+class _ConfigTypeDictionary(dict):
     '''A dictionary that stores config files
         by type (main, included, and custom)'''
-
-    def __new__(cls):
-        '''Method used to make sure class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
 
     def __getitem__(self, item):
         '''Override the __getitem__ method of dict
@@ -35,7 +28,7 @@ class ConfigTypeDictionary(dict):
         if item in self:
 
             # Return the list of cfg files
-            return super(ConfigTypeDictionary, self).__getitem__(item)
+            return super(_ConfigTypeDictionary, self).__getitem__(item)
 
         # Add the item to the dictionary and get a list of cfg files
         values = self[item] = self._get_configs_by_type(item)
@@ -87,3 +80,6 @@ class ConfigTypeDictionary(dict):
 
         # Return a set of path instances of the *_config.py files
         return set(cfg_paths.walkfiles('*_config.py'))
+
+# Get the ConfigTypeDictionary instance
+ConfigTypeDictionary = _ConfigTypeDictionary()

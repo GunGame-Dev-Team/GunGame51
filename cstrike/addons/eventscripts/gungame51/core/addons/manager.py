@@ -21,33 +21,28 @@ from loaded import LoadedAddons
 # >> CLASSES
 # =============================================================================
 class AddonManager(object):
-    def __new__(cls):
-        '''Method to make sure the class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = object.__new__(cls)
-        return cls._the_instance
+    '''Class that manages loading/unloading addons'''
 
     def _load_addon(self, addon):
         '''Method used to load a GunGame sub-addon'''
 
         # Is the addon already loaded?
-        if addon in LoadedAddons():
+        if addon in LoadedAddons:
 
             # If so, raise an error
             raise NameError('GunGame sub-addon "%s" is already loaded' % addon)
 
         # Load the addon and get it's instance
-        instance = LoadedAddons()[addon]
+        instance = LoadedAddons[addon]
 
         # Loop through all of the addon's dependencies
         for dependee in instance.info.requires:
 
             # Add the dependency
-            DependentAddons()._add_dependency(dependee, instance.basename)
+            DependentAddons._add_dependency(dependee, instance.basename)
 
             # Is the dependee in LoadedAddons?
-            if not dependee in LoadedAddons():
+            if not dependee in LoadedAddons:
 
                 # Load the dependee
                 self._load_addon(dependee)
@@ -56,7 +51,7 @@ class AddonManager(object):
         for conflict in instance.info.conflicts:
 
             # Add the conflict
-            AddonConflicts()._add_conflict(conflict, instance.basename)
+            AddonConflicts._add_conflict(conflict, instance.basename)
 
         # Update GunGame info
         gungame_info('update')
@@ -65,25 +60,25 @@ class AddonManager(object):
         '''Method used to unload a GunGame sub-addon'''
 
         # Is the addon not currently loaded?
-        if not addon in LoadedAddons():
+        if not addon in LoadedAddons:
 
             # If not, raise an error
             raise NameError('GunGame sub-addon "%s" is not loaded' % addon)
 
         # Get the addon's instance
-        instance = LoadedAddons()[addon]
+        instance = LoadedAddons[addon]
 
         # Loop through all of the addon's dependencies
         for dependee in instance.info.requires:
 
             # Store whether the dependee needs unloaded
-            keep_addon_loaded = DependentAddons()[dependee]._remain_loaded
+            keep_addon_loaded = DependentAddons[dependee].remain_loaded
 
             # Add the dependency
-            DependentAddons()._remove_dependency(dependee, instance.basename)
+            DependentAddons._remove_dependency(dependee, instance.basename)
 
             # Does the dependee still have dependers?
-            if not dependee in DependentAddons():
+            if not dependee in DependentAddons:
 
                 # Does the dependee need unloaded?
                 if not keep_addon_loaded:
@@ -95,28 +90,29 @@ class AddonManager(object):
         for conflict in instance.info.conflicts:
 
             # Add the conflict
-            AddonConflicts()._remove_conflict(conflict, instance.basename)
+            AddonConflicts._remove_conflict(conflict, instance.basename)
 
         # Remove the addon from LoadedAddons
-        del LoadedAddons()[addon]
+        del LoadedAddons[addon]
 
         # If not, update GunGame info
         gungame_info('update')
 
-    def unload_all_addons(self):
+    @staticmethod
+    def unload_all_addons():
         '''Method used to remove all addons on unload'''
 
         # Remove all dependencies
-        DependentAddons().clear()
+        DependentAddons.clear()
 
         # Remove all conflicts
-        AddonConflicts().clear()
+        AddonConflicts.clear()
 
         # Loop through all loaded addons
-        for addon in LoadedAddons().keys():
+        for addon in LoadedAddons.keys():
 
             # Unload the addon
-            del LoadedAddons()[addon]
+            del LoadedAddons[addon]
 
     @staticmethod
     def call_block(instance, blockname, *a, **kw):
@@ -127,7 +123,7 @@ class AddonManager(object):
         '''
 
         # Call the function with the given arguments and keywords
-        instance.call_block(blockname, *a, **kw)
+        instance._call_block(blockname, *a, **kw)
 
     @property
     def __loaded__(self):
@@ -138,4 +134,4 @@ class AddonManager(object):
         '''
 
         # Return the LoadedAddons dictionary
-        return LoadedAddons()
+        return LoadedAddons

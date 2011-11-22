@@ -23,15 +23,8 @@ from gungame51.core.messaging import MessageManager
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class LoadedAddons(dict):
+class _LoadedAddons(dict):
     '''Class to store all loaded addons'''
-
-    def __new__(cls):
-        '''Method used to make sure class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
 
     def __getitem__(self, addon):
         '''Method used to get the instance for the given addon'''
@@ -40,7 +33,7 @@ class LoadedAddons(dict):
         if addon in self:
 
             # Return the addon's instance
-            return super(LoadedAddons, self).__getitem__(addon)
+            return super(_LoadedAddons, self).__getitem__(addon)
 
         # Store the addon in the dictionary and get its instance
         value = self[addon] = _LoadedAddonInstance(addon)
@@ -62,7 +55,10 @@ class LoadedAddons(dict):
         self[addon]._unload_addon()
 
         # Remove the addon from the dictionary
-        super(LoadedAddons, self).__delitem__(addon)
+        super(_LoadedAddons, self).__delitem__(addon)
+
+# Get the LoadedAddons instance
+LoadedAddons = _LoadedAddons()
 
 
 class _LoadedAddonInstance(object):
@@ -72,7 +68,7 @@ class _LoadedAddonInstance(object):
         '''Called when the addon is first imported'''
 
         # Get the Addons main instance
-        instance = AddonInstances()[addon]
+        instance = AddonInstances[addon]
 
         # Loop through all class attributes in the instance
         for attribute in instance.__dict__:
@@ -96,7 +92,7 @@ class _LoadedAddonInstance(object):
             MessageManager().load(translation, self.basename)
 
         # Call the addon's load function
-        self.call_block('load')
+        self._call_block('load')
 
         # Create the Addon Loaded event instance
         gg_addon_loaded = GG_Addon_Loaded(
@@ -118,7 +114,7 @@ class _LoadedAddonInstance(object):
             MessageManager().unload(translation, self.basename)
 
         # Call the addon's unload function
-        self.call_block('unload')
+        self._call_block('unload')
 
         # Create the Addon Unloaded event instance
         gg_addon_unloaded = GG_Addon_Unloaded(
@@ -134,7 +130,7 @@ class _LoadedAddonInstance(object):
         for event in self._possible_events():
 
             # Register the event
-            EventRegistry().register_for_event(event, self.globals[event])
+            EventRegistry.register_for_event(event, self.globals[event])
 
     def _unregister_events(self):
         '''Unregisters all functions as events'''
@@ -143,9 +139,9 @@ class _LoadedAddonInstance(object):
         for event in self._possible_events():
 
             # Unregister the event
-            EventRegistry().unregister_for_event(event, self.globals[event])
+            EventRegistry.unregister_for_event(event, self.globals[event])
 
-    def call_block(self, blockname, *a, **kw):
+    def _call_block(self, blockname, *a, **kw):
         '''Calls a function for the addon with arguments and keywords'''
 
         # Does the block exist as a function in the addon?
@@ -164,6 +160,12 @@ class _LoadedAddonInstance(object):
             if type(self.globals[event]).__name__ != 'function':
 
                 # If not, do not register
+                continue
+
+            # Is the global private?
+            if event.startswith('_'):
+
+                # If private, do not register
                 continue
 
             # Is the global native to the script?

@@ -52,16 +52,14 @@ def get_addon_info(name=None):
     if name:
 
         # Get the addon's instance
-        addon = AddonInstances()[str(name).lower()]
+        addon = AddonInstances[str(name).lower()]
 
         # Return the addon's info
         return addon.info
 
-    # Get a list of all loaded addons
-    addons = list(LoadedAddons())
-
     # Return a dictionary of loaded addons and their info
-    return dict(zip((addon, LoadedAddons()[addon].info) for addon in addons))
+    return dict(zip(
+        (addon, LoadedAddons[addon].info) for addon in LoadedAddons))
 
 
 def get_addon_type(name):
@@ -72,7 +70,7 @@ def get_addon_type(name):
     '''
 
     # Return the type of addon
-    return ValidAddons().get_addon_type(str(name).lower())
+    return ValidAddons.get_addon_type(str(name).lower())
 
 
 def addon_exists(name):
@@ -96,21 +94,18 @@ def addon_exists(name):
     '''
 
     # Is the given name a valid addon
-    return str(name).lower() in ValidAddons().all
+    return str(name).lower() in ValidAddons.all
 
 
 def get_loaded_addon_list(addon_type=None):
     '''Returns a list of loaded addons for the given type'''
 
-    # Get all addons
-    addons = LoadedAddons()
-
     # Was a specific type needed?
     if addon_type in ('custom', 'included'):
 
         # Return a list of loaded addons for the given type
-        return [addon for addon in addons
-            if addons[addon].addon_type == addon_type]
+        return [addon for addon in LoadedAddons
+            if LoadedAddons[addon].addon_type == addon_type]
 
     # Return a list of all loaded addons
-    return list(addons)
+    return list(LoadedAddons)

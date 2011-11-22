@@ -191,7 +191,7 @@ def drop_filter(userid, args):
 
     # If gg_warmup_round is loaded, the weapon they should have is the warmup
     # weapon
-    if 'gg_warmup_round' in PriorityAddon():
+    if 'gg_warmup_round' in PriorityAddon:
         weapon = get_warmup_weapon()
 
     # Get the player's current weapon

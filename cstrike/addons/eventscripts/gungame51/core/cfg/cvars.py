@@ -15,7 +15,7 @@ import es
 # GunGame Imports
 #   Cfg
 from attributes import *
-from manager import ConfigManager
+from defaults import CvarDefaults
 
 
 # =============================================================================
@@ -78,8 +78,8 @@ class CvarContextManager(object):
             # Raise an error
             raise ValueError('No "text" set for "' + self.cvarname + '"')
 
-        # Add the cvar with it's default value to ConfigManager
-        ConfigManager()._cvar_defaults[self.cvarname] = self.default
+        # Add the cvar with it's default value to CvarDefaults
+        CvarDefaults[self.cvarname] = self.default
 
         # Return
         return True

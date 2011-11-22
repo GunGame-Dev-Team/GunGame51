@@ -60,7 +60,7 @@ def unload():
 # =============================================================================
 def player_spawn(event_var):
     # Check for priority addons
-    if PriorityAddon():
+    if PriorityAddon:
         return
 
     # Is a spectator?
@@ -83,7 +83,7 @@ def player_spawn(event_var):
 
 def gg_levelup(event_var):
     # Check for priority addons
-    if PriorityAddon():
+    if PriorityAddon:
         return
 
     # Set player ids

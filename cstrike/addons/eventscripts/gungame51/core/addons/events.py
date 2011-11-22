@@ -22,21 +22,14 @@ from priority import PriorityAddon
 # =============================================================================
 # These events should always fire, even if there are Priority Addons
 _priority_events = ['es_map_start', 'player_activate', 'es_player_validated',
-    'player_disconnect', 'gg_addon_loaded', 'gg_addon_unloaded']
+    'player_team', 'player_disconnect', 'gg_addon_loaded', 'gg_addon_unloaded']
 
 
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class EventRegistry(dict):
+class _EventRegistry(dict):
     '''Class that holds all _EventManager instances to call events'''
-
-    def __new__(cls):
-        '''Method that makes sure the class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
 
     def register_for_event(self, event, callback):
         '''Method that registers events to be fired for addons'''
@@ -60,13 +53,16 @@ class EventRegistry(dict):
             self[event].remove(callback)
 
             # Are there any remaining callbacks for the event?
-            if not self[event].callbacks:
+            if not self[event]._callbacks:
 
                 # Unregister the event
                 self[event]._unregister()
 
                 # Remove the event from the dictionary
                 del self[event]
+
+# Get the EventRegistry instance
+EventRegistry = _EventRegistry()
 
 
 class _EventManager(object):
@@ -76,13 +72,13 @@ class _EventManager(object):
         '''Registers the event'''
 
         # Store the event name
-        self.event = event
+        self._event = event
 
         # Store a list to add callbacks to
-        self.callbacks = []
+        self._callbacks = []
 
         # Register the event
-        es.addons.registerForEvent(self, self.event, self._call_event)
+        es.addons.registerForEvent(self, self._event, self._call_event)
 
     def append(self, callback):
         '''Overrides the append method to make
@@ -92,10 +88,10 @@ class _EventManager(object):
         callback = self._get_callback(callback)
 
         # Is the callback already in the list?
-        if not callback in self.callbacks:
+        if not callback in self._callbacks:
 
             # Append the callback instance for the given callback
-            self.callbacks.append(callback)
+            self._callbacks.append(callback)
 
     def remove(self, callback):
         '''Overrides the remove method to make sure the
@@ -105,25 +101,25 @@ class _EventManager(object):
         callback = self._get_callback(callback)
 
         # Is the callback in the list?
-        if callback in self.callbacks:
+        if callback in self._callbacks:
 
             # Remove the callback
-            self.callbacks.remove(callback)
+            self._callbacks.remove(callback)
 
     def _call_event(self, event_var):
         '''Calls the event if there are no Priority Addons'''
 
         # Loop through all callbacks for the event
-        for callback in self.callbacks:
+        for callback in self._callbacks:
 
             # Are there Priority Addons?
-            if PriorityAddon():
+            if PriorityAddon:
 
                 # Is the callback in a Priority Addon?
-                if not callback['addon'] in PriorityAddon():
+                if not callback['addon'] in PriorityAddon:
 
                     # Is the event supposed to fire anyway?
-                    if not self.event in _priority_events:
+                    if not self._event in _priority_events:
 
                         # Do not fire this callback
                         continue
@@ -135,7 +131,7 @@ class _EventManager(object):
         '''Unregisters the event'''
 
         # Unregister the event
-        es.addons.unregisterForEvent(self, self.event)
+        es.addons.unregisterForEvent(self, self._event)
 
     @staticmethod
     def _get_callback(callback):

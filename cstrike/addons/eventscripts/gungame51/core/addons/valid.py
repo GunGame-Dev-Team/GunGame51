@@ -23,15 +23,8 @@ _main_addon_path = get_game_dir('addons/eventscripts/gungame51/scripts')
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class ValidAddons(dict):
+class _ValidAddons(dict):
     '''Class used to get/store all valid addons and their type'''
-
-    def __new__(cls):
-        '''Method used to make sure class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
 
     def __init__(self):
         '''Gets all addons if the class has not already be initialized'''
@@ -74,7 +67,7 @@ class ValidAddons(dict):
             raise KeyError('Key must be either "included" or "custom"')
 
         # Use super to finish setting the item
-        super(ValidAddons, self).__setitem__(item, value)
+        super(_ValidAddons, self).__setitem__(item, value)
 
     def get_addon_type(self, addon):
         '''Returns the "type" of addon (included or custom)'''
@@ -105,3 +98,6 @@ class ValidAddons(dict):
         # Return the set of addons
         return set([addon.namebase for addon in
             _main_addon_path.joinpath(addon_type).dirs()])
+
+# Get the ValidAddons instance
+ValidAddons = _ValidAddons()

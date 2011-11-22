@@ -17,15 +17,8 @@ class ConflictError(Exception):
     '''
 
 
-class AddonConflicts(dict):
+class _AddonConflicts(dict):
     '''Class used to store any Conflicting Addons'''
-
-    def __new__(cls):
-        '''Method used to make sure the class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
 
     def __getitem__(self, addon):
         '''Returns an addon's set of conflicts'''
@@ -34,7 +27,7 @@ class AddonConflicts(dict):
         if addon in self:
 
             # If so, simply return the set
-            return super(AddonConflicts, self).__getitem__(addon)
+            return super(_AddonConflicts, self).__getitem__(addon)
 
         # Add the addon to the dictionary
         value = self[addon] = set()
@@ -59,3 +52,6 @@ class AddonConflicts(dict):
 
             # Remove the conflicter from the dictionary
             del self[conflict]
+
+# Get the AddonConflicts instance
+AddonConflicts = _AddonConflicts()

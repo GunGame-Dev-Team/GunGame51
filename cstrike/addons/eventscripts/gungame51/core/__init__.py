@@ -185,9 +185,9 @@ def gungame_info(info, _info=None):
 
         # Format our output
         addonlist = ['\t' * 4 + '%s (v%s)\n' % (
-            LoadedAddons()[addon].info.name,
-            LoadedAddons()[addon].info.version) for addon in
-            LoadedAddons() if LoadedAddons()[addon].addon_type == info]
+            LoadedAddons[addon].info.name,
+            LoadedAddons[addon].info.version) for addon in
+            LoadedAddons if LoadedAddons[addon].addon_type == info]
 
         # If no addons, output is None
         if not addonlist:

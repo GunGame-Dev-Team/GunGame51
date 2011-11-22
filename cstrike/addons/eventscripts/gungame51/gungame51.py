@@ -155,7 +155,7 @@ info.Website = ('\n' + '\t' * 4 + 'http://forums.gungame.net/\n')
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class EventsManager(object):
+class _EventsManager(object):
     '''
         Class used to register events so that
         they are called prior to any sub-addons
@@ -171,13 +171,6 @@ class EventsManager(object):
             The method should "always" start with an underscore: "_"
     '''
 
-    def __new__(cls):
-        '''Method used to ensure the class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = object.__new__(cls)
-        return cls._the_instance
-
     # =========================================================================
     # >> REGISTER/UNREGISTER METHODS
     # =========================================================================
@@ -188,7 +181,7 @@ class EventsManager(object):
         for event in self._class_events:
 
             # Register the method for the event
-            EventRegistry().register_for_event(
+            EventRegistry.register_for_event(
                 event, self.__getattribute__(event))
 
     def _unload_events(self):
@@ -198,7 +191,7 @@ class EventsManager(object):
         for event in self._class_events:
 
             # Unregister the method for the event
-            EventRegistry().unregister_for_event(
+            EventRegistry.unregister_for_event(
                 event, self.__getattribute__(event))
 
     @property
@@ -288,10 +281,6 @@ class EventsManager(object):
     def player_spawn(self, event_var):
         '''Called any time a player spawns'''
 
-        # Check for priority addons
-        if PriorityAddon():
-            return
-
         userid = int(event_var['userid'])
 
         # Is a spectator?
@@ -338,10 +327,6 @@ class EventsManager(object):
     @staticmethod
     def player_death(event_var):
         '''Called every time a player dies'''
-
-        # Check for priority addons
-        if PriorityAddon():
-            return
 
         # Set player ids
         userid = int(event_var['userid'])
@@ -578,7 +563,9 @@ class EventsManager(object):
 
         es.server.queuecmd(cmd)
 
-EventsManager()._load_events()
+EventsManager = _EventsManager()
+
+EventsManager._load_events()
 
 
 # =============================================================================
@@ -639,7 +626,7 @@ def unload():
     WeaponOrderManager().unregister()
 
     # Unregister events
-    EventsManager()._unload_events()
+    EventsManager._unload_events()
 
     # Unload Menus
     MenuManager().unload_menus()
@@ -759,7 +746,7 @@ def check_first_gg_start():
 
 def check_priority():
     # If there is nothing in priority addons, fire event gg_start
-    if not PriorityAddon():
+    if not PriorityAddon:
         if first_gg_start:
             GG_Start().fire()
 

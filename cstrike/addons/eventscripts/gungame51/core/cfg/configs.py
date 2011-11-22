@@ -21,7 +21,7 @@ from cfglib import AddonCFG
 # GunGame Imports
 #   Cfg
 from cvars import CvarContextManager
-from manager import ConfigManager
+from instance import ConfigInstances
 
 
 # =============================================================================
@@ -47,20 +47,21 @@ class ConfigContextManager(object):
         config_type = config_path[0]
 
         # Set the filename of the cfg file
-        self.filename = config_path[1] + '.cfg'
+        self._filename = config_path[1] + '.cfg'
 
         # Is the path from an included or custom addon?
         if config_type in ('included', 'custom'):
 
             # Get the name of the addon
-            self.name = ' '.join(config_path[1].split('_')).capitalize()
+            self.name = ' '.join(
+                config_path[1].split('_')).title().replace('Gg ', 'GG ')
 
             # Set the description to use
             self.description = ('This file defines GunGame '
                 + config_type.capitalize() + ' Addon settings.')
 
             # Set the path within ../cfg/gungame51/ for the .cfg file
-            self.cfgpath = config_type + '_addon_configs/' + self.filename
+            self.cfgpath = config_type + '_addon_configs/' + self._filename
 
         # Is this from the core of GunGame?
         else:
@@ -72,7 +73,7 @@ class ConfigContextManager(object):
             self.description = None
 
             # Set the path within ../cfg/gungame51/ for the .cfg file
-            self.cfgpath = self.filename
+            self.cfgpath = self._filename
 
         # Set the path to the .cfg file
         self.filepath = _base_config_path.joinpath(self.cfgpath)
@@ -84,7 +85,7 @@ class ConfigContextManager(object):
         self.config = AddonCFG(self.filepath)
 
         # Add the AddonCFG instance to config_files
-        ConfigManager()._config_files[self.filename[:~3]] = self.config
+        ConfigInstances.add(self.config)
 
         # Create the list of sections to add cvars and text to
         self.sections = list()
@@ -100,7 +101,7 @@ class ConfigContextManager(object):
 
         # Is this cvar the name of the file?
         # Used for auto adding the "notify" flag for included/custom addons
-        if cvarname == self.filename[:~3]:
+        if cvarname == self._filename[:~3]:
 
             # Set the "notify" flag to True
             notify = True
@@ -137,7 +138,7 @@ class ConfigContextManager(object):
 
             # Raise an error
             raise ValueError(
-                'No description set for .cfg file "' + self.filename + '"')
+                'No description set for .cfg file "' + self._filename + '"')
 
         # Create the first line of the header
         self.config.text('*' * 76)
@@ -146,13 +147,13 @@ class ConfigContextManager(object):
         if self.name is None:
 
             # Set the topline to be just the filename
-            topline = self.filename
+            topline = self._filename
 
         # Is there a name that needs to be added to the filename in the header?
         else:
 
             # Set the topline to be the filename and the name
-            topline = self.filename + ' -- ' + self.name
+            topline = self._filename + ' -- ' + self.name
 
         # Add the topline to the header
         self.config.text('*' + topline.center(74) + '*')
@@ -214,22 +215,22 @@ class ConfigContextManager(object):
                     self.config.text('=' * 76)
 
                 # Print the description
-                section.description.print_to_text()
+                section.description._print_to_text()
 
                 # Print the instructions
-                section.instructions.print_to_text()
+                section.instructions._print_to_text()
 
                 # Print any extra text
-                section.extra.print_to_text()
+                section.extra._print_to_text()
 
                 # Print the notes
-                section.notes.print_to_text()
+                section.notes._print_to_text()
 
                 # Print the examples
-                section.examples.print_to_text()
+                section.examples._print_to_text()
 
                 # Print the options
-                section.options.print_to_text()
+                section.options._print_to_text()
 
                 # Is there default_text to print?
                 if not section.default_text is None:

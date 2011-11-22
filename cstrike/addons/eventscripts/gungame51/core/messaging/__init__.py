@@ -95,7 +95,7 @@ class AddonStrings(object):
         from gungame51.core.addons.valid import ValidAddons
 
         # Get the addon type
-        addon_type = ValidAddons().get_addon_type(addon)
+        addon_type = ValidAddons.get_addon_type(addon)
 
         # Return the path to the addon INI
         return get_game_dir("addons/eventscripts/gungame51/scripts/" +

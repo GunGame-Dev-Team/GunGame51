@@ -18,15 +18,8 @@ from valid import ValidAddons
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class AddonInstances(dict):
+class _AddonInstances(dict):
     '''Class that stores all included/custom addon instances'''
-
-    def __new__(cls):
-        '''Method used to make sure class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
 
     def __getitem__(self, addon):
         '''Returns the given addon's instance'''
@@ -35,13 +28,16 @@ class AddonInstances(dict):
         if addon in self:
 
             # If so, simply return the instance
-            return super(AddonInstances, self).__getitem__(addon)
+            return super(_AddonInstances, self).__getitem__(addon)
 
         # Add the addon's instance to the dictionary
         value = self[addon] = _AddonInstance(addon)
 
         # Return the instance
         return value
+
+# Get the AddonInstances instance
+AddonInstances = _AddonInstances()
 
 
 class _AddonInstance(object):
@@ -54,7 +50,7 @@ class _AddonInstance(object):
         self.basename = addon
 
         # Get the type of addon (included or custom)
-        self.addon_type = ValidAddons().get_addon_type(self.basename)
+        self.addon_type = ValidAddons.get_addon_type(self.basename)
 
         # Store the __module__ path for the addon
         self.module = 'gungame51.scripts.%s.%s.%s' % (

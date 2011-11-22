@@ -12,7 +12,6 @@ $LastChangedDate$
 # GunGame Imports
 #   Cfg
 from addons import AddonCvars
-from dictionary import ConfigTypeDictionary
 from manager import ConfigManager
 
 
@@ -23,20 +22,20 @@ def load_configs():
     '''Loads all configs and registers the server_cvar event'''
 
     # Load all configs
-    ConfigManager()._load_configs()
+    ConfigManager._load_configs()
 
     # Register the server_cvar event
-    AddonCvars()._register_cvar_event()
+    AddonCvars._register_cvar_event()
 
 
 def unload_configs():
     '''Unloads and cleans up the configuration structure'''
 
     # Unregister the server cvar hooking
-    AddonCvars()._unregister_cvar_event()
+    AddonCvars._unregister_cvar_event()
 
     # Unload configuration files
-    ConfigManager()._unload_configs()
+    ConfigManager._unload_configs()
 
 
 def generate_header(config):

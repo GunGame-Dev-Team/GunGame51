@@ -103,10 +103,10 @@ class Priorities(set):
         '''Overriding method that also adds all addons to PriorityAddon'''
 
         # Is the addon already set as a Priority?
-        if not addon in PriorityAddon():
+        if not addon in PriorityAddon:
 
             # Add the addon as a Priority
-            PriorityAddon().add(addon)
+            PriorityAddon.add(addon)
 
             # Add the addon to Warmup's priorities
             super(Priorities, self).add(addon)
@@ -118,7 +118,7 @@ class Priorities(set):
         for addon in self:
 
             # Remove the addon from PriorityAddon
-            PriorityAddon().discard(addon)
+            PriorityAddon.discard(addon)
 
         # Clear Warmup's priorities
         super(Priorities, self).clear()
@@ -227,7 +227,7 @@ class WarmupRound(object):
         '''Adds all Loader Addons to Priority'''
 
         # Loop through all loaded addons
-        for addon in LoadedAddons():
+        for addon in LoadedAddons:
 
             # Add the addon as a Priority
             self.priorities.add(addon)
@@ -356,7 +356,7 @@ class WarmupRound(object):
         '''Ends the current Warmup Round'''
 
         # Is Warmup Round currently active?
-        if not info.name in PriorityAddon():
+        if not info.name in PriorityAddon:
 
             # If not, there is no need to end the Warmup Round
             return
@@ -411,7 +411,7 @@ class WarmupRound(object):
 
     def player_spawn(self, userid):
         # Is Warmup Round in PriorityAddon?
-        if info.name in PriorityAddon():
+        if info.name in PriorityAddon:
 
             # Give player the warmup weapon
             self.give_warmup_weapon(userid)
@@ -465,7 +465,7 @@ class WarmupRound(object):
         '''Checks to see if a player needs to recieve another hegrenade'''
 
         # Is Warmup Round active?
-        if not info.name in PriorityAddon():
+        if not info.name in PriorityAddon:
 
             # If not, return
             return

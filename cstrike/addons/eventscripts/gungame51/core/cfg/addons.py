@@ -20,28 +20,33 @@ from gungame51.core.addons.loaded import LoadedAddons
 from gungame51.core.addons.queue import AddonQueue
 from gungame51.core.addons.valid import ValidAddons
 #   Cfg
+from defaults import CvarDefaults
 from manager import ConfigManager
 
 
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class AddonCvars(object):
-    def __new__(cls):
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = object.__new__(cls)
-        return cls._the_instance
+class _AddonCvars(object):
+    '''Class used to load and unload addons via changing cvar values'''
 
     def _register_cvar_event(self):
-        es.addons.registerForEvent(self, 'server_cvar', self.server_cvar)
+        '''Registers for the server_cvar event'''
+
+        # Register for the server_cvar event
+        es.addons.registerForEvent(self, 'server_cvar', self._server_cvar)
 
     def _unregister_cvar_event(self):
+        '''Unregisters for the server_cvar event'''
+
+        # Unregister for the server_cvar event
         es.addons.unregisterForEvent(self, 'server_cvar')
 
-    def server_cvar(self, event_var):
+    def _server_cvar(self, event_var):
+        '''Method used to check to see if addons need loaded/unloaded'''
 
         # Is this being called when the cvars are being created?
-        if not ConfigManager()._files_have_been_executed:
+        if not ConfigManager._files_have_been_executed:
 
             # If so, return
             # The cvar should be called again once the .cfg files are executed
@@ -52,7 +57,7 @@ class AddonCvars(object):
         cvarvalue = event_var['cvarvalue']
 
         # Is the cvar the cvar for an addon?
-        if not cvarname in ValidAddons().all:
+        if not cvarname in ValidAddons.all:
 
             # If not, simply return
             return
@@ -61,39 +66,39 @@ class AddonCvars(object):
         if self._is_enable_value(cvarvalue):
 
             # Is the addon already loaded?
-            if cvarname in LoadedAddons():
+            if cvarname in LoadedAddons:
 
                 # Is the addon a dependent addon?
-                if cvarname in DependentAddons():
+                if cvarname in DependentAddons:
 
                     # Was the addon recently set to be loaded by a depender?
-                    if not cvarname in DependentAddons().recently_added:
+                    if not cvarname in DependentAddons.recently_added:
 
                         # If not, set the addon to remain loaded
                         # when no other addons depend upon it
-                        DependentAddons()[cvarname]._remain_loaded = True
+                        DependentAddons[cvarname].remain_loaded = True
 
                 # The addon is already loaded, so return
                 return
 
             # Load the addon
-            AddonQueue().add_to_queue('load', cvarname)
+            AddonQueue.add_to_queue('load', cvarname)
 
         # Unload addons with the value of 0 (including floats) or ''
         else:
 
             # Is the addon loaded?
-            if not cvarname in LoadedAddons():
+            if not cvarname in LoadedAddons:
 
                 # If not, simply return
                 return
 
             # Is the addon depended upon by other addons?
-            if cvarname in DependentAddons():
+            if cvarname in DependentAddons:
 
                 # Mark the addon as needing to be
                 # unloaded when no addons depend upon it
-                DependentAddons()[cvarname]._remain_loaded = False
+                DependentAddons[cvarname].remain_loaded = False
 
                 # Force the value back to 1
                 es.forcevalue(cvarname, 1)
@@ -102,7 +107,7 @@ class AddonCvars(object):
                 return
 
             # Unload the addon
-            AddonQueue().add_to_queue('unload', cvarname)
+            AddonQueue.add_to_queue('unload', cvarname)
 
     @staticmethod
     def _is_enable_value(value):
@@ -134,4 +139,7 @@ class AddonCvars(object):
 
     @staticmethod
     def _is_default_value(name, value):
-        return str(ConfigManager()._cvar_defaults[cvarname]) == cvarvalue
+        return str(CvarDefaults[cvarname]) == cvarvalue
+
+# Get the AddonCvars instance
+AddonCvars = _AddonCvars()

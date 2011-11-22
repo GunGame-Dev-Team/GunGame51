@@ -28,13 +28,8 @@ from manager import AddonManager
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class AddonQueue(dict):
-    def __new__(cls):
-        '''Make sure the class is a singleton'''
-
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-        return cls._the_instance
+class _AddonQueue(dict):
+    '''Class used to hold a queue of addons to load and unload'''
 
     def __getattr__(self, attr):
         '''Redirects to __getitem__ since this is a dictionary'''
@@ -49,7 +44,7 @@ class AddonQueue(dict):
         if queue_type in self:
 
             # Return the item
-            return super(AddonQueue, self).__getitem__(queue_type)
+            return super(_AddonQueue, self).__getitem__(queue_type)
 
         # Is the wanted queue type a valid value?
         if not queue_type in ('load', 'unload'):
@@ -122,18 +117,18 @@ class AddonQueue(dict):
             for addon in self._current_instances:
 
                 # Is the addon listed as a conflict?
-                if addon in AddonConflicts():
+                if addon in AddonConflicts:
 
                     # If so, raise an error about the conflict
                     raise ConflictError('"%s" can not be loaded.' % addon +
                         '  Sub-addon is listed as a conflict with ' +
-                        '"%s"' % '", "'.join(list(AddonConflicts()[addon])))
+                        '"%s"' % '", "'.join(list(AddonConflicts[addon])))
 
                 # Loop through all conflicts for the current addon
                 for conflict in self._current_instances[addon].info.conflicts:
 
                     # Is the conflict already loaded?
-                    if conflict in LoadedAddons():
+                    if conflict in LoadedAddons:
 
                         # If so, raise an error
                         raise ConflictError(
@@ -168,11 +163,11 @@ class AddonQueue(dict):
         for addon in self.load:
 
             # Has the addon been loaded as a dependency?
-            if addon in DependentAddons():
+            if addon in DependentAddons:
 
                 # Make sure the addon is set to remain
                 # loaded when no more dependers exist
-                DependentAddons()[addon]._remain_loaded = True
+                DependentAddons[addon].remain_loaded = True
 
                 # Do not re-attempt to load the addon
                 continue
@@ -190,10 +185,13 @@ class AddonQueue(dict):
             return
 
         # Add the addons instance to the dictionary
-        self._current_instances[addon] = AddonInstances()[addon]
+        self._current_instances[addon] = AddonInstances[addon]
 
         # Loop through all dependencies for the current addon
         for required_addon in self._current_instances[addon].info.requires:
 
             # Add the dependency to the dictionary
             self._add_addon_instance(required_addon)
+
+# Get the AddonQueue instance
+AddonQueue = _AddonQueue()

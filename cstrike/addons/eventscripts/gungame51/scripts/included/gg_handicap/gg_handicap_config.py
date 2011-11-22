@@ -55,7 +55,6 @@ def load():
             cvar.default = 0
             cvar.text = ('Helps newly connected ' +
                 'players by adjusting their level. (max)')
-            cvar.notify = True
 
         # Create the gg_handicap_no_reconnect instance
         with config.cfg_cvar('gg_handicap_no_reconnect') as cvar:
@@ -71,7 +70,6 @@ def load():
             cvar.options.append('1 = (Enabled)')
             cvar.default = 0
             cvar.text = 'Prevents abuse from reconnecting'
-            cvar.notify = True
 
         # Create the gg_handicap_update instance
         with config.cfg_cvar('gg_handicap_update') as cvar:
@@ -100,4 +98,3 @@ def load():
             cvar.options.append('1 = (Enabled)')
             cvar.default = 0
             cvar.text = 'Legacy mode'
-            cvar.notify = True

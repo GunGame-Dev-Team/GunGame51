@@ -22,9 +22,9 @@ class ListManagement(list):
         '''Create an instance of the list and store its config file'''
 
         # Store the config file that the cvar is stored in
-        self.config = config
+        self._config = config
 
-    def print_to_text(self):
+    def _print_to_text(self):
         '''Creates the text in the cfg file'''
 
         # Are there any items to be printed to the file?
@@ -37,20 +37,20 @@ class ListManagement(list):
         if self.header:
 
             # Add the header
-            self.config.text(self.header)
+            self._config.text(self.header)
 
         # Loop through all items in the list
         for section in self:
 
             for line in self._get_all_lines(section):
 
-                self.config.text(line)
+                self._config.text(line)
 
     def _get_all_lines(self, section):
         '''Gets all lines for the given section'''
 
         # Is the line already less than 80 characters?
-        if len(self.first + section) + self.config.indention < 80:
+        if len(self.first + section) + self._config.indention < 80:
 
             # If so, simply return the section
             return [self.first + section]
@@ -66,7 +66,7 @@ class ListManagement(list):
         lines.append(first_line)
 
         # Use a "while" statement to get remaining lines under 80 characters
-        while (len(remainder) + self.indent + self.config.indention > 80
+        while (len(remainder) + self.indent + self._config.indention > 80
           or '\n' in remainder):
 
             # Get the current line
@@ -86,7 +86,7 @@ class ListManagement(list):
         '''Gets the current line so that it is under 80 characters'''
 
         # Get the starting point to find the closest <space> to 80 characters
-        start = message[:80 - self.config.indention]
+        start = message[:80 - self._config.indention]
 
         # Use a "while" statement to find the last <space> before 80 characters
         while start[~0] != ' ' and start:
@@ -141,7 +141,7 @@ class ListNotes(ListManagement):
     indent = 6
 
     def __init__(self, config):
-        self.config = config
+        self._config = config
 
         # Create a list of required addons and conflicting addons
         self.requires = list()
@@ -151,14 +151,14 @@ class ListNotes(ListManagement):
         '''Checks if printing to text, and if so,
             interject required and conflicting addons'''
 
-        # Is the attribute "print_to_text"?
-        if attr == 'print_to_text':
+        # Is the attribute "_print_to_text"?
+        if attr == '_print_to_text':
 
             # Are there any required or conflicting addons?
             if self.requires or self.conflict:
 
                 # Add the header
-                self.config.text(self.header)
+                self._config.text(self.header)
 
                 # Change the header so it doesn't get added again later
                 self.header = ''
@@ -167,16 +167,16 @@ class ListNotes(ListManagement):
                 for addon in self.requires:
 
                     # Add both lines about required addons
-                    self.config.text(self.first + '"'
+                    self._config.text(self.first + '"'
                         + addon + '" will automatically be enabled.')
-                    self.config.text(self.first +
+                    self._config.text(self.first +
                         'Will not load if "' + addon + '" can not be enabled.')
 
                 # Loop through all conflicting addons
                 for addon in self.conflict:
 
                     # Add the conflicting addon text
-                    self.config.text(self.first +
+                    self._config.text(self.first +
                         'Will not load with "' + addon + '" enabled.')
 
         # Return the attribute

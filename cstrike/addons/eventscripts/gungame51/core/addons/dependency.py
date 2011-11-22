@@ -23,16 +23,14 @@ from loaded import LoadedAddons
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class DependentAddons(dict):
+class _DependentAddons(dict):
     '''Class to store all dependent addons and their dependees'''
 
-    def __new__(cls):
-        '''Method used to make sure the class is a singleton'''
+    def __init__(self):
+        '''Called when the instance is created'''
 
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = dict.__new__(cls)
-            cls._the_instance.recently_added = set()
-        return cls._the_instance
+        # Store a set of recently added dependencies
+        self.recently_added = set()
 
     def __getitem__(self, dependee):
         '''Gets the addon's instance and adds it if not in the dictionary'''
@@ -41,13 +39,13 @@ class DependentAddons(dict):
         if dependee in self:
 
             # Return the addon's instance
-            return super(DependentAddons, self).__getitem__(dependee)
+            return super(_DependentAddons, self).__getitem__(dependee)
 
         # Add the dependee to the dictionary
-        value = self[dependee] = _Dependency(dependee in LoadedAddons())
+        value = self[dependee] = _Dependency(dependee in LoadedAddons)
 
         # Add the addon to recently_added
-        # Used to keep track of _Dependency()._remain_loaded values properly
+        # Used to keep track of _Dependency().remain_loaded values properly
         self.recently_added.add(dependee)
 
         # In 1 tick, remove the addon from recently_added
@@ -60,13 +58,13 @@ class DependentAddons(dict):
         '''Adds the addon's instance to the dictionary'''
 
         # Is the addon loaded?
-        if not addon in LoadedAddons():
+        if not addon in LoadedAddons:
 
             # Set the addon's cvar to 1
             es.set(addon, 1)
 
         # Re-call __setitem__ to add the addon to the dictionary
-        super(DependentAddons, self).__setitem__(addon, value)
+        super(_DependentAddons, self).__setitem__(addon, value)
 
     def __delitem__(self, addon):
         '''Removes the addon from the dictionary'''
@@ -75,13 +73,13 @@ class DependentAddons(dict):
         if addon in self:
 
             # Does the addon need unloaded?
-            if not self[addon]._remain_loaded:
+            if not self[addon].remain_loaded:
 
                 # Set the addon's cvar to 0
                 es.set(addon, 0)
 
             # Remove the addon from the dictionary
-            super(DependentAddons, self).__delitem__(addon)
+            super(_DependentAddons, self).__delitem__(addon)
 
     def _add_dependency(self, dependee, depender):
         '''Adds a dependent addon to an addon that it depends upon'''
@@ -114,6 +112,9 @@ class DependentAddons(dict):
             # Remove the addon from the dictionary
             del self[dependee]
 
+# Get the DependentAddons instance
+DependentAddons = _DependentAddons()
+
 
 class _Dependency(set):
     '''
@@ -125,4 +126,4 @@ class _Dependency(set):
 
         # Set the addon to be unloaded or left
         # loaded when no addons depend upon it
-        self._remain_loaded = remain_loaded
+        self.remain_loaded = remain_loaded
