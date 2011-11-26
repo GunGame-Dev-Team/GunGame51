@@ -81,13 +81,13 @@ class WarmupRoundRepeat(Repeat):
     '''Class that extends the Repeat functionality for use by Warmup Round'''
 
     def extend_warmup_time(self):
-        # Send message to players about extension
+        '''Extends the Warmup timer'''
 
         # Extend Warmup Time
         self.extend(int(warmup_timer))
 
     def end_warmup_time(self):
-        # Send message that there are enough players and game is commencing
+        '''Ends the Warmup timer in 1 second'''
 
         # Get the time remaining
         remaining = self.timeleft
@@ -166,7 +166,7 @@ class WarmupRound(object):
         # After a delay, allow the weapon to be set again in the future
         delayed(1, self.__setattr__, ('set_on_load', False))
 
-    def end_warmup_cmd(seld, args):
+    def end_warmup_cmd(self, args):
         '''Callback for command to end Warmup Round'''
 
         # Set the message to be sent to Warmup_End_Forced

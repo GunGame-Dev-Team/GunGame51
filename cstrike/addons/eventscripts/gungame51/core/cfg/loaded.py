@@ -61,7 +61,8 @@ class _LoadedConfigs(dict):
             raise ValueError('"%s" is an invalid config file' % item)
 
         # Import the config file
-        config = self[item] = __import__(import_path, globals(), locals(), [''])
+        config = self[item] = __import__(
+            import_path, globals(), locals(), [''])
 
         # Reload the config file
         reload(config)
