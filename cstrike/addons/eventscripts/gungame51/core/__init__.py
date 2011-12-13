@@ -162,24 +162,47 @@ def gungame_info(info, _info=None):
     Fetches the head revision number from all of gungame's files
     '''
 
+    # Looking for GunGame's version?
     if info == 'version':
+
+        # Return the version number
         return GunGameInfo().version
 
+    # Passing in addoninfo?
     if info == 'addoninfo':
+
+        # Set the addoninfo
         GunGameInfo().info = _info
+
+        # Update GunGame's information
         gungame_info('update')
 
+    # Updating GunGame's information?
     elif info == 'update':
+
+        # Has addoninfo been passed in?
         if GunGameInfo().info is None:
+
+            # If not, don't go any further
             return
+
+        # Update Included Addons
         GunGameInfo().info.__setattr__(
             'Included Addons', gungame_info('included'))
+
+        # Update Custom Addons
         GunGameInfo().info.__setattr__(
             'Custom Addons', gungame_info('custom'))
 
+    # Getting Included or Custom Addon information?
     if info in ('included', 'custom'):
+
+        # Has addoninfo been passed in?
         if GunGameInfo().info is None:
+
+            # If not, don't go any further
             return
+
         # Retrieve the Loaded Addons
         from addons.loaded import LoadedAddons
 
