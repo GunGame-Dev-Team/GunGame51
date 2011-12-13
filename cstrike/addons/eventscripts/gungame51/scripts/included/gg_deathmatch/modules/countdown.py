@@ -12,6 +12,7 @@ $LastChangedDate$
 # EventScripts Imports
 #   ES
 from es import ServerVar
+from es import exists
 #   Gamethread
 from gamethread import delayed
 #   Playerlib
@@ -54,7 +55,7 @@ class PlayerCountdown(object):
         '''
 
         # Is the player still on the server?
-        if not es.exists('userid', self.userid):
+        if not exists('userid', self.userid):
 
             # If not, remove them from the players dictionary
             del players[self.userid]
