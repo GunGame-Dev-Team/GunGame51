@@ -14,6 +14,8 @@ $LastChangedDate$
 from es import ServerVar
 #   Gamethread
 from gamethread import delayed
+#   Playerlib
+from playerlib import getPlayer
 
 # GunGame Imports
 #   Repeat
@@ -52,7 +54,7 @@ class PlayerCountdown(object):
         '''
 
         # Is the player still on the server?
-        if not self.spe_player.pointer:
+        if not es.exists('userid', self.userid):
 
             # If not, remove them from the players dictionary
             del players[self.userid]
@@ -61,7 +63,7 @@ class PlayerCountdown(object):
             return
 
         # Is the player alive?
-        if not self.spe_player.isdead:
+        if not getPlayer(self.userid).isdead:
 
             # Stop the repeat
             self.stop_repeat()

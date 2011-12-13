@@ -12,10 +12,8 @@ $LastChangedDate$
 # EventScripts Imports
 #   ES
 from es import isbot
-
-# SPE Tools Imports
-#   Player
-from spe.tools.player import SPEPlayer
+#   Playerlib
+from playerlib import getPlayer
 
 # GunGame Imports
 #   Players
@@ -37,20 +35,19 @@ class BasePlayer(PlayerCountdown):
         # Store the player's base attributes
         self.userid = userid
         self.gg_player = Player(self.userid)
-        self.spe_player = SPEPlayer(self.userid)
         self.isbot = isbot(self.userid)
 
     def dm_loaded(self):
         '''Called when DeathMatch is first loaded'''
 
         # Is the player alive?
-        if not self.spe_player.isdead:
+        if not getPlayer(self.userid).isdead:
 
             # No need to spawn the player
             return
 
         # Is the player a spectator?
-        if self.spe_player.team < 2:
+        if self.gg_player.team < 2:
 
             # No need to spawn the player
             return
