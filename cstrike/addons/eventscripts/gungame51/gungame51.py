@@ -127,6 +127,7 @@ credits = {
         'Predator',
         'tnb=[porsche]911',
         'RG3 Community',
+        "L'In20Cible",
         'counter-strike.com',
         'The Cheebs']
 }
