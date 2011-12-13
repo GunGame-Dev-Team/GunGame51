@@ -210,20 +210,6 @@ class _PlayerContainer(dict):
             del self[userid]
         #self.remove_old()
 
-    """
-    def remove_old(self):
-        useridList = _es.getUseridList()
-
-        # For all userids
-        for userid in self.copy():
-            # If the userid is on the server, stop here
-            if userid in useridList:
-                continue
-
-            # If the user is no longer in the server, remove their instance
-            del self[userid]
-    """
-
 
 class _ExtendedPlayerBase(PlayerLevels, PlayerSounds, PlayerMessaging,
                           PlayerWeapons, PlayerWins):
@@ -335,12 +321,12 @@ class _BasePlayer(_ExtendedPlayerBase, _PlayerMeta):
         #self._userid = int(userid)
         #self._steamid = _getPlayer(self.userid).uniqueid(True)
         #self._index = _getPlayer(self.userid).index
+        super(_BasePlayer, self).__init__()
         self._afk = AFK(self.userid)
         self.multikill = 0
         self.stripexceptions = StripExceptions()
         self.soundpack = SoundPack(str(gg_soundpack))
         self._preventlevel = PreventLevel()
-        super(_BasePlayer, self).__init__()
 
     def __delattr__(self, name):
         # Make sure we don't try to delete required GunGame attributes

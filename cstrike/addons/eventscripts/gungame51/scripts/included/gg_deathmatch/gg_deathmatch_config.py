@@ -35,7 +35,8 @@ def load():
             cvar.notes.requires.append('gg_dead_strip')
             cvar.notes.requires.append('gg_dissolver')
             cvar.notes.conflict.append('gg_elimination')
-            cvar.options.append('0 = (Disabled) Do not load gg_deathmatch.')
+            cvar.options.append(
+                '0 = (Disabled) Do not load gg_deathmatch.')
             cvar.options.append('1 = (Enabled) Load gg_deathmatch.')
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_deathmatch.'
