@@ -22,6 +22,9 @@ from playerlib import getPlayer
 #   Repeat
 from gungame51.core.repeat import Repeat
 
+# Script Imports
+from active import RoundInfo
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
