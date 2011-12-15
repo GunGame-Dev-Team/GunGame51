@@ -72,6 +72,15 @@ class PlayerCountdown(object):
             # No need to continue the count-down
             return
 
+        # Is the round inactive?
+        if not RoundInfo.active:
+
+            # Send the player a hudhint that the round has ended
+            self.send_hudhint('RespawnCountdown_RoundEnded')
+
+            # Stop the repeat
+            self.stop_repeat()
+
         # Is there more than 1 loop remaining?
         if self.repeat.remaining > 1:
 

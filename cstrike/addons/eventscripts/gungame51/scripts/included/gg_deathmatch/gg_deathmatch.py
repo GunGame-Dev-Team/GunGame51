@@ -18,6 +18,7 @@ import es
 from gungame51.core.addons.shortcuts import AddonInfo
 
 # Script Imports
+from modules.active import RoundInfo
 from modules.dictionary import players
 
 
@@ -59,6 +60,9 @@ def load():
     # Register the joinclass filter
     es.addons.registerClientCommandFilter(joinclass_filter)
 
+    # Mark round as inactive
+    RoundInfo.active = False
+
     # Loop through all players on the server
     for userid in es.getUseridList():
 
@@ -96,6 +100,9 @@ def joinclass_filter(userid, args):
 def es_map_start(event_var):
     '''Called each time a new map is loaded'''
 
+    # Mark round as inactive
+    RoundInfo.active = False
+
     # Clear the players dictionary
     players.clear()
 
@@ -117,5 +124,22 @@ def player_disconnect(event_var):
 def player_death(event_var):
     '''Called when a player dies'''
 
-    # Start the player's repeat
-    players[event_var['userid']].start_repeat()
+    # Is the round active?
+    if RoundInfo.active:
+
+        # Start the player's repeat
+        players[event_var['userid']].start_repeat()
+
+
+def round_start(event_var):
+    '''Called at the start of every round'''
+
+    # Mark round as active
+    RoundInfo.active = True
+
+
+def round_end(event_var):
+    '''Called at the end of every round'''
+
+    # Mark round as inactive
+    RoundInfo.active = False
