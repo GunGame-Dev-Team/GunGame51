@@ -82,7 +82,7 @@ def disable_objectives():
         if len(es.getEntityIndexes('func_bomb_target')):
 
             # Disable all func_bomb_target entities
-            cmd += 'es_xfire %d func_bomb_target %s;' % (userid, mode)
+            cmd += 'es_xfire %d func_bomb_target Disable;' % userid
 
             # Kill all weapon_c4 entities
             cmd += 'es_xfire %d weapon_c4 Kill;' % userid
@@ -94,7 +94,7 @@ def disable_objectives():
         if len(es.getEntityIndexes('func_hostage_rescue')):
 
             # Disable all func_hostage_rescue entities
-            cmd += 'es_xfire %d func_hostage_rescue %s;' % (userid, mode)
+            cmd += 'es_xfire %d func_hostage_rescue Disable;' % userid
 
             # Kill all hostage_entity entities
             cmd += 'es_xfire %d hostage_entity Kill;' % userid
