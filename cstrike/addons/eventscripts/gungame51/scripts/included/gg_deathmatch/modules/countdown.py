@@ -45,7 +45,7 @@ class PlayerCountdown(object):
         if not int(gg_dm_respawn_delay):
 
             # If not, simply spawn the player
-            delayed(0.1, self.gg_player.respawn)
+            delayed(0.1, self.check_respawn)
 
             # No need to go further
             return
@@ -84,6 +84,9 @@ class PlayerCountdown(object):
             # Stop the repeat
             self.stop_repeat()
 
+            # No need to continue
+            return
+
         # Is there more than 1 loop remaining?
         if self.repeat.remaining > 1:
 
@@ -110,7 +113,7 @@ class PlayerCountdown(object):
             if remaining:
 
                 # Respawn the player after the remaining time
-                delayed(remaining, self.gg_player.respawn)
+                delayed(remaining, self.check_respawn)
 
             # Is there no time remaining?
             else:
@@ -129,6 +132,16 @@ class PlayerCountdown(object):
 
             # Delete the repeat
             self.repeat.delete()
+
+    def check_respawn(self):
+        '''Checks to see if the round is still
+            active before spawning the player'''
+
+        # Is the round still active?
+        if RoundInfo.active:
+
+            # Spawn the player
+            self.gg_player.respawn()
 
     @property
     def repeat(self):
