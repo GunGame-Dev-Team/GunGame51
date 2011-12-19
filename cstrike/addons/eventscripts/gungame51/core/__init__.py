@@ -32,15 +32,16 @@ class GunGameError(Exception):
     pass
 
 
-class GunGameInfo(object):
-    def __new__(cls):
-        if not '_the_instance' in cls.__dict__:
-            cls._the_instance = object.__new__(cls)
-        return cls._the_instance
+class InfoList(list):
+    def append(self, item):
+        if not item.startswith('_'):
+            super(InfoList, self).append(item)
 
+
+class _GunGameInfo(es.AddonInfo):
     def __init__(self):
-        if not hasattr(self, '_version'):
-            self._version = self._get_version()
+        self.keylist = InfoList()
+        self._version = _get_gg_version()
 
     def _get_info(self):
         if hasattr(self, '_info'):
@@ -56,22 +57,6 @@ class GunGameInfo(object):
     @property
     def version(self):
         return self._version
-
-    @staticmethod
-    def _get_version():
-        revision = int(__doc__.split('$Rev: ')[1].split()[0])
-        for file_path in get_game_dir(
-          'addons/eventscripts/gungame51').walkfiles('*.py'):
-            if 'custom' in file_path.splitall():
-                continue
-            try:
-                with file_path.open() as pyfile:
-                    version = int(pyfile.read().split('$Rev: ')[1].split()[0])
-                if version > revision:
-                    revision = version
-            except:
-                continue
-        return '5.1.%s' % revision
 
 
 # =============================================================================
@@ -157,7 +142,7 @@ for old_file in old_files:
     es.server.queuecmd('echo [GunGame] Deleted %s' % str(old_file))
 
 
-def gungame_info(info, _info=None):
+def gungame_info(info):
     '''
     Fetches the head revision number from all of gungame's files
     '''
@@ -166,42 +151,19 @@ def gungame_info(info, _info=None):
     if info == 'version':
 
         # Return the version number
-        return GunGameInfo().version
-
-    # Passing in addoninfo?
-    if info == 'addoninfo':
-
-        # Set the addoninfo
-        GunGameInfo().info = _info
-
-        # Update GunGame's information
-        gungame_info('update')
+        return GunGameInfo.version
 
     # Updating GunGame's information?
-    elif info == 'update':
-
-        # Has addoninfo been passed in?
-        if GunGameInfo().info is None:
-
-            # If not, don't go any further
-            return
+    if info == 'update':
 
         # Update Included Addons
-        GunGameInfo().info.__setattr__(
-            'Included Addons', gungame_info('included'))
+        GunGameInfo.__setattr__('Included Addons', gungame_info('included'))
 
         # Update Custom Addons
-        GunGameInfo().info.__setattr__(
-            'Custom Addons', gungame_info('custom'))
+        GunGameInfo.__setattr__('Custom Addons', gungame_info('custom'))
 
     # Getting Included or Custom Addon information?
     if info in ('included', 'custom'):
-
-        # Has addoninfo been passed in?
-        if GunGameInfo().info is None:
-
-            # If not, don't go any further
-            return
 
         # Retrieve the Loaded Addons
         from addons.loaded import LoadedAddons
@@ -221,3 +183,41 @@ def gungame_info(info, _info=None):
 
         # Return the list as one string
         return ' '.join(addonlist)
+
+
+def _get_gg_version():
+    '''Function used to get the current version of GunGame'''
+
+    # Use this file's revision as a starting point
+    revision = int(__doc__.split('$Rev: ')[1].split()[0])
+
+    # Loop through all .py files in the GunGame structure
+    for file_path in get_game_dir(
+      'addons/eventscripts/gungame51').walkfiles('*.py'):
+
+        # Is the file part of a custom addon?
+        if 'custom' in file_path.splitall():
+
+            # If so, we don't want to include this file
+            continue
+
+        # Try to open the file and get its revision number
+        try:
+            with file_path.open() as pyfile:
+                version = int(pyfile.read().split('$Rev: ')[1].split()[0])
+
+            # Is the current file's version newer than the current newest file?
+            if version > revision:
+
+                # Set the newest file version to the current file's version
+                revision = version
+
+        # If an error is encountered, just continue to the next file
+        except:
+            continue
+
+    # Return the newest revision number
+    return '5.1.%s' % revision
+
+# Get the _GunGameInfo instance
+GunGameInfo = _GunGameInfo()
