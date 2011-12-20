@@ -29,6 +29,7 @@ except ImportError:
 from core import gungame_info
 #   Modules
 from modules.eventmanager import unload_events
+from modules.helpers import disable_auto_kick
 from modules.helpers import thanks
 from modules.info import info
 from modules.initialization import initialize
