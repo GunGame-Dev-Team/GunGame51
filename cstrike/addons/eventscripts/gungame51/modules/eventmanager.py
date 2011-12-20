@@ -55,7 +55,7 @@ def _game_events():
             continue
 
         # Is the object native to gameevents?
-        if not instance.__module__ == 'gungame51.gameevents':
+        if not instance.__module__ == 'gungame51.modules.gameevents':
 
             # Do not register the object
             continue

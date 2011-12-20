@@ -9,22 +9,12 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python imports
-import sys
-
 # EventScripts Imports
 #   ES
 import es
 #   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
-#   Gamethread
-from gamethread import delayed
-#   Playerlib
-from playerlib import getPlayer
-from playerlib import getUseridList
-#   Weaponlib
-from weaponlib import getWeaponList
 
 # SPE Imports
 try:
@@ -45,41 +35,20 @@ from modules.initialization import initialize
 from modules.initialization import unload_on_error
 #   Addons
 from core.addons.manager import AddonManager
-from core.addons.events import EventRegistry
-from core.addons.priority import PriorityAddon
 #   Cfg
-from core.cfg import load_configs
 from core.cfg import unload_configs
 #   Events
-from core.events import gg_resource_file
-from core.events import GG_Load
 from core.events import GG_Unload
-from core.events import GG_Start
-#   Logs
-from core.logs import make_log_file
-#   Leaders
-from core.leaders.shortcuts import LeaderManager
 #   Menus
 from core.menus import MenuManager
 #   Messaging
-from core.messaging.shortcuts import langstring
-from core.messaging.shortcuts import load_translation
 from core.messaging.shortcuts import unload_translation
-from core.messaging.shortcuts import msg
 #   Players
 from core.players.players import _PlayerContainer
-from core.players.shortcuts import Player
-from core.players.shortcuts import reset_players
-#   Sounds
-from core.sound import make_downloadable
 #   Sql
-from core.sql.shortcuts import prune_winners_db
-from core.sql.shortcuts import update_winner
 from core.sql.shortcuts import Database
 #   Weapons
 from core.weapons import WeaponOrderManager
-from core.weapons.shortcuts import get_level_multikill
-from core.weapons.shortcuts import get_weapon_order
 
 
 # =============================================================================

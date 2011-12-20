@@ -9,17 +9,19 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
-
-
 # Eventscripts Imports
+#   ES
 import es
+#   Playerlib
 from playerlib import getPlayer
-import gamethread
+#   Gamethread
+from gamethread import delayed
 
 # GunGame Imports
 #    Core
 from gungame51.core import in_map
+#   Modules
+from gungame51.modules.active import RoundInfo as _RoundInfo
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Messaging
@@ -29,6 +31,7 @@ from gungame51.core.messaging.shortcuts import saytext2
 from gungame51.core.players.players import UseridError
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import setAttribute
+
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -42,6 +45,7 @@ info.requires = ['gg_dead_strip', 'gg_dissolver']
 info.conflicts = ['gg_deathmatch']
 info.translations = ['gg_elimination']
 
+
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
@@ -53,19 +57,17 @@ roundSpawned = []
 # >> CLASSES
 # =============================================================================
 class RoundInfo(object):
-    def __init__(self):
-        self.active = False
-        self.round = 0
+    round = 0
 
-roundInfo = RoundInfo()
+    @property
+    def active(self):
+        return _RoundInfo.active
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    if in_map():
-        roundInfo.active = True
 
     # Get userids of all connected players
     setAttribute('#all', 'eliminated', [])
@@ -84,14 +86,12 @@ def unload():
 # =============================================================================
 def es_map_start(event_var):
     # Reset round tracking
-    roundInfo.active = False
-    roundInfo.round = 0
+    RoundInfo.round = 0
 
 
 def round_start(event_var):
     # Round tracking
-    roundInfo.active = True
-    roundInfo.round += 1
+    RoundInfo.round += 1
 
     # Reset all eliminated player counters
     setAttribute('#all', 'eliminated', [])
@@ -102,9 +102,6 @@ def round_start(event_var):
 
 def round_end(event_var):
     global roundSpawned
-
-    # Set round inactive
-    roundInfo.active = False
 
     # If gg_elimination_spawn is loaded, reset the spawned list
     if int(gg_elimination_spawn):
@@ -155,7 +152,7 @@ def joinclass_filter(userid, args):
         return 1
 
     # Spawn the player in 4 seconds
-    gamethread.delayed(4, respawnPlayer, (userid, roundInfo.round))
+    delayed(4, respawnPlayer, (userid, RoundInfo.round))
     return 1
 
 
@@ -169,13 +166,13 @@ def player_disconnect(event_var):
 
     # Respawn eliminated players if needed
     if ggPlayer.eliminated:
-        respawnEliminated(userid, roundInfo.round)
+        respawnEliminated(userid, RoundInfo.round)
 
 
 def player_death(event_var):
 
     # Check to see if the round is active
-    if not roundInfo.active:
+    if not RoundInfo.active:
         return
 
     # Get userid and attacker userids
@@ -185,12 +182,12 @@ def player_death(event_var):
 
     # Was suicide?
     if userid == attacker or attacker == 0:
-        gamethread.delayed(5, respawnPlayer, (userid, roundInfo.round))
+        delayed(5, respawnPlayer, (userid, RoundInfo.round))
         ggVictim.msg('SuicideAutoRespawn', prefix=True)
 
     # Was a teamkill?
     elif event_var['es_userteam'] == event_var['es_attackerteam']:
-        gamethread.delayed(5, respawnPlayer, (userid, roundInfo.round))
+        delayed(5, respawnPlayer, (userid, RoundInfo.round))
         ggVictim.msg('TeamKillAutoRespawn', prefix=True)
 
     # Was a normal death
@@ -207,7 +204,7 @@ def player_death(event_var):
         {'attacker': event_var['es_attackername']}, True)
 
     # Check if victim had any Eliminated players
-    gamethread.delayed(1, respawnEliminated, (userid, roundInfo.round))
+    delayed(1, respawnEliminated, (userid, RoundInfo.round))
 
 
 # =============================================================================
@@ -215,11 +212,11 @@ def player_death(event_var):
 # =============================================================================
 def respawnPlayer(userid, respawnRound):
     # Make sure the round is active
-    if not roundInfo.active:
+    if not RoundInfo.active:
         return
 
     # Check if respawn was issued in the current round
-    if roundInfo.round != respawnRound:
+    if RoundInfo.round != respawnRound:
         return
 
     # See if the player suicided due to disconnect
@@ -250,11 +247,11 @@ def respawnPlayer(userid, respawnRound):
 
 def respawnEliminated(userid, respawnRound):
     # Check if round is over
-    if not roundInfo.active:
+    if not RoundInfo.active:
         return
 
     # Check if respawn was issued in the current round
-    if roundInfo.round != respawnRound:
+    if RoundInfo.round != respawnRound:
         return
 
     # Get the GunGame player object

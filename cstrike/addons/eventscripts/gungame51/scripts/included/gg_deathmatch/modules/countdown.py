@@ -19,11 +19,10 @@ from gamethread import delayed
 from playerlib import getPlayer
 
 # GunGame Imports
+#   Modules
+from gungame51.modules.active import RoundInfo
 #   Repeat
 from gungame51.core.repeat import Repeat
-
-# Script Imports
-from active import RoundInfo
 
 
 # =============================================================================
@@ -37,7 +36,7 @@ gg_dm_respawn_delay = ServerVar('gg_dm_respawn_delay')
 # =============================================================================
 class PlayerCountdown(object):
     '''Object used to house the countdown methods for BasePlayer objects'''
-    
+
     def start_repeat(self):
         '''Starts the player's repeat'''
 
