@@ -102,6 +102,13 @@ def es_map_start(event_var):
     players.clear()
 
 
+def gg_start(event_var):
+    '''Called everytime a GunGame match starts'''
+
+    # Set mp_freezetime to 0 to make compatible with Warmup Round
+    mp_freezetime.set(0)
+
+
 def gg_win(event_var):
     '''Called when someone wins the match'''
 
