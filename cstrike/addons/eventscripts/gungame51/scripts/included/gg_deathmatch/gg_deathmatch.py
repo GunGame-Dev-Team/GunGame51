@@ -124,11 +124,3 @@ def player_death(event_var):
 
         # Start the player's repeat
         players[event_var['userid']].start_repeat()
-
-
-def round_start(event_var):
-    '''Called at the start of every round'''
-
-
-def round_end(event_var):
-    '''Called at the end of every round'''
