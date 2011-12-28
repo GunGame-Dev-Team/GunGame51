@@ -303,7 +303,7 @@ def cmd_spawn_show(args=None):
 
 
 def read_spawn_points():
-    if filePath.isfile():
+    if not filePath.isfile():
         return []
 
     with filePath.open() as spawnPointFile:
