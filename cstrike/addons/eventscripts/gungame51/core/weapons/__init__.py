@@ -133,6 +133,10 @@ class _BaseWeaponOrder(object):
         # Create the random weapon order
         self._random = dict(zip(range(1, len(weapons) + 1), weapons))
 
+        # Since self.active is set to the previous value of self.random,
+        # we need to re-call _set_active_order_type to set the new values
+        self._set_active_order_type()
+
     def echo(self):
         '''
         Echos (prints) the current weapon order to console.
