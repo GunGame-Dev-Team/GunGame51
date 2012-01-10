@@ -105,6 +105,10 @@ class LeaderManager(dict):
 
     def _tied_leader(self, ggPlayer):
         """Adds a leader to the current leader list."""
+
+        # Store the old leaders
+        old_leaders = self._get_leader_string()
+
         # Update the current userid
         self._update_level(ggPlayer.userid, ggPlayer.level)
 
@@ -113,6 +117,7 @@ class LeaderManager(dict):
         gg_tied_leader = GG_Tied_Leader(userid=ggPlayer.userid,
                                         leveler=ggPlayer.userid,
                                         leaders=new_leaders,
+                                        old_leaders=old_leaders,
                                         leader_level=self.leaderlevel)
         # Fire gg_tied_leader
         return gg_tied_leader.fire()
@@ -124,6 +129,9 @@ class LeaderManager(dict):
             raise ValueError('Unable to remove "%s" from the current leaders. '
                 % userid + 'The userid "%s" is not a current leader.' % userid)
 
+        # Store the old leaders
+        old_leaders = self._get_leader_string()
+
         # Update the current userid
         self._update_level(ggPlayer.userid, ggPlayer.level)
 
@@ -133,12 +141,17 @@ class LeaderManager(dict):
         gg_leader_lostlevel = GG_Leader_LostLevel(userid=ggPlayer.userid,
                                                   leveler=ggPlayer.userid,
                                                   leaders=new_leaders,
+                                                  old_leaders=old_leaders,
                                                   leader_level=leaderLevel)
         # Fire gg_leader_lostlevel
         gg_leader_lostlevel.fire()
 
     def _new_or_same_leader(self, ggPlayer):
         """Sets the current leader list as the new leader's userid."""
+
+        # Store the old leaders
+        old_leaders = self._get_leader_string()
+
         # Update the current userid
         self._update_level(ggPlayer.userid, ggPlayer.level)
 
@@ -147,6 +160,7 @@ class LeaderManager(dict):
         gg_new_leader = GG_New_Leader(userid=ggPlayer.userid,
                                       leveler=ggPlayer.userid,
                                       leaders=new_leaders,
+                                      old_leaders=old_leaders,
                                       leader_level=self.leaderlevel)
         # Fire the "gg_new_leader" event
         return gg_new_leader.fire()
@@ -163,6 +177,9 @@ class LeaderManager(dict):
             self._remove_userid(userid)
             return
 
+        # Store the old leaders
+        old_leaders = self._get_leader_string()
+
         # Remove the userid
         self._remove_userid(userid)
 
@@ -171,6 +188,7 @@ class LeaderManager(dict):
         leaderLevel = self.leaderlevel
         gg_leader_disconnect = GG_Leader_Disconnect(userid=userid,
                                                     leaders=new_leaders,
+                                                    old_leaders=old_leaders,
                                                     leader_level=leaderLevel)
         # Fire the "gg_leader_disconnect" event
         return gg_leader_disconnect.fire()

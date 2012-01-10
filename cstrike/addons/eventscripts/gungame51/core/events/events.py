@@ -85,6 +85,8 @@ class GG_New_Leader(ESEvent):
                          ' leveled up to become the new leader')
     leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
+    old_leaders = StringField(comment='String of old leaders\' userids ' +
+                              'separated by "," e.g. "2,7,9"')
     leader_level = ByteField(comment="The current leader's level")
 
 
@@ -96,6 +98,8 @@ class GG_Tied_Leader(ESEvent):
                          ' leveled up to tie the leader(s)')
     leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
+    old_leaders = StringField(comment='String of old leaders\' userids ' +
+                              'separated by "," e.g. "2,7,9"')
     leader_level = ByteField(comment="The current leader's level")
 
 
@@ -107,6 +111,8 @@ class GG_Leader_LostLevel(ESEvent):
                          ' is leveling')
     leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
+    old_leaders = StringField(comment='String of old leaders\' userids ' +
+                              'separated by "," e.g. "2,7,9"')
     leader_level = ByteField(comment="The current leader's level")
 
 
@@ -116,6 +122,8 @@ class GG_Leader_Disconnect(ESEvent):
                         'disconnected')
     leaders = StringField(comment="String of current leaders' userids " +
                           'separated by "," e.g. "2,7,9"')
+    old_leaders = StringField(comment='String of old leaders\' userids ' +
+                              'separated by "," e.g. "2,7,9"')
     leader_level = ByteField(comment="The current leader's level")
 
 
