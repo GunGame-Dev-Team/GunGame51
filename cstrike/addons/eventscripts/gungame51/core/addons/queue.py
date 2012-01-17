@@ -16,6 +16,7 @@ import es
 from gamethread import delayed
 
 # GunGame Imports
+from gungame51.core import gungame_info
 #   Addons
 from conflicts import AddonConflicts
 from conflicts import ConflictError
@@ -59,6 +60,15 @@ class _AddonQueue(dict):
         # Return the set
         return value
 
+    def _finish(self):
+        '''Updates GunGame info and clears the queue'''
+
+        # Update GunGame info
+        gungame_info('update')
+
+        # Clear the queue
+        self.clear()
+
     def add_to_queue(self, queue_type, addon):
         '''Adds an addon to the load or unload queue'''
 
@@ -87,7 +97,7 @@ class _AddonQueue(dict):
             self._load_addons()
 
         # Clear the dictionary for further use
-        self.clear()
+        self._finish()
 
     def _unload_addons(self):
         '''Unloads all addons in the unload queue'''
@@ -120,8 +130,9 @@ class _AddonQueue(dict):
                 if addon in AddonConflicts:
 
                     # If so, raise an error about the conflict
-                    raise ConflictError('"%s" can not be loaded.' % addon +
-                        '  Sub-addon is listed as a conflict with ' +
+                    raise ConflictError(
+                        'Sub-addon "%s" can not be loaded.' % addon +
+                        '  It is listed as a conflict with Sub-addon(s) ' +
                         '"%s"' % '", "'.join(list(AddonConflicts[addon])))
 
                 # Loop through all conflicts for the current addon
@@ -132,16 +143,18 @@ class _AddonQueue(dict):
 
                         # If so, raise an error
                         raise ConflictError(
-                            'Sub-addon "%s" is already ' % conflict +
-                            'loaded and is a conflict with "%s"' % addon)
+                            'Sub-addon "%s" can not be loaded.' % addon +
+                            '  Sub-addon "%s" ' % conflict +
+                            'is loaded and is listed as a conflict.')
 
                     # Is the conflict going to be loaded?
                     if conflict in self._current_instances:
 
                         # If so, raise an error
                         raise ConflictError(
-                            'Sub-addon "%s" is set to be ' % conflict +
-                            'loaded and is a conflict with "%s"' % addon)
+                            'Sub-addon "%s" can not be loaded.' % addon +
+                            '  Sub-addon "%s" is set ' % conflict +
+                            'to be loaded as well and is listed as a conflict')
 
         # Did an exception occur?
         except:
@@ -153,7 +166,7 @@ class _AddonQueue(dict):
                 es.forcevalue(addon, 0)
 
             # Clear the dictionary
-            self.clear()
+            self._finish()
 
             # Finish by raising the error
             raise

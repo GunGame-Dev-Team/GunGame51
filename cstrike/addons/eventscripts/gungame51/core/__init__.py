@@ -41,7 +41,7 @@ class InfoList(list):
 class _GunGameInfo(es.AddonInfo):
     def __init__(self):
         self.keylist = InfoList()
-        self._version = _get_gg_version()
+        self._version = get_version()
 
     def _get_info(self):
         if hasattr(self, '_info'):
@@ -185,15 +185,26 @@ def gungame_info(info):
         return ' '.join(addonlist)
 
 
-def _get_gg_version():
+def get_version(addon=None):
     '''Function used to get the current version of GunGame'''
 
-    # Use this file's revision as a starting point
-    revision = int(__doc__.split('$Rev: ')[1].split()[0])
+    # Start with 0 as the revision number
+    revision = 0
+
+    # Getting GunGame's version?
+    if addon is None:
+
+        # Get all files in the gungame51 directory
+        basepath = get_game_dir('addons/eventscripts/gungame51')
+
+    else:
+
+        # Get all files in the addon's directory
+        basepath = get_game_dir(
+            'addons/eventscripts/gungame51/scripts/included/%s' % addon)
 
     # Loop through all .py files in the GunGame structure
-    for file_path in get_game_dir(
-      'addons/eventscripts/gungame51').walkfiles('*.py'):
+    for file_path in basepath.walkfiles('*.py'):
 
         # Is the file part of a custom addon?
         if 'custom' in file_path.splitall():

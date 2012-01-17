@@ -9,8 +9,6 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# GunGame Imports
-from gungame51.core import gungame_info
 #   Addons
 from conflicts import AddonConflicts
 from dependency import DependentAddons
@@ -53,9 +51,6 @@ class AddonManager(object):
             # Add the conflict
             AddonConflicts._add_conflict(conflict, instance.basename)
 
-        # Update GunGame info
-        gungame_info('update')
-
     def _unload_addon(self, addon):
         '''Method used to unload a GunGame sub-addon'''
 
@@ -94,9 +89,6 @@ class AddonManager(object):
 
         # Remove the addon from LoadedAddons
         del LoadedAddons[addon]
-
-        # If not, update GunGame info
-        gungame_info('update')
 
     @staticmethod
     def unload_all_addons():

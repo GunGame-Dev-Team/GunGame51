@@ -109,9 +109,6 @@ def finish_initialization():
     # Prune the DB
     prune_winners_db()
 
-    # Update GunGame's info
-    gungame_info('update')
-
     # Load error logging
     delayed(3.50, make_log_file)
 

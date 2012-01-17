@@ -14,6 +14,7 @@ $LastChangedDate$
 import es
 
 # GunGame Imports
+from gungame51.core import get_version
 #   Modules
 from gungame51.modules.active import RoundInfo
 #   Addons
@@ -30,7 +31,7 @@ info = AddonInfo()
 info.name = 'gg_deathmatch'
 info.title = 'GG Deathmatch'
 info.author = 'GG Dev Team'
-info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.version = get_version('gg_deathmatch')
 info.requires = ['gg_dead_strip', 'gg_dissolver']
 info.conflicts = ['gg_elimination', 'gg_teamplay', 'gg_teamwork']
 info.translations = ['gg_deathmatch']
