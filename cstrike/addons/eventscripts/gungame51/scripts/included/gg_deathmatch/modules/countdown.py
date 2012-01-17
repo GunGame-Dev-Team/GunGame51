@@ -24,6 +24,9 @@ from gungame51.modules.active import RoundInfo
 #   Repeat
 from gungame51.core.repeat import Repeat
 
+# Script Imports
+from dictionary import players
+
 
 # =============================================================================
 # >> GLOBAL VARIABLES
