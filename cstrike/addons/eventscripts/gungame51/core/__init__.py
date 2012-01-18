@@ -43,17 +43,6 @@ class _GunGameInfo(es.AddonInfo):
         self.keylist = InfoList()
         self._version = get_version()
 
-    def _get_info(self):
-        if hasattr(self, '_info'):
-            return self._info
-        return None
-
-    def _set_info(self, info):
-        if isinstance(info, es.AddonInfo):
-            self._info = info
-
-    info = property(fget=_get_info, fset=_set_info)
-
     @property
     def version(self):
         return self._version
