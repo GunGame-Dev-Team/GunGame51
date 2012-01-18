@@ -186,6 +186,7 @@ def get_version(addon=None):
         # Get all files in the gungame51 directory
         basepath = get_game_dir('addons/eventscripts/gungame51')
 
+    # Getting an included addon's version?
     else:
 
         # Get all files in the addon's directory

@@ -41,6 +41,10 @@ class Credits(dict):
         self.order.append(item)
         super(Credits, self).__setitem__(item, value)
 
+    def __iter__(self):
+        for x in self.order:
+            yield x
+
 # =============================================================================
 # >> GG THANKS
 # =============================================================================
