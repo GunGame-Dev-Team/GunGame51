@@ -78,9 +78,6 @@ def es_map_start(event_var):
     # Execute GunGame's server.cfg file
     es.delayed(1, 'exec gungame51/gg_server.cfg')
 
-    # Set the round as inactive
-    RoundInfo.active = False
-
     # Reset all players
     reset_players()
 
@@ -129,9 +126,6 @@ def server_cvar(event_var):
 def round_start(event_var):
     '''Called at the start of every round'''
 
-    # Set the round as active
-    RoundInfo.active = True
-
     # Retrieve a random userid
     userid = es.getuserid()
 
@@ -159,13 +153,6 @@ def round_start(event_var):
     # Equip players with a knife and
     # possibly item_kevlar or item_assaultsuit
     equip_player()
-
-
-def round_end(event_var):
-    '''Called at the end of each round'''
-
-    # Set the round as inactive
-    RoundInfo.active = False
 
 
 # =========================================================================

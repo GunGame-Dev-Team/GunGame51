@@ -28,6 +28,7 @@ except ImportError:
 # GunGame Imports
 from core import gungame_info
 #   Modules
+from modules.active import RoundInfo
 from modules.eventmanager import unload_events
 from modules.helpers import disable_auto_kick
 from modules.helpers import thanks
@@ -157,3 +158,27 @@ def unload():
 
     # Unregister !thanks command
     unregisterSayCommand('!thanks')
+
+
+# =============================================================================
+# >> ROUND ACTIVE EVENTS
+# =============================================================================
+def es_map_start(event_var):
+    '''Called when a new map is loaded'''
+
+    # Set the round as inactive
+    RoundInfo.active = False
+
+
+def round_start(event_var):
+    '''Called at the start of every round'''
+
+    # Set the round as active
+    RoundInfo.active = True
+
+
+def round_end(event_var):
+    '''Called at the end of each round'''
+
+    # Set the round as inactive
+    RoundInfo.active = False

@@ -27,8 +27,6 @@ from playerlib import getPlayerList
 from weaponlib import getWeaponList
 
 # GunGame Imports
-#   Modules
-from gungame51.modules.active import RoundInfo
 #   Addons
 from gungame51.core.addons.info import AddonInfo
 from gungame51.core.addons.loaded import LoadedAddons
@@ -551,16 +549,6 @@ def hegrenade_detonate(event_var):
 
 def cs_win_panel_match(event_var):
     warmup.repeat.stop()
-
-
-def round_start(event_var):
-    if warmup.priorities:
-        RoundInfo.active = True
-
-
-def round_end(event_var):
-    if warmup.priorities:
-        RoundInfo.active = False
 
 
 # =============================================================================
