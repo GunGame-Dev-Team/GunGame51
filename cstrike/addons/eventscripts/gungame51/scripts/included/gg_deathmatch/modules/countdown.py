@@ -24,9 +24,6 @@ from gungame51.modules.active import RoundInfo
 #   Repeat
 from gungame51.core.repeat import Repeat
 
-# Script Imports
-from dictionary import players
-
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -63,7 +60,7 @@ class PlayerCountdown(object):
         if not exists('userid', self.userid):
 
             # If not, remove them from the players dictionary
-            del players[self.userid]
+            self.remove_player(self.userid)
 
             # No need to go further
             return

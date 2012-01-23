@@ -36,6 +36,10 @@ class DictionaryOfPlayers(dict):
         # Create the player's instance
         player = self[userid] = BasePlayer(userid)
 
+        # Assign the remove_player method
+        # to delete the userid from the dictionary
+        player.remove_player = self.__delitem__
+
         # Return the player's new instance
         return player
 

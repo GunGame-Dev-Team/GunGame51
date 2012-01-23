@@ -29,12 +29,6 @@ class _ValidAddons(dict):
     def __init__(self):
         '''Gets all addons if the class has not already be initialized'''
 
-        # Are there any values in the dictionary?
-        if self:
-
-            # If so, no need to get the addons again
-            return
-
         # Store the included addons
         self.included = self._get_addons_by_type('included')
 
