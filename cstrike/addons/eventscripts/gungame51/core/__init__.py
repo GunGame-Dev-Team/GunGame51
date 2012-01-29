@@ -110,6 +110,7 @@ old_files = [
     'addons/eventscripts/gungame51/scripts/included/gg_thanks',
     'cfg/gungame51/included_addon_configs/gg_error_logging.cfg',
     'cfg/gungame51/included_addon_configs/gg_thanks.cfg',
+    'cfg/gungame51/gg_default_addons.cfg',
 ]
 
 # Delete any out of date files

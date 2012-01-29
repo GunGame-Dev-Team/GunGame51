@@ -168,3 +168,24 @@ def load():
                 'that players will hear when sounds are played.')
             cvar.default = 'default'
             cvar.text = 'Controls which sound pack will be used by default.'
+
+        # Create the Database section
+        config.cfg_section('DATABASE SETTINGS')
+
+        # Create the gg_prune_database instance
+        with config.cfg_cvar('gg_prune_database') as cvar:
+
+            cvar.name = 'STATS DATABASE PRUNE'
+            cvar.description.append('The number of days of ' +
+                'inactivity for a winner that is tolerated until')
+            cvar.description.append('they are removed from the database.')
+            cvar.notes.append('Pruning the database of ' +
+                'old entries is STRONGLY RECOMMENDED for ')
+            cvar.notes.append('high-volume servers.')
+            cvar.options.append(
+                '0 = Do not prune inactive winners from the database.')
+            cvar.options.append('# = Number of inactive days ' +
+                'before a winner is pruned from the database.')
+            cvar.default = 0
+            cvar.text = ('The number inactive days ' +
+                'before a winner is removed from the database.')
