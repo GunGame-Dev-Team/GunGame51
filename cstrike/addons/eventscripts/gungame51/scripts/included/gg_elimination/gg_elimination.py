@@ -56,12 +56,14 @@ roundSpawned = []
 # =============================================================================
 # >> CLASSES
 # =============================================================================
-class RoundInfo(object):
+class _ElimRoundInfo(object):
     round = 0
 
     @property
     def active(self):
         return _RoundInfo.active
+
+RoundInfo = _ElimRoundInfo()
 
 
 # =============================================================================
