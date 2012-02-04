@@ -14,7 +14,11 @@ import es
 import gamethread
 
 # GunGame Imports
+#   Modules
+from gungame51.modules.active import RoundInfo
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+#   Players
 from gungame51.core.players.shortcuts import Player
 
 
@@ -39,23 +43,10 @@ gg_suicide_punish = es.ServerVar('gg_suicide_punish')
 # committed suicide to do so
 recentTeamChange = []
 
-# Is the round live?
-liveRound = True
-
 
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
-def round_start(event_var):
-    global liveRound
-    liveRound = True
-
-
-def round_end(event_var):
-    global liveRound
-    liveRound = False
-
-
 def player_team(event_var):
     userid = int(event_var["userid"])
 
@@ -74,7 +65,7 @@ def player_death(event_var):
         track of counting bomb deaths as suicide.
     '''
     # Has the round ended?
-    if not liveRound:
+    if not RoundInfo.active:
         return
 
     # Set player ids
@@ -87,7 +78,7 @@ def player_death(event_var):
 
     # If the attacker is not "world or the userid of the victim, it is not a
     # suicide
-    if not ((attacker == 0) or (attacker == userid)):
+    if not attacker in (0, userid):
         return
 
     # If the suicide was caused by a team change, stop here
