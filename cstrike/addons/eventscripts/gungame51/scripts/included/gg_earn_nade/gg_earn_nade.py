@@ -11,15 +11,19 @@ $LastChangedDate$
 # =============================================================================
 # Eventscripts Imports
 import es
-import gamethread
+from gamethread import delayed
 from playerlib import getPlayer
-from playerlib import getUseridList
 
 # GunGame Imports
+#   Modules
+from gungame51.modules.active import RoundInfo
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+#   Players
 from gungame51.core.players import Player
 from gungame51.core.players.shortcuts import add_attribute_callback
 from gungame51.core.players.shortcuts import remove_callbacks_for_addon
+#   Weapons
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # =============================================================================
@@ -70,7 +74,7 @@ def level_call_back(name, value, ggPlayer):
     # Add the player to recentlyOnHegrenade for a short time so that we will
     # know in player_death that they just leveled up to hegrenade level
     recentlyOnHegrenade.append(ggPlayer.userid)
-    gamethread.delayed(0.2, recentlyOnHegrenade.remove, ggPlayer.userid)
+    delayed(0.2, recentlyOnHegrenade.remove, ggPlayer.userid)
 
 
 def player_death(event_var):
@@ -90,7 +94,7 @@ def player_death(event_var):
 
     # Only give a nade to a player on nade level
     if Player(attacker).weapon == 'hegrenade':
-        give_nade(attacker)
+        delayed(0, give_nade, attacker)
 
 
 # =============================================================================
@@ -105,12 +109,8 @@ def give_nade(userid):
     if userid in recentlyOnHegrenade:
         return
 
-    # Was this the last kill in the round? (CT)
-    if not getUseridList('#alive,#ct'):
-        return
-
-    # Was this the last kill in the round? (T)
-    if not getUseridList('#alive,#t'):
+    # Is the round still active?
+    if not RoundInfo.active:
         return
 
     pPlayer = getPlayer(userid)
