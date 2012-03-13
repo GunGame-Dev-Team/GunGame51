@@ -49,13 +49,13 @@ def _game_events():
         instance = gameevents.__dict__[event]
 
         # Is the object a function?
-        if not type(instance).__name__ == 'function':
+        if type(instance).__name__ != 'function':
 
             # Do not register the object
             continue
 
         # Is the object native to gameevents?
-        if not instance.__module__ == gameevents.__name__:
+        if instance.__module__ != gameevents.__name__:
 
             # Do not register the object
             continue

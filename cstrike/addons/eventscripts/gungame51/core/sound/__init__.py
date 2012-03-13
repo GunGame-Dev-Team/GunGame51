@@ -132,7 +132,7 @@ def make_downloadable(gg_loading=False):
     for f in iniDir.walkfiles():
 
         # Make sure the extension is ".ini"
-        if not f.ext.lower() == '.ini':
+        if f.ext.lower() != '.ini':
             continue
 
         # Grab the ConfigObj for the INI

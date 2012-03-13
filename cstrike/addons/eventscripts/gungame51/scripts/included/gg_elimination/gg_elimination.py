@@ -9,28 +9,24 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Eventscripts Imports
+# EventScripts Imports
 #   ES
 import es
-#   Playerlib
-from playerlib import getPlayer
-#   Gamethread
-from gamethread import delayed
 
 # GunGame Imports
-#    Core
-from gungame51.core import in_map
+from gungame51.core import get_version
 #   Modules
-from gungame51.modules.active import RoundInfo as _RoundInfo
+from gungame51.modules.active import RoundInfo
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Messaging
 from gungame51.core.messaging.shortcuts import msg
-from gungame51.core.messaging.shortcuts import saytext2
 #   Players
-from gungame51.core.players.players import UseridError
 from gungame51.core.players.shortcuts import Player
-from gungame51.core.players.shortcuts import setAttribute
+
+# Script Imports
+from modules.dictionary import players
+from modules.respawn import respawn_players
 
 
 # =============================================================================
@@ -40,260 +36,104 @@ info = AddonInfo()
 info.name = 'gg_elimination'
 info.title = 'GG Elimination'
 info.author = 'GG Dev Team'
-info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.version = get_version(info.name)
 info.requires = ['gg_dead_strip', 'gg_dissolver']
 info.conflicts = ['gg_deathmatch']
-info.translations = ['gg_elimination']
-
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-gg_elimination_spawn = es.ServerVar('gg_elimination_spawn')
-roundSpawned = []
-
-
-# =============================================================================
-# >> CLASSES
-# =============================================================================
-class _ElimRoundInfo(object):
-    round = 0
-
-    @property
-    def active(self):
-        return _RoundInfo.active
-
-RoundInfo = _ElimRoundInfo()
+info.translations = [info.name]
 
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+    '''Called when Elimination is loaded'''
 
-    # Get userids of all connected players
-    setAttribute('#all', 'eliminated', [])
-
-    # Register the joinclass command to trigger the first spawn.
-    es.addons.registerClientCommandFilter(joinclass_filter)
+    # Register the joinclass/jointeam filter
+    es.addons.registerClientCommandFilter(join_filter)
 
 
 def unload():
-    # Unregister the joinclass command
-    es.addons.unregisterClientCommandFilter(joinclass_filter)
+    '''Called when Elimination is unloaded'''
+
+    # Unegister the joinclass/jointeam filter
+    es.addons.unregisterClientCommandFilter(join_filter)
+
+
+# =============================================================================
+# >> REGISTERED CALLBACKS
+# =============================================================================
+def join_filter(userid, args):
+    '''Checks to see if the player needs spawned'''
+
+    # Is the command being used "joinclass"?
+    if len(args) and args[0].lower() == 'joinclass':
+
+        # Check if the player needs to be spawned
+        players[userid].check_spawn()
+
+    # Always return True so that the command runs
+    return True
 
 
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
 def es_map_start(event_var):
-    # Reset round tracking
-    RoundInfo.round = 0
+    '''Called every map start'''
+
+    # Clear the player dictionary
+    players.clear()
 
 
 def round_start(event_var):
-    # Round tracking
-    RoundInfo.round += 1
+    '''Called at the start of every round'''
 
-    # Reset all eliminated player counters
-    setAttribute('#all', 'eliminated', [])
-
-    # Send the round information message
+    # Send a message about Elimination running
     msg('#human', 'RoundInfo', prefix=True)
 
 
 def round_end(event_var):
-    global roundSpawned
+    '''Called at the end of every round'''
 
-    # If gg_elimination_spawn is loaded, reset the spawned list
-    if int(gg_elimination_spawn):
-        roundSpawned = []
+    # Clear the respawn list
+    respawn_players.clear()
 
-
-def player_activate(event_var):
-    # Create player dictionary
-    userid = int(event_var['userid'])
-    setAttribute(userid, 'eliminated', [])
+    # Clear the player dictionary
+    players.clear()
 
 
 def player_spawn(event_var):
-    steamid = event_var['es_steamid']
+    '''Called any time a player spawns'''
 
-    # If gg_elimination_spawn isn't loaded, stop here
-    if not int(gg_elimination_spawn):
+    # Is the player on a team?
+    if int(event_var['es_userteam']) < 2:
+
+        # If not, return
         return
 
-    # If the player didn't join an active team, stop here
-    if not event_var['es_userteam'] in ['2', '3']:
+    # Create a Player instance for the player
+    players[int(event_var['userid'])]
+
+
+def player_death(event_var):
+    if not RoundInfo.active:
         return
-
-    # If the player is already in roundSpawned, stop here
-    if steamid in roundSpawned:
-        return
-
-    roundSpawned.append(steamid)
-
-
-def joinclass_filter(userid, args):
-    # If the command is not joinclass, stop here
-    if (not len(args)) or args[0].lower() != 'joinclass':
-        return 1
-
-    steamid = es.getplayersteamid(userid)
-
-    # If gg_elimination_spawn isn't loaded, stop here
-    if not int(gg_elimination_spawn):
-        return 1
-
-    # If the player didn't join an active team, stop here
-    if es.getplayerteam(userid) < 2:
-        return 1
-
-    # If the player already has spawned this round, stop here
-    if steamid in roundSpawned:
-        return 1
-
-    # Spawn the player in 4 seconds
-    delayed(4, respawnPlayer, (userid, RoundInfo.round))
-    return 1
+    victim = int(event_var['userid'])
+    attacker = int(event_var['attacker'])
+    if attacker in (victim, 0):
+        players[victim].auto_respawn('SuicideAutoRespawn')
+    elif event_var['es_userteam'] == event_var['es_attackerteam']:
+        players[victim].auto_respawn('TeamKillAutoRespawn')
+    else:
+        players[attacker].eliminated.add(victim)
+        Player(victim).saytext2(
+            players[attacker].gg_player.index, 'RespawnWhenAttackerDies',
+            {'attacker': event_var['es_attackername']}, True)
+        players[victim].eliminated.clear()
 
 
 def player_disconnect(event_var):
     userid = int(event_var['userid'])
-    # Players may disconnect before activating, causing an error
-    try:
-        ggPlayer = Player(userid)
-    except (ValueError, UseridError):
+    if not userid in players:
         return
-
-    # Respawn eliminated players if needed
-    if ggPlayer.eliminated:
-        respawnEliminated(userid, RoundInfo.round)
-
-
-def player_death(event_var):
-
-    # Check to see if the round is active
-    if not RoundInfo.active:
-        return
-
-    # Get userid and attacker userids
-    userid = int(event_var['userid'])
-    attacker = int(event_var['attacker'])
-    ggVictim = Player(userid)
-
-    # Was suicide?
-    if userid == attacker or attacker == 0:
-        delayed(5, respawnPlayer, (userid, RoundInfo.round))
-        ggVictim.msg('SuicideAutoRespawn', prefix=True)
-
-    # Was a teamkill?
-    elif event_var['es_userteam'] == event_var['es_attackerteam']:
-        delayed(5, respawnPlayer, (userid, RoundInfo.round))
-        ggVictim.msg('TeamKillAutoRespawn', prefix=True)
-
-    # Was a normal death
-    else:
-        ggAttacker = Player(attacker)
-
-        # Add victim to the attackers eliminated players
-        ggAttacker.eliminated.append(userid)
-
-        # Tell them they will respawn when their attacker dies
-        index = ggAttacker.index
-
-        ggVictim.saytext2(index, 'RespawnWhenAttackerDies',
-        {'attacker': event_var['es_attackername']}, True)
-
-    # Check if victim had any Eliminated players
-    delayed(1, respawnEliminated, (userid, RoundInfo.round))
-
-
-# =============================================================================
-# >> CUSTOM/HELPER FUNCTIONS
-# =============================================================================
-def respawnPlayer(userid, respawnRound):
-    # Make sure the round is active
-    if not RoundInfo.active:
-        return
-
-    # Check if respawn was issued in the current round
-    if RoundInfo.round != respawnRound:
-        return
-
-    # See if the player suicided due to disconnect
-    if not es.exists('userid', userid) and userid != 0:
-        return
-
-    # Retrieve the playerlib player object
-    plPlayer = getPlayer(userid)
-
-    # Is spectator?
-    if es.getplayerteam(userid) < 2:
-        return
-
-    # Is player alive?
-    if not plPlayer.isdead:
-        return
-
-    # Retrieve the GunGame player object
-    ggPlayer = Player(userid)
-
-    # Tell everyone that they are respawning
-    saytext2('#human', ggPlayer.index, 'RespawningPlayer',
-    {'player': es.getplayername(userid)}, True)
-
-    # Respawn player
-    ggPlayer.respawn()
-
-
-def respawnEliminated(userid, respawnRound):
-    # Check if round is over
-    if not RoundInfo.active:
-        return
-
-    # Check if respawn was issued in the current round
-    if RoundInfo.round != respawnRound:
-        return
-
-    # Get the GunGame player object
-    ggPlayer = Player(userid)
-
-    # Set variables
-    players = []
-    index = 0
-
-    # Respawn all victims eliminated players
-    for playerid in ggPlayer.eliminated:
-        # Make sure the player exists
-        if not es.exists('userid', playerid):
-            continue
-
-        # Is spectator?
-        if es.getplayerteam(playerid) < 2:
-            continue
-
-        # Is player already alive?
-        if not getPlayer(playerid).isdead:
-            continue
-
-        # Respawn player
-        Player(playerid).respawn()
-
-        # Add to message format
-        players.append('\3%s\1' % es.getplayername(playerid))
-
-        # Get index
-        if not index:
-            index = Player(playerid).index
-
-    # Check if anyone is respawning
-    if not players:
-        return
-
-    # Tell everyone that they are respawning
-    saytext2('#human', index, 'RespawningPlayer',
-    {'player': ', '.join(players)}, True)
-
-    # Clear victims eliminated player list
-    ggPlayer.eliminated = []
+    players[userid].eliminated.clear()
