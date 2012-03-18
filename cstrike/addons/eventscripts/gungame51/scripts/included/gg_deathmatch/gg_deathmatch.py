@@ -44,16 +44,17 @@ info.translations = ['gg_deathmatch']
 mp_freezetime = es.ServerVar('mp_freezetime')
 mp_roundtime = es.ServerVar('mp_roundtime')
 
-# Backups
-mp_freezetime_backup = int(mp_freezetime)
-mp_roundtime_backup = int(mp_roundtime)
-
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
     '''Called when DeathMatch is loaded'''
+
+    # Store the freezetime and roundtime values on load
+    global mp_freezetime_backup, mp_roundtime_backup
+    mp_freezetime_backup = int(mp_freezetime)
+    mp_roundtime_backup = int(mp_roundtime)
 
     # Set freezetime and roundtime
     mp_freezetime.set('0')

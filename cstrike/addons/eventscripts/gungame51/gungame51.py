@@ -59,16 +59,6 @@ from core.weapons import WeaponOrderManager
 eventscripts_gg = es.ServerVar('eventscripts_gg')
 eventscripts_gg5 = es.ServerVar('eventscripts_gg5')
 
-gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
-gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
-gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
-gg_map_strip_exceptions = es.ServerVar('gg_map_strip_exceptions')
-gg_player_armor = es.ServerVar('gg_player_armor')
-gg_map_obj = es.ServerVar('gg_map_obj')
-gg_player_defuser = es.ServerVar('gg_player_defuser')
-gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
-gg_weapon_order_sort_type = es.ServerVar('gg_weapon_order_sort_type')
-
 sv_tags = es.ServerVar('sv_tags')
 
 

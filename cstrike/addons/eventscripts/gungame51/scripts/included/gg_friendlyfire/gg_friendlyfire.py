@@ -38,16 +38,22 @@ gg_friendlyfire = es.ServerVar('gg_friendlyfire')
 # Get the es.ServerVar() instance of "mp_friendlyfire"
 mp_friendlyfire = es.ServerVar('mp_friendlyfire')
 
-# Backup the value of "mp_friendlyfire"
-oldFriendlyFire = int(mp_friendlyfire)
-
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
+def load():
+    # Store a backup of friendlyfire
+    global friendlyfire_backup
+    friendlyfire_backup = int(mp_friendlyfire)
+
+    # Set mp_friendlyfire to 0
+    mp_friendlyfire.set(0)
+
+
 def unload():
     # Set friendlyfire back to what it was before gg_friendlyfire loaded
-    mp_friendlyfire.set(oldFriendlyFire)
+    mp_friendlyfire.set(friendlyfire_backup)
 
 
 # =============================================================================

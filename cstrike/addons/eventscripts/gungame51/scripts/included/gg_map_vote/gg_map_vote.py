@@ -73,8 +73,6 @@ gg_map_vote_nominate_command = es.ServerVar('gg_map_vote_nominate_command')
 
 eventscripts_currentmap = es.ServerVar('eventscripts_currentmap')
 eventscripts_maphandler = es.ServerVar('eventscripts_maphandler')
-eventscripts_maphandler_backup = int(eventscripts_maphandler)
-eventscripts_maphandler.set(1)
 
 # Player command backup var
 player_command_backup = str(gg_map_vote_player_command)
@@ -130,6 +128,13 @@ voteRocked = False
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
+    # Store the value of eventscripts_maphandler
+    global eventscripts_maphandler_backup
+    eventscripts_maphandler_backup = int(eventscripts_maphandler)
+
+    # Set eventscripts_maphandler to 1
+    eventscripts_maphandler.set(1)
+
     # Check to see if GunGame's voting system is to be used
     if int(gg_map_vote) == 1:
 
