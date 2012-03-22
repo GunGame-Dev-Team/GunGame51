@@ -101,6 +101,7 @@ def load():
                 '1 = (Enabled) Load gg_spawn_protect_cancelonfire.')
             cvar.default = 0
             cvar.text = 'Cancels spawn protection when the weapon is fired.'
+            cvar.notify = True
 
         # Create the gg_spawn_protect_can_level_up instance
         with config.cfg_cvar('gg_spawn_protect_can_level_up') as cvar:

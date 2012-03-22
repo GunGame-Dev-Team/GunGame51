@@ -14,11 +14,18 @@ import es
 from playerlib import getUseridList
 
 # GunGame Imports
+#   Modules
+from gungame51.modules.backups import VariableBackups
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+#   Leaders
 from gungame51.core.leaders.shortcuts import get_leader_level
-from gungame51.core.weapons.shortcuts import get_total_levels
+#   Messaging
 from gungame51.core.messaging.shortcuts import msg
+#   Players
 from gungame51.core.players.shortcuts import Player
+#   Weapons
+from gungame51.core.weapons.shortcuts import get_total_levels
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -44,8 +51,7 @@ mp_friendlyfire = es.ServerVar('mp_friendlyfire')
 # =============================================================================
 def load():
     # Store a backup of friendlyfire
-    global friendlyfire_backup
-    friendlyfire_backup = int(mp_friendlyfire)
+    VariableBackups['mp_friendlyfire'].add(info.name)
 
     # Set mp_friendlyfire to 0
     mp_friendlyfire.set(0)
@@ -53,7 +59,7 @@ def load():
 
 def unload():
     # Set friendlyfire back to what it was before gg_friendlyfire loaded
-    mp_friendlyfire.set(friendlyfire_backup)
+    VariableBackups['mp_friendlyfire'].remove(info.name)
 
 
 # =============================================================================

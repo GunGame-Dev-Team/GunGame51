@@ -13,7 +13,11 @@ $LastChangedDate$
 import es
 
 # GunGame Imports
+#   Modules
+from gungame51.modules.active import RoundInfo
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+#   Players
 from gungame51.core.players.shortcuts import Player
 
 
@@ -34,26 +38,13 @@ info.translations = ['gg_tk_punish']
 # Get the es.ServerVar() instance of "gg_tk_punish"
 gg_tk_punish = es.ServerVar('gg_tk_punish')
 
-# Is the round live?
-liveRound = True
-
 
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
-def round_start(event_var):
-    global liveRound
-    liveRound = True
-
-
-def round_end(event_var):
-    global liveRound
-    liveRound = False
-
-
 def player_death(event_var):
     # Has the round ended?
-    if not liveRound:
+    if not RoundInfo.active:
         return
 
     # Set player ids

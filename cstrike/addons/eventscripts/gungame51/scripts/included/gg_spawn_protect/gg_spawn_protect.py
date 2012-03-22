@@ -63,33 +63,28 @@ protectedList = []
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    global noisySave
-
     if gg_spawn_protect_cancelonfire:
-        noisySave = int(eventscripts_noisy)
-        eventscripts_noisy.set(1)
+        es.doblock('corelib/noisy_on')
 
 
 def unload():
-    eventscripts_noisy.set(noisySave)
+    if gg_spawn_protect_cancelonfire:
+        es.doblock('corelib/noisy_off')
 
 
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
 def server_cvar(event_var):
-    global noisySave
-
     # Change "eventscripts_noisy" due to "gg_spawn_protect_cancelonfire"?
     if event_var['cvarname'] == 'gg_spawn_protect_cancelonfire':
 
         if int(event_var['cvarvalue']) >= 1:
             # Set noisy vars
-            noisySave = int(eventscripts_noisy)
-            eventscripts_noisy.set(1)
+            es.doblock('corelib/noisy_on')
         else:
             # Set noisy back
-            eventscripts_noisy.set(noisySave)
+            es.doblock('corelib/noisy_off')
 
 
 def weapon_fire(event_var):

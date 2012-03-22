@@ -10,6 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # EventScripts Imports
+#   ES
 import es
 
 # GunGame Imports

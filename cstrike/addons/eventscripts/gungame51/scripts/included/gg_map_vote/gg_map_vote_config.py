@@ -203,6 +203,7 @@ def load():
             cvar.examples.append('1 = (Enabled)')
             cvar.default = 1
             cvar.text = 'Allow rocking the vote.'
+            cvar.notify = True
 
         # Create the gg_map_vote_rtv_command instance
         with config.cfg_cvar('gg_map_vote_rtv_command') as cvar:
