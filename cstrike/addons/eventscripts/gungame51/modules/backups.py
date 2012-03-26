@@ -67,10 +67,13 @@ class _RegisteredAddons(set):
         self.variable = variable
 
         # Get the default value
+        value = str(ServerVar(variable))
+
+        # Try to typecast the value to float
         try:
-            value = float(ServerVar(variable))
+            value = float(value)
         except:
-            value = str(ServerVar(variable))
+            pass
 
         # Store the default value
         self.default = value
