@@ -14,7 +14,7 @@ import es
 
 # GunGame Imports
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Players
@@ -44,7 +44,7 @@ gg_tk_punish = es.ServerVar('gg_tk_punish')
 # =============================================================================
 def player_death(event_var):
     # Has the round ended?
-    if not RoundInfo.active:
+    if not ActiveInfo.round:
         return
 
     # Set player ids

@@ -16,7 +16,7 @@ import es
 # GunGame Imports
 from gungame51.core import get_version
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 from gungame51.modules.backups import VariableBackups
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
@@ -129,7 +129,7 @@ def player_death(event_var):
     '''Called when a player dies'''
 
     # Is the round active?
-    if RoundInfo.active:
+    if ActiveInfo.round:
 
         # Start the player's repeat
         players[event_var['userid']].start_repeat()

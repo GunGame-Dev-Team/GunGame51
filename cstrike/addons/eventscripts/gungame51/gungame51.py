@@ -28,7 +28,7 @@ except ImportError:
 # GunGame Imports
 from core import gungame_info
 #   Modules
-from modules.active import RoundInfo
+from modules.active import ActiveInfo
 from modules.eventmanager import unload_events
 from modules.helpers import disable_auto_kick
 from modules.helpers import thanks
@@ -88,6 +88,10 @@ def load():
     eventscripts_gg.makepublic()
     eventscripts_gg5.set(gungame_info('version'))
     eventscripts_gg5.makepublic()
+
+
+    # Update the Included/Custom Addon lists
+    gungame_info('update')
 
     # Register !thanks command
     registerSayCommand('!thanks', thanks, 'Displays a list of those involved' +
@@ -157,18 +161,49 @@ def es_map_start(event_var):
     '''Called when a new map is loaded'''
 
     # Set the round as inactive
-    RoundInfo.active = False
+    ActiveInfo.round = False
+
+    # Set GunGame as inactive
+    ActiveInfo.gungame = False
+
+
+def gg_start(event_var):
+    '''Called when GunGame starts'''
+
+    # Set GunGame as active
+    ActiveInfo.gungame = True
+
+
+def gg_win(event_var):
+    '''Called when a player wins GunGame'''
+
+    # Set GunGame as inactive
+    ActiveInfo.gungame = False
+
+
+def gg_team_win(event_var):
+    '''Called when a team wins GunGame'''
+
+    # Set GunGame as inactive
+    ActiveInfo.gungame = False
 
 
 def round_start(event_var):
     '''Called at the start of every round'''
 
     # Set the round as active
-    RoundInfo.active = True
+    ActiveInfo.round = True
 
 
 def round_end(event_var):
     '''Called at the end of each round'''
 
     # Set the round as inactive
-    RoundInfo.active = False
+    ActiveInfo.round = False
+
+
+def cs_win_panel_match(event_var):
+    '''Called when a map ends'''
+
+    # Set GunGame as inactive
+    ActiveInfo.gungame = False

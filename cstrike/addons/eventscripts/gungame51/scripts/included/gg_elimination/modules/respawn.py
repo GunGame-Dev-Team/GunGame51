@@ -21,7 +21,7 @@ from gamethread import delayedname
 
 # GunGame Imports
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Players
 from gungame51.core.players.shortcuts import Player
 #   Messaging
@@ -39,7 +39,7 @@ class _RespawnPlayers(list):
             and removes the list after 1 second'''
 
         # Is the round active?
-        if not RoundInfo.active:
+        if not ActiveInfo.round:
 
             # If not, do not add the list to the respawn list
             return

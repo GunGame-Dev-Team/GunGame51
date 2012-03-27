@@ -16,7 +16,7 @@ import es
 # GunGame Imports
 from gungame51.core import get_version
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Messaging
@@ -116,7 +116,7 @@ def player_spawn(event_var):
 
 
 def player_death(event_var):
-    if not RoundInfo.active:
+    if not ActiveInfo.round:
         return
     victim = int(event_var['userid'])
     attacker = int(event_var['attacker'])

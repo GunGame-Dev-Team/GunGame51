@@ -20,7 +20,7 @@ from playerlib import getPlayer
 
 # GunGame Imports
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Repeat
 from gungame51.core.repeat import Repeat
 
@@ -75,7 +75,7 @@ class PlayerCountdown(object):
             return
 
         # Is the round inactive?
-        if not RoundInfo.active:
+        if not ActiveInfo.round:
 
             # Send the player a hudhint that the round has ended
             self.send_hudhint('RespawnCountdown_RoundEnded')
@@ -137,7 +137,7 @@ class PlayerCountdown(object):
             active before spawning the player'''
 
         # Is the round still active?
-        if RoundInfo.active:
+        if ActiveInfo.round:
 
             # Spawn the player
             self.gg_player.respawn()

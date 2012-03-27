@@ -29,22 +29,42 @@ game_path = path(path(
 # >> CLASSES
 # =============================================================================
 class GunGameError(Exception):
+    '''Base Error to use for GunGame errors'''
     pass
 
 
 class InfoList(list):
+    '''Class used to store the keylist and verify that attributes
+        that start with "_" do not get added to the keylist'''
+
     def append(self, item):
+        '''Verify that the item does not start with
+            "_" when adding the item to the keylist'''
+
+        # Does the item start with "_"?
         if not item.startswith('_'):
+
+            # If not, add it to the list
             super(InfoList, self).append(item)
 
 
 class _GunGameInfo(es.AddonInfo):
+    '''Class used to store the AddonInfo for GunGame51'''
+
     def __init__(self):
+        '''Called on initialization of the class'''
+
+        # Store the keylist as an InfoList instance
         self.keylist = InfoList()
+
+        # Store the version
         self._version = get_version()
 
     @property
     def version(self):
+        '''Property that returns the version of GunGame51'''
+
+        # Return the version
         return self._version
 
 
@@ -166,7 +186,9 @@ def gungame_info(info):
 
         # If no addons, output is None
         if not addonlist:
-            return 'None\n'
+
+            # Return a string showing no addons are loaded
+            return '\n' + '\t' * 4 + 'None\n'
 
         # Add a line return to the beginning of our output
         addonlist.insert(0, '\n')

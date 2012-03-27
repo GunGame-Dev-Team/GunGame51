@@ -21,7 +21,7 @@ from playerlib import getPlayer
 
 # GunGame Imports
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Players
 from gungame51.core.players.shortcuts import Player as ggPlayer
 
@@ -62,7 +62,7 @@ class Player(object):
             return
 
         # Is the round active?
-        if not RoundInfo.active:
+        if not ActiveInfo.round:
 
             # If not, return
             return

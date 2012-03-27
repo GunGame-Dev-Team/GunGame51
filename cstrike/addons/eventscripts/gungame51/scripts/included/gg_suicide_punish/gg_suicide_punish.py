@@ -15,7 +15,7 @@ import gamethread
 
 # GunGame Imports
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Players
@@ -65,7 +65,7 @@ def player_death(event_var):
         track of counting bomb deaths as suicide.
     '''
     # Has the round ended?
-    if not RoundInfo.active:
+    if not ActiveInfo.round:
         return
 
     # Set player ids

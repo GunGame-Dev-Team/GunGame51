@@ -25,7 +25,7 @@ from spe import removeEntityByIndex
 
 # GunGame Imports
 #   Modules
-from active import RoundInfo
+from active import ActiveInfo
 from helpers import check_gg_start
 from helpers import disable_auto_kick
 from helpers import equip_player
@@ -209,7 +209,7 @@ def player_death(event_var):
     '''Called every time a player dies'''
 
     # Is the round active?
-    if not RoundInfo.active:
+    if not ActiveInfo.round:
 
         # If not, do nothing
         return

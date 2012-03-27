@@ -16,7 +16,7 @@ from playerlib import getPlayer
 
 # GunGame Imports
 #   Modules
-from gungame51.modules.active import RoundInfo
+from gungame51.modules.active import ActiveInfo
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 #   Players
@@ -110,7 +110,7 @@ def give_nade(userid):
         return
 
     # Is the round still active?
-    if not RoundInfo.active:
+    if not ActiveInfo.round:
         return
 
     pPlayer = getPlayer(userid)
