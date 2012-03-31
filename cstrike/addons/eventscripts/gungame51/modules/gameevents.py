@@ -129,9 +129,6 @@ def round_start(event_var):
     # Retrieve a random userid
     userid = es.getuserid()
 
-    # Disable Buyzones
-    es.server.queuecmd('es_xfire %s func_buyzone Disable' % userid)
-
     # Remove weapons from the map
     do_not_strip = [(x.strip() if x.strip().startswith('weapon_') else
         'weapon_%s' % x.strip()) for x in str(
