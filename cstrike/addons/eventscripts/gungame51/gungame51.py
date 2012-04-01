@@ -194,6 +194,9 @@ def round_start(event_var):
     # Set the round as active
     ActiveInfo.round = True
 
+    # Retrieve a random userid
+    userid = es.getuserid()
+
     # Disable Buyzones
     es.server.queuecmd('es_xfire %s func_buyzone Disable' % userid)
 

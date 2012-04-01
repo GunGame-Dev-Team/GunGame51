@@ -126,9 +126,6 @@ def server_cvar(event_var):
 def round_start(event_var):
     '''Called at the start of every round'''
 
-    # Retrieve a random userid
-    userid = es.getuserid()
-
     # Remove weapons from the map
     do_not_strip = [(x.strip() if x.strip().startswith('weapon_') else
         'weapon_%s' % x.strip()) for x in str(
