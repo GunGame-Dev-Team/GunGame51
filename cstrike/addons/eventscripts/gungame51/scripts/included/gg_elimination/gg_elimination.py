@@ -129,7 +129,7 @@ def player_death(event_var):
         Player(victim).saytext2(
             players[attacker].gg_player.index, 'RespawnWhenAttackerDies',
             {'attacker': event_var['es_attackername']}, True)
-        players[victim].eliminated.clear()
+    players[victim].eliminated.clear()
 
 
 def player_disconnect(event_var):
