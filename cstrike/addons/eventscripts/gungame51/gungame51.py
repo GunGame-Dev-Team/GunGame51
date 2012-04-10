@@ -153,6 +153,9 @@ def unload():
     # Unregister !thanks command
     unregisterSayCommand('!thanks')
 
+    # Set GunGame as not loaded
+    ActiveInfo.loaded = False
+
 
 # =============================================================================
 # >> ROUND ACTIVE EVENTS

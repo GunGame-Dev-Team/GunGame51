@@ -17,6 +17,7 @@ from playerlib import getPlayer
 
 # GunGame Imports
 #   Modules
+from active import ActiveInfo
 from info import credits
 #   Addons
 from gungame51.core.addons.priority import PriorityAddon
@@ -34,8 +35,6 @@ from gungame51.core.weapons import WeaponOrderManager
 # >> GLOBAL VARIABLES
 # =============================================================================
 gg_player_armor = es.ServerVar('gg_player_armor')
-
-_first_gg_start = False
 
 
 # =============================================================================
@@ -82,15 +81,14 @@ def equip_player():
 
 
 def check_first_gg_start():
-    global _first_gg_start
-    _first_gg_start = True
+    ActiveInfo.loaded = True
     check_gg_start()
 
 
 def check_gg_start():
     # If there is nothing in priority addons, fire event gg_start
     if not PriorityAddon:
-        if _first_gg_start:
+        if ActiveInfo.loaded:
             GG_Start().fire()
 
 

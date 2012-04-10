@@ -11,5 +11,6 @@ $LastChangedDate$
 # >> CLASSES
 # =============================================================================
 class ActiveInfo(object):
-    round = False
     gungame = False
+    loaded = False
+    round = False
