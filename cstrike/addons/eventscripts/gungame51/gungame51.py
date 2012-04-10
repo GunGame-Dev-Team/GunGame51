@@ -47,8 +47,10 @@ from core.menus import MenuManager
 from core.messaging.shortcuts import unload_translation
 #   Players
 from core.players.players import _PlayerContainer
+from core.players.shortcuts import Player
 #   Sql
 from core.sql.shortcuts import Database
+from core.sql.shortcuts import update_winner
 #   Weapons
 from core.weapons import WeaponOrderManager
 
@@ -216,3 +218,15 @@ def cs_win_panel_match(event_var):
 
     # Set GunGame as inactive
     ActiveInfo.gungame = False
+
+
+# =============================================================================
+# >> OTHER GAME EVENTS
+# =============================================================================
+def player_changename(event_var):
+    '''Called when a player changes their name while on the server'''
+
+    # Update the player's name in the winners database if they are in it
+    if Player(int(event_var['userid'])).wins:
+        update_winner('name', event_var['newname'],
+            uniqueid=event_var['es_steamid'])

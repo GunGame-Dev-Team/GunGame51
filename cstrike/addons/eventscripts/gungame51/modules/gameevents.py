@@ -44,7 +44,6 @@ from gungame51.core.players.shortcuts import reset_players
 from gungame51.core.sound import make_downloadable
 #   Sql
 from gungame51.core.sql.shortcuts import prune_winners_db
-from gungame51.core.sql.shortcuts import update_winner
 from gungame51.core.sql.shortcuts import Database
 #   Weapons
 from gungame51.core.weapons.shortcuts import get_level_multikill
@@ -314,15 +313,6 @@ def player_team(event_var):
     # team to an active team, play the welcome sound
     if int(event_var['oldteam']) < 2 and int(event_var['team']) > 1:
         Player(int(event_var['userid'])).playsound('welcome')
-
-
-def player_changename(event_var):
-    '''Called when a player changes their name while on the server'''
-
-    # Update the player's name in the winners database if they are in it
-    if Player(int(event_var['userid'])).wins:
-        update_winner('name', event_var['newname'],
-            uniqueid=event_var['es_steamid'])
 
 
 def player_activate(event_var):
