@@ -252,6 +252,27 @@ def gg_levelup(event_var):
     voteStart()
 
 
+def gg_team_levelup(event_var):
+    global voteHasStarted
+    # Vote has allready been started?
+    if voteHasStarted:
+        return
+
+    # Start vote ?
+    if get_leader_level() < (get_total_levels() - int(gg_map_vote_trigger)):
+        return
+
+    # Change global so we dont fire the vote twice
+    voteHasStarted = True
+
+    # Use 3rd party voting system ?
+    if int(gg_map_vote) > 1:
+        es.server.queuecmd(str(gg_map_vote_command))
+        return
+
+    voteStart()
+
+
 def player_death(event_var):
     # Is the player a bot?
     if event_var['es_steamid'] == 'BOT':
