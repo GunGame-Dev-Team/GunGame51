@@ -81,6 +81,15 @@ class _AddonQueue(dict):
         # Add the given addon to the given type's set
         self[queue_type].add(addon)
 
+    def remove_from_queue(self, queue_type, addon):
+        '''Removes an addon from the load or unload queue'''
+
+        # Is the addon in the given queue?
+        if queue_type in self and addon in self[queue_type]:
+
+            # If so, remove the addon from the queue
+            self[queue_type].remove(addon)
+
     def _loop_through_queue(self):
         '''Unload and load addons from the queues'''
 

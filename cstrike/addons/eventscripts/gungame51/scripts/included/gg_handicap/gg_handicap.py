@@ -153,7 +153,7 @@ def handicap(userid, from_player_activate):
         handicapLevel = getLevelAboveUser(userid)
 
     # Get the average level of the players other than himself?
-    elif gg_handicap == 2:
+    else:
         handicapLevel = getAverageLevel(userid)
 
     # Max level for joining for the first time?

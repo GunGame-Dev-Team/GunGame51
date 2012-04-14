@@ -78,6 +78,12 @@ class _AddonCvars(object):
                         # when no other addons depend upon it
                         DependentAddons[cvarname].remain_loaded = True
 
+                # Is the addon not a dependent addon?
+                else:
+
+                    # Remove the addon from the unload queue if it needs to be
+                    AddonQueue.remove_from_queue('unload', cvarname)
+
                 # The addon is already loaded, so return
                 return
 
@@ -89,6 +95,9 @@ class _AddonCvars(object):
 
             # Is the addon loaded?
             if not cvarname in LoadedAddons:
+
+                # Remove the addon from the load queue if it needs to be
+                AddonQueue.remove_from_queue('load', cvarname)
 
                 # If not, simply return
                 return

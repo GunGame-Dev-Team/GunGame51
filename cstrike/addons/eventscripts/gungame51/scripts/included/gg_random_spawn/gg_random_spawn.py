@@ -9,19 +9,27 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-#Python Imports
+# Python Imports
 from __future__ import with_statement
-import random
+#   Random
+from random import shuffle
+
+# EventScripts Imports
+#   ES
+from es import entitysetvalue
+from es import ServerVar
 
 # SPE Imports
-import spe
-
-# Eventscripts Imports
-import es
+from spe import createEntity
+from spe import getIndexOfEntity
 
 # GunGame Imports
 from gungame51.core import get_game_dir
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+
+# Script Imports
+from modules.backups import backups
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -32,101 +40,88 @@ info.title = 'GG Random Spawn'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
 
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-
-spawnPoints = []
-pointsLoaded = False
-
 
 # =============================================================================
 # >> LOAD & UNLOAD
 # =============================================================================
 def load():
-    loadSpawnFile(str(es.ServerVar("eventscripts_currentmap")))
+    '''Called when the script loads'''
 
-    userid = es.getuserid()
+    # Load the current map's spawnpoint file
+    load_spawnpoints()
 
-    # If there are no players on the server, stop here
-    if not userid:
-        return
 
-    pointsLoaded = True
+def unload():
+    '''Called when the script unloads'''
 
-    if not spawnPoints:
-        return
-
-    loadRandomPoints(userid)
+    # Clear the backups dictionary
+    backups.clear()
 
 
 # =============================================================================
-# >> GUNGAME EVENTS
+# >> GAME EVENTS
 # =============================================================================
 def es_map_start(event_var):
-    global pointsLoaded
+    '''Called when a new map has been loaded'''
 
-    pointsLoaded = False
-    loadSpawnFile(event_var['mapname'])
+    # Clear the backups dictionary
+    backups.clear(True)
 
-
-def player_activate(event_var):
-    global pointsLoaded
-
-    if pointsLoaded:
-        return
-
-    pointsLoaded = True
-
-    if not spawnPoints:
-        return
-
-    loadRandomPoints(event_var['userid'])
+    # Load the current map's spawnpoint file
+    load_spawnpoints()
 
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
-def loadSpawnFile(mapName):
-    global spawnPoints
-    global pointsLoaded
+def load_spawnpoints():
+    '''Loads the spawnpoints for the current map'''
 
-    spawnPoints = []
-    pointsLoaded = False
+    # Get the location of the spawnpoint file for the current map
+    spawnpoint_file = get_game_dir('cfg/gungame51/' +
+        'spawnpoints/%s.txt' % ServerVar('eventscripts_currentmap'))
 
-    # Get spawnpoint file
-    spawnFile = get_game_dir('cfg/gungame51/spawnpoints/%s.txt' % mapName)
+    # Is there a spawnpoint file for the current map?
+    if not spawnpoint_file.isfile():
 
-    # Does the file exist?
-    if not spawnFile.isfile():
+        # If not, simply return
         return
 
-    # Get spawnpoint lines
-    with spawnFile.open() as spawnPointFile:
-        fileLines = [x.strip() for x in spawnPointFile.readlines()]
+    # Open the spawnpoint file
+    with spawnpoint_file.open() as open_file:
 
-    # Set up spawnpoints
-    spawnPoints = [x.split(' ', 6) for x in fileLines]
+        # Store the lines in a list
+        spawn_lines = [x.strip() for x in open_file.readlines() if x.strip()]
 
-    # Randomize spawnpoints
-    random.shuffle(spawnPoints)
+    # Split the spawnpoints into groups of 6 (3 for location, 3 for angle)
+    spawnpoints = [x.split(' ', 6) for x in spawn_lines]
 
+    # Shuffle the spawnpoints to randomize them
+    shuffle(spawnpoints)
 
-def loadRandomPoints(userid):
-    # Remove existing spawnpoints
-    for tSpawn in es.getEntityIndexes('info_player_terrorist'):
-        es.server.cmd('es_xremove %s' % tSpawn)
-    for ctSpawn in es.getEntityIndexes('info_player_counterterrorist'):
-        es.server.cmd('es_xremove %s' % ctSpawn)
+    # Store the backups
+    already_created = backups.update()
 
-    # Loop through the spawnpoints
-    for spawn in spawnPoints:
+    # Have the spawnpoints already been created?
+    if already_created:
+
+        # If they have return
+        return
+
+    # Loop through all of the spawnpoints
+    for location in spawnpoints:
+
+        # Loop through each team's spawnpoint entity
         for team in ('info_player_terrorist', 'info_player_counterterrorist'):
-            # Create the spawnpoint and get the index
-            index = spe.getIndexOfEntity(spe.giveNamedItem(userid, team))
 
-            # Set the spawnpoint position and rotation
-            es.setindexprop(index, 'CBaseEntity.m_vecOrigin',
-                '%s,%s,%s' % (spawn[0], spawn[1], spawn[2]))
-            es.setindexprop(index, 'CBaseEntity.m_angRotation',
-                '0,%s,0' % spawn[4])
+            # Create an entity of the current type
+            entity = createEntity(team)
+
+            # Get the entity's index
+            index = getIndexOfEntity(entity)
+
+            # Set the entity's origin
+            entitysetvalue(index, 'origin', ' '.join(location[:3]))
+
+            # Set the entity's angle
+            entitysetvalue(index, 'angles', ' '.join(location[3:]))
