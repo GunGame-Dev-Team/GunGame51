@@ -1,4 +1,4 @@
-# ../scripts/custom/gg_teamplay/gg_teamplay_config.py
+# ../scripts/included/gg_teamplay/gg_teamplay_config.py
 
 '''
 $Rev$

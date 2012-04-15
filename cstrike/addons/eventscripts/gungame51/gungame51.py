@@ -91,7 +91,6 @@ def load():
     eventscripts_gg5.set(gungame_info('version'))
     eventscripts_gg5.makepublic()
 
-
     # Update the Included/Custom Addon lists
     gungame_info('update')
 

@@ -1,4 +1,4 @@
-# ../core/players/levels/levels.py
+# ../core/players/levels.py
 
 '''
 $Rev$

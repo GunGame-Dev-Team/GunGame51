@@ -1,4 +1,4 @@
-# ../scripts/custom/gg_teamwork/gg_teamwork_config.py
+# ../scripts/included/gg_teamwork/gg_teamwork_config.py
 
 '''
 $Rev$

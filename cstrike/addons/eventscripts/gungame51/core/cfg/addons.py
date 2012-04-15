@@ -81,14 +81,20 @@ class _AddonCvars(object):
                 # Is the addon not a dependent addon?
                 else:
 
-                    # Remove the addon from the unload queue if it needs to be
-                    AddonQueue.remove_from_queue('unload', cvarname)
+                    # Does the "unload" have a current queue?
+                    if 'unload' in AddonQueue:
+
+                        # Is the addon in the unload queue?
+                        if cvarname in AddonQueue['unload']:
+
+                            # Remove the addon from the unload queue
+                            AddonQueue['unload'].remove(cvarname)
 
                 # The addon is already loaded, so return
                 return
 
-            # Load the addon
-            AddonQueue.add_to_queue('load', cvarname)
+            # Add the addon to the "load" queue
+            AddonQueue['load'].add(cvarname)
 
         # Unload addons with the value of 0 (including floats) or ''
         else:
@@ -96,8 +102,14 @@ class _AddonCvars(object):
             # Is the addon loaded?
             if not cvarname in LoadedAddons:
 
-                # Remove the addon from the load queue if it needs to be
-                AddonQueue.remove_from_queue('load', cvarname)
+                # Does the "load" have a current queue?
+                if 'load' in AddonQueue:
+
+                    # Is the addon in the load queue?
+                    if cvarname in AddonQueue['load']:
+
+                        # Remove the addon from the load queue
+                        AddonQueue['load'].remove(cvarname)
 
                 # If not, simply return
                 return
@@ -115,8 +127,8 @@ class _AddonCvars(object):
                 # Return, since we do not want to unload the dependent addon
                 return
 
-            # Unload the addon
-            AddonQueue.add_to_queue('unload', cvarname)
+            # Add the addon to the "unload" queue
+            AddonQueue['unload'].add(cvarname)
 
     @staticmethod
     def _is_enable_value(value):

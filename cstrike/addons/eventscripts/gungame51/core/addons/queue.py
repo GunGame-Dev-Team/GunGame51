@@ -54,6 +54,12 @@ class _AddonQueue(dict):
             raise KeyError('"%s" ' % queue_type +
                 'is not a valid key for AddonQueue')
 
+        # Are there any values in the dictionary?
+        if not self:
+
+            # If not, create the delay
+            delayed(0, self._loop_through_queue)
+
         # Set the queue type to a set to add addons in
         value = self[queue_type] = set()
 
@@ -68,27 +74,6 @@ class _AddonQueue(dict):
 
         # Clear the queue
         self.clear()
-
-    def add_to_queue(self, queue_type, addon):
-        '''Adds an addon to the load or unload queue'''
-
-        # Are there any values in the dictionary?
-        if not self:
-
-            # If not, create the delay
-            delayed(0, self._loop_through_queue)
-
-        # Add the given addon to the given type's set
-        self[queue_type].add(addon)
-
-    def remove_from_queue(self, queue_type, addon):
-        '''Removes an addon from the load or unload queue'''
-
-        # Is the addon in the given queue?
-        if queue_type in self and addon in self[queue_type]:
-
-            # If so, remove the addon from the queue
-            self[queue_type].remove(addon)
 
     def _loop_through_queue(self):
         '''Unload and load addons from the queues'''

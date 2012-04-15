@@ -363,7 +363,7 @@ class WarmupRound(object):
 
         # Send stop command to repeat loop
         self.repeat.stop()
-        
+
         # Send hudhint to players that Warmup has ended
         hudhint('#human', self.message)
 

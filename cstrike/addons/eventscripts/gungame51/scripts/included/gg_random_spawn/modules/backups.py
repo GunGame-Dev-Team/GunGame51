@@ -1,4 +1,4 @@
-# ../scripts/included/gg_random_spawn/modules/__init__.py
+# ../scripts/included/gg_random_spawn/modules/backups.py
 
 '''
 $Rev$
