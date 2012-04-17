@@ -129,6 +129,19 @@ def load():
             cvar.text = ('Enables dynamic end of round ' +
                 'chat time based on the winner music.')
 
+        # Create the gg_allow_kills_after_round instance
+        with config.cfg_cvar('gg_allow_kills_after_round') as cvar:
+
+            cvar.name = 'ALLOW KILLS AFTER ROUND END'
+            cvar.description.append('If enabled, kills ' +
+                'after the end of a round will be counted.')
+            cvar.options.append(
+                '0 = Do not count kills after the round has ended.')
+            cvar.options.append('1 = Count kills after the round has ended.')
+            cvar.default = 0
+            cvar.text = ('Allow kills after the end ' +
+                'of the round to count towards leveling.')
+
         # Create the Player Settings section
         config.cfg_section('PLAYER SETTINGS')
 

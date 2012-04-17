@@ -27,6 +27,8 @@ from playerlib import getPlayerList
 from weaponlib import getWeaponList
 
 # GunGame Imports
+#   Modules
+from gungame51.modules.backups import VariableBackups
 #   Addons
 from gungame51.core.addons.info import AddonInfo
 from gungame51.core.addons.loaded import LoadedAddons
@@ -200,7 +202,7 @@ class WarmupRound(object):
         self.message = 'Timer_Ended'
 
         # Store a backup of mp_freezetime
-        self.freezetime = int(mp_freezetime)
+        VariableBackups['mp_freezetime'].add(info.name)
 
         # Set Freeze Time to 0
         mp_freezetime.set(0)
@@ -374,7 +376,7 @@ class WarmupRound(object):
         self.extensions = 0
 
         # Reset mp_freezetime
-        mp_freezetime.set(self.freezetime)
+        VariableBackups['mp_freezetime'].remove(info.name)
 
         # Execute the End Warmup Round cfg file
         es.mexec('gungame51/' + str(warmup_end_file))

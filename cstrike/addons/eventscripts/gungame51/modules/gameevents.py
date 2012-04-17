@@ -60,6 +60,7 @@ gg_map_obj = es.ServerVar('gg_map_obj')
 gg_allow_afk_levels = es.ServerVar('gg_allow_afk_levels')
 gg_allow_afk_levels_nade = es.ServerVar('gg_allow_afk_levels_nade')
 gg_allow_afk_levels_knife = es.ServerVar('gg_allow_afk_levels_knife')
+gg_allow_kills_after_round = es.ServerVar('gg_allow_kills_after_round')
 
 
 # =========================================================================
@@ -201,8 +202,8 @@ def player_spawn(event_var):
 def player_death(event_var):
     '''Called every time a player dies'''
 
-    # Is the round active?
-    if not ActiveInfo.round:
+    # Is the round active, or should kills after round_end count?
+    if not (ActiveInfo.round or int(gg_allow_kills_after_round)):
 
         # If not, do nothing
         return

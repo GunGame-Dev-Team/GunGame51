@@ -41,7 +41,14 @@ def load():
     '''Called when the script is loaded'''
 
     # Disable objectives
-    disable_objectives()
+    modify_objectives()
+
+
+def unload():
+    '''Called when the script is unloaded'''
+
+    # Enable the objectives
+    modify_objectives()
 
 
 # =============================================================================
@@ -51,13 +58,13 @@ def round_start(event_var):
     '''Called when a new round starts'''
 
     # Disable objectives
-    disable_objectives()
+    modify_objectives()
 
 
 # =============================================================================
 # >> CUSTOM/HELPER FUNCTIONS
 # =============================================================================
-def disable_objectives():
+def modify_objectives():
     '''Disables Objectives on the map'''
 
     # Get a userid
@@ -98,6 +105,21 @@ def disable_objectives():
 
             # Kill all hostage_entity entities
             cmd += 'es_xfire %d hostage_entity Kill;' % userid
+
+    # Do the func_ entities need Enabled?
+    if map_objectives == 0:
+
+        # Are there any func_bomb_target indexes
+        if len(es.getEntityIndexes('func_bomb_target')):
+
+            # Disable all func_bomb_target entities
+            cmd += 'es_xfire %d func_bomb_target Enable;' % userid
+
+        # Are there any func_hostage_rescue indexes?
+        if len(es.getEntityIndexes('func_hostage_rescue')):
+
+            # Disable all func_hostage_rescue entities
+            cmd += 'es_xfire %d func_hostage_rescue Enable;' % userid
 
     # Is there a command string?
     if cmd:
