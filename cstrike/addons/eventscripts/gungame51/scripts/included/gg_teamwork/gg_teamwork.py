@@ -36,8 +36,7 @@ from gungame51.core.events.eventlib import ESEvent
 #       Resource
 from gungame51.core.events.eventlib.resource import ResourceFile
 #       Fields
-from gungame51.core.events.eventlib.fields import BooleanField
-from gungame51.core.events.eventlib.fields import ShortField
+from gungame51.core.events.eventlib.fields import ByteField
 #   Events
 from gungame51.core.events import GG_Win
 #   Messaging
@@ -75,10 +74,10 @@ gg_teamwork_winner_messages = ServerVar('gg_teamwork_winner_messages')
 class GG_Team_Win(ESEvent):
     '''Fires when a team wins the game'''
 
-    winner = ShortField(
+    winner = ByteField(
         min_value=2, max_value=3, comment='Team that won the match')
 
-    loser = ShortField(
+    loser = ByteField(
         min_value=2, max_value=3, comment='Team that lost the match')
 
 # Get the ResourceFile instance to create the .res file

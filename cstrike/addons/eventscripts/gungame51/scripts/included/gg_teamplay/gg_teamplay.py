@@ -37,7 +37,6 @@ from gungame51.core.events.eventlib.resource import ResourceFile
 #       Fields
 from gungame51.core.events.eventlib.fields import BooleanField
 from gungame51.core.events.eventlib.fields import ByteField
-from gungame51.core.events.eventlib.fields import ShortField
 #   Messaging
 from gungame51.core.messaging.shortcuts import langstring
 #   Players
@@ -75,17 +74,17 @@ gg_teamplay_end_on_first_kill = ServerVar('gg_teamplay_end_on_first_kill')
 class GG_Team_Win(ESEvent):
     '''Fires when a team wins the game'''
 
-    winner = ShortField(
+    winner = ByteField(
         min_value=2, max_value=3, comment='Team that won the match')
 
-    loser = ShortField(
+    loser = ByteField(
         min_value=2, max_value=3, comment='Team that lost the match')
 
 
 class GG_Team_LevelUp(ESEvent):
     '''Fires when a team levels up'''
 
-    team = ShortField(min_value=2, max_value=3, comment='Team that leveled up')
+    team = ByteField(min_value=2, max_value=3, comment='Team that leveled up')
 
     old_level = ByteField(
         min_value=1, comment='The old level of the team that leveled up')

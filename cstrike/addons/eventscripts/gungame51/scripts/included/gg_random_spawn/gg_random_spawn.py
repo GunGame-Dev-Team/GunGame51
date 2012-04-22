@@ -25,6 +25,7 @@ from spe import getIndexOfEntity
 
 # GunGame Imports
 from gungame51.core import get_game_dir
+from gungame51.core import get_version
 #   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
 
@@ -38,7 +39,7 @@ info = AddonInfo()
 info.name = 'gg_random_spawn'
 info.title = 'GG Random Spawn'
 info.author = 'GG Dev Team'
-info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+info.version = get_version('gg_random_spawn')
 
 
 # =============================================================================
