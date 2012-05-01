@@ -276,6 +276,9 @@ class _MapVoteManagement(object):
             # Select a random map from the maplist as the winner
             AttributeManagement.winner = rchoice(self.maps)
 
+            # Store a base value for the winning votes
+            votes = 0
+
         # Were there some votes?
         else:
 
@@ -293,16 +296,20 @@ class _MapVoteManagement(object):
             winning_votes = votes_per_map[sorted_votes[0]]
 
             # Get all maps that received the winning number of votes
-            winners = [map_name for map_name in votes_per_map 
+            winners = [map_name for map_name in votes_per_map
                 if votes_per_map[map_name] == winning_votes]
 
             # Choose a winner out of the maps that
             # received the winning number of votes
             AttributeManagement.winner = rchoice(winners)
 
+            # Store the number of votes for the winning map
+            votes = votes_per_map[AttributeManagement.winner]
+
         # Setup the gg_map_vote_ended event
-        gg_map_vote_ended = GG_Map_Vote_Ended(winner=AttributeManagement.winner,
-            votes=votes_per_map[AttributeManagement.winner], total_votes=len(all_votes))
+        gg_map_vote_ended = GG_Map_Vote_Ended(
+            winner=AttributeManagement.winner,
+            votes=votes, total_votes=len(all_votes))
 
         # Fire the gg_map_vote_ended event
         gg_map_vote_ended.fire()
