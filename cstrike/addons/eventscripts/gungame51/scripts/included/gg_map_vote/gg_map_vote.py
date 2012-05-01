@@ -32,6 +32,7 @@ from modules.attributes import AttributeManagement
 from modules.events import gg_map_vote_resource
 from modules.lastmaps import last_x_maps
 from modules.mapvote import mapvote
+from modules.nominate import nominate
 from modules.rtv import rtv
 
 # =============================================================================
@@ -132,6 +133,9 @@ def player_disconnect(event_var):
 
     # Remove the player from the set of RTV'ers
     rtv.players.discard(userid)
+
+    # Remove the player from the nominators dictionary
+    del nominate.nominators[userid]
 
 
 # =============================================================================
