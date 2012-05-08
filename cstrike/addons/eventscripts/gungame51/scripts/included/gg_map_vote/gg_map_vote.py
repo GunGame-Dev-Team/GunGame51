@@ -107,6 +107,41 @@ def es_map_start(event_var):
 
 
 # =============================================================================
+# >> SERVER EVENTS
+# =============================================================================
+def server_cvar(event_var):
+    '''Called when a server variable's value is
+        changed and the variable is set to notify'''
+
+    # Get the cvar's name
+    cvar_name = event_var['cvarname']
+
+    # Get the cvar's new value
+    cvar_value = event_var['cvarvalue']
+
+    # Is the variable enabling/disabling rtv or nominate?
+    if not cvar_name in ('gg_map_vote_rtv', 'gg_map_vote_nominate'):
+
+        # If not, no need to do anything
+        return
+
+    # Get the feature
+    feature = cvar_name.rsplit('_', 1)[1]
+
+    # Is the feature being enabled?
+    if int(cvar_value):
+
+        # Enable the feature
+        voting_management.register_command(feature)
+
+    # Is the feature being disabled?
+    else:
+
+        # Disable the feature
+        voting_management.unregister_command(feature)
+
+
+# =============================================================================
 # >> PLAYER EVENTS
 # =============================================================================
 def player_death(event_var):
@@ -257,7 +292,7 @@ def check_start_vote(level):
     levels = get_total_levels()
 
     # Is the level the player achieved high enough to start vote?
-    if levels - int(level) >= int(ServerVar('gg_map_vote_trigger')):
+    if level >= levels - int(ServerVar('gg_map_vote_trigger')):
 
         # Start the vote
         mapvote.start_map_vote()

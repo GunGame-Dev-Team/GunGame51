@@ -65,6 +65,12 @@ class _RockTheVoteManagement(object):
             # No need to go further
             return
 
+        # Is a third party MapVote being used?
+        if AttributeManagement.active == 2:
+
+            # Just return
+            return
+
         # Is the MapVote active?
         if AttributeManagement.active:
 

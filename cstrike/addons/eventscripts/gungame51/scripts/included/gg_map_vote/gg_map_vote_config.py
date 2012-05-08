@@ -254,6 +254,7 @@ def load():
             cvar.options.append('1 = (Enabled)')
             cvar.default = 1
             cvar.text = 'Allow vote nominations.'
+            cvar.notify = True
 
         # Create the gg_map_vote_nominate_command instance
         with config.cfg_cvar('gg_map_vote_nominate_command') as cvar:

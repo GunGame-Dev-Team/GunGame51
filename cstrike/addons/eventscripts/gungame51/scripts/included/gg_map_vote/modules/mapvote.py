@@ -88,6 +88,12 @@ class _MapVoteManagement(object):
             # If the MapVote is not active, do not send
             return False
 
+        # Is a third party MapVote being used?
+        if AttributeManagement.active == 2:
+
+            # If so, do not send
+            return False
+
         # Has the player already voted?
         if userid in self.votes and not self.votes[userid].choice is None:
 
@@ -106,8 +112,11 @@ class _MapVoteManagement(object):
     def start_map_vote(self):
         '''Starts the MapVote'''
 
+        # Set the MapVote to be active
+        AttributeManagement.active = int(ServerVar('gg_map_vote'))
+
         # Is a 3rd party MapVote system being used?
-        if int(ServerVar('gg_map_vote')) == 2:
+        if AttributeManagement.active == 2:
 
             # Execute the 3rd party's command
             ServerCommand(str(ServerVar('gg_map_vote_command')))
@@ -117,9 +126,6 @@ class _MapVoteManagement(object):
 
         # Get the list of maps to vote on
         self.maps = VoteMapList()
-
-        # Set the MapVote to be active
-        AttributeManagement.active = True
 
         # Create the MapVote menu
         self.menu = easymenu('gg_map_vote', 'choice', self.chosen_map)

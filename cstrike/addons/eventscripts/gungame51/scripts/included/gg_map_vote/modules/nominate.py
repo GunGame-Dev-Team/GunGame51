@@ -62,6 +62,12 @@ class _NominationManagement(object):
     def player_nominate_command(self, userid, args):
         '''Called when a player uses the nominate command'''
 
+        # Is a third party MapVote being used?
+        if AttributeManagement.active == 2:
+
+            # Just return
+            return
+
         # Is the MapVote active?
         if AttributeManagement.active:
 
