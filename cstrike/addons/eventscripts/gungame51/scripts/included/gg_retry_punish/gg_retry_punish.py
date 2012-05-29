@@ -44,7 +44,15 @@ def player_activate(event_var):
 
     if ggPlayer.level > 1:
         try:
-            ggPlayer.level -= int(gg_retry_punish)
+
+            # Get the new value to set the player's level
+            # Use max with 1 to make sure the player's
+            # level will not be set to an invalid number.
+            value = max(1, ggPlayer.level - int(gg_retry_punish))
+
+            # Set the player's level
+            ggPlayer.level = value
+
         except ValidationError:
             pass
         except (ValueError, TypeError):
