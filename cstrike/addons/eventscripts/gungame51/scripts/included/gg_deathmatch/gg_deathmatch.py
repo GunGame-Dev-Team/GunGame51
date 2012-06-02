@@ -125,6 +125,22 @@ def player_disconnect(event_var):
     del players[event_var['userid']]
 
 
+def player_spawn(event_var):
+    '''Called when a player spawns on the server'''
+
+    # Is the player a bot?
+    if event_var['es_steamid'] != 'BOT':
+
+        # If not, return
+        return
+
+    # Is the round active?
+    if ActiveInfo.round:
+
+        # Start the player's respawn repeat
+        players[event_var['userid']].start_repeat()
+
+
 def player_death(event_var):
     '''Called when a player dies'''
 
