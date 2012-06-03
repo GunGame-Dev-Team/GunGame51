@@ -255,7 +255,8 @@ class _MapVoteManagement(object):
         gg_map_vote_submit.fire()
 
         # Has everyone on the server voted?
-        if len(list(self.all_players)) != len(self.votes):
+        if len(list(self.all_players)) != len([player for
+          player in self.votes if not self.votes[player].choice is None]):
 
             # If not, simply return
             return
