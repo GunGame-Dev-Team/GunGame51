@@ -179,21 +179,15 @@ def player_disconnect(event_var):
 def gg_win(event_var):
     '''Called when a player wins the match'''
 
-    # Is there a winning map?
-    if not AttributeManagement.winner is None:
-
-        # Set the "nextlevel" variable
-        ServerVar('nextlevel').set(AttributeManagement.winner)
+    # Finish the MapVote
+    finish_map_vote()
 
 
 def gg_team_win(event_var):
     '''Called when a team wins the match'''
 
-    # Is there a winning map?
-    if not AttributeManagement.winner is None:
-
-        # Set the "nextlevel" variable
-        ServerVar('nextlevel').set(AttributeManagement.winner)
+    # Finish the MapVote
+    finish_map_vote()
 
 
 def gg_levelup(event_var):
@@ -296,3 +290,19 @@ def check_start_vote(level):
 
         # Start the vote
         mapvote.start_map_vote()
+
+
+def finish_map_vote():
+    '''Ends the vote if still on-going and sets the nextmap if necessary'''
+
+    # Is there a winning map?
+    if not AttributeManagement.winner is None:
+
+        # Set the "nextlevel" variable
+        ServerVar('nextlevel').set(AttributeManagement.winner)
+
+    # Is the MapVote still active?
+    elif AttributeManagement.active and AttributeManagement.active != 2:
+
+        # End the MapVote
+        mapvote.end_map_vote()

@@ -37,6 +37,7 @@ from attributes import AttributeManagement
 from events import GG_Map_Vote_Ended
 from events import GG_Map_Vote_Started
 from events import GG_Map_Vote_Submit
+from nominate import nominate
 from votemaps import VoteMapList
 from players.voters import DictionaryOfPlayers
 
@@ -114,6 +115,9 @@ class _MapVoteManagement(object):
 
         # Set the MapVote to be active
         AttributeManagement.active = int(ServerVar('gg_map_vote'))
+
+        # Clear the current nominators
+        nominate.nominators.clear()
 
         # Is a 3rd party MapVote system being used?
         if AttributeManagement.active == 2:

@@ -36,3 +36,18 @@ def load():
             cvar.options.append('1 = (Enabled) Load gg_turbo.')
             cvar.default = 0
             cvar.text = 'Enables/Disables gg_turbo.'
+
+        # Create the gg_turbo_quick
+        with config.cfg_cvar('gg_turbo_quick') as cvar:
+
+            cvar.name = 'QUICK SWITCH'
+            cvar.description.append('Allows players to use ' +
+                'their new weapon immediately after receiving it.')
+            cvar.description.append(
+                'Without setting this, players will have to go ' +
+                'through the animation before they can use the weapon.')
+            cvar.options.append('0 = (Disabled) The animation will play.')
+            cvar.options.append('1 = (Enabled) The animation will not play.')
+            cvar.default = 0
+            cvar.text = ('Allows players to use their new ' +
+                'weapon immediately after receiving it.')

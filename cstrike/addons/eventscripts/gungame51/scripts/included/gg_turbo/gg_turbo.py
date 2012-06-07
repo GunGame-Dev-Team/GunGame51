@@ -9,24 +9,35 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
+# Python Imports
+#   OS
+from os import name as os_name
+
 # Eventscripts Imports
-import es
-import gamethread
+#   ES
+from es import exists
+from es import getplayerteam
+from es import ServerVar
+#   Gamethread
+from gamethread import delayed
+#   Playerlib
 from playerlib import getPlayer
 
+# SPE Imports
+from spe import getPlayer as spePlayer
+from spe import setLocVal
+
 # GunGame Imports
+#   Addons
 from gungame51.core.addons.shortcuts import AddonInfo
+from gungame51.core.addons.loaded import LoadedAddons
+#   Player
 from gungame51.core.players.shortcuts import Player
 from gungame51.core.players.shortcuts import add_attribute_callback
 from gungame51.core.players.shortcuts import remove_callbacks_for_addon
+#   Weapon
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_total_levels
-from ..gg_nade_bonus.gg_nade_bonus import get_weapon
-
-# =============================================================================
-# >> GLOBALS
-# =============================================================================
-gg_nade_bonus = es.ServerVar("gg_nade_bonus")
 
 # =============================================================================
 # >> ADDON REGISTRATION/INFORMATION
@@ -36,6 +47,11 @@ info.name = 'gg_turbo'
 info.title = 'GG Turbo'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
+
+# =============================================================================
+# >> GLOBAL VARIABLES
+# =============================================================================
+offset = 1576 if os_name == 'nt' else 1596
 
 
 # =============================================================================
@@ -63,22 +79,19 @@ def level_call_back(name, value, ggPlayer):
         previousLevel = 1
 
     # Delay to give them a new weapon (callbacks are too fast)
-    gamethread.delayed(0.005, give_weapon, (ggPlayer.userid, previousLevel))
+    delayed(0.005, give_weapon, (ggPlayer.userid, previousLevel))
 
 
 def give_weapon(userid, previousLevel):
-    if not es.exists('userid', userid) and userid != 0:
+    if not exists('userid', userid) and userid != 0:
         return
 
     # Is spectator?
-    if es.getplayerteam(userid) < 2:
+    if getplayerteam(userid) < 2:
         return
 
-    # Get playerlib object
-    pPlayer = getPlayer(userid)
-
     # Is player dead?
-    if pPlayer.isdead:
+    if getPlayer(userid).isdead:
         return
 
     # Give them their next weapon
@@ -96,7 +109,7 @@ def give_weapon(userid, previousLevel):
     # and the current level is not hegrenade as well, get the list of their
     # bonus weapons
     if (weapsToStrip[0] == "hegrenade" and
-      str(gg_nade_bonus) != "0" and ggPlayer.weapon != "hegrenade"):
+      'gg_nade_bonus' in LoadedAddons and ggPlayer.weapon != "hegrenade"):
         weapsToStrip.extend(get_weapon(userid))
 
     # If any weapons to be removed were just given, do not strip them
@@ -105,3 +118,9 @@ def give_weapon(userid, previousLevel):
 
     # Strip the previous weapons
     ggPlayer.strip_weapons(weapsToStrip)
+
+    # Is quick weapon activated
+    if ServerVar('gg_turbo_quick'):
+
+        # Set the NextAttack offset
+        setLocVal('f', spePlayer(userid) + offset, 0)

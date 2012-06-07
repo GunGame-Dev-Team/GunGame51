@@ -16,8 +16,6 @@ from es import ServerVar
 #   Gamethread
 from gamethread import cancelDelayed
 from gamethread import delayedname
-#   Playerlib
-from playerlib import getPlayer
 
 # GunGame Imports
 #   Modules

@@ -120,9 +120,8 @@ def cmd_spawn_add(args):
                                                         {"userid": userid}))
         return
 
-    pPlayer = getPlayer(userid)
     location = es.getplayerlocation(userid)
-    angle = pPlayer.get("viewangle")
+    angle = getPlayer(userid).get("viewangle")
 
     spawnPoint = "%s %s %s %s %s %s\n" % (location + angle)
     currentSpawnPoints = read_spawn_points()
@@ -165,7 +164,6 @@ def cmd_spawn_remove(args):
                                                         {"userid": userid}))
         return
 
-    pPlayer = getPlayer(userid)
     location = es.getplayerlocation(userid)
 
     x, y, z = location[0], location[1], location[2]
