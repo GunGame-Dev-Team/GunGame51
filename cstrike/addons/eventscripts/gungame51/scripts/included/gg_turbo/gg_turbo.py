@@ -9,23 +9,16 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
-#   OS
-from os import name as os_name
-
 # Eventscripts Imports
 #   ES
 from es import exists
 from es import getplayerteam
 from es import ServerVar
+from es import setplayerprop
 #   Gamethread
 from gamethread import delayed
 #   Playerlib
 from playerlib import getPlayer
-
-# SPE Imports
-from spe import getPlayer as spePlayer
-from spe import setLocVal
 
 # GunGame Imports
 #   Addons
@@ -47,11 +40,6 @@ info.name = 'gg_turbo'
 info.title = 'GG Turbo'
 info.author = 'GG Dev Team'
 info.version = "5.1.%s" % "$Rev$".split('$Rev: ')[1].split()[0]
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-offset = 1576 if os_name == 'nt' else 1596
 
 
 # =============================================================================
@@ -122,5 +110,6 @@ def give_weapon(userid, previousLevel):
     # Is quick weapon activated
     if ServerVar('gg_turbo_quick'):
 
-        # Set the NextAttack offset
-        setLocVal('f', spePlayer(userid) + offset, 0)
+        # Set the NextAttack property
+        setplayerprop(userid,
+            'CBaseCombatCharacter.bcc_localdata.m_flNextAttack', 0)
