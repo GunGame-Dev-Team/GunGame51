@@ -11,7 +11,7 @@ $LastChangedDate$
 # =============================================================================
 # EventScripts Imports
 #   ES
-import es
+from es import forcevalue
 #   Gamethread
 from gamethread import delayed
 
@@ -157,7 +157,7 @@ class _AddonQueue(dict):
             for addon in self.load:
 
                 # Force the cvar back to 0
-                es.forcevalue(addon, 0)
+                forcevalue(addon, 0)
 
             # Clear the dictionary
             self._finish()

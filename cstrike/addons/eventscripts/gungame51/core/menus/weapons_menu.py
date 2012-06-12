@@ -10,14 +10,19 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Eventscripts Imports
-import es
+#   ES
+from es import exists
+#   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
 # GunGame Imports
-from gungame51.core.players import Player
+#   Menus
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
+#   Players
+from gungame51.core.players import Player
+#   Weapons
 from gungame51.core.weapons.shortcuts import get_level_weapon
 from gungame51.core.weapons.shortcuts import get_level_multikill
 from gungame51.core.weapons.shortcuts import get_total_levels
@@ -42,7 +47,7 @@ def unload():
 # =============================================================================
 def weapons_menu_cmd(userid, args):
     # Make sure player exists
-    if not es.exists('userid', userid) and userid != 0:
+    if not exists('userid', userid) and userid != 0:
         return
 
     weaponOrder = []

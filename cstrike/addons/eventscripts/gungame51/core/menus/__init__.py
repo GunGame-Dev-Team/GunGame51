@@ -10,12 +10,16 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Python Imports
+#   Path
 from path import path
 
 # Eventscripts Imports
-import es
-from popuplib import Popup_popup
+#   ES
+from es import dbgmsg
+#   Playerlib
 from playerlib import getUseridList
+#   Popuplib
+from popuplib import Popup_popup
 
 # GunGame Imports
 #   Messaging
@@ -43,7 +47,7 @@ class MenuManager(object):
         return cls._gg_menus
 
     def load_menus(self):
-        es.dbgmsg(0, langstring('Load_Commands'))
+        dbgmsg(0, langstring('Load_Commands'))
         for file_path in menu_folder.files('*_menu.py'):
             self._load(file_path)
 

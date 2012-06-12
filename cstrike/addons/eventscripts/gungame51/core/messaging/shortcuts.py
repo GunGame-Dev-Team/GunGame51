@@ -6,9 +6,17 @@ $LastChangedBy$
 $LastChangedDate$
 '''
 
+# =============================================================================
+# >> IMPORTS
+# =============================================================================
+# GunGame Imports
+#   Messaging
 from gungame51.core.messaging import MessageManager
 
 
+# =============================================================================
+# >> CUSTOM/HELPER FUNCTIONS
+# =============================================================================
 def msg(filter, string, tokens={}, prefix=False):
     MessageManager().msg(filter, string, tokens, prefix)
 

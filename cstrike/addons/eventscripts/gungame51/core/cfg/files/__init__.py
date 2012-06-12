@@ -12,6 +12,7 @@ $LastChangedDate$
 # GunGame Imports
 from gungame51.core.cfg.dictionary import ConfigTypeDictionary
 
+
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================

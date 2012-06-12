@@ -41,6 +41,8 @@ from core.addons.manager import AddonManager
 from core.cfg import unload_configs
 #   Events
 from core.events import GG_Unload
+#   Logs
+from core.logs import LogManager
 #   Menus
 from core.menus import MenuManager
 #   Messaging
@@ -156,6 +158,9 @@ def unload():
 
     # Set GunGame as not loaded
     ActiveInfo.loaded = False
+
+    # Unregister the logging system
+    LogManager.clean_logging()
 
 
 # =============================================================================

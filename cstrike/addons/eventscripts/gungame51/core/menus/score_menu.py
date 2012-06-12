@@ -10,14 +10,20 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Eventscripts Imports
-import es
+#   ES
+from es import exists
+from es import getplayername
+from es import getUseridList
+#   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
 # GunGame Imports
-from gungame51.core.players.shortcuts import Player
+#   Menus
 from gungame51.core.menus import OrderedMenu
 from gungame51.core.menus.shortcuts import get_index_page
+#   Players
+from gungame51.core.players.shortcuts import Player
 
 
 # =============================================================================
@@ -38,14 +44,14 @@ def unload():
 # =============================================================================
 def score_menu_cmd(userid, args):
     # Make sure player exists
-    if not es.exists('userid', userid) and userid != 0:
+    if not exists('userid', userid) and userid != 0:
         return
 
     # Get list of levels
     scoreList = []
-    for player in es.getUseridList():
+    for player in getUseridList():
         scoreList.append('[%s] %s' % (Player(player).level,
-                                                    es.getplayername(player)))
+                                                    getplayername(player)))
     # Sort from highest to lowest
     scoreList.sort(lambda a, b: cmp(int(b[1:].split("]")[0]),
         int(a[1:].split("]")[0])))
@@ -56,7 +62,7 @@ def score_menu_cmd(userid, args):
 
     # Get the list number the player is at
     listNumber = scoreList.index('[%s] %s' % (Player(userid).level,
-                                                es.getplayername(userid))) + 1
+                                                getplayername(userid))) + 1
 
     # Create a new OrderedMenu
     ggScoreMenu = OrderedMenu(userid, 'GunGame: Score Menu', scoreList,

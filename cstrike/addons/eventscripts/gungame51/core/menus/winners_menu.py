@@ -10,7 +10,10 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Eventscripts Imports
-import es
+#   ES
+from es import exists
+from es import getplayersteamid
+#   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
 
@@ -42,7 +45,7 @@ def unload():
 # =============================================================================
 def winner_menu_cmd(userid, args):
     # Make sure player exists
-    if not es.exists('userid', userid) and userid != 0:
+    if not exists('userid', userid) and userid != 0:
         return
 
     # Get the winners list with a limit of the top 50 winners
@@ -58,7 +61,7 @@ def winner_menu_cmd(userid, args):
     elif isinstance(currentWinners, dict):
         # Check to see if the player requesting the menu is the player being
         # listed
-        if currentWinners["uniqueid"] == es.getplayersteamid(userid):
+        if currentWinners["uniqueid"] == getplayersteamid(userid):
             rank = 1
 
         # Add the player
@@ -74,7 +77,7 @@ def winner_menu_cmd(userid, args):
 
             # Check to see if the player requesting the menu is the player
             # being listed
-            if player["uniqueid"] == es.getplayersteamid(userid):
+            if player["uniqueid"] == getplayersteamid(userid):
                 rank = count
 
             # Add the player

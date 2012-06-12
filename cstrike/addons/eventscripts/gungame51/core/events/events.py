@@ -7,8 +7,10 @@ $LastChangedDate$
 '''
 
 # =============================================================================
-# Imports
+# >> IMPORTS
 # =============================================================================
+# GunGame Imports
+#   Events
 from gungame51.core.events.eventlib import ESEvent
 from gungame51.core.events.eventlib.fields import BooleanField
 from gungame51.core.events.eventlib.fields import ByteField
@@ -17,7 +19,7 @@ from gungame51.core.events.eventlib.fields import StringField
 
 
 # =============================================================================
-# Global Variables
+# >> GLOBAL VARIABLES
 # =============================================================================
 # from events import * will only import from __all__
 __all__ = ['GG_LevelUp', 'GG_LevelDown', 'GG_Knife_Steal', 'GG_Multi_Level',
@@ -28,7 +30,7 @@ __all__ = ['GG_LevelUp', 'GG_LevelDown', 'GG_Knife_Steal', 'GG_Multi_Level',
 
 
 # =============================================================================
-# Classes (Events)
+# CLASSES (EVENTS)
 # =============================================================================
 class GG_LevelUp(ESEvent):
     """Fires when a player levels up"""

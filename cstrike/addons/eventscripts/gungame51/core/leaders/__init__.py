@@ -10,6 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # GunGame Imports
+#   Events
 from gungame51.core.events import GG_Leader_Disconnect
 from gungame51.core.events import GG_New_Leader
 from gungame51.core.events import GG_Leader_LostLevel

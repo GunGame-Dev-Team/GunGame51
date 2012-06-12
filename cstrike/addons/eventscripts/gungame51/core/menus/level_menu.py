@@ -10,11 +10,22 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Eventscripts Imports
-import es
-import popuplib
-from playerlib import getUseridList
+#   ES
+from es import exists
+from es import getplayername
+from es import getuserid
+#   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
+#   Playerlib
+from playerlib import getUseridList
+#   Popuplib
+from popuplib import create
+from popuplib import delete
+from popuplib import exists as pexists
+from popuplib import find
+from popuplib import send
+from popuplib import unsendname
 
 # GunGame Imports
 from gungame51.core.menus.leader_menu import leader_menu_cmd
@@ -32,12 +43,12 @@ from gungame51.core.messaging.shortcuts import msg
 # =============================================================================
 def load():
     # Delete the popup if it exists
-    if popuplib.exists('ggLevelMenu'):
-        popuplib.unsendname('ggLevelMenu', getUseridList('#human'))
-        popuplib.delete('ggLevelMenu')
+    if pexists('ggLevelMenu'):
+        unsendname('ggLevelMenu', getUseridList('#human'))
+        delete('ggLevelMenu')
 
     # Let's create the "gungameLevelMenu" popup
-    ggLevelMenu = popuplib.create('ggLevelMenu')
+    ggLevelMenu = create('ggLevelMenu')
 
     # Create empty instance of the popup
     ggLevelMenu.addline('->1. LEVEL')
@@ -58,9 +69,9 @@ def load():
 
 def unload():
     # Delete the popup if it exists
-    if popuplib.exists('ggLevelMenu'):
-        popuplib.unsendname('ggLevelMenu', getUseridList('#human'))
-        popuplib.delete('ggLevelMenu')
+    if pexists('ggLevelMenu'):
+        unsendname('ggLevelMenu', getUseridList('#human'))
+        delete('ggLevelMenu')
 
     # Unregister commands
     unregisterSayCommand('!level')
@@ -71,13 +82,13 @@ def unload():
 # =============================================================================
 def level_menu_cmd(userid, args):
     # Make sure player exists
-    if not es.exists('userid', userid) and userid != 0:
+    if not exists('userid', userid) and userid != 0:
         return
 
     if len(args):
         # Send user level search
         searchInput = str(args)
-        checkUserid = es.getuserid(searchInput)
+        checkUserid = getuserid(searchInput)
 
         # If the search failed, tell them and return
         if not checkUserid:
@@ -90,20 +101,20 @@ def level_menu_cmd(userid, args):
 
         # Send the results
         saytext2(userid, ggPlayer.index, 'LevelInfo_PlayerSearch',
-                            {'player': es.getplayername(checkUserid),
+                            {'player': getplayername(checkUserid),
                             'level': ggPlayer.level,
                             'weapon': ggPlayer.weapon})
     else:
         # Send menu
-        popuplib.send('ggLevelMenu', userid)
+        send('ggLevelMenu', userid)
 
 
 def prep_level_menu(userid, popupid):
     # Make sure the popup exists
-    if not popuplib.exists('ggLevelMenu'):
+    if not pexists('ggLevelMenu'):
         return
 
-    ggLevelMenu = popuplib.find('ggLevelMenu')
+    ggLevelMenu = find('ggLevelMenu')
     ggPlayer = Player(userid)
 
     # Get multikill count for the player's level

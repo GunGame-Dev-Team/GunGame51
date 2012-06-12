@@ -22,7 +22,7 @@ class _PriorityAddon(set):
     def __call__(self, *elems):
         '''Adds any elements when class object is called and returns the class
 
-           Added for backwards compat with custom addons '''
+           Added for backwards compatibility with custom addons '''
 
         # Update the set with the elements
         self.update(set(elems))

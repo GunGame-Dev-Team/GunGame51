@@ -29,7 +29,7 @@ from gungame51.core.cfg import load_configs
 from gungame51.core.events import GG_Load
 from gungame51.core.events import gg_resource_file
 #   Logs
-from gungame51.core.logs import make_log_file
+from gungame51.core.logs import LogManager
 #   Menus
 from gungame51.core.menus import MenuManager
 #   Messaging
@@ -57,6 +57,9 @@ gg_weapon_order_file = es.ServerVar('gg_weapon_order_file')
 # =============================================================================
 def initialize():
     '''Tries to initialize GunGame'''
+
+    # Load error logging
+    LogManager.initialize_logging()
 
     # Load GunGame's events
     load_events()
@@ -108,9 +111,6 @@ def finish_initialization():
 
     # Prune the DB
     prune_winners_db()
-
-    # Load error logging
-    delayed(3.50, make_log_file)
 
     # Fire gg_load event
     GG_Load().fire()

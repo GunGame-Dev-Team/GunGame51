@@ -11,7 +11,7 @@ $LastChangedDate$
 # =============================================================================
 # EventScripts Imports
 #   ES
-import es
+from es import ServerVar
 #   Gamethread
 from gamethread import delayed
 
@@ -61,7 +61,7 @@ class _DependentAddons(dict):
         if not addon in LoadedAddons:
 
             # Set the addon's cvar to 1
-            es.set(addon, 1)
+            ServerVar(addon).set(1)
 
         # Re-call __setitem__ to add the addon to the dictionary
         super(_DependentAddons, self).__setitem__(addon, value)
@@ -76,7 +76,7 @@ class _DependentAddons(dict):
             if not self[addon].remain_loaded:
 
                 # Set the addon's cvar to 0
-                es.set(addon, 0)
+                ServerVar(addon).set(0)
 
             # Remove the addon from the dictionary
             super(_DependentAddons, self).__delitem__(addon)

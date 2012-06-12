@@ -11,212 +11,154 @@ $LastChangedDate$
 # =============================================================================
 # Python Imports
 from __future__ import with_statement
-from time import strftime
-import sys
-import traceback
-import gamethread
 
-# Eventscripts Imports
-import es
+# EventScripts Imports
+#   Gamethread
+from gamethread import delayedname
 
 # GunGame Imports
 from gungame51.core import get_game_dir
-from gungame51.core.addons.shortcuts import AddonInfo
-from gungame51.core import gungame_info
-from gungame51.core import get_os
-
-# =============================================================================
-# >> GLOBAL VARIABLES
-# =============================================================================
-# Server Vars
-spe_version_var = es.ServerVar('spe_version')
-eventscripts_ver = es.ServerVar('eventscripts_ver')
-es_corelib_ver = es.ServerVar('es_corelib_ver')
-ip = es.ServerVar('ip')
-port = es.ServerVar('hostport')
-metamod_version = es.ServerVar('metamod_version')
-sourcemod_version = es.ServerVar('sourcemod_version')
-mani_admin_plugin_version = es.ServerVar('mani_admin_plugin_version')
-est_version = es.ServerVar('est_version')
-
-# Other vars
-file_name = get_game_dir('cfg/gungame51/logs' +
-              '/GunGame%s_Log.txt' % gungame_info('version').replace('.', '_'))
-
-file_created = False
-
-OS = get_os()
+from gungame51.core import GunGameInfo
+#   Logs
+from header import _HeaderManager
+from dictionary import stored_errors
+from errors import _TracebackManager
 
 
 # =============================================================================
-# >> TRACEBACK EVENT
+# >> CLASSES
 # =============================================================================
-def gungame_except_hook(tb_type, value, trace_back, mute_console=False):
-    # If this error was called to stop an attribute from being set, do not log
-    # it.
-    if str(value) == "gg_cancel_callback":
-        return
+class _LogManager(_HeaderManager, _TracebackManager):
+    '''Class used to manage GunGame error logging'''
 
-    tb = traceback.format_exception(tb_type, value, trace_back)
+    def __init__(self):
+        '''Called when the class instance is initialized'''
 
-    # If not a gungame error, send to ES and return
-    if 'gungame51' not in str(tb).lower():
-        es.excepter(tb_type, value, trace_back)
-        return
+        # Store the path instance of the log file
+        self.filepath = get_game_dir(
+            'cfg/gungame51/logs/GunGame%s_Log.txt' %
+            '_'.join(GunGameInfo.version.split('.')))
 
-    # Format the traceback
-    for i in range(len(tb)):
+        # Set file_created to False until it is created
+        self.file_created = False
 
-        # Remove long file names ?
-        if tb[i].strip().startswith('File "'):
-            tb[i] = (tb[i].replace(tb[i][(tb[i].find('File "') +
-                    6):tb[i].find('eventscripts')], '../')).replace('\\', '/')
-    tb[-2] = tb[-2] + '\n'
+    def initialize_logging(self):
+        '''Method used to initialize logging on load'''
 
-    # turn tb into a string
-    tb = reduce((lambda a, b: a + b), tb)
+        # Hook the exceptions
+        self.hook_excepter()
 
-    # Is the length under 255 chars?
-    if len(tb) < 255:
-        db_tb = [tb]
+        # Delay a few seconds to create the log file
+        delayedname(3.5, 'gg_logging_main', self.create_log_file)
 
-    # Length over 255 chars
-    else:
-        db_tb = [x.strip() for x in tb.split('\n') if x != '']
+    def clean_logging(self):
+        '''Method used to clean up logging on unload'''
 
-    # Print traceback to console?
-    if not mute_console:
-        es.dbgmsg(0, ' \n')
-        es.dbgmsg(0, '# ' + '=' * 48)
-        es.dbgmsg(0, '# >>' + 'GunGame 5.1 Exception Caught!'.rjust(50))
-        es.dbgmsg(0, '# ' + '=' * 48)
+        # Unhook the exceptions
+        self.unhook_excepter()
 
-        # Divide up for 255 line limit
-        for db_line in db_tb:
-            es.dbgmsg(0, db_line)
+        # Clear the dictionary
+        stored_errors.clear()
 
-        es.dbgmsg(0, '# ' + '=' * 48)
-        es.dbgmsg(0, ' \n')
+    def create_log_file(self):
+        '''Creates a log file, if necessary, and
+            parses the current one if it already exists'''
 
-    # Does the log file exist yet?
-    if not file_created:
-        gamethread.delayed(5, gungame_except_hook,
-                        (tb_type, value, trace_back, True))
-        return
+        # Does the log file already exist?
+        if self.filepath.isfile():
 
-    # Use Log File
-    with file_name.open('r+') as log_file:
+            # Have any variables changed since the last file was updated?
+            if self.header != self.old_header:
 
-        # Get contents
-        log_contents = log_file.read()
+                # Get the new name for the old error log
+                old_filename = self.get_filename_for_old_file()
 
-        # Look for duplicate error
-        find_error_index = log_contents.find(tb)
+                # Rename the old error log
+                self.filepath.rename(old_filename)
 
-        # File has no duplicate error ?
-        if find_error_index == -1:
+                # Create the new error log file
+                self.create_file()
 
-            # Error template
-            error_format = ['-=' * 39 + '-\n', (('LAST EVENT: ' +
-                        '%s' % strftime('[%m/%d/%Y @ %H:%M:%S]')) + ' ' * 9 +
-                        ' TOTAL OCCURENCES: [0001]').center(79) + '\n',
-                        '-=' * 39 + '-\n', '\n', tb, '\n', '\n']
+            # Is the old file being used?
+            else:
 
-            # No duplicate, appending to end of file
-            '''
-            For some reason we get an error if we do not read again here
-            if someone knows why, please let me know!
-                - Monday
-            '''
-            log_file.read()
-            log_file.writelines(error_format)
+                # Parse the old file to add any errors to the dictionary
+                self.parse_old_errors()
 
+        # Does a log file not exist for the current version?
         else:
-            # Go to the back to the begining of the file
-            log_file.seek(0)
 
-            # Increase occurence count
-            error_count = (int(log_contents[(find_error_index - 92):
-                (find_error_index - 88)]) + 1)
+            # Create the new log file
+            self.create_file()
 
-            # Write change w/ new date and occurence count
-            log_file.write(log_contents[:(find_error_index - 241)] +
-            log_contents[(find_error_index + len(tb) + 2):] + '-=' * 39 +
-                '-\n' + (('LAST EVENT: ' + '%s' % strftime(
-                '[%m/%d/%Y @ %H:%M:%S]')) + ' ' * 9 + ' TOTAL OCCURENCES:' +
-                ' [%04i]' % error_count).center(79) + '\n' +
-                '-=' * 39 + '-\n\n' + tb + '\n\n')
+        # Set file_created to True, so error logging can occur
+        self.file_created = True
 
+    def create_file(self):
+        '''Method that simply creates the log file'''
 
-# =============================================================================
-# >> CREATE THE LOG FILE
-# =============================================================================
-def make_log_file():
-    # Log file header
-    header = ['*' * 79 + '\n', '*' + ' ' * 77 + '*\n',
-              '*' + 'GUNGAME v5.1 ERROR LOGGING'.center(77) + '*' + '\n',
-              '*' + 'HTTP://FORUMS.GUNGAME.NET/'.center(77) + '*\n',
-              '*' + ' ' * 77 + '*\n',
-              ('*' + 'GG VERSION: '.rjust(19) +
-                gungame_info('version').ljust(19) + 'IP: '.rjust(19) +
-                str(ip).upper().ljust(15) + ' ' * 5 + '*\n'),
-              ('*' + 'SPE VERSION: '.rjust(19) +
-                str(spe_version_var).ljust(19) +
-                'PORT: '.rjust(19) + str(port).ljust(15) + ' ' * 5 + '*\n'),
-              ('*' + 'PLATFORM: '.rjust(19) + str(OS).upper().ljust(19) +
-                'DATE: '.rjust(19) + strftime('%m-%d-%Y').ljust(15) +
-                ' ' * 5 + '*\n'), ('*' + 'ES VERSION: '.rjust(19) +
-               str(eventscripts_ver).ljust(19) +
-               'ES CORE VERSION: '.rjust(19) + str(es_corelib_ver).ljust(15) +
-               ' ' * 5 + '*\n'), ('*' + 'MM VERSION: '.rjust(19) +
-               str(metamod_version).ljust(19) + 'SM VERSION: '.rjust(19) +
-               str(sourcemod_version).ljust(15) + ' ' * 5 + '*\n'),
-               ('*' + 'MANI VERSION: '.rjust(19) +
-               str(mani_admin_plugin_version).ljust(19) +
-               'EST VERSION: '.rjust(19) + str(est_version).ljust(15) +
-               ' ' * 5 + '*\n'),
-               '*' + ' ' * 77 + '*\n', '*' * 79 + '\n', '\n', '\n']
+        # Open the log file
+        with self.filepath.open('w') as open_file:
 
-    # Does the file allready exists ?
-    if file_name.isfile():
+            # Write the header to the log file
+            open_file.writelines(self.header)
 
-        # Read the file
-        with file_name.open() as log_file:
+    def get_filename_for_old_file(self):
+        '''Method used to get the new filename for an old log'''
 
-            readlines = log_file.readlines()
+        # Set a variable to be used to find the new filename
+        old_log = 0
 
-        # Does the header match ?
-        for i in range(len(header)):
-            if readlines[i] != header[i]:
-                if i == 7 and header[7][20:39] == readlines[7][20:39]:
-                    continue
-                break
+        # Get the basename for the new file
+        new_filename_base = ('cfg/gungame51/logs/GunGame%s' %
+            '_'.join(GunGameInfo.version.split('.')) + '_Log_Old[%s].txt')
 
-        # Header matched, use this file
-        else:
-            return
+        # Use a loop to determine if the file
+        # exists for the current variable value
+        while get_game_dir(new_filename_base % n).isfile():
 
-        # Find a new file name for the old file
-        n = 0
-
-        while True:
+            # Increase the variable by 1
             n += 1
-            new_file_name = (get_game_dir('cfg/gungame51/logs') +
-                '/GunGame%s' % gungame_info('version').replace('.', '_') +
-                '_Log_Old[%01i].txt' % n)
-            if not new_file_name.isfile():
-                break
 
-        # Make new file w/ old errors
-        with new_file_name.open('w') as log_file:
-            log_file.writelines(readlines)
+        # Return the path instance to the new filename
+        return get_game_dir(new_filename_base % n)
 
-    # Start new log file
-    with file_name.open('w') as log_file:
-        log_file.writelines(header)
+    def parse_old_errors(self):
+        '''Method used to parse the current log file
+            for errors that have already been logged'''
 
-    global file_created
-    file_created = True
+        # Open the log file
+        with self.filepath.open() as open_file:
 
-# Trackback hook
-sys.excepthook = gungame_except_hook
+            # Store the log file's contents
+            contents = open_file.read()
+
+        # Loop through the errors in the log file
+        for x in contents.split('\n\n\n')[1:~0]:
+
+            # Store the attributes and traceback
+            attributes, trace_back = x.split('-=' * 39 + '-\n')[1:]
+
+            # Strip the leading \n from the traceback
+            trace_back = trace_back.lstrip()
+
+            # Store the individual attributes
+            last_event, count = attributes.split(']')[:~0]
+
+            # Get the last time this error occurred
+            last_event = last_event.split(': ')[1] + ']'
+
+            # Get the number of times this error has occurred
+            count = int(count.split('[')[1])
+
+            # Add the traceback to the dictionary
+            value = stored_errors[trace_back + '\n']
+
+            # Set the count for the traceback
+            value.count = count
+
+            # Set the last event for the traceback
+            value.last_event = last_event
+
+# Get the _LogManager instance
+LogManager = _LogManager()

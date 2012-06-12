@@ -9,12 +9,12 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# Python Imports
-from path import path
-
 # EventScripts Imports
 #   ES
-import es
+from es import dbgmsg
+from es import forcevalue
+from es import mexec
+from es import ServerVar
 #   Cfglib
 from cfglib import AddonCFG
 #   Gamethread
@@ -52,7 +52,7 @@ class _ConfigManager(object):
 
         # Print a message that the base cfg files
         # and the Included Addon cfg files are being loaded
-        es.dbgmsg(0, langstring('Load_Configs'))
+        dbgmsg(0, langstring('Load_Configs'))
 
         # Loop through all base _config.py files
         for cfgfile in ConfigTypeDictionary.main:
@@ -67,7 +67,7 @@ class _ConfigManager(object):
             self._load_config(cfgfile)
 
         # Print a message that the Custom Addon cfg files are being loaded
-        es.dbgmsg(0, langstring('Load_CustomConfigs'))
+        dbgmsg(0, langstring('Load_CustomConfigs'))
 
         # Loop through all Custom Addon _config.py files
         for cfgfile in ConfigTypeDictionary.custom:
@@ -103,7 +103,7 @@ class _ConfigManager(object):
         for cfg in ConfigInstances:
 
             # Execute the configs
-            es.mexec('gungame51' + cfg.cfgpath.rsplit('gungame51', 1)[1])
+            mexec('gungame51' + cfg.cfgpath.rsplit('gungame51', 1)[1])
 
         # Delay 1 tick to allow all cfg files to be executed
         delayed(0, self._reload_addons)
@@ -118,16 +118,16 @@ class _ConfigManager(object):
         for cvar in ValidAddons.all:
 
             # Get the current value
-            value = str(es.ServerVar(cvar))
+            value = str(ServerVar(cvar))
 
             # Does the cvar need reloaded?
             if value != '0':
 
                 # Force the value back to 0 without calling server_cvar
-                es.forcevalue(cvar, 0)
+                forcevalue(cvar, 0)
 
                 # Set the value back to the current setting
-                es.set(cvar, value)
+                ServerVar(cvar).set(value)
 
     def _unload_configs(self):
         '''Unloads all cfg instances when unloading gungame51'''

@@ -10,7 +10,8 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # EventScripts Imports
-import es
+#   ES
+from es import dbgmsg
 
 # GunGame Imports
 #   Cfg
@@ -56,7 +57,7 @@ class CvarContextManager(object):
         if _traceback:
 
             # Print the traceback
-            es.dbgmsg(0, _traceback)
+            dbgmsg(0, _traceback)
             return False
 
         # Does the cvar have a name value?

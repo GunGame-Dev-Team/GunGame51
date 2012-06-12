@@ -10,7 +10,7 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # EventScripts Imports
-import es
+from es import ServerVar
 
 
 # =============================================================================
@@ -26,10 +26,10 @@ class _CvarDefaults(dict):
         for cvar in self:
 
             # Set the cvar to its default value
-            es.ServerVar(cvar).set(self[cvar])
+            ServerVar(cvar).set(self[cvar])
 
             # Remove the notify flag from the cvar
-            es.ServerVar(cvar).removeFlag('notify')
+            ServerVar(cvar).removeFlag('notify')
 
         # Clear the dictionary
         super(_CvarDefaults, self).clear()

@@ -9,23 +9,27 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
-# EventScripts Imports
-import es
+# Python Imports
+#   Path
+from path import path
 
-# GunGame imports
+# GunGame Imports
+#   Events
 from events import *
 from eventlib.resource import ResourceFile
+
+
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-gg_resource_file = ResourceFile('%s/core/events/data/gungame_events.res' % (
-                         es.getAddonPath('gungame51')))
+gg_resource_file = ResourceFile(
+    path(__file__).parent.joinpath('data/gungame_events.res'))
 
 
 # =============================================================================
-# Resource File Creation
+# >> RESOURCE FILE CREATION
 # =============================================================================
-# Create a list of the above events
+# Create a list of the events
 events = [GG_LevelUp, GG_LevelDown, GG_Knife_Steal, GG_Multi_Level,
           GG_New_Leader, GG_Tied_Leader, GG_Leader_LostLevel,
           GG_Leader_Disconnect, GG_Vote, GG_Win, GG_Start, GG_Map_End, GG_Load,

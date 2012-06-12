@@ -19,8 +19,12 @@ from mp3lib import mp3info
 from wave import open as wave_open
 
 # EventScripts Imports
-import es
-import gamethread
+#   ES
+from es import dbgmsg
+from es import ServerVar
+from es import stringtable
+#   Gamethread
+from gamethread import delayed
 
 # GunGame Imports
 from gungame51.core import get_game_dir
@@ -32,10 +36,10 @@ from gungame51.core.messaging.shortcuts import langstring
 # =============================================================================
 # >> GLOBALS
 # =============================================================================
-# Get the es.ServerVar() instance of "gg_dynamic_chattime"
-gg_dynamic_chattime = es.ServerVar("gg_dynamic_chattime")
-# Get the es.ServerVar() instance of "mp_chattime"
-mp_chattime = es.ServerVar("mp_chattime")
+# Get the ServerVar() instance of "gg_dynamic_chattime"
+gg_dynamic_chattime = ServerVar("gg_dynamic_chattime")
+# Get the ServerVar() instance of "mp_chattime"
+mp_chattime = ServerVar("mp_chattime")
 
 soundDir = get_game_dir('sound')
 iniDir = get_game_dir('cfg/gungame51/sound_packs')
@@ -122,7 +126,7 @@ def make_downloadable(gg_loading=False):
     if gg_loading:
 
         # Print message to server console
-        es.dbgmsg(0, langstring('Load_SoundSystem'))
+        dbgmsg(0, langstring('Load_SoundSystem'))
 
     # Make sure we are in a map
     if not in_map():
@@ -149,7 +153,7 @@ def make_downloadable(gg_loading=False):
             if sound_exists(config[name]):
 
                 # Make the sound downloadable
-                es.stringtable('downloadables', 'sound/%s' % config[name])
+                stringtable('downloadables', 'sound/%s' % config[name])
 
             else:
 
@@ -168,7 +172,7 @@ def make_downloadable(gg_loading=False):
                         winnerSounds.pop(0)
                         # Make the new random winner sound downloadable
                         if sound_exists(winnerSounds[0]):
-                            es.stringtable(
+                            stringtable(
                                 'downloadables', 'sound/%s' % winnerSounds[0])
                         # If gg_dynamic_chattime is enabled, set the chattime
                         if int(gg_dynamic_chattime):
@@ -206,7 +210,7 @@ def make_downloadable(gg_loading=False):
                     # Make sure that the sound file exists at the given path
                     if sound_exists(sound):
                         # Make the sound downloadable
-                        es.stringtable('downloadables', 'sound/%s' % sound)
+                        stringtable('downloadables', 'sound/%s' % sound)
 
                 # Now that we are done adding random winner sounds to
                 # the winnerSounds list, choose one to make downloadable
@@ -215,7 +219,7 @@ def make_downloadable(gg_loading=False):
                     shuffle(winnerSounds)
                     # Make the new random winner sound downloadable
                     if sound_exists(winnerSounds[0]):
-                        es.stringtable(
+                        stringtable(
                             'downloadables', 'sound/%s' % winnerSounds[0])
                     # If gg_dynamic_chattime is enabled, set the chattime
                     if int(gg_dynamic_chattime):
@@ -265,7 +269,7 @@ def set_chattime():
         duration = 30
 
     # Set the new mp_chattime
-    gamethread.delayed(5, mp_chattime.set, duration)
+    delayed(5, mp_chattime.set, duration)
 
 
 def sound_exists(sound):

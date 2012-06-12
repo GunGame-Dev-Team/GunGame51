@@ -15,11 +15,14 @@ from random import shuffle
 from path import path
 
 # EventScripts Imports
+#   ES
 import es
+#   Weaponlib
 from weaponlib import getWeaponList
 
 # GunGame Imports
 from gungame51.core import get_game_dir
+#   Messaging
 from gungame51.core.messaging.shortcuts import langstring
 
 

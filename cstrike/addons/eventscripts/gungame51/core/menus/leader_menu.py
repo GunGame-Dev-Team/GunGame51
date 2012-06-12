@@ -10,15 +10,25 @@ $LastChangedDate$
 # >> IMPORTS
 # =============================================================================
 # Eventscripts Imports
-import es
-import popuplib
-from playerlib import getUseridList
+#   ES
+from es import exists
+#   Cmdlib
 from cmdlib import registerSayCommand
 from cmdlib import unregisterSayCommand
+#   Playerlib
+from playerlib import getUseridList
+#   Popuplib
+from popuplib import create
+from popuplib import delete
+from popuplib import exists as pexists
+from popuplib import send
+from popuplib import unsendname
 
 # GunGame Imports
+#   Leaders
 from gungame51.core.leaders.shortcuts import get_leader_level
 from gungame51.core.leaders.shortcuts import get_leader_names
+#   Weapons
 from gungame51.core.weapons.shortcuts import get_level_weapon
 
 # =============================================================================
@@ -32,9 +42,9 @@ leaderList = []
 # =============================================================================
 def load():
     # Delete the popup if it exists
-    if popuplib.exists('ggLeaderMenu'):
-        popuplib.unsendname('ggLeaderMenu', getUseridList('#human'))
-        popuplib.delete('ggLeaderMenu')
+    if pexists('ggLeaderMenu'):
+        unsendname('ggLeaderMenu', getUseridList('#human'))
+        delete('ggLeaderMenu')
 
     # Register commands
     registerSayCommand('!leader', leader_menu_cmd, 'Displays a !leader menu.')
@@ -44,9 +54,9 @@ def load():
 
 def unload():
     # Delete the popup if it exists
-    if popuplib.exists('ggLeaderMenu'):
-        popuplib.unsendname('ggLeaderMenu', getUseridList('#human'))
-        popuplib.delete('ggLeaderMenu')
+    if pexists('ggLeaderMenu'):
+        unsendname('ggLeaderMenu', getUseridList('#human'))
+        delete('ggLeaderMenu')
 
     # Unregister commands
     unregisterSayCommand('!leader')
@@ -60,7 +70,7 @@ def leader_menu_cmd(userid, args):
     global leaderList
 
     # Make sure player exists
-    if not es.exists('userid', userid) and userid != 0:
+    if not exists('userid', userid) and userid != 0:
         return
 
     # Get menu contents
@@ -89,19 +99,19 @@ def leader_menu_cmd(userid, args):
     newLeaderList.extend(('-' * 26, '0. Exit'))
 
     # Does the popup exists ?
-    if popuplib.exists('ggLeaderMenu'):
+    if pexists('ggLeaderMenu'):
 
         # Send the user the current popup ?
         if newLeaderList == leaderList:
-            popuplib.send('ggLeaderMenu', userid)
+            send('ggLeaderMenu', userid)
             return
 
         # Delete the popup
-        popuplib.unsendname('ggLeaderMenu', getUseridList('#human'))
-        popuplib.delete('ggLeaderMenu')
+        unsendname('ggLeaderMenu', getUseridList('#human'))
+        delete('ggLeaderMenu')
 
     # Build new popup
-    ggLeaderMenu = popuplib.create('ggLeaderMenu')
+    ggLeaderMenu = create('ggLeaderMenu')
     ggLeaderMenu.timeout('send', 10)
     ggLeaderMenu.timeout('view', 10)
 
@@ -113,4 +123,4 @@ def leader_menu_cmd(userid, args):
     leaderList = newLeaderList
 
     # Send it
-    popuplib.send('ggLeaderMenu', userid)
+    send('ggLeaderMenu', userid)

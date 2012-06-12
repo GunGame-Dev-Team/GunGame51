@@ -19,6 +19,7 @@ import es
 from cfglib import AddonCFG
 
 # GunGame Imports
+from gungame51.core import get_game_dir
 #   Cfg
 from cvars import CvarContextManager
 from instance import ConfigInstances
@@ -27,8 +28,7 @@ from instance import ConfigInstances
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-_base_config_path = path(
-    path(__file__).parent.rsplit('addons', 1)[0]).joinpath('cfg/gungame51')
+_base_config_path = get_game_dir('cfg/gungame51')
 
 
 # =============================================================================
