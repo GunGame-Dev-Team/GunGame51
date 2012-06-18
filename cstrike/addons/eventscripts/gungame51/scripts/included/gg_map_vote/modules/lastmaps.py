@@ -36,5 +36,11 @@ class _LastMaps(list):
             # Remove any maps that shouldn't be stored
             self[:] = self[last_maps - 1:]
 
+    def clear(self):
+        '''Clears the last x maps list'''
+
+        # Clear the list
+        self[:] = []
+
 # Get the _LastMaps instance
 last_x_maps = _LastMaps()

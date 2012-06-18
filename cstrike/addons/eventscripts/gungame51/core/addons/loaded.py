@@ -120,7 +120,7 @@ class _LoadedAddonInstance(object):
         gg_addon_unloaded = GG_Addon_Unloaded(
             addon=self.basename, type=self.addon_type)
 
-        # Fire the gg_addon_loaded event
+        # Fire the gg_addon_unloaded event
         gg_addon_unloaded.fire()
 
     def _register_events(self):

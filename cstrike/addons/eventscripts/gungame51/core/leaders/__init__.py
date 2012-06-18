@@ -9,6 +9,10 @@ $LastChangedDate$
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
+# EventScripts Imports
+#   ES
+from es import exists
+
 # GunGame Imports
 #   Events
 from gungame51.core.events import GG_Leader_Disconnect
@@ -168,9 +172,9 @@ class LeaderManager(dict):
 
     def disconnected_leader(self, userid):
         """Handles the disconnection of players."""
-        import es
+
         # Make sure the userid no longer exists on the server
-        if es.exists("userid", userid):
+        if exists("userid", userid):
             return
 
         # Make sure this player is a leader

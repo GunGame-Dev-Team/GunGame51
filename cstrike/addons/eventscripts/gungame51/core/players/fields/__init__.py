@@ -12,6 +12,9 @@ $LastChangedDate$
 from fields import *
 
 
+# =============================================================================
+# >> FUNCTIONS
+# =============================================================================
 def make_fields(**kwargs):
     for k, v in kwargs.items():
         if not isinstance(v, PlayerField):

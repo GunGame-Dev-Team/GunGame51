@@ -12,7 +12,6 @@ $LastChangedDate$
 # Python Imports
 from __future__ import with_statement
 from configobj import ConfigObj
-from path import path
 from random import choice
 from random import shuffle
 from mp3lib import mp3info

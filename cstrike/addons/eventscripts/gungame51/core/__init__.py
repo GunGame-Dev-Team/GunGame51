@@ -21,7 +21,7 @@ import es
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-game_path = path(path(
+_game_path = path(path(
     __file__).parent.rsplit('addons', 1)[0][:~0].replace('\\', '/'))
 
 
@@ -33,7 +33,7 @@ class GunGameError(Exception):
     pass
 
 
-class InfoList(list):
+class _InfoList(list):
     '''Class used to store the keylist and verify that attributes
         that start with "_" do not get added to the keylist'''
 
@@ -45,7 +45,7 @@ class InfoList(list):
         if not item.startswith('_'):
 
             # If not, add it to the list
-            super(InfoList, self).append(item)
+            super(_InfoList, self).append(item)
 
 
 class _GunGameInfo(es.AddonInfo):
@@ -54,8 +54,8 @@ class _GunGameInfo(es.AddonInfo):
     def __init__(self):
         '''Called on initialization of the class'''
 
-        # Store the keylist as an InfoList instance
-        self.keylist = InfoList()
+        # Store the keylist as an _InfoList instance
+        self.keylist = _InfoList()
 
         # Store the version
         self._version = get_version()
@@ -81,8 +81,8 @@ def get_game_dir(folder=None):
     @return An absolute path to the game directory plus \p dir.'''
     if folder:
         folder = str(folder).replace('\\', '/')
-        return game_path.joinpath(folder)
-    return game_path
+        return _game_path.joinpath(folder)
+    return _game_path
 
 
 def get_os():

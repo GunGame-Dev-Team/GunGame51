@@ -29,7 +29,7 @@ from gungame51.core.messaging.shortcuts import langstring
 # =============================================================================
 # >> GLOBAL VARIABLES
 # =============================================================================
-menu_folder = path(__file__).parent
+_menu_folder = path(__file__).parent
 
 
 # =============================================================================
@@ -48,7 +48,7 @@ class MenuManager(object):
 
     def load_menus(self):
         dbgmsg(0, langstring('Load_Commands'))
-        for file_path in menu_folder.files('*_menu.py'):
+        for file_path in _menu_folder.files('*_menu.py'):
             self._load(file_path)
 
     def _load(self, file_path):
