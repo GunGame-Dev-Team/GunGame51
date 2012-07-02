@@ -98,6 +98,10 @@ def give_weapon(userid, previousLevel):
     # bonus weapons
     if (weapsToStrip[0] == "hegrenade" and
       'gg_nade_bonus' in LoadedAddons and ggPlayer.weapon != "hegrenade"):
+
+        from ..gg_nade_bonus.gg_nade_bonus import get_weapon
+
+        # Add the Nade Bonus Weapon
         weapsToStrip.extend(get_weapon(userid))
 
     # If any weapons to be removed were just given, do not strip them
