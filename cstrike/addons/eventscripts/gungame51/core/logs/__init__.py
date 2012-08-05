@@ -115,13 +115,13 @@ class _LogManager(_HeaderManager, _TracebackManager):
 
         # Use a loop to determine if the file
         # exists for the current variable value
-        while get_game_dir(new_filename_base % n).isfile():
+        while get_game_dir(new_filename_base % old_log).isfile():
 
             # Increase the variable by 1
-            n += 1
+            old_log += 1
 
         # Return the path instance to the new filename
-        return get_game_dir(new_filename_base % n)
+        return get_game_dir(new_filename_base % old_log)
 
     def parse_old_errors(self):
         '''Method used to parse the current log file
