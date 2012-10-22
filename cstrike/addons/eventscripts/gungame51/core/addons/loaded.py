@@ -92,7 +92,7 @@ class _LoadedAddonInstance(object):
             MessageManager().load(translation, self.basename)
 
         # Call the addon's load function
-        self._call_block('load')
+        self.call_block('load')
 
         # Create the Addon Loaded event instance
         gg_addon_loaded = GG_Addon_Loaded(
@@ -114,7 +114,7 @@ class _LoadedAddonInstance(object):
             MessageManager().unload(translation, self.basename)
 
         # Call the addon's unload function
-        self._call_block('unload')
+        self.call_block('unload')
 
         # Create the Addon Unloaded event instance
         gg_addon_unloaded = GG_Addon_Unloaded(
@@ -127,7 +127,7 @@ class _LoadedAddonInstance(object):
         '''Registers all functions as events'''
 
         # Loop through all global functions in the addon
-        for event in self._possible_events():
+        for event in self._possible_events:
 
             # Register the event
             EventRegistry.register_for_event(event, self.globals[event])
@@ -136,12 +136,12 @@ class _LoadedAddonInstance(object):
         '''Unregisters all functions as events'''
 
         # Loop through all global functions in the addon
-        for event in self._possible_events():
+        for event in self._possible_events:
 
             # Unregister the event
             EventRegistry.unregister_for_event(event, self.globals[event])
 
-    def _call_block(self, blockname, *a, **kw):
+    def call_block(self, blockname, *a, **kw):
         '''Calls a function for the addon with arguments and keywords'''
 
         # Does the block exist as a function in the addon?
@@ -150,6 +150,7 @@ class _LoadedAddonInstance(object):
             # Call the function with the given arguments and keywords
             self.globals[blockname](*a, **kw)
 
+    @property
     def _possible_events(self):
         '''Generator used to get all possible events within an addon'''
 

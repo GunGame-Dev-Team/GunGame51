@@ -116,7 +116,7 @@ class AddonManager(object):
         '''
 
         # Call the function with the given arguments and keywords
-        instance._call_block(blockname, *a, **kw)
+        instance.call_block(blockname, *a, **kw)
 
     @property
     def __loaded__(self):
